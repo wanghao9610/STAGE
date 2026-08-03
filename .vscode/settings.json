@@ -1,4 +1,27 @@
 {
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/*/**": true,
+        ".*/**": true,
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/__pycache__/**": true,
+        "**/.pyc": true,
+        "**/.*/**": true,
+        "**/*.pyc": true,
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+    },
     // Aligns with execs/run.sh: manus/main.tex → wkdrs/builds/ (out-of-tree).
     // extensions.latex
     "[latex]": {
