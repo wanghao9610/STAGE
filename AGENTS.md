@@ -47,7 +47,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 | `stage-copy-editor` | polish prose; never meaning, never numbers |
 | `stage-clms-auditor` | trace every number to a fingerprint |
 | `stage-cite-auditor` | verify citations against reading notes |
-| `stage-peer-reviewer` | simulated review, one lens per run |
+| `stage-peer-reviewer` | simulated five-perspective review panel |
 | `stage-resp-writer` † | reviews → point ledger → response + promises |
 | `stage-subm-packer` † | preflight, package, submission record, freeze |
 | `stage-flow-status` | read-only status and the one next action |

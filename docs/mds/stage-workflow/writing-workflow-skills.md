@@ -33,7 +33,7 @@ audits — cheap, repeat at will
   → stage-cite-auditor: every \cite key and every assertion ⇄ a reading note
 
 the submission cycle — one venue attempt per cycls/<venue>_<year>/
-  → stage-peer-reviewer: simulated review, one lens per run, real-review format
+  → stage-peer-reviewer: five-perspective simulated panel, real-review format
   → stage-resp-writer: reviews → point ledger → response + promise checkboxes
   → stage-subm-packer: build+lint gate, checklist, package, SUBMISSION record,
     freeze/<cycle>_<date> tag
@@ -101,7 +101,7 @@ The citation counterpart: every `\cite` key must resolve in the bib; every asser
 
 ### stage-peer-reviewer
 
-A simulated review, one lens per run — novelty, rigor, clarity, or related-work — with the rubric taken from the active cycle's `venue.yml`. Output goes to `cycls/<cycle>/reviews/SIM_REVIEW_<lens>_<date>.md` in the same format as a real review (summary, strengths, weaknesses, questions, rating), with each weakness naming the claim IDs it attacks — which is what lets `stage-resp-writer` treat simulated and real reviews identically. It never edits the manuscript: it attacks, and the drafting loop answers.
+A simulated program committee. Panel mode dispatches five read-only perspectives — novelty & related work, technical soundness, experimental rigor & reproducibility, clarity & presentation, and a devil's advocate who builds the strongest honest rejection case and rules whether it survives rebuttal — each with a question bank, a citation-integrity contract (references named only when whitelisted in the paper's own bib or verified by a logged live fetch; memory is never a source), and a structured return. The chair verifies every anchor, synthesizes one meta-review, and scores by matching anchored rubric bands — a 6-point conference scale or journal decision tiers per `venue.yml`'s `scale:` — with hard caps (verified undiscussed prior art doing the core contribution caps the score at 2) and an honest confidence; `quick` runs a single-pass version. The durable artifact is `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md`, weaknesses naming the claim IDs they attack — which is what lets `stage-resp-writer` treat simulated and real reviews identically; per-perspective reviews and the citation audit live in the run's `wkdrs/reports/` directory. It never edits the manuscript: it attacks, and the drafting loop answers.
 
 ### stage-resp-writer
 

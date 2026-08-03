@@ -97,7 +97,7 @@ perspective: <one of the five>
 paper_summary: <3–5 sentences in your own words — proves the read; the meta-reviewer
   discards a review whose summary the paper does not support>
 strengths: [{point, anchor}]
-major_weaknesses: [{point, anchor, evidence, fixable: yes|no|partially}]
+major_weaknesses: [{point, anchor, evidence, fixable: yes|no|partially, attacked_claims: [<IDs>]}]
 minor_weaknesses: [{point, anchor}]
 questions: [<questions to the authors, each answerable in a rebuttal>]
 scores: {<this perspective's dimension>: 1–6, overall_lean: 1–6, confidence: 1–5}
@@ -109,6 +109,8 @@ failures: [{step_or_host, error}]
 
 Anchors are locations in the paper — `§3.2`, `Tab. 2`, `Fig. 4`, `Eq. (5)`, or a tex source line.
 Every strength and weakness carries one; an unanchored item will be dropped at synthesis and the
-drop reported. Scores use the anchor bands of the rubric file you were given, not your gut: state
+drop reported. `attacked_claims` lists the claim-ledger IDs (`notes/claims.md`) the weakness
+undermines — `[]` when none applies; the chair carries the IDs into the meta-review so the
+response stage can map each attack without re-deriving it. Scores use the anchor bands of the rubric file you were given, not your gut: state
 the band, then check the paper against the band's description. On the journal scale, put your
 tier lean in `overall_lean` as its 6-point equivalent per the mapping in `rubric-journal.md`.

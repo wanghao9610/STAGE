@@ -150,7 +150,7 @@ The tool-neutral half. **How** to ask — AskUserQuestion, a structured user-inp
 
    The user sets the level; the skill **resolves it once at the start of the run**, before the first question, from three sources in precedence order: an `INVOLVE=` line the user has added to `.env` (`low` / `medium` / `high`; absent, unset, or invalid → `medium` — the line is optional and `.env.example` does not ship it), then an `involve=<level>` token in the invocation, then plain language mid-run ("ask me less", "ask me everything") — the last instruction wins for the rest of the run. Reading it is a one-line lookup (`grep -sE '^INVOLVE=' .env || true`), resolved once, riding in the skill's opening load call rather than costing a call of its own.
 
-   **The token is not an argument.** `involve=<level>` is stripped from the invocation before anything else is resolved — the section (§5.2), the cycle, the mode, the lens. This holds in **every** skill, including ones whose `SKILL.md` never mentions the level: a skill matching its first argument against outline titles must not see `involve=low` and treat it as a section name. A skill that accepts no arguments at all still strips it.
+   **The token is not an argument.** `involve=<level>` is stripped from the invocation before anything else is resolved — the section (§5.2), the cycle, the mode. This holds in **every** skill, including ones whose `SKILL.md` never mentions the level: a skill matching its first argument against outline titles must not see `involve=low` and treat it as a section name. A skill that accepts no arguments at all still strips it.
 
    - `medium` — the default: this file and every `SKILL.md` exactly as written. The level adds nothing.
    - `low` — a judgment call is not asked: take the option you would have marked recommended, and log it (item 8). A genuinely open question has no recommendation to take, so it is asked at every level — and when unsure which kind a question is, treat it as the more interactive kind.
@@ -180,7 +180,7 @@ Every skill's durable output, in one table. `stage-flow-status` reads this as th
 | Figures | `stage-figs-designer` | `manus/figs/<slug>.pdf`, `manus/figs/srcs/<slug>.*` | Figures row in outline |
 | References | `stage-refs-curator` | `manus/bibs/reference.bib`, `notes/refs/refs_index.md`, `notes/refs/<ABBREV>.md` | index presence |
 | Audit reports | `stage-clms-auditor`, `stage-cite-auditor`, `stage-copy-editor` | `wkdrs/reports/CLAIMS_<date>.md`, `CITES_<date>.md`, `POLISH_<date>.md` (ephemeral) | date in filename |
-| Simulated review | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<lens>_<date>.md` | date in filename |
+| Simulated review | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` — the panel meta-review; per-perspective working files in `wkdrs/reports/peer_<cycle>_<date>/` | date in filename |
 | Response | `stage-resp-writer` | `cycls/<cycle>/response/RESPONSE_<date>.md`, promises in `tasks/<cycle>_promises.md` | promise checkboxes |
 | Submission | `stage-subm-packer` | `cycls/<cycle>/SUBMISSION_<date>.md`, git tag `freeze/<cycle>_<date>`, package under `wkdrs/builds/` | `frozen:` |
 | Status | `stage-flow-status` | — (read-only; reports in chat) | — |
@@ -237,6 +237,7 @@ full_deadline: 2026-11-13
 response_type: rebuttal       # rebuttal | response-letter | none
 response_limit: one page      # the venue's official wording
 checklist: none               # none | neurips | acl-arr | custom
+scale: conference             # review rubric track: conference | journal (missing = conference)
 confirmed:                    # date the USER confirmed these numbers; never filled by a skill on its own
 ```
 
@@ -264,7 +265,7 @@ Note frontmatter: `title:`, `venue:`, `year:`, `bibkey:`, `added:`. Sections: `#
 
 ### 8.8 Reviews and response
 
-`SIM_REVIEW_<lens>_<date>.md` frontmatter: `cycle:`, `lens:` (novelty | rigor | clarity | related-work), `date:`. Sections: `## Summary`, `## Strengths` (S1…), `## Weaknesses` (W1…, each naming attacked claim IDs where applicable), `## Questions` (Q1…), `## Rating` (venue scale).
+`SIM_REVIEW_<date>.md` is the peer-review panel's meta-review, venue-shaped. Frontmatter: `type: peer_review`, `target:`, `cycle:`, `scale:` (conference-6 | journal), `mode:` (panel | quick), `generated:`, `recommendation:`. Sections: `## Summary`, `## Strengths`, `## Major Weaknesses` (numbered; each anchored, naming the claim IDs it attacks and the perspectives that raised it), `## Minor Weaknesses`, `## Questions to the Authors`, `## Limitations & Ethics`, `## Concern Matrix`, `## Recommendation` (anchored band or journal tier, confidence, every triggered cap named), `## Synthesis Notes`. The full templates, the five perspective briefs, and the rubrics live in `stage-peer-reviewer`'s `references/`; per-perspective reviews and the citation audit stay in the run's `wkdrs/reports/peer_<cycle>_<date>/` directory.
 `RESPONSE_<date>.md` frontmatter: `cycle:`, `date:`, `sources:` (review files read). Sections: `## Point ledger` `| Point | Reviewer | Attacked claims | Evidence | Response summary | Promise? |`, `## Draft response` (within `response_limit`), and promises mirrored to `tasks/<cycle>_promises.md` as `- [ ]` checkboxes.
 
 ### 8.9 `notes/adopt.md`
@@ -307,6 +308,7 @@ A paper is a chain of checkable statements, and a writing agent's cheapest failu
 - **Checkable** means the note's `## Citable facts` holds a fact precise enough to decide the sentence. "ODISE reaches 23.4 PQ on ADE20K" needs that number in ODISE's note; "unlike [X], we require no box supervision" needs X's note to state that X requires box supervision. A bib entry alone backs nothing: it proves the paper exists, not what it says.
 - Grouped citations assert too: "[A,B,C] rely on frozen backbones" asserts it of each of A, B, and C, and each needs the fact in its note.
 - **The fix for an unbacked assertion is never to soften it into vagueness** — a vague mispositioning of related work is still false. The honest paths: read the paper and write the note (`/stage-refs-curator`), mark it `\todo{verify: does X require box supervision?}`, or drop the assertion. `stage-cite-auditor` flags unverifiable assertions in its report; it never silently "fixes" prose, because a silent fix is an unreviewed claim change.
+- **Review artifacts extend this rule beyond the manuscript.** A simulated review (`stage-peer-reviewer`) may name a work the manuscript does not cite only under its citation-integrity contract: the reference is **whitelist** (already in `manus/bibs/reference.bib`) or **verified** — fetched during that run, with the record (title, authors, year, venue, URL) and the query that found it logged in the run's citation audit. A reference recalled from memory is treated as nonexistent; what cannot be verified is phrased as a direction ("check whether prior work exists on X"), never as a named fact. This is the writing workflow's one sanctioned use of live search; the skill states its polite rate, and §2's bulk-fetch line still binds.
 
 **(c) Venue rules in `venue.yml` are entered only as user-confirmed facts** — skills never invent page limits or deadlines.
 

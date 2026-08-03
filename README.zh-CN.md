@@ -215,7 +215,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 | `stage-copy-editor` | 对一个章节或全稿做润色：清晰、流畅、记号一致、按预算删减——绝不改技术含义和任何数字 | `wkdrs/reports/POLISH_<date>.md` |
 | `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转台账状态，检查证据过期 | `wkdrs/reports/CLAIMS_<date>.md` + `tasks/` 条目 |
 | `stage-cite-auditor` | 每个 `\cite` key 都能解析；关于被引论文的每个断言都能对上一份阅读笔记——对不上的断言被标记，绝不悄悄改掉 | `wkdrs/reports/CITES_<date>.md` |
-| `stage-peer-reviewer` | 模拟评审，每次一个视角（novelty、rigor、clarity、related-work），评分标准来自 `venue.yml`，产出与真实评审同格式；绝不修改稿件 | `cycls/<cycle>/reviews/SIM_REVIEW_<lens>_<date>.md` |
+| `stage-peer-reviewer` | 模拟程序委员会：五视角评审团（新颖性与相关工作、技术正确性、实验严谨性、清晰度、魔鬼代言人），引用只认 whitelist/verified，按锚定评分带 + 封顶规则打分；`quick` 为单遍精简模式；绝不修改稿件 | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
 | `stage-resp-writer` † | 把真实与模拟评审解析成逐点台账，把每个攻击映射到论断和证据，在 venue 限制内起草回复，把每个承诺的修改记为复选框 | `cycls/<cycle>/response/RESPONSE_<date>.md`、`tasks/<cycle>_promises.md` |
 | `stage-subm-packer` † | 投稿前检查与打包：build + lint 必须通过、走查检查单、完整性扫描、camera/补充材料/arXiv 包、投稿记录、冻结标签——camera-ready 模式在承诺未清空前拒绝打包 | `cycls/<cycle>/SUBMISSION_<date>.md`、标签 `freeze/<cycle>_<date>` |
 | `stage-flow-status` | 全流程的只读地图：章节/图/表状态、按状态统计的论断覆盖、证据新鲜度、周期状态、最近一次构建——以及唯一的下一步行动和它的准确命令 | 聊天内报告；从不写文件 |
@@ -232,7 +232,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 6. **起草** —— `/stage-sect-drafter` 每次一个章节，依据简报、证据和论断；`/stage-tabs-builder` 从证据生成表格；`/stage-figs-designer` 把每张图从源文件做到渲染 PDF。台账状态翻到 `drafted`。
 7. **润色** —— `/stage-copy-editor`：清晰、流畅、记号一致；含义和数字碰不得。
 8. **审计** —— `/stage-clms-auditor` 把每个数字追溯到指纹；`/stage-cite-auditor` 核查每条引用和断言；每个失败都变成一条 `tasks/` 条目和一个台账状态，而不是埋在报告里的一行。
-9. **评审与回复** —— `/stage-peer-reviewer` 每次以一个视角做模拟评审，写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点台账、一份不超 venue 限制的回复，以及 `tasks/` 里的承诺复选框。
+9. **评审与回复** —— `/stage-peer-reviewer` 召集五视角模拟评审团（或用 `quick` 单遍模式），把 meta-review 写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点台账、一份不超 venue 限制的回复，以及 `tasks/` 里的承诺复选框。
 10. **打包冻结** —— `/stage-subm-packer`：build 和 lint 必须通过、走查检查单、包放到 `wkdrs/builds/` 下、写出 `SUBMISSION_<date>.md`、打出标签 `freeze/<cycle>_<date>`。camera-ready 模式在 `tasks/<cycle>_promises.md` 还有未勾选项时拒绝打包。
 
 ## 证据、指纹与论断台账

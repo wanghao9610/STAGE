@@ -77,8 +77,8 @@ that `$stage-peer-reviewer` can simulate a panel meanwhile. No `spawn_agent` (§
 
 ### Step 2: Parse reviews into points
 
-Per file: fix the reviewer label — `received_R2.md` → R2, `SIM_REVIEW_rigor_<date>.md` →
-SIM-rigor — then split the text into atomic points: one weakness, question, or request each.
+Per file: fix the reviewer label — `received_R2.md` → R2, `SIM_REVIEW_<date>.md` →
+SIM-<date> — then split the text into atomic points: one weakness, question, or request each.
 Point IDs reuse the reviewer's own numbering where present (`R2.W1`), else number in reading
 order. Quote or tightly paraphrase; never soften a reviewer's words while carrying them into
 the ledger.
@@ -125,7 +125,7 @@ promise checkboxes; side effect: `weakened` downgrades in `notes/claims.md`. Exa
 ---
 cycle: <cycle>
 date: YYYY-MM-DD
-sources: [reviews/received_R2.md, reviews/SIM_REVIEW_rigor_<date>.md]
+sources: [reviews/received_R2.md, reviews/SIM_REVIEW_<date>.md]
 ---
 ## Point ledger
 | Point | Reviewer | Attacked claims | Evidence | Response summary | Promise? |

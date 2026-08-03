@@ -20,7 +20,7 @@ meta-review, and the citation audit. Fill every section; a section with nothing 
 
 ## Major Weaknesses
 1. <point> (<anchor>)
-   Evidence: <evidence> · Fixable: <yes|no|partially>
+   Evidence: <evidence> · Fixable: <yes|no|partially> · Attacks: <claim IDs or —>
 
 ## Minor Weaknesses
 - <point> (<anchor>)
@@ -59,7 +59,7 @@ perspectives are not independent."
 ---
 type: peer_review
 target: <manus/main.tex | path>
-venue: <venue>_<year>
+cycle: <venue>_<year>
 scale: <conference-6 | journal>
 mode: <panel | quick>
 generated: <YYYY-MM-DD>
@@ -75,7 +75,7 @@ recommendation: "<4 — Borderline Accept (confidence 3) | Major Revision>"
 - <consolidated, with anchors and which perspectives raised each>
 
 ## Major Weaknesses
-1. <consolidated point> (<anchor>) — raised by <perspectives>; fixable: <…>
+1. <consolidated point> (<anchor>) — attacks <claim IDs or —>; raised by <perspectives>; fixable: <…>
 
 ## Minor Weaknesses
 - <batched, with anchors>
