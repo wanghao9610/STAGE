@@ -1,10 +1,12 @@
-{
+{   
+    // Exclude files from being watched by the file system watcher
     "files.watcherExclude": {
         "**/.git/objects/**": true,
         "**/.git/subtree-cache/**": true,
         "**/node_modules/*/**": true,
         ".*/**": true,
     },
+    // Exclude files from being indexed by the search engine
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
@@ -17,6 +19,7 @@
         "**/.*/**": true,
         "**/*.pyc": true,
     },
+    // Exclude files from being searched by the search engine
     "search.exclude": {
         "**/node_modules": true,
         "**/bower_components": true,
