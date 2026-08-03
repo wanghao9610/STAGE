@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".codex/hooks/stage_memory.sh",
+            "statusMessage": "Loading STAGE project memory"
+          }
+        ]
+      }
+    ]
+  }
+}

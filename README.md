@@ -31,6 +31,7 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - [Writing workflow](#writing-workflow)
 - [The ten-step path to a submission](#the-ten-step-path-to-a-submission)
 - [Evidence, fingerprints, and the claim ledger](#evidence-fingerprints-and-the-claim-ledger)
+- [Project memory](#project-memory)
 - [Updating STAGE skills and workflow docs](#updating-stage-skills-and-workflow-docs)
 - [Project conventions](#project-conventions)
 - [Adapting STAGE to a new paper](#adapting-stage-to-a-new-paper)
@@ -47,6 +48,7 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - **A complete writing lifecycle** through fifteen complementary skills, in the order they run: wire the repo, curate evidence, shape the story, outline the paper, draft each section, build tables from evidence, design figures, curate references, polish the prose, audit every number, audit every citation, simulate review, write the response, pack the submission, and report status.
 - **Submission cycles as data**: each venue attempt lives in `cycls/<venue>_<year>/` with a user-confirmed `venue.yml` profile, received and simulated reviews, the response, and a frozen submission record.
 - **One workflow, four agent trees**: the same fifteen skills for Claude Code (`.claude/skills/`), Codex (`.agents/skills/`), Cursor (`.cursor/skills/`), and Kimi Code (`.kimi-code/skills/`), differing only in invocation prefix and tool names — plus one shared `AGENTS.md`, whose body is mirrored into `.cursor/rules/` as an always-on Cursor rule.
+- **A memory the paper owns**: what a session learns that no file in the repository holds — a TeX toolchain quirk, a standing preference of yours, a framing already tried and rejected — is recorded under `.stage/memory/` and put in front of the next session by a hook, in whichever tool you drive STAGE with.
 - **zh-CN mirrors for human readers**: `SKILL_zh.md` beside every `SKILL.md`, `*_zh.md` beside the peer-reviewer references, and `*.zh-CN.md` beside the conventions and the skills guide — kept in step, never loaded at runtime, and the English files stay authoritative.
 
 See [Writing workflow](#writing-workflow) for what each skill does and how to invoke it. The [Writing Workflow Skills Guide](docs/mds/stage-workflow/writing-workflow-skills.md) adds a paragraph per skill and the pipeline diagram; the rules every skill shares are in the [Writing Workflow Conventions](docs/mds/stage-workflow/writing-workflow-conventions.md).
@@ -82,12 +84,22 @@ STAGE/
 │   ├── htmls/              # The landing pages: stage.html + stage_zh.html
 │   ├── mds/stage-workflow/ # Conventions + skills guide (upstream-managed)
 │   └── srcs/               # Documentation images and other static assets
-├── .claude/skills/         # Writing workflow skills for Claude Code
+├── .stage/memory/          # Project memory: what earlier sessions learned (local/ is git-ignored)
+├── .claude/
+│   ├── skills/             # Writing workflow skills for Claude Code
+│   ├── hooks/              # Session hook: injects the project-memory index
+│   └── settings.json       # Registers that hook
 ├── .agents/skills/         # Writing workflow skills for Codex (+ agents/openai.yaml each)
+├── .codex/                 # Codex session hook + hooks.json (skills live in .agents/)
 ├── .cursor/
 │   ├── skills/             # Writing workflow skills for Cursor
-│   └── rules/              # Always-on rules: AGENTS.md body + skill-root ownership
-├── .kimi-code/skills/      # Writing workflow skills for Kimi Code
+│   ├── rules/              # Always-on rules: AGENTS.md body + skill-root ownership
+│   ├── hooks/              # Session hook, registered in hooks.json
+│   └── hooks.json
+├── .kimi-code/
+│   ├── skills/             # Writing workflow skills for Kimi Code
+│   ├── hooks/              # Session hook + install.sh (Kimi registers globally)
+│   └── hooks.example.toml  # The registration snippet install.sh writes for you
 ├── .cursorignore           # Keeps builds and LaTeX junk out of Cursor's index
 ├── .env.example            # Local configuration example
 ├── AGENTS.md               # Shared instructions for AI writing agents
@@ -246,6 +258,8 @@ The skeleton stands on its own — the layout, `.env`, `run.sh`, and `import.sh`
 
 `/stage-flow-status` is the one to remember: it reads the outline, ledger, manifest, and cycle state on disk and names the single next action with its exact command, so you never have to recall where you left off.
 
+**One hook, once per machine.** A session hook puts the [project memory](#project-memory) index in front of the agent at the start of every session. Claude, Codex, and Cursor ship it already registered in `.claude/settings.json`, `.codex/hooks.json`, and `.cursor/hooks.json`. Kimi has no project-level hook config, so run `bash .kimi-code/hooks/install.sh` once — it registers the hook in your global Kimi config, backs that file up first, does nothing on a second run, and then covers every STAGE paper on the machine. On Codex, registered is not yet running: a project hook fires only once the project is trusted and the hook approved, so run `/hooks` in the Codex CLI to approve it, and again whenever it changes. Until you do, no memory reaches the session and nothing points out the gap. A paper adopted before this hook existed keeps its own registration file — `execs/update.sh` never overwrites one, and names the hook missing from it instead.
+
 ## Writing workflow
 
 STAGE includes fifteen complementary skills that turn imported evidence and a story into a submitted paper with an auditable claim trail.
@@ -338,6 +352,17 @@ Lifecycle: `proposed` (story) → `drafted` (stated in text) → `verified` (aud
 
 The fabrication boundary (conventions §9) closes the loop: every number in `manus/` either traces to a fingerprinted `mates/` entry or is written as `\todo{...}` — no third state; every assertion about a cited paper must be checkable against a reading note; venue rules are entered only as user-confirmed facts; and no skill may weaken these rules "to be helpful".
 
+## Project memory
+
+What a session learns that no file in the repository owns — a build that only works under one engine on this machine, a standing preference of yours, a framing the simulated panel already rejected — is recorded in the paper at `.stage/memory/`, not in whichever tool you happened to be driving. One file per fact, one line per fact in `.stage/memory/MEMORY.md`, and a session hook puts that index in front of the agent at the start of every session, in all four tools.
+
+Four kinds: `env` (a machine or TeX-toolchain fact, usually learned by failing), `pref` (how you want the writing done), `insight` (a judgment that outlived the run that produced it), and `deadend` (tried, rejected, not worth retrying — the one a paper needs most between cycles). Two rules keep the store from becoming a second, drifting copy of the repository:
+
+- **A fact is recorded there only when no file already owns it.** A number belongs to a fingerprinted `mates/` entry, a claim to `notes/claims.md`, a page limit to the cycle's `venue.yml`, what a paper says to `notes/refs/`, a promise to `tasks/`. Memory holds the residue.
+- **A memory is never a source.** It can never back a number in `manus/`, a venue rule, or an assertion about a cited work — the fabrication boundary does not soften because a memory recalls the value. Where a memory disagrees with a file in the repository, the file wins.
+
+Facts that hold only on this machine go to `.stage/memory/local/`, which git ignores the way it ignores `.env`; an `env` entry whose last confirmation is over 180 days old is flagged stale where the session sees it, since a machine changes under a fact recorded about it. Nothing is recorded without your say-so: the agent offers, you decide — and `INVOLVE=low` in `.env` turns that into record-and-tell. The file format, the index line the hooks parse, and how a memory is retired are in [Project Memory](docs/mds/stage-workflow/memory_spec.md).
+
 ## Updating STAGE skills and workflow docs
 
 After creating a paper from STAGE, you can sync later STAGE skill and writing workflow doc releases without touching the manuscript, the evidence, the notes, or Git remotes:
@@ -350,13 +375,14 @@ By default, the command updates these paths from STAGE's `main` branch:
 
 - `AGENTS.md` and `.cursor/rules/` — the shared agent instructions and the Cursor rule that copies their body; your own edits to them are replaced, and the two move as a pair, since one is the other's body and they must not drift
 - `.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — the same fifteen skills once per harness
-- `docs/mds/stage-workflow/` — the workflow conventions and the skill guide, in both editions
+- `.claude/hooks/`, `.codex/hooks/`, `.cursor/hooks/`, `.kimi-code/hooks/` and `.kimi-code/hooks.example.toml` — the session hook that injects the project-memory index, once per harness; the store under `.stage/memory/` is the paper's own and is never synced
+- `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, and the memory spec, in both editions
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
 - `execs/update.sh` — the updater itself, so that no repository strands on an update mechanism too old to fetch its successor. It is installed by rename: the run doing the update finishes on the old file, and the next invocation uses the new one
 
 The repository it pulls from is `STAGE_REPOSITORY`, resolved in that order: the environment, then `.env`, then the default `https://github.com/wanghao9610/STAGE.git`. Set it in `.env` to track a fork permanently, or prefix a single command — `STAGE_REPOSITORY=… bash execs/update.sh` — to override it once. Nothing else in `.env` is ever synced, which is why both entrypoints are safe to replace: an instance's configuration does not live in them.
 
-Harness configuration — `.cursorignore` — is installed only when missing, and never overwritten unless you pass `--force`. When a kept file differs from upstream, the command prints a note naming how many. Papers created before the updater learned to sync itself should refresh it once by hand, since an older `execs/update.sh` never overwrites itself:
+Harness configuration — `.cursorignore` and the three hook registrations (`.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`) — is installed only when missing, and never overwritten unless you pass `--force`, since a paper may have added its own settings to those files. When a kept file differs from upstream, the command prints a note naming how many; when a kept registration does not name the memory hook, it says so, because the alternative is a hook that silently never fires. Papers created before the updater learned to sync itself should refresh it once by hand, since an older `execs/update.sh` never overwrites itself:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update.sh -o execs/update.sh
@@ -385,6 +411,7 @@ Working on STAGE itself rather than on a paper? `bash .github/scripts/check_cons
 5. Builds and ephemeral reports live under `wkdrs/` and are never committed; durable outcomes land as status flips in `notes/claims.md` and entries in `tasks/`, not as report files.
 6. Use `execs/run.sh` as the single build entrypoint and keep utilities in `execs/scpts/`; read runtime paths from `.env` rather than hardcoding machine-specific ones.
 7. Every number in `manus/` either traces to a fingerprinted `mates/` entry or is written as `\todo{...}` — no third state — and every date written into an artifact comes from the system clock.
+8. What a session learns that no file above owns goes to `.stage/memory/`, offered before it is written, with machine-specific facts in `.stage/memory/local/`; a memory never sources a number, a venue rule, or a claim about a cited paper.
 
 The full collaboration and writing conventions are in [`AGENTS.md`](AGENTS.md) and [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md).
 

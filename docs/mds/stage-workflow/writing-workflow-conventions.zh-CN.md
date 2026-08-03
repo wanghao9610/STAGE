@@ -365,6 +365,7 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 | 投稿周期 | `cycls/<venue>_<year>/`：`venue.yml`、`template/`（官方 venue 模板包，整份解包，逐字节，永不编辑）、`reviews/`、`response/`、`SUBMISSION_<date>.md` |
 | 修订草稿、承诺清单 | `tasks/` |
 | 构建与临时报告 | `wkdrs/builds/`、`wkdrs/reports/`（gitignore，可重新生成） |
+| 早先会话学到、又没有别的文件认领的事实 | `.stage/memory/`；只对本机成立的放 `.stage/memory/local/`，git 忽略（[`memory_spec.zh-CN.md`](memory_spec.zh-CN.md)） |
 | 入口脚本 | `execs/run.sh`、`execs/update.sh`——**execs/ 根目录是封闭的**；工具脚本放 `execs/scpts/`。`run.sh` 由上游管理，`execs/update.sh` 会覆盖它；每个项目自己的设置住在 `.env` 里 |
 | 工作流文档（上游管理） | `docs/mds/stage-workflow/` |
 

@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # execs/update.sh — sync STAGE-managed content from the upstream template (the
-# four per-harness skill trees, docs/mds/stage-workflow/, the shared agent
-# instructions, and both execs/ entrypoints — this script included), or install
-# the STAGE skeleton into an existing paper repo with --adopt.
+# four per-harness skill trees, the four session-hook trees, docs/mds/stage-workflow/,
+# the shared agent instructions, and both execs/ entrypoints — this script
+# included), or install the STAGE skeleton into an existing paper repo with --adopt.
 
 STAGE_REF="main"
 SKILL_NAME=""
@@ -27,6 +27,17 @@ SKILL_ROOTS=(
 )
 DOCS_TREE="docs/mds/stage-workflow"
 
+# STAGE-owned session-hook assets: the script that injects the project-memory
+# index (.stage/memory/) at the start of a session, one copy per harness because
+# each runtime spells the event and the output field differently. Overwritten on
+# update like the skills — the store itself is the paper's and is never synced.
+HOOK_TREES=(
+    ".claude/hooks"
+    ".codex/hooks"
+    ".cursor/hooks"
+    ".kimi-code/hooks"
+)
+
 # Single STAGE-managed files an update overwrites alongside the trees above.
 # execs/run.sh is here because the skills call it by name and by flag — a paper
 # repo that syncs a skill using `run.sh --main` while keeping a run.sh that
@@ -43,6 +54,9 @@ DOCS_TREE="docs/mds/stage-workflow"
 SELF_PATH="execs/update.sh"
 SYNC_FILES=(
     "execs/run.sh"
+    # Kimi has no project-level hook config, so its registration snippet ships
+    # as documentation beside the hook rather than as a config an update keeps.
+    ".kimi-code/hooks.example.toml"
     "${SELF_PATH}"
 )
 
@@ -59,8 +73,22 @@ AGENT_RULES_TREE=".cursor/rules"
 # says so. A flat file list on purpose: an empty array expands to an unbound
 # variable under `set -u` on bash 3.2, so a tree joins this only with the
 # guarded expansion that needs.
+#
+# The last three register the session hooks. They are kept rather than
+# overwritten because a paper repo may have added its own settings to them — so
+# a repo adopted before the memory hook existed keeps a config that does not
+# register it, which HOOK_CONFIGS below turns into a printed line instead of a
+# hook that silently never fires.
 HARNESS_FILES=(
     ".cursorignore"
+    ".claude/settings.json"
+    ".codex/hooks.json"
+    ".cursor/hooks.json"
+)
+HOOK_CONFIGS=(
+    ".claude/settings.json"
+    ".codex/hooks.json"
+    ".cursor/hooks.json"
 )
 
 log() {
@@ -84,6 +112,27 @@ harness_rels() {
     done
 }
 
+# A kept registration config that does not name the memory hook: the hook is
+# installed, nothing errors, and no memory ever reaches a session. Reported, not
+# repaired — merging into a file the project may have extended is the user's.
+report_unregistered_hooks() {
+    local cfg
+    for cfg in "${HOOK_CONFIGS[@]}"; do
+        [[ -e "${ROOT_DIR}/${cfg}" ]] || continue
+        if ! grep -q 'stage_memory\.sh' "${ROOT_DIR}/${cfg}" 2>/dev/null; then
+            log "NOTE: ${cfg} was kept and does not register the STAGE project-memory hook."
+            log "      Merge the hook entry from upstream ${cfg} to enable it."
+        elif [[ "${cfg}" == ".codex/hooks.json" ]]; then
+            # Registering it is not enough on Codex: a project hook runs only
+            # once the project is trusted and the hook itself approved, and a
+            # changed hook needs approving again. Nothing reports the gap — the
+            # hook simply does not fire and no memory reaches the session.
+            log "NOTE: ${cfg} is registered, but Codex runs a project hook only after you approve it."
+            log "      Run /hooks in the Codex CLI and approve it — re-approve whenever it changes."
+        fi
+    done
+}
+
 usage() {
     cat <<'EOF'
 Usage: bash execs/update.sh [ref] [--skill NAME] [--force]
@@ -92,13 +141,14 @@ Usage: bash execs/update.sh [ref] [--skill NAME] [--force]
 
 Overwrite the STAGE-managed content — the shared agent instructions (AGENTS.md
 and the Cursor rule that copies its body), the four per-harness skill trees
-(.claude/skills/, .agents/skills/, .cursor/skills/, .kimi-code/skills/),
-docs/mds/stage-workflow/, and both execs/ entrypoints, run.sh and this script —
-with files from upstream. The default ref is main; a branch or tag may be
-supplied instead. Local edits to those paths are replaced, AGENTS.md included;
-the manuscript, evidence, and notes are never touched. Use --skill to update
-only the named skill across all four skill trees (it leaves everything else,
-entrypoints and docs included, alone).
+(.claude/skills/, .agents/skills/, .cursor/skills/, .kimi-code/skills/), the
+four session-hook trees that inject the project-memory index, docs/mds/stage-workflow/,
+and both execs/ entrypoints, run.sh and this script — with files from upstream.
+The default ref is main; a branch or tag may be supplied instead. Local edits to
+those paths are replaced, AGENTS.md included; the manuscript, evidence, notes,
+and the memory store under .stage/memory/ are never touched. Use --skill to
+update only the named skill across all four skill trees (it leaves everything
+else, entrypoints and docs included, alone).
 
 Neither entrypoint holds project configuration — everything an instance sets
 lives in .env, which is git-ignored and never synced — so both are safe to
@@ -107,9 +157,11 @@ execs/update.sh syncs itself, so no repo strands on an update mechanism too old
 to fetch its successor: it is installed by rename, which leaves this running
 process on the old file and gives the next invocation the new one.
 
-Harness configuration an instance may have edited — .cursorignore — is
-installed when it is absent and otherwise kept, however far it has drifted from
-upstream; only --force overwrites it.
+Harness configuration an instance may have edited — .cursorignore and the three
+hook registrations (.claude/settings.json, .codex/hooks.json, .cursor/hooks.json)
+— is installed when it is absent and otherwise kept, however far it has drifted
+from upstream; only --force overwrites it. A kept registration that does not name
+the project-memory hook is reported, since the hook would otherwise never fire.
 
 --diff previews an update without changing anything: it lists upstream files
 that are new or differ from the local copies, harness configuration that
@@ -201,12 +253,18 @@ if [[ "${ADOPT}" == true ]]; then
     # Directories merged file by file, and single files, all copy-if-absent.
     ADOPT_TREES=(
         "${SKILL_ROOTS[@]}"
+        "${HOOK_TREES[@]}"
         "${AGENT_RULES_TREE}"
         "${DOCS_TREE}"
     )
     ADOPT_FILES=(
         "${AGENT_DOC}"
         "${HARNESS_FILES[@]}"
+        ".kimi-code/hooks.example.toml"
+        # The memory store's index. The store is the paper's own from here on;
+        # only this seed file, which documents the line format, comes from
+        # upstream.
+        ".stage/memory/MEMORY.md"
         ".env.example"
         ".gitignore"
         "execs/run.sh"
@@ -258,16 +316,23 @@ else
         "${AGENT_DOC}"
         "${AGENT_RULES_TREE}"
         "${SKILL_ROOTS[@]}"
+        "${HOOK_TREES[@]}"
         "${DOCS_TREE}"
         "${SYNC_FILES[@]}"
     )
     SPARSE_PATHS=(
         "${AGENT_RULES_TREE}"
         "${SKILL_ROOTS[@]}"
+        "${HOOK_TREES[@]}"
         "${DOCS_TREE}"
     )
-    for f in "${SYNC_FILES[@]}"; do
-        SPARSE_PATHS+=("$(dirname -- "${f}")")
+    # Parent directories of every synced or kept single file. The harness
+    # configs are named explicitly rather than left to cone mode's ancestor
+    # rule: harness_rels() checks them in the fetched tree, and a config the
+    # checkout never materialized would read as "upstream does not have it".
+    for f in "${SYNC_FILES[@]}" "${HARNESS_FILES[@]}"; do
+        d="$(dirname -- "${f}")"
+        [[ "${d}" == "." ]] || SPARSE_PATHS+=("${d}")
     done
 fi
 
@@ -320,8 +385,21 @@ if [[ "${ADOPT}" == false ]]; then
     # instead of being silently skipped.
     git -C "${SOURCE_DIR}" sparse-checkout set "${SPARSE_PATHS[@]}"
 
+    # SYNCED is SYNC_PATHS minus what the fetched ref does not carry, and it is
+    # what everything below diffs, dirty-checks, and extracts. Only the session
+    # hooks may be absent: they arrived later than the skills, so pinning an
+    # older ref is a legitimate reason for the ref not to have them, and that is
+    # a skipped line rather than a stopped update. Anything else missing is a
+    # broken ref and still fatal.
+    SYNCED=()
     for path in "${SYNC_PATHS[@]}"; do
-        [[ -e "${SOURCE_DIR}/${path}" ]] || fail "Upstream ref is missing ${path}."
+        if [[ -e "${SOURCE_DIR}/${path}" ]]; then
+            SYNCED+=("${path}")
+        elif [[ "${path}" == .*/hooks* ]]; then
+            log "Skipping ${path}: not present in ref '${STAGE_REF}'."
+        else
+            fail "Upstream ref is missing ${path}."
+        fi
     done
 
     if [[ "${DIFF}" == true ]]; then
@@ -338,7 +416,7 @@ if [[ "${ADOPT}" == false ]]; then
                 printf '  differs  %s\n' "${rel}"
                 changed=$(( changed + 1 ))
             fi
-        done < <(cd "${SOURCE_DIR}" && find "${SYNC_PATHS[@]}" -type f | sort)
+        done < <(cd "${SOURCE_DIR}" && find "${SYNCED[@]}" -type f | sort)
 
         # Project-local files under the same paths; an update keeps them.
         while IFS= read -r rel; do
@@ -346,7 +424,7 @@ if [[ "${ADOPT}" == false ]]; then
                 printf '  extra    %s (not in upstream ref; update keeps it)\n' "${rel}"
                 kept=$(( kept + 1 ))
             fi
-        done < <(cd "${ROOT_DIR}" && find "${SYNC_PATHS[@]}" -type f 2>/dev/null | sort)
+        done < <(cd "${ROOT_DIR}" && find "${SYNCED[@]}" -type f 2>/dev/null | sort)
 
         # Harness configuration: installed when missing, kept when it differs —
         # unless --force, which puts it back in the overwrite set. A skill-only
@@ -390,7 +468,7 @@ if [[ "${ADOPT}" == false ]]; then
     if git -C "${ROOT_DIR}" rev-parse --git-dir >/dev/null 2>&1; then
         # --force also overwrites the harness configuration, so it belongs in
         # what gets reported as about to be lost.
-        DIRTY_PATHS=("${SYNC_PATHS[@]}")
+        DIRTY_PATHS=("${SYNCED[@]}")
         if [[ "${FORCE}" == true && -z "${SKILL_NAME}" ]]; then
             DIRTY_PATHS+=("${HARNESS_FILES[@]}")
         fi
@@ -411,7 +489,7 @@ if [[ "${ADOPT}" == false ]]; then
     # This script is the one file that must not be written in place while it is
     # running, so it is filtered out here and renamed into position below.
     TAR_PATHS=()
-    for path in "${SYNC_PATHS[@]}"; do
+    for path in "${SYNCED[@]}"; do
         [[ "${path}" == "${SELF_PATH}" ]] || TAR_PATHS+=("${path}")
     done
 
@@ -453,9 +531,10 @@ if [[ "${ADOPT}" == false ]]; then
             log "NOTE: ${harness_kept} harness config file(s) differ from upstream and were kept."
             log "      See which with 'bash execs/update.sh --diff'; take upstream's with --force."
         fi
+        report_unregistered_hooks
     fi
 
-    log "Updated: ${SYNC_PATHS[*]}"
+    log "Updated: ${SYNCED[*]}"
     log "Review the changes with git status and git diff before committing them."
     exit 0
 fi
@@ -525,10 +604,21 @@ if [[ -e "${ROOT_DIR}/AGENTS.md" ]] && \
     log "      Compare against ${STAGE_REPOSITORY} AGENTS.md and merge what you want."
     log "      Adopt keeps it, but a later 'bash execs/update.sh' overwrites it."
 fi
-if [[ -e "${ROOT_DIR}/.gitignore" ]] && \
-   ! grep -qE '^/?wkdrs(/|/\*|/\*\*)?$' "${ROOT_DIR}/.gitignore" 2>/dev/null; then
-    log "NOTE: your .gitignore was kept and does not ignore wkdrs/."
-    log "      Add it before committing, or builds and reports will enter history."
+if [[ -e "${ROOT_DIR}/.gitignore" ]]; then
+    # Checked per path, and tolerant of the glob forms a rule may take. One
+    # combined grep would let a .gitignore naming only wkdrs/ silence the
+    # warning about the machine-local memory store too.
+    unignored=()
+    for tree in "wkdrs" "\.stage/memory/local"; do
+        grep -qE "^/?${tree}(/|/\*|/\*\*)?$" "${ROOT_DIR}/.gitignore" 2>/dev/null || \
+            unignored+=("${tree//\\/}/")
+    done
+    if (( ${#unignored[@]} > 0 )); then
+        log "NOTE: your .gitignore was kept and does not ignore ${unignored[*]}."
+        log "      Add them before committing, or builds, reports, or one machine's own notes enter history."
+    fi
 fi
+report_unregistered_hooks
 
 log "Next: copy .env.example to .env, then run /stage-proj-adopt to wire the paper up."
+log "      Kimi Code only: 'bash .kimi-code/hooks/install.sh' registers the project-memory hook once per machine."

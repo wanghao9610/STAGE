@@ -1,6 +1,10 @@
 # local runtime config
 .env
 
+# Machine-specific project memories, ignored the way .env is: the shared store
+# .stage/memory/ travels with a clone, local/ does not.
+.stage/memory/local/
+
 # builds and ephemeral reports live out-of-tree
 wkdrs/*
 !wkdrs/.gitkeep

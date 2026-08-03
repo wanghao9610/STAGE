@@ -31,6 +31,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - [写作工作流](#写作工作流)
 - [通往投稿的十步路径](#通往投稿的十步路径)
 - [证据、指纹与论断台账](#证据指纹与论断台账)
+- [项目记忆](#项目记忆)
 - [更新 STAGE 的 skill 与工作流文档](#更新-stage-的-skill-与工作流文档)
 - [项目约定](#项目约定)
 - [将 STAGE 用于新论文](#将-stage-用于新论文)
@@ -47,6 +48,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - **完整的写作生命周期**：十五个相互配合的 skill，按运行顺序依次是——接线仓库、整理证据、打磨故事、规划提纲、逐节起草、由证据生成表格、设计图、维护参考文献、润色文字、审计每个数字、审计每条引用、模拟评审、撰写回复、打包投稿、汇报状态。
 - **投稿周期即数据**：每次投稿尝试都住在 `cycls/<venue>_<year>/` 里：经用户确认的 `venue.yml` 档案、真实与模拟评审、回复，以及冻结的投稿记录。
 - **一套工作流，四份 agent 目录**：同样的十五个 skill 分别供 Claude Code（`.claude/skills/`）、Codex（`.agents/skills/`）、Cursor（`.cursor/skills/`）和 Kimi Code（`.kimi-code/skills/`）使用，彼此只差调用前缀与工具名；外加一份共享的 `AGENTS.md`，其正文被镜像进 `.cursor/rules/`，成为 Cursor 的常驻规则。
+- **属于论文自己的记忆**：一次会话学到、而仓库里没有任何文件认领的东西——某个 TeX 工具链的坑、你的一项长期偏好、一个试过又被否掉的框架——记在 `.stage/memory/` 下，并由一个钩子在下一次会话开头摆到 agent 面前；不管你用哪个工具驱动 STAGE 都一样。
 - **供人阅读的中文镜像**：每个 `SKILL.md` 旁边一份 `SKILL_zh.md`、peer-reviewer 的 references 旁边一份 `*_zh.md`、规范与 skills 指南旁边一份 `*.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
 
 每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.md)中。
@@ -82,12 +84,22 @@ STAGE/
 │   ├── htmls/              # 落地页：stage.html + stage_zh.html
 │   ├── mds/stage-workflow/ # 规范 + skills 指南（由上游管理）
 │   └── srcs/               # 文档图片及其他静态资源
-├── .claude/skills/         # Claude Code 使用的写作工作流 skill
+├── .stage/memory/          # 项目记忆：早先会话学到的东西（local/ 被 git 忽略）
+├── .claude/
+│   ├── skills/             # Claude Code 使用的写作工作流 skill
+│   ├── hooks/              # 会话钩子：注入项目记忆索引
+│   └── settings.json       # 注册该钩子
 ├── .agents/skills/         # Codex 使用的写作工作流 skill（各带一份 agents/openai.yaml）
+├── .codex/                 # Codex 的会话钩子与 hooks.json（skill 在 .agents/ 下）
 ├── .cursor/
 │   ├── skills/             # Cursor 使用的写作工作流 skill
-│   └── rules/              # 常驻规则：AGENTS.md 正文 + skill 目录归属
-├── .kimi-code/skills/      # Kimi Code 使用的写作工作流 skill
+│   ├── rules/              # 常驻规则：AGENTS.md 正文 + skill 目录归属
+│   ├── hooks/              # 会话钩子，注册在 hooks.json 里
+│   └── hooks.json
+├── .kimi-code/
+│   ├── skills/             # Kimi Code 使用的写作工作流 skill
+│   ├── hooks/              # 会话钩子 + install.sh（Kimi 只认全局注册）
+│   └── hooks.example.toml  # install.sh 替你写进配置的那段注册片段
 ├── .cursorignore           # 把构建产物与 LaTeX 垃圾挡在 Cursor 索引之外
 ├── .env.example            # 本地配置示例
 ├── AGENTS.md               # AI 写作助手共享的协作规范
@@ -246,6 +258,8 @@ bash execs/scpts/lint.sh   # 未定义引用、\todo 计数、页数上限、匿
 
 `/stage-flow-status` 是最值得记住的一个：它读取盘上的提纲、台账、manifest 和周期状态，给出唯一的下一步行动及其准确命令，你永远不必回忆上次写到哪里。
 
+**一个钩子，每台机器装一次。** 一个会话钩子会在每次会话开头，把[项目记忆](#项目记忆)索引摆到 agent 面前。Claude、Codex、Cursor 出厂就分别在 `.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json` 里注册好了。Kimi 没有项目级钩子配置，所以跑一次 `bash .kimi-code/hooks/install.sh`——它把钩子写进你的全局 Kimi 配置，写之前先备份，重复跑不会有第二次改动，此后这台机器上的每篇 STAGE 论文都覆盖到。在 Codex 上，注册好还不等于在跑：项目钩子要先信任该项目、再批准该钩子才会触发，所以在 Codex CLI 里跑 `/hooks` 批准它，钩子变更后再批准一次。在此之前不会有任何记忆到达会话，也没有任何地方会提示这个缺口。在这个钩子出现之前就接入的论文仓库，保留的是它自己的注册文件——`execs/update.sh` 从不覆盖，只会点名其中缺了哪个钩子。
+
 ## 写作工作流
 
 STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事变成一篇论断链可审计的投稿论文。
@@ -350,13 +364,14 @@ bash execs/update.sh
 
 - `AGENTS.md` 与 `.cursor/rules/`——共享的 agent 指令，以及抄录其正文的 Cursor 规则；你对它们的改动会被替换，且两者成对移动——一份就是另一份的正文，不能各走各的
 - `.agents/skills/`、`.claude/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——同样的十五个 skill，每套 harness 一份
-- `docs/mds/stage-workflow/`——工作流规约与 skill 指南，中英两版
+- `.claude/hooks/`、`.codex/hooks/`、`.cursor/hooks/`、`.kimi-code/hooks/` 与 `.kimi-code/hooks.example.toml`——注入项目记忆索引的那个会话钩子，每套 harness 一份；`.stage/memory/` 下的记忆库属于论文自己，从不同步
+- `docs/mds/stage-workflow/`——工作流规约、skill 指南与记忆规范，中英两版
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
 - `execs/update.sh`——更新脚本自己，为的是不让任何仓库卡在一个老到取不回后继版本的更新机制上。它用重命名装上：执行更新的那一次仍读旧文件跑完，下一次调用才用上新的
 
 拉取来源由 `STAGE_REPOSITORY` 指定，取值顺序为：环境变量、`.env`、内置默认值 `https://github.com/wanghao9610/STAGE.git`。想长期跟随某个 fork，就写进 `.env`；只想临时改一次，在命令前加变量即可——`STAGE_REPOSITORY=… bash execs/update.sh`。`.env` 里的其余内容从不同步——这也正是两个入口脚本可以放心替换的原因：实例的配置不住在它们里面。
 
-harness 配置——`.cursorignore`——仅在缺失时安装，除非加 `--force`，否则绝不覆盖。若保留下来的文件与上游有差异，命令会打印一条提示说明有几处。如果论文仓库是在更新脚本学会自同步之前创建的，请先手动刷新它一次——旧版 `execs/update.sh` 不会覆盖自己：
+harness 配置——`.cursorignore` 与三份钩子注册文件（`.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json`）——仅在缺失时安装，除非加 `--force`，否则绝不覆盖：论文仓库可能往这些文件里加过自己的设置。若保留下来的文件与上游有差异，命令会打印一条提示说明有几处；若保留下来的注册文件里没有那个记忆钩子，它会点名说出来——否则的结果是一个永远不触发、也永远不报错的钩子。如果论文仓库是在更新脚本学会自同步之前创建的，请先手动刷新它一次——旧版 `execs/update.sh` 不会覆盖自己：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update.sh -o execs/update.sh
@@ -385,6 +400,7 @@ curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update
 5. 构建产物与临时报告放在 `wkdrs/`，永不提交；可留存的结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目落盘，而不是报告文件。
 6. 用 `execs/run.sh` 作为唯一构建入口，工具脚本放 `execs/scpts/`；运行环境路径从 `.env` 读取，不要在脚本里硬编码本机路径。
 7. `manus/` 里的每个数字，要么可追溯到一条带指纹的 `mates/` 记录，要么写成 `\todo{...}`——没有第三种状态；写进文档的日期一律取自系统时钟。
+8. 一次会话学到、而上面这些文件都不认领的东西，记进 `.stage/memory/`——先提议再写入，只对本机成立的放 `.stage/memory/local/`；记忆永远不为某个数字、某条会场规则、某句关于被引论文的断言充当来源。
 
 完整的协作与写作规范见 [`AGENTS.md`](AGENTS.md) 与 [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md)（中文对照版 [`writing-workflow-conventions.zh-CN.md`](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)）。
 

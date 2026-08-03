@@ -87,7 +87,17 @@ The test: every changed line traces to the user's request, and every number in i
 - Runtime configuration lives in `.env`, created from `.env.example`: `STAR_HOME` (empty means standalone), `LATEX_ENGINE`, `ANON`, `STAGE_REPOSITORY`, `STAGE_LANG`. Do not hardcode machine-specific paths.
 - Real dates only: every date written into an artifact comes from the system clock, never from memory or invention (conventions §4).
 
-## 10. Verification
+## 10. Project Memory
+
+**What a session learns goes to `.stage/memory/` in the project, not to your own memory store.**
+
+- Record a fact there only when no file in the repository already owns it — a number belongs to `mates/`, a claim to `notes/claims.md`, a page limit to the cycle's `venue.yml`, what a paper says to `notes/refs/`, a promise to `tasks/`. Memory holds the residue.
+- A memory is never a source: it can never back a number in `manus/`, a venue rule, or an assertion about a cited work (§2 stands whatever a memory says).
+- Offer, never assume: at most two offers per session, and write only after the user agrees. `INVOLVE=low` records unasked and says so.
+- A fact true only of this machine goes to `.stage/memory/local/`, which git ignores. Where a memory disagrees with a file in the repository, the file wins.
+- Types, file format, the index line the hooks parse, and how a memory is retired: `docs/mds/stage-workflow/memory_spec.md`.
+
+## 11. Verification
 
 **Prove the change works before calling it done.**
 

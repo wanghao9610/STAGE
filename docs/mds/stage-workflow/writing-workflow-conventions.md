@@ -363,6 +363,7 @@ Where a skill puts what it writes. Each destination is exclusive — a file belo
 | Submission cycles | `cycls/<venue>_<year>/`: `venue.yml`, `template/` (the official venue kit, unpacked whole, byte-for-byte, never edited), `reviews/`, `response/`, `SUBMISSION_<date>.md` |
 | Revision scratch, promise lists | `tasks/` |
 | Builds and ephemeral reports | `wkdrs/builds/`, `wkdrs/reports/` (gitignored, regenerable) |
+| What earlier sessions learned, owned by no other file | `.stage/memory/`; machine-specific facts in `.stage/memory/local/`, which git ignores ([`memory_spec.md`](memory_spec.md)) |
 | Entrypoints | `execs/run.sh`, `execs/update.sh` — **execs/ root is closed**; utilities go in `execs/scpts/`. `run.sh` is upstream-managed and `execs/update.sh` overwrites it; per-project settings live in `.env` |
 | Workflow docs (upstream-managed) | `docs/mds/stage-workflow/` |
 
