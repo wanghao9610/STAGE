@@ -3,6 +3,7 @@
   <h1>STAGE</h1>
   <p><strong>Systematic Toolchain for Authoring, Guiding, and Editing</strong></p>
   <p><em>STAR 的学术写作伴侣 —— every STAR needs a STAGE。</em></p>
+  <p><a href="https://wanghao9610.github.io/STAGE/"><strong>文档站点</strong></a></p>
 </div>
 
 **语言：** [English](README.md) | 简体中文
@@ -76,6 +77,8 @@ STAGE/
 │   ├── update.sh           # 同步上游 STAGE skill 与文档；--adopt 安装骨架
 │   └── scpts/              # import.sh（证据导入）、lint.sh（确定性检查）
 ├── docs/                   # 项目文档
+│   ├── index.html          # GitHub Pages 文档入口（→ htmls/stage.html）
+│   ├── htmls/              # 落地页：stage.html + stage_zh.html
 │   ├── mds/stage-workflow/ # 规范 + skills 指南（由上游管理）
 │   └── srcs/               # 文档图片及其他静态资源
 ├── .claude/skills/         # Claude Code 使用的写作工作流 skill

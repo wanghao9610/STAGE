@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="STAGE — 面向学术写作的系统化工具链（Systematic Toolchain for Authoring, Guiding, and Editing）。STAR 的写作伴侣：每个数字都可追溯到带指纹的证据文件，每个论断都有案可查。">
+<title>STAGE — 面向学术写作的系统化工具链</title>
+<link rel="icon" href="./srcs/stage-project-icon.png">
+<style>
+  /* ============================================================
+     STAGE landing page — dark, cinematic, constellation-themed,
+     in the STAR family look. Self-contained: no external fonts,
+     scripts, or stylesheets.
+     ============================================================ */
+  :root {
+    --bg-0: #04060f;
+    --bg-1: #0a0f1e;
+    --bg-2: #101731;
+    --panel: rgba(255, 255, 255, 0.03);
+    --panel-hi: rgba(255, 255, 255, 0.06);
+    --line: rgba(148, 163, 216, 0.16);
+    --line-hi: rgba(148, 163, 216, 0.35);
+    --text: #e6eaf6;
+    --text-dim: #9aa5c4;
+    --text-faint: #626e92;
+    --gold: #ffd86b;
+    --gold-deep: #f5a623;
+    --violet: #8b93ff;
+    --blue: #4cc3ff;
+    --teal: #3ee6c0;
+    --rose: #ff7eb6;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg-0);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: rgba(255, 216, 107, 0.25); }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; }
+
+  /* ---------- starfield canvas ---------- */
+  #sky {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .content { position: relative; z-index: 1; }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem clamp(1.2rem, 4vw, 3rem);
+    background: rgba(4, 6, 15, 0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(148, 163, 216, 0.08);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+  nav.scrolled {
+    background: rgba(4, 6, 15, 0.85);
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.4);
+  }
+  .nav-progress {
+    position: absolute;
+    left: 0; bottom: -1px;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--violet), var(--blue));
+    transform: scaleX(0);
+    transform-origin: left;
+    pointer-events: none;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    font-size: 1.05rem;
+  }
+  .nav-brand img { width: 26px; height: 26px; }
+  .nav-links {
+    display: flex;
+    gap: clamp(0.8rem, 2.5vw, 2rem);
+    font-size: 0.88rem;
+    color: var(--text-dim);
+  }
+  .nav-links a { position: relative; transition: color 0.2s; }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -5px;
+    height: 1px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
+  .nav-links a.active { color: var(--gold); }
+  .nav-gh {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.42rem 0.95rem;
+    border: 1px solid var(--line-hi);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .nav-gh:hover { border-color: var(--gold); background: rgba(255, 216, 107, 0.08); }
+  .nav-gh svg { width: 16px; height: 16px; fill: currentColor; }
+  .nav-right { display: flex; align-items: center; gap: 0.6rem; }
+  .nav-lang {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.85rem;
+    border: 1px solid var(--line-hi);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .nav-lang:hover { border-color: var(--gold); color: var(--gold); background: rgba(255, 216, 107, 0.08); }
+  @media (max-width: 720px) { .nav-links { display: none; } }
+
+  /* ---------- hero ---------- */
+  .hero {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 7rem 1.5rem 4rem;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 240px;
+    background: linear-gradient(to bottom, transparent, var(--bg-0));
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1.1rem;
+    border: 1px solid rgba(255, 216, 107, 0.35);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(255, 216, 107, 0.06);
+    animation: badge-glow 4s ease-in-out infinite;
+  }
+  @keyframes badge-glow {
+    0%, 100% { box-shadow: 0 0 0 rgba(255, 216, 107, 0); }
+    50% { box-shadow: 0 0 24px rgba(255, 216, 107, 0.18); }
+  }
+  .hero h1 {
+    margin-top: 1.6rem;
+    font-size: clamp(4.5rem, 16vw, 11rem);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    background: linear-gradient(100deg, #fff 10%, var(--gold) 38%, var(--violet) 68%, var(--blue) 92%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: shimmer 7s linear infinite;
+  }
+  @keyframes shimmer {
+    to { background-position: 200% center; }
+  }
+  .hero-sub {
+    margin-top: 0.8rem;
+    font-size: clamp(1.05rem, 2.6vw, 1.5rem);
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .hero-desc {
+    margin-top: 1.6rem;
+    max-width: 620px;
+    font-size: clamp(0.98rem, 2vw, 1.12rem);
+    color: var(--text-dim);
+  }
+  .hero-desc strong { color: var(--text); font-weight: 600; }
+  .hero-ctas {
+    margin-top: 2.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.78rem 1.7rem;
+    border-radius: 12px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
+  }
+  .btn-primary {
+    background: linear-gradient(120deg, var(--gold-deep), var(--gold));
+    color: #1a1204;
+    box-shadow: 0 6px 28px rgba(245, 166, 35, 0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(245, 166, 35, 0.5); }
+  .btn-ghost {
+    border: 1px solid var(--line-hi);
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .btn-ghost:hover { transform: translateY(-2px); border-color: var(--violet); background: rgba(139, 147, 255, 0.08); }
+  .hero-stats {
+    margin-top: 3.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stat { text-align: center; padding: 0 clamp(1.2rem, 3.5vw, 2.4rem); }
+  .stat:not(:first-child) { border-left: 1px solid rgba(148, 163, 216, 0.14); }
+  .stat b {
+    display: block;
+    font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+    font-weight: 750;
+    background: linear-gradient(120deg, var(--gold), var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .stat span {
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  @media (max-width: 600px) {
+    .stat { padding: 0.4rem 0.9rem; }
+    .stat:not(:first-child) { border-left: none; }
+  }
+
+  /* aurora glows behind the title */
+  .aurora {
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+  }
+  .aurora-a {
+    width: 480px; height: 480px;
+    top: 10%; left: 50%;
+    margin-left: -440px;
+    background: radial-gradient(circle, rgba(255, 216, 107, 0.13), transparent 65%);
+    animation: drift-a 14s ease-in-out infinite;
+  }
+  .aurora-b {
+    width: 560px; height: 560px;
+    top: 24%; left: 50%;
+    margin-left: -40px;
+    background: radial-gradient(circle, rgba(139, 147, 255, 0.12), transparent 65%);
+    animation: drift-b 18s ease-in-out infinite;
+  }
+  @keyframes drift-a {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(42px, -28px); }
+  }
+  @keyframes drift-b {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-48px, 22px); }
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--text-faint);
+    animation: bob 2.2s ease-in-out infinite;
+  }
+  .scroll-hint svg { display: block; width: 20px; height: 20px; }
+  @keyframes bob {
+    0%, 100% { transform: translate(-50%, 0); opacity: 0.5; }
+    50% { transform: translate(-50%, 8px); opacity: 1; }
+  }
+
+  /* ---------- shared section chrome ---------- */
+  section { padding: clamp(4rem, 9vw, 7rem) clamp(1.2rem, 5vw, 3rem); }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  .kicker {
+    font-size: 0.8rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+  }
+  .kicker::before { content: "✦ "; }
+  h2 {
+    font-size: clamp(1.7rem, 4.5vw, 2.6rem);
+    font-weight: 750;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .section-lead {
+    margin-top: 1rem;
+    max-width: 640px;
+    color: var(--text-dim);
+    font-size: 1.02rem;
+  }
+
+  /* scroll reveal */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ---------- pillars: bento grid ---------- */
+  .bento {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+  }
+  .card {
+    grid-column: span 2;
+    padding: 1.6rem;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: linear-gradient(160deg, var(--panel-hi), var(--panel));
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--line-hi);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--card-glow, rgba(255,216,107,0.12)), transparent 70%);
+    transition: opacity 0.25s;
+    opacity: 0.7;
+  }
+  .card:hover::before { opacity: 1; }
+  /* cursor spotlight, driven by --mx/--my from JS */
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), var(--card-glow, rgba(255,216,107,0.12)), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .card:hover::after { opacity: 1; }
+  .card.wide { grid-column: span 3; }
+  .card-icon {
+    width: 42px; height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    margin-bottom: 1rem;
+    color: var(--card-c, var(--gold));
+    background: color-mix(in srgb, var(--card-c, var(--gold)) 9%, transparent);
+    border: 1px solid color-mix(in srgb, var(--card-c, var(--gold)) 28%, transparent);
+  }
+  .card-icon svg { width: 20px; height: 20px; }
+  .card h3 { font-size: 1.08rem; font-weight: 650; margin-bottom: 0.5rem; }
+  .card p { font-size: 0.9rem; color: var(--text-dim); }
+  .card code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--gold);
+    background: rgba(255, 216, 107, 0.08);
+    padding: 0.08em 0.4em;
+    border-radius: 5px;
+  }
+  @media (max-width: 900px) { .card, .card.wide { grid-column: span 3; } }
+  @media (max-width: 600px) { .card, .card.wide { grid-column: span 6; } }
+
+  /* ---------- structure: tree + legend ---------- */
+  .structure-grid {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 860px) { .structure-grid { grid-template-columns: 1fr; } }
+  .tree-window {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(6, 9, 20, 0.85);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
+  .window-title {
+    margin-left: 0.6rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text-faint);
+  }
+  .tree-body {
+    padding: 1.2rem 1.4rem;
+    font-family: var(--mono);
+    font-size: 0.84rem;
+    line-height: 1.75;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .tree-body .dir { color: var(--blue); font-weight: 600; }
+  .tree-body .file { color: var(--text-dim); }
+  .tree-body .cm { color: var(--text-faint); }
+  .tree-body .hl { color: var(--gold); font-weight: 600; }
+  .legend { display: flex; flex-direction: column; gap: 0.7rem; }
+  .legend-row {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 0.9rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    align-items: baseline;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .legend-row:hover { border-color: var(--line-hi); background: var(--panel-hi); }
+  .legend-row code {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--gold);
+  }
+  .legend-row span { font-size: 0.86rem; color: var(--text-dim); }
+
+  /* ---------- workflow constellation ---------- */
+  .phases { margin-top: 3.2rem; display: flex; flex-direction: column; gap: 0; }
+  .phase {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 1.6rem;
+    padding: 1.8rem 0;
+    position: relative;
+  }
+  .phase:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 58px;
+    bottom: -14px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--phase-c, var(--gold)), transparent);
+    opacity: 0.35;
+  }
+  .phase-head { display: flex; align-items: flex-start; gap: 0.9rem; }
+  .phase-star {
+    flex: none;
+    width: 30px; height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.95rem;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35), transparent 60%), var(--phase-c, var(--gold));
+    color: #0a0d18;
+    box-shadow: 0 0 18px var(--phase-glow, rgba(255, 216, 107, 0.45));
+  }
+  .phase-head h3 { font-size: 1.12rem; font-weight: 700; line-height: 30px; }
+  .phase-head small {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--text-faint);
+    line-height: 1.45;
+    margin-top: 0.25rem;
+  }
+  .skills { display: flex; flex-wrap: wrap; gap: 0.7rem; align-content: flex-start; }
+  .skill {
+    flex: 1 1 240px;
+    max-width: 340px;
+    padding: 0.85rem 1.05rem;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    background: var(--panel);
+    transition: transform 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .skill:hover {
+    transform: translateY(-3px);
+    border-color: var(--phase-c, var(--gold));
+    background: var(--panel-hi);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4);
+  }
+  .skill code {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--phase-c, var(--gold));
+  }
+  .skill p { margin-top: 0.3rem; font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+  @media (max-width: 760px) {
+    .phase { grid-template-columns: 1fr; gap: 1rem; }
+    .phase:not(:last-child)::after { display: none; }
+    .skill { max-width: none; }
+  }
+  .flow-note {
+    margin-top: 1.6rem;
+    padding: 1rem 1.3rem;
+    border: 1px dashed var(--line-hi);
+    border-radius: 13px;
+    background: rgba(255, 216, 107, 0.04);
+    font-size: 0.88rem;
+    color: var(--text-dim);
+  }
+  .flow-note code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--gold);
+    background: rgba(255, 216, 107, 0.08);
+    padding: 0.08em 0.4em;
+    border-radius: 5px;
+  }
+  .workflow-map {
+    margin-top: 3.5rem;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .workflow-map img { display: block; width: 100%; }
+  .workflow-map figcaption {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.82rem;
+    color: var(--text-faint);
+    border-top: 1px solid var(--line);
+    text-align: center;
+  }
+
+  /* ---------- quick start terminal ---------- */
+  .term {
+    margin-top: 3rem;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(5, 8, 18, 0.92);
+    overflow: hidden;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  }
+  .term-body {
+    padding: 1.4rem 1.6rem;
+    font-family: var(--mono);
+    font-size: 0.87rem;
+    line-height: 1.9;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .term-body .p { color: var(--teal); user-select: none; }
+  .term-body .c { color: var(--text-faint); }
+  .term-body .cmd { color: var(--text); }
+  .term-body .flag { color: var(--violet); }
+  .term-body .str { color: var(--gold); }
+  .cursor-blink {
+    display: inline-block;
+    width: 8px; height: 1.05em;
+    background: var(--teal);
+    vertical-align: text-bottom;
+    animation: blink 1.1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ---------- final CTA + footer ---------- */
+  .cta-final {
+    text-align: center;
+    padding-bottom: clamp(4rem, 8vw, 6rem);
+  }
+  .cta-final h2 span {
+    background: linear-gradient(110deg, var(--gold), var(--violet), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .cta-final .section-lead { margin-left: auto; margin-right: auto; }
+  footer {
+    border-top: 1px solid rgba(148, 163, 216, 0.08);
+    padding: 2rem clamp(1.2rem, 5vw, 3rem);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.84rem;
+    color: var(--text-faint);
+  }
+  footer .f-links { display: flex; gap: 1.4rem; }
+  footer a:hover { color: var(--gold); }
+
+  /* ---------- polish: dividers, grain, sheen, hover, focus ---------- */
+  section { position: relative; }
+  section + section::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: min(1120px, 86%);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(148, 163, 216, 0.16), transparent);
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+  .tree-window, .term { position: relative; }
+  .tree-window::before, .term::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(230, 234, 246, 0.14), transparent);
+  }
+  .phase-star { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+  .phase:hover .phase-star {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px var(--phase-glow, rgba(255, 216, 107, 0.45));
+  }
+  footer .f-links { gap: 0; flex-wrap: wrap; row-gap: 0.6rem; }
+  footer .f-links a { white-space: nowrap; }
+  footer .f-links a + a::before {
+    content: "✦";
+    margin: 0 1.1rem;
+    opacity: 0.35;
+  }
+  @media (max-width: 600px) {
+    footer { flex-direction: column; align-items: center; gap: 1.1rem; }
+    footer .f-links { justify-content: center; column-gap: 1.3rem; row-gap: 0.7rem; }
+    footer .f-links a + a::before { content: none; }
+  }
+  a:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<div class="content">
+
+<nav>
+  <a class="nav-brand" href="#top">
+    <img src="./srcs/stage-project-icon.png" alt="">
+    STAGE
+  </a>
+  <div class="nav-links">
+    <a href="#pillars">为何选择</a>
+    <a href="#structure">项目结构</a>
+    <a href="#workflow">写作工作流</a>
+    <a href="#quickstart">快速上手</a>
+  </div>
+  <div class="nav-right">
+    <a class="nav-lang" href="/STAGE/index.html" hreflang="en">English</a>
+    <a class="nav-gh" href="https://github.com/wanghao9610/STAGE" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      GitHub
+    </a>
+  </div>
+  <span class="nav-progress" aria-hidden="true"></span>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<header class="hero" id="top">
+  <div class="aurora aurora-a" aria-hidden="true"></div>
+  <div class="aurora aurora-b" aria-hidden="true"></div>
+  <span class="hero-badge">Authoring · Guiding · Editing</span>
+  <h1>STAGE</h1>
+  <p class="hero-sub">Every STAR needs a STAGE</p>
+  <p class="hero-desc">
+    <strong>STAR</strong> 的学术写作伴侣 —— 把一个研究项目变成一篇<strong>正式投稿的论文</strong>，
+    全程不丢失监管链：手稿中的每个数字都能追溯到带指纹的证据文件，或显著标记为缺失；
+    每个论断都在同一份台账中从提出追踪到核实。
+  </p>
+  <div class="hero-ctas">
+    <a class="btn btn-primary" href="#quickstart">✦ 开始使用</a>
+    <a class="btn btn-ghost" href="https://github.com/wanghao9610/STAGE" target="_blank" rel="noopener">在 GitHub 查看</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><b>15</b><span>个工作流技能</span></div>
+    <div class="stat"><b>4</b><span>个受支持的 AI 代理</span></div>
+    <div class="stat"><b>2</b><span>种语言 · EN 中文</span></div>
+    <div class="stat"><b>MIT</b><span>开源协议</span></div>
+  </div>
+  <a class="scroll-hint" href="#pillars" aria-label="向下滚动"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></a>
+</header>
+
+<!-- ==================== PILLARS ==================== -->
+<section id="pillars">
+  <div class="wrap">
+    <p class="kicker reveal">为何选择 STAGE</p>
+    <h2 class="reveal">每个数字都有出处。<br>每个论断都有案可查。</h2>
+    <p class="section-lead reveal">
+      当数字散落在聊天记录里、论断只存在于某个人脑中时，论文就会腐烂。
+      STAGE 把整条监管链 —— 证据、论断、评审、投稿 —— 全部搬进仓库。
+    </p>
+    <div class="bento">
+      <div class="card reveal" style="--card-glow: rgba(255,216,107,0.14); --card-c: #ffd86b">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <h3>一致的手稿布局</h3>
+        <p>章节、带源文件的图、表格、参考文献、会议样式，在 <code>manus/</code> 下各有唯一、可预期的位置 —— 且开箱即可编译。</p>
+      </div>
+      <div class="card reveal" style="--card-glow: rgba(139,147,255,0.16); --card-c: #8b93ff">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+        <h3>只读的证据层</h3>
+        <p>STAR 产物或手工登记的证据被快照进 <code>mates/</code>，每个文件的指纹记录在 <code>MANIFEST.md</code>。证据单向流动 —— 绝不在原地修改。</p>
+      </div>
+      <div class="card reveal" style="--card-glow: rgba(76,195,255,0.16); --card-c: #4cc3ff">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+        <h3>论断台账作为中枢</h3>
+        <p><code>notes/claims.md</code> 把每个论断的表述 ⇄ 证据 ⇄ 状态连接起来 —— <code>proposed → drafted → verified</code> —— 从故事种子一直到投稿。</p>
+      </div>
+      <div class="card wide reveal" style="--card-glow: rgba(62,230,192,0.14); --card-c: #3ee6c0">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 11.5l2 2 4-4"/></svg></div>
+        <h3>杜绝编造的边界</h3>
+        <p><code>manus/</code> 中的每个数字，要么追溯到带指纹的 <code>mates/</code> 条目，要么写成 <code>\todo{...}</code> —— 没有第三种状态。关于被引论文的断言必须能对上阅读笔记；会议规则只以用户确认的事实录入。可见的 <code>\todo</code> 是一种状态；一个貌似合理却编造出来的数字则是缺陷。</p>
+      </div>
+      <div class="card wide reveal" style="--card-glow: rgba(255,126,182,0.14); --card-c: #ff7eb6">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+        <h3>确定性检查归脚本，判断归技能</h3>
+        <p><code>bash execs/run.sh</code> 用 latexmk 在树外构建；<code>lint.sh</code> 机械地拦截未定义引用、<code>\todo</code> 标记、页数超限与匿名性泄漏。一切需要判断的工作交给十五个技能。</p>
+      </div>
+      <div class="card wide reveal" style="--card-glow: rgba(245,166,35,0.14); --card-c: #f5a623">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
+        <h3>投稿周期即数据</h3>
+        <p>每次投稿都活在 <code>cycls/&lt;venue&gt;_&lt;year&gt;/</code> 中：用户确认的 <code>venue.yml</code>、收到与模拟的评审、回复信，以及冻结的投稿记录 —— 包括拒稿在内，因此下一次尝试从上一次结束的地方开始。</p>
+      </div>
+      <div class="card wide reveal" style="--card-glow: rgba(139,147,255,0.14); --card-c: #8b93ff">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="14" height="11" rx="2"/><path d="M12 9V5"/><circle cx="12" cy="3.5" r="1.2"/><path d="M2.5 14v2"/><path d="M21.5 14v2"/><path d="M9.5 13.5v2"/><path d="M14.5 13.5v2"/></svg></div>
+        <h3>AI 代理原生，与 STAR 配对</h3>
+        <p>同一套十五个技能同时发布给 <strong>Claude Code</strong>、<strong>Codex</strong>、<strong>Cursor</strong> 与 <strong>Kimi Code</strong> —— 中英双语。可与 STAR 仓库配对、一条命令导入证据，也可独立使用、手工登记证据；下游一切完全相同。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== STRUCTURE ==================== -->
+<section id="structure">
+  <div class="wrap">
+    <p class="kicker reveal">项目结构</p>
+    <h2 class="reveal">八个目录。<br>一条监管链。</h2>
+    <p class="section-lead reveal">
+      缩写命名沿用 STAR 的约定：输入简短、搜索无歧义，
+      并且在每一篇基于 STAGE 写作的论文中保持一致。
+    </p>
+    <div class="structure-grid">
+      <div class="tree-window reveal">
+        <div class="window-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="window-title">tree ~/my-paper</span>
+        </div>
+        <div class="tree-body"><span class="hl">STAGE/</span>
+├── <span class="dir">manus/</span>       <span class="cm"># 手稿本体</span>
+│   ├── <span class="file">main.tex</span>  <span class="cm"># 入口 —— 始终按预印本编译</span>
+│   ├── <span class="dir">secs/</span>    <span class="cm"># 章节：&lt;n&gt;_&lt;slug&gt;.tex</span>
+│   ├── <span class="dir">figs/</span>    <span class="cm"># 渲染好的 PDF；figs/srcs/ 存放源文件</span>
+│   ├── <span class="dir">tabs/</span>    <span class="cm"># 表格，由证据生成</span>
+│   ├── <span class="dir">bibs/</span>    <span class="cm"># reference.bib</span>
+│   └── <span class="dir">stys/</span>    <span class="cm"># arxiv.cls（外观）+ stage.sty（宏）</span>
+├── <span class="dir">mates/</span>       <span class="cm"># 导入的证据 —— 只读</span>
+│   └── <span class="file">MANIFEST.md</span> <span class="cm"># 指纹台账</span>
+├── <span class="dir">notes/</span>       <span class="cm"># 故事、论断、大纲、符号约定</span>
+│   └── <span class="dir">refs/</span>    <span class="cm"># 每篇论文的阅读笔记</span>
+├── <span class="dir">cycls/</span>       <span class="cm"># 投稿周期：&lt;venue&gt;_&lt;year&gt;/</span>
+├── <span class="dir">tasks/</span>       <span class="cm"># 修改草稿与承诺清单</span>
+├── <span class="dir">wkdrs/</span>       <span class="cm"># 构建与报告（gitignored）</span>
+├── <span class="dir">execs/</span>
+│   ├── <span class="file">run.sh</span>    <span class="cm"># ← 唯一的构建入口</span>
+│   ├── <span class="file">update.sh</span> <span class="cm"># 同步技能；--adopt 安装骨架</span>
+│   └── <span class="dir">scpts/</span>   <span class="cm"># import.sh · lint.sh</span>
+├── <span class="file">.env</span>         <span class="cm"># 本机配置（绝不提交）</span>
+└── <span class="file">AGENTS.md</span>    <span class="cm"># 人与代理共用的指令</span></div>
+      </div>
+      <div class="legend reveal">
+        <div class="legend-row"><code>manus/</code><span><strong>Manuscripts</strong> —— 论文的 LaTeX 源文件</span></div>
+        <div class="legend-row"><code>mates/</code><span><strong>Materials</strong> —— 带指纹的证据快照，只读</span></div>
+        <div class="legend-row"><code>notes/</code><span><strong>写作元数据</strong> —— 故事、大纲与论断台账</span></div>
+        <div class="legend-row"><code>cycls/</code><span><strong>Cycles</strong> —— 每次投稿尝试一个目录</span></div>
+        <div class="legend-row"><code>tasks/</code><span><strong>Tasks</strong> —— 修改草稿与承诺勾选框</span></div>
+        <div class="legend-row"><code>wkdrs/</code><span><strong>Work directories</strong> —— 构建与临时报告，绝不提交</span></div>
+        <div class="legend-row"><code>scpts/</code><span><strong>Scripts</strong> —— 证据导入与确定性检查</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== WORKFLOW ==================== -->
+<section id="workflow">
+  <div class="wrap">
+    <p class="kicker reveal">写作工作流</p>
+    <h2 class="reveal">十五个技能。<br>一条监管链。</h2>
+    <p class="section-lead reveal">
+      从导入证据到冻结投稿 —— 每个技能都把自己的状态写入项目文件，
+      因此整篇论文在任何时候都可审计、可续作。
+    </p>
+
+    <div class="phases">
+      <div class="phase reveal" style="--phase-c: var(--gold); --phase-glow: rgba(255,216,107,0.45)">
+        <div class="phase-head">
+          <div class="phase-star">✦</div>
+          <h3>搭建<small>接好仓库，导入带指纹的证据。</small></h3>
+        </div>
+        <div class="skills">
+          <div class="skill"><code>/stage-proj-adopt †</code><p>把新建或已有的论文仓库接入 STAGE —— 草稿里已有的数字成为 <em>unsourced</em> 论断，而非沉默的债务。</p></div>
+          <div class="skill"><code>/stage-evid-curator</code><p>运行导入、登记手工投放的文件、规范化杂乱的导出，并提出论断⇄证据映射。</p></div>
+        </div>
+      </div>
+
+      <div class="phase reveal" style="--phase-c: var(--violet); --phase-glow: rgba(139,147,255,0.45)">
+        <div class="phase-head">
+          <div class="phase-star">✦</div>
+          <h3>规划<small>打磨故事，搭起论文骨架。</small></h3>
+        </div>
+        <div class="skills">
+          <div class="skill"><code>/stage-stry-coach †</code><p>对话式的故事打磨：卖点、带论断 ID 的贡献、投稿理由 —— 同时播种论断台账。</p></div>
+          <div class="skill"><code>/stage-outl-planner †</code><p>故事 → 骨架：章节页数预算、图表计划、论断→章节分配。</p></div>
+          <div class="skill"><code>/stage-refs-curator</code><p>参考文献治理、带可引用事实的阅读笔记、相关工作的定位。</p></div>
+        </div>
+      </div>
+
+      <div class="phase reveal" style="--phase-c: var(--blue); --phase-glow: rgba(76,195,255,0.45)">
+        <div class="phase-head">
+          <div class="phase-star">✦</div>
+          <h3>写作<small>从证据起草，绝不凭记忆。</small></h3>
+        </div>
+        <div class="skills">
+          <div class="skill"><code>/stage-sect-drafter</code><p>每次运行起草一节，依据该节简报、映射好的证据与论断 —— 缺失的数字写成 <em>\todo{}</em>。</p></div>
+          <div class="skill"><code>/stage-tabs-builder</code><p>表格只从 <em>mates/</em> 证据生成 —— 每个数据行一条 <em>% src:</em> 指纹注释。</p></div>
+          <div class="skill"><code>/stage-figs-designer</code><p>端到端负责每张图：用途、<em>figs/srcs/</em> 下的可编辑源文件、渲染出的 PDF。</p></div>
+        </div>
+      </div>
+
+      <div class="phase reveal" style="--phase-c: var(--teal); --phase-glow: rgba(62,230,192,0.45)">
+        <div class="phase-head">
+          <div class="phase-star">✦</div>
+          <h3>打磨与审计<small>追溯每个数字，核对每条引用。</small></h3>
+        </div>
+        <div class="skills">
+          <div class="skill"><code>/stage-copy-editor</code><p>清晰度、行文与符号一致性 —— 技术含义与任何数字都不可触碰。</p></div>
+          <div class="skill"><code>/stage-clms-auditor</code><p>提取手稿中的每个数字并逐一追溯指纹：matched / mismatched / unsourced。</p></div>
+          <div class="skill"><code>/stage-cite-auditor</code><p>每个 <em>\cite</em> 都能解析；每条关于被引工作的断言都能对上阅读笔记。</p></div>
+        </div>
+      </div>
+
+      <div class="phase reveal" style="--phase-c: var(--rose); --phase-glow: rgba(255,126,182,0.45)">
+        <div class="phase-head">
+          <div class="phase-star">✦</div>
+          <h3>投稿周期<small>评审、回复、冻结。</small></h3>
+        </div>
+        <div class="skills">
+          <div class="skill"><code>/stage-peer-reviewer</code><p>五视角的模拟程序委员会，在引用诚信契约下评审。</p></div>
+          <div class="skill"><code>/stage-resp-writer †</code><p>评审 → 要点台账 → 篇幅符合会议限制的回复信，每个承诺的修改都是一个勾选框。</p></div>
+          <div class="skill"><code>/stage-subm-packer †</code><p>预检、用官方模板套件转换版式、打包、投稿记录、冻结标签。</p></div>
+        </div>
+      </div>
+
+      <div class="phase reveal" style="--phase-c: #c8d2f2; --phase-glow: rgba(200,210,242,0.45)">
+        <div class="phase-head">
+          <div class="phase-star">✦</div>
+          <h3>纵览<small>报告全局进度，指出下一步。</small></h3>
+        </div>
+        <div class="skills">
+          <div class="skill"><code>/stage-flow-status</code><p>只读的全局地图 —— 大纲、台账、清单、投稿周期状态 —— 并给出唯一的下一步动作及其确切命令。从不写入。</p></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="flow-note reveal">
+      <code>†</code> 标记五个只能显式调用的技能：它们只在你点名时运行，因为决策点 —— 接入、故事、大纲、回复、投稿 —— 始终由你把持。
+    </p>
+
+    <figure class="workflow-map reveal">
+      <img src="./srcs/stage-writing-workflow.svg" alt="STAGE 写作工作流：十五个技能分布在五个阶段带中 —— 搭建、规划、写作、打磨与审计、投稿周期 —— 每个技能的产出，以及起草回路和拒稿回路如何闭合" loading="lazy">
+      <figcaption>完整工作流地图 —— 五个阶段、每个技能的产出，以及起草回路与拒稿回路如何闭合。</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ==================== QUICK START ==================== -->
+<section id="quickstart">
+  <div class="wrap">
+    <p class="kicker reveal">快速上手</p>
+    <h2 class="reveal">五步得到一篇可编译的论文。</h2>
+    <p class="section-lead reveal">
+      从模板全新开始 —— 或者在已有的论文仓库里运行 <code style="font-family:var(--mono);color:var(--gold)">update.sh --adopt</code>，
+      STAGE 会围绕你的草稿安装骨架，不移动任何文件。
+    </p>
+    <div class="term reveal">
+      <div class="window-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="window-title">zsh — my-paper</span>
+      </div>
+      <div class="term-body"><span class="c"># 1 · 从 STAGE 模板建立论文仓库 —— 一篇论文，一个仓库</span>
+<span class="p">❯</span> <span class="cmd">git clone https://github.com/wanghao9610/STAGE my-paper <span class="flag">&amp;&amp;</span> cd my-paper</span>
+<span class="p">❯</span> <span class="cmd">rm <span class="flag">-rf</span> .git <span class="flag">&amp;&amp;</span> git init</span>   <span class="c"># 去掉 STAGE 的历史</span>
+
+<span class="c"># 2 · 配置本机运行环境</span>
+<span class="p">❯</span> <span class="cmd">cp .env.example .env <span class="flag">&amp;&amp;</span> <span class="str">$EDITOR</span> .env</span>   <span class="c"># STAR_HOME（可选）· LATEX_ENGINE · ANON</span>
+
+<span class="c"># 3 · 从配对的 STAR 仓库导入证据 —— 或把文件放进 mates/manual/</span>
+<span class="p">❯</span> <span class="cmd">bash execs/scpts/import.sh</span>
+
+<span class="c"># 4 · 构建与检查 —— 全新克隆开箱即可编译</span>
+<span class="p">❯</span> <span class="cmd">bash execs/run.sh</span>
+<span class="p">❯</span> <span class="cmd">bash execs/scpts/lint.sh</span>
+
+<span class="c"># 5 · 进入工作流 —— 它会告诉你唯一的下一步动作</span>
+<span class="p">❯</span> <span class="cmd">/stage-flow-status</span>
+<span class="p">❯</span> <span class="cursor-blink"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FINAL CTA ==================== -->
+<section class="cta-final">
+  <div class="wrap">
+    <p class="kicker reveal">随时可以开始</p>
+    <h2 class="reveal">给你的论文一条<br><span>值得投稿的监管链。</span></h2>
+    <p class="section-lead reveal">
+      STAGE 免费、MIT 协议、代理中立。
+      可以作为 GitHub 模板使用，也可以接入你已经在写的论文仓库。
+    </p>
+    <div class="hero-ctas reveal">
+      <a class="btn btn-primary" href="https://github.com/wanghao9610/STAGE" target="_blank" rel="noopener">✦ 使用模板</a>
+      <a class="btn btn-ghost" href="https://github.com/wanghao9610/STAGE#quick-start" target="_blank" rel="noopener">阅读文档</a>
+      <a class="btn btn-ghost" href="https://github.com/wanghao9610/STAR" target="_blank" rel="noopener">与 STAR 配对</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 STAGE · 基于 MIT 协议发布</span>
+  <div class="f-links">
+    <a href="https://github.com/wanghao9610/STAGE" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/wanghao9610/STAGE#writing-workflow" target="_blank" rel="noopener">工作流指南</a>
+    <a href="https://github.com/wanghao9610/STAR" target="_blank" rel="noopener">STAR</a>
+    <a href="/STAGE/index.html" hreflang="en">English</a>
+    <a href="#top">回到顶部 ↑</a>
+  </div>
+</footer>
+
+</div><!-- /.content -->
+
+<script>
+(function () {
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- scroll reveal (with stagger for grouped items) ---------- */
+  var revealEls = document.querySelectorAll(".reveal");
+  var bento = document.querySelector(".bento");
+  if (bento) {
+    Array.prototype.forEach.call(bento.children, function (card, i) {
+      card.setAttribute("data-stagger", i * 70);
+    });
+  }
+  if ("IntersectionObserver" in window && !reduced) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          var el = e.target;
+          var d = parseInt(el.getAttribute("data-stagger") || "0", 10);
+          if (d > 0) {
+            el.style.transitionDelay = d + "ms";
+            setTimeout(function () { el.style.transitionDelay = ""; }, d + 800);
+          }
+          el.classList.add("visible");
+          io.unobserve(el);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add("visible"); });
+  }
+
+  /* ---------- nav: scroll progress, condensed state, active section ---------- */
+  var nav = document.querySelector("nav");
+  var progress = document.querySelector(".nav-progress");
+  function onScroll() {
+    var st = window.scrollY || document.documentElement.scrollTop;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    if (progress) progress.style.transform = "scaleX(" + (max > 0 ? Math.min(st / max, 1) : 0) + ")";
+    if (nav) nav.classList.toggle("scrolled", st > 24);
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  var navLinks = document.querySelectorAll(".nav-links a");
+  if ("IntersectionObserver" in window && navLinks.length) {
+    var secObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          navLinks.forEach(function (a) {
+            a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id);
+          });
+        }
+      });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    document.querySelectorAll("section[id]").forEach(function (s) { secObs.observe(s); });
+  }
+
+  /* ---------- hero stats count-up ---------- */
+  if (!reduced) {
+    document.querySelectorAll(".hero-stats .stat b").forEach(function (el) {
+      var end = parseInt(el.textContent, 10);
+      if (isNaN(end)) return;
+      var t0 = null, dur = 1100;
+      el.textContent = "0";
+      requestAnimationFrame(function tick(t) {
+        if (t0 === null) t0 = t;
+        var p = Math.min((t - t0) / dur, 1);
+        el.textContent = String(Math.round(end * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(tick);
+      });
+    });
+  }
+
+  /* ---------- card spotlight ---------- */
+  if (!reduced && window.matchMedia("(pointer: fine)").matches) {
+    document.querySelectorAll(".card").forEach(function (card) {
+      card.addEventListener("mousemove", function (e) {
+        var r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        card.style.setProperty("--my", (e.clientY - r.top) + "px");
+      });
+    });
+  }
+
+  /* ---------- starfield + constellation ---------- */
+  var canvas = document.getElementById("sky");
+  var ctx = canvas.getContext("2d");
+  var stars = [], meteors = [], W = 0, H = 0;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var running = true;
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    seed();
+  }
+
+  function seed() {
+    stars = [];
+    var n = Math.min(260, Math.floor((W * H) / 6500));
+    for (var i = 0; i < n; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.3 + 0.25,
+        base: Math.random() * 0.5 + 0.25,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.9 + 0.35,
+        hue: Math.random() < 0.16 ? "255,216,107" : (Math.random() < 0.5 ? "165,180,252" : "226,232,255")
+      });
+    }
+  }
+
+  function spawnMeteor() {
+    if (meteors.length > 2) return;
+    meteors.push({
+      x: Math.random() * W * 0.8 + W * 0.1,
+      y: Math.random() * H * 0.35,
+      vx: -(4 + Math.random() * 4),
+      vy: 2 + Math.random() * 2,
+      life: 1
+    });
+  }
+
+  /* constellation: connect nearby stars with faint lines */
+  function drawLinks() {
+    var linkDist = 110;
+    ctx.lineWidth = 0.5;
+    for (var i = 0; i < stars.length; i++) {
+      var a = stars[i];
+      if (a.y > H * 0.85) continue;
+      for (var j = i + 1; j < i + 6 && j < stars.length; j++) {
+        var b = stars[j];
+        var dx = a.x - b.x, dy = a.y - b.y;
+        var d2 = dx * dx + dy * dy;
+        if (d2 < linkDist * linkDist) {
+          var alpha = (1 - Math.sqrt(d2) / linkDist) * 0.14;
+          ctx.strokeStyle = "rgba(148,163,216," + alpha.toFixed(3) + ")";
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  var last = 0;
+  function frame(t) {
+    if (running) requestAnimationFrame(frame);
+    if (t - last < 1000 / 45) return; /* cap ~45fps */
+    last = t;
+    var time = t / 1000;
+
+    /* deep-space gradient backdrop */
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#04060f");
+    g.addColorStop(0.5, "#070b1a");
+    g.addColorStop(1, "#04060f");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    /* soft violet nebula glow */
+    var neb = ctx.createRadialGradient(W * 0.5, H * 0.32, 0, W * 0.5, H * 0.32, Math.max(W, H) * 0.5);
+    neb.addColorStop(0, "rgba(99,102,241,0.075)");
+    neb.addColorStop(0.5, "rgba(76,195,255,0.03)");
+    neb.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = neb;
+    ctx.fillRect(0, 0, W, H);
+
+    drawLinks();
+
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      var tw = reduced ? 1 : (0.55 + 0.45 * Math.sin(time * s.speed + s.phase));
+      var alpha = s.base * tw;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(" + s.hue + "," + alpha.toFixed(3) + ")";
+      ctx.fill();
+      if (s.r > 1.15) { /* bright stars get a cross flare */
+        ctx.strokeStyle = "rgba(" + s.hue + "," + (alpha * 0.35).toFixed(3) + ")";
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(s.x - s.r * 3.2, s.y); ctx.lineTo(s.x + s.r * 3.2, s.y);
+        ctx.moveTo(s.x, s.y - s.r * 3.2); ctx.lineTo(s.x, s.y + s.r * 3.2);
+        ctx.stroke();
+      }
+    }
+
+    /* meteors */
+    if (!reduced && Math.random() < 0.0035) spawnMeteor();
+    for (var m = meteors.length - 1; m >= 0; m--) {
+      var mt = meteors[m];
+      mt.x += mt.vx; mt.y += mt.vy; mt.life -= 0.012;
+      if (mt.life <= 0) { meteors.splice(m, 1); continue; }
+      var grad = ctx.createLinearGradient(mt.x, mt.y, mt.x - mt.vx * 14, mt.y - mt.vy * 14);
+      grad.addColorStop(0, "rgba(255,240,200," + (0.85 * mt.life).toFixed(3) + ")");
+      grad.addColorStop(1, "rgba(255,240,200,0)");
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(mt.x, mt.y);
+      ctx.lineTo(mt.x - mt.vx * 14, mt.y - mt.vy * 14);
+      ctx.stroke();
+    }
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    var wasRunning = running;
+    running = !document.hidden && !reduced;
+    if (running && !wasRunning) requestAnimationFrame(frame);
+  });
+
+  window.addEventListener("resize", resize);
+  resize();
+  if (reduced) {
+    /* static render: a single frame, no animation loop */
+    running = false;
+    requestAnimationFrame(function (t) { frame(t + 1000); });
+  } else {
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
+
+</body>
+</html>

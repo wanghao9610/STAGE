@@ -3,6 +3,7 @@
   <h1>STAGE</h1>
   <p><strong>Systematic Toolchain for Authoring, Guiding, and Editing</strong></p>
   <p><em>The academic-writing companion to STAR — every STAR needs a STAGE.</em></p>
+  <p><a href="https://wanghao9610.github.io/STAGE/"><strong>Documentation site</strong></a></p>
 </div>
 
 **Language:** English | [简体中文](README.zh-CN.md)
@@ -76,6 +77,8 @@ STAGE/
 │   ├── update.sh           # Sync upstream STAGE skills and docs; --adopt installs the skeleton
 │   └── scpts/              # import.sh (evidence import), lint.sh (deterministic checks)
 ├── docs/                   # Project documentation
+│   ├── index.html          # Documentation entrypoint for GitHub Pages (→ htmls/stage.html)
+│   ├── htmls/              # The landing pages: stage.html + stage_zh.html
 │   ├── mds/stage-workflow/ # Conventions + skills guide (upstream-managed)
 │   └── srcs/               # Documentation images and other static assets
 ├── .claude/skills/         # Writing workflow skills for Claude Code
