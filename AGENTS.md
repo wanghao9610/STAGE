@@ -8,7 +8,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 
 - Read the whole file at the start of every skill run. Skills cite its § numbers (§0 vocabulary … §9 fabrication boundary, §10 layout) and state only what is specific to themselves; where a skill is stricter, the skill wins.
 - Skip the re-read only when the same file's text is still verbatim visible in this conversation. Summaries and memories of having read it don't count.
-- Do not edit `docs/mds/stage-workflow/` — it is upstream-managed and `execs/update.sh` overwrites it. The same holds for `execs/run.sh` and the four skill trees; project-specific settings belong in `.env`, which is never synced.
+- Do not edit `docs/mds/stage-workflow/` — it is upstream-managed and `execs/update.sh` overwrites it. The same holds for the four skill trees, both `execs/` entrypoints (`update.sh` syncs itself), and this file with the Cursor rule that copies it; project-specific settings belong in `.env`, which is never synced.
 - What each skill does is in `docs/mds/stage-workflow/writing-workflow-skills.md`.
 - The `*.zh-CN.md` files beside the docs, and `SKILL_zh.md` beside each `SKILL.md`, are Chinese editions for human readers: never loaded at runtime, never authoritative. Load the English file and reply per §8.
 

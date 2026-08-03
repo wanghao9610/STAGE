@@ -129,4 +129,4 @@ Slash-only。预检与打包：`run.sh` 构建与 `lint.sh` 必须通过、venue
 
 - 共享规则与 § 编号：[writing-workflow-conventions.zh-CN.md](writing-workflow-conventions.zh-CN.md) —— 产物登记表是 §8，编造边界是 §9，布局是 §10。
 - skill 本身：`.claude/skills/<name>/SKILL.md`（权威）与 `.agents/skills/<name>/SKILL.md`（派生），由 `execs/update.sh` 同步进各实例；`SKILL_zh.md` 是随之维护的中文对照版，运行时不装载。
-- 面向用户的总览、快速上手与路线图：仓库 [README.zh-CN](../../../README.zh-CN.md)。
+- 面向用户的总览与快速上手：仓库 [README.zh-CN](../../../README.zh-CN.md)。

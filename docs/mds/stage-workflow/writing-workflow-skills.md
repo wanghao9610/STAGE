@@ -127,4 +127,4 @@ The read-only map of the whole flow: per-section, per-figure, per-table status f
 
 - Shared rules and § numbers: [writing-workflow-conventions.md](writing-workflow-conventions.md) — the artifact registry is §8, the fabrication boundary §9, the layout §10.
 - The skills themselves: `.claude/skills/<name>/SKILL.md` (canonical) and `.agents/skills/<name>/SKILL.md` (derived), synced into instances by `execs/update.sh`; `SKILL_zh.md` beside each is its Chinese edition, kept in step for human readers and never loaded at runtime.
-- The user-facing overview, quick start, and roadmap: the repository [README](../../../README.md).
+- The user-facing overview and quick start: the repository [README](../../../README.md).

@@ -228,9 +228,9 @@ building: `bash execs/run.sh --help` lists `--main` or it does not. When it does
 not, stop — the copy is written and the build is the step that could not run — and
 give the one-line fix: `bash execs/update.sh`, which syncs the entrypoint along with
 the skill trees and the workflow docs. If a run of that leaves `--main` still absent,
-the repository's `update.sh` predates the change too and no script updates itself —
-then both entrypoints have to be copied from upstream by hand, and saying so is the
-report. Never paper over it with a bare `latexmk`
+this repository's `update.sh` predates self-syncing too — a current one installs its
+own replacement, an older one cannot — so both entrypoints have to be copied from
+upstream by hand, and saying so is the report. Never paper over it with a bare `latexmk`
 line: §3.3 puts every build through the entrypoint so the engine comes from one
 place, and a package built by a different command is not evidence that
 `execs/run.sh` can build it.

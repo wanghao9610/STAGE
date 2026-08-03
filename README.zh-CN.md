@@ -10,7 +10,7 @@
 
 STAGE 把一个研究项目变成一篇提交的论文，并保证全程证据链不断。它把稿件、导入的实验证据、写作元数据和投稿周期分别放在约定好的目录中，给研究者和 AI 写作助手同一个构建入口、同一份共享规范，并提供一条完整的写作工作流——证据导入、故事、提纲、起草、图表制作、审计、模拟评审、回复、投稿打包。稿件中的每一个数字要么可追溯到一份带指纹的证据文件，要么被显式标记为缺失；每一条论断（claim）都在同一本台账中从提出一路跟踪到验证。
 
-STAGE 是 [STAR](https://github.com/wanghao9610/STAR)（*Systematic Toolchain for AI Research*，系统化 AI 研究工具链）在写作侧的伴侣仓库：STAR 负责推进研究、产出方法文档、实验结果和阶段小结；STAGE 把它们快照为只读证据，在其上写出论文。配对是可选的——STAGE 也可以完全独立使用，证据由人工登记。
+STAGE 是 [STAR](https://github.com/wanghao9610/STAR)（*Systematic Toolchain for AI Research*，系统化 AI 研究工具链，[文档站点](https://wanghao9610.github.io/STAR/)）在写作侧的伴侣仓库：STAR 负责推进研究、产出方法文档、实验结果和阶段小结；STAGE 把它们快照为只读证据，在其上写出论文。配对是可选的——STAGE 也可以完全独立使用，证据由人工登记。
 
 STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实例**，通过克隆模板创建，或用 `execs/update.sh --adopt` 把骨架装进一个已有的论文仓库。实例之后可以通过 `update.sh` 从上游同步 STAGE 管理的 skill 和工作流文档，而不会碰你的稿件。
 
@@ -32,7 +32,6 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - [通往投稿的十步路径](#通往投稿的十步路径)
 - [证据、指纹与论断台账](#证据指纹与论断台账)
 - [更新 STAGE 的 skill 与工作流文档](#更新-stage-的-skill-与工作流文档)
-- [路线图](#路线图)
 - [引用](#引用)
 - [许可证](#许可证)
 
@@ -345,26 +344,17 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 bash execs/update.sh
 ```
 
-默认从 `STAGE_REPOSITORY` 更新四份 skill 目录——`.claude/skills/`、`.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——以及 `docs/mds/stage-workflow/` 和构建入口 `execs/run.sh`。`run.sh` 之所以在内，是因为 skill 会按名字、按参数调用它，而它不承载任何项目配置：实例要设的一切都在 `.env` 里，而 `.env` 被 git 忽略、从不同步。`execs/update.sh` 被刻意排除在外——一个正在运行的脚本不能被就地改写。完整形式是 `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`：
+默认从 `STAGE_REPOSITORY` 更新四份 skill 目录——`.claude/skills/`、`.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——以及 `docs/mds/stage-workflow/`、共享的 agent 指令（`AGENTS.md` 与照抄其正文的 Cursor 规则），和 `execs/` 下的两个入口脚本。两个入口都不承载项目配置——实例要设的一切都在 `.env` 里，而 `.env` 被 git 忽略、从不同步——所以都可以放心替换：`run.sh` 是因为 skill 会按名字、按参数调用它；`update.sh` 自同步，是为了不让任何仓库卡在一个老到取不回后继版本的更新机制上。`update.sh` 用重命名的方式装上自己的新版：正在运行的进程继续读旧文件，下一次调用才用上新的。完整形式是 `bash execs/update.sh [--diff] [ref] [--skill NAME] [--force] [--adopt]`：
 
-- `--diff` 只预览、不改任何文件，有更新会改动文件时以退出码 `1` 结束——便于脚本化。
+- `--diff` 只预览、不改任何文件。全部一致时退出码 `0`，有更新会改动文件时 `2`，出错时 `1`——脚本因此能区分"有更新可用"与"检查本身失败"。
 - `ref` 把更新钉在某个 tag 或分支上。
-- `--skill NAME` 只更新一个 skill，四份目录同步；不动文档与 `execs/run.sh`。
+- `--skill NAME` 只更新一个 skill，四份目录同步；不动文档、agent 指令与两个入口脚本。
+- `--force` 解除两道拒绝：同步路径下未提交的改动被直接覆盖而不是中止命令，`.cursorignore` 被覆盖而不是保留。除此之外不扩大任何范围。
 - `--adopt` 把骨架装进一个已有仓库，只复制缺失的文件（见[步骤 1b](#1b-或者接入一个已有的论文仓库)）。
 
 如果你改的是 STAGE 本身而不是某篇论文：`bash .github/scripts/check_consistency.sh` 守着四份手工维护的 skill 目录自己守不住的那些不变量——各处 skill 集合与文件清单一致、slash-only 守卫在四套 harness 上互相吻合、调用 token 与工具名各归其树、Cursor 规则仍与 `AGENTS.md` 逐行对齐、description 不超 `SKILL.md` 的 1024 字符上限、开场装载完整、每条 `规约 §n` 引用都还解析得到。它在每次 push 与 PR 时跑 CI，属于上游维护工具——`.github/` 不会同步进论文仓库。
 
-`docs/mds/stage-workflow/` 由上游管理：不要在实例里编辑它，`update.sh` 会覆盖。harness 配置反过来——`AGENTS.md`、`.cursor/rules/` 与 `.cursorignore` 只在缺失时由 `--adopt` 安装，更新永远不覆盖它们，所以项目可以改自己的副本。`.cursor/rules/agent-instructions.mdc` 就是 `AGENTS.md` 的正文加一段规则头；改了其中一份，就把另一份同步。
-
-## 路线图
-
-v1 未含、计划推进：
-
-- **远程 git 导入源** —— `import.sh` 直接从 git URL 按钉住的 ref 拉取证据，不再要求本地检出。
-- **`.cursor/`、`.codex/`、`.kimi-code/` 目录** —— 对齐 STAR 的其余工具 skill 镜像。
-- **skill 级资产** —— venue 评分标准、回复模板、问题清单，作为 `references/` 放在使用它们的 skill 旁边。
-- **一致性 CI** —— 用 GitHub 检查保持 `.claude`/`.agents` 双目录与文档同步，如同 STAR 对它的四份镜像所做的。
-- **溯源钩子** —— STAR 式的 model-id 记录，覆盖每个 skill 写出的产物。
+`docs/mds/stage-workflow/` 由上游管理：不要在实例里编辑它，`update.sh` 会覆盖。`AGENTS.md` 与 `.cursor/rules/agent-instructions.mdc` 同理——它们是同一份文档的两副本，一份正文、一份正文加规则头——所以更新把它们成对替换，不留下互相漂移的空间；项目自己的约定该写进 `.env`，或写进一个更新不接管的文件。`.cursorignore` 反过来：缺失时安装，之后无论漂多远都保留，只有 `--force` 会覆盖它。
 
 ## 引用
 

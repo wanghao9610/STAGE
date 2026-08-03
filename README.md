@@ -10,7 +10,7 @@
 
 STAGE turns a research project into a submitted paper without losing the chain of custody along the way. It keeps the manuscript, imported experimental evidence, writing metadata, and submission cycles in predictable locations, gives researchers and AI writing agents one build entrypoint and one shared set of instructions, and runs a complete writing workflow — evidence import, story, outline, drafting, figures and tables, audits, simulated review, response, and submission packaging. Every number in the manuscript traces to a fingerprinted evidence file or is visibly marked as missing; every claim is tracked from proposal to verification in a single ledger.
 
-STAGE is the writing-side companion to [STAR](https://github.com/wanghao9610/STAR) (*Systematic Toolchain for AI Research*): STAR runs the research and produces the method documents, results, and digests; STAGE snapshots them as read-only evidence and writes the paper on top. The pairing is optional — STAGE also works standalone, with evidence registered by hand.
+STAGE is the writing-side companion to [STAR](https://github.com/wanghao9610/STAR) (*Systematic Toolchain for AI Research*, [documentation site](https://wanghao9610.github.io/STAR/)): STAR runs the research and produces the method documents, results, and digests; STAGE snapshots them as read-only evidence and writes the paper on top. The pairing is optional — STAGE also works standalone, with evidence registered by hand.
 
 STAGE is double-layered: this repository is the **template**; one paper = one **instance**, created by cloning the template or by installing its skeleton into an existing paper repo with `execs/update.sh --adopt`. Instances later sync STAGE-managed skills and workflow docs from upstream via `update.sh`, without touching the manuscript.
 
@@ -32,7 +32,6 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - [The ten-step path to a submission](#the-ten-step-path-to-a-submission)
 - [Evidence, fingerprints, and the claim ledger](#evidence-fingerprints-and-the-claim-ledger)
 - [Updating STAGE skills and workflow docs](#updating-stage-skills-and-workflow-docs)
-- [Roadmap](#roadmap)
 - [Citation](#citation)
 - [License](#license)
 
@@ -345,26 +344,17 @@ After creating a paper from STAGE, sync later STAGE releases without touching th
 bash execs/update.sh
 ```
 
-By default this updates the four skill trees — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — plus `docs/mds/stage-workflow/` and the build entrypoint `execs/run.sh`, from `STAGE_REPOSITORY`. `run.sh` is included because the skills call it by name and by flag, and it holds no project configuration: everything an instance sets lives in `.env`, which is git-ignored and never synced. `execs/update.sh` is deliberately excluded — a running script must not be rewritten underneath itself. The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`:
+By default this updates the four skill trees — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — plus `docs/mds/stage-workflow/`, the shared agent instructions (`AGENTS.md` and the Cursor rule that copies its body), and both `execs/` entrypoints, from `STAGE_REPOSITORY`. Neither entrypoint holds project configuration — everything an instance sets lives in `.env`, which is git-ignored and never synced — so both are safe to replace: `run.sh` because the skills call it by name and by flag, and `update.sh` so that no repository strands on an update mechanism too old to fetch its successor. `update.sh` installs its own replacement by rename, which leaves the running process on the old file and gives the next invocation the new one. The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--force] [--adopt]`:
 
-- `--diff` previews without changing a file, and exits `1` when an update would change something — scriptable.
+- `--diff` previews without changing a file. It exits `0` when everything matches, `2` when an update would change something, and `1` on error — so a script can tell "an update is available" from "the check itself failed".
 - A `ref` pins the update to a tag or branch.
-- `--skill NAME` updates one skill across all four trees, leaving the docs and `execs/run.sh` alone.
+- `--skill NAME` updates one skill across all four trees, leaving the docs, the agent instructions, and the entrypoints alone.
+- `--force` lifts both refusals: uncommitted changes under the synced paths are overwritten instead of stopping the command, and `.cursorignore` is overwritten instead of kept. It widens nothing else.
 - `--adopt` installs the skeleton into an existing repository, copying only what is absent (see [step 1b](#1b-or-adopt-a-paper-repo-that-already-exists)).
 
 Working on STAGE itself rather than on a paper? `bash .github/scripts/check_consistency.sh` holds the invariants four hand-maintained skill trees cannot hold on their own: same skill set and file inventory everywhere, the slash-only guards agreeing across all four harnesses, invocation tokens and tool names native to each tree, the Cursor rule still mirroring `AGENTS.md`, descriptions inside the 1024-character `SKILL.md` limit, the opening load intact, and every `conventions §n` citation still resolving. It runs in CI on every push and pull request, and is upstream-maintainer tooling — `.github/` is not synced into paper repositories.
 
-`docs/mds/stage-workflow/` is upstream-managed: do not edit it in an instance, `update.sh` overwrites it. The harness configuration goes the other way — `AGENTS.md`, `.cursor/rules/`, and `.cursorignore` are installed by `--adopt` only when absent and are never overwritten by an update, so a project may edit its own copies. `.cursor/rules/agent-instructions.mdc` is the body of `AGENTS.md` with a rule header; edit one and put the other in step.
-
-## Roadmap
-
-Not in v1, planned next:
-
-- **Remote git import sources** — `import.sh` fetching evidence straight from a git URL at a pinned ref, instead of requiring a local checkout.
-- **`.cursor/`, `.codex/`, `.kimi-code/` trees** — STAR-parity skill mirrors for the remaining tools.
-- **Per-skill assets** — venue rubrics, response templates, and question banks as `references/` beside the skills that use them.
-- **Consistency CI** — a GitHub check keeping the `.claude`/`.agents` trees and the docs in step, as STAR does for its four mirrors.
-- **Provenance hooks** — STAR-style model-id recording for every skill-written artifact.
+`docs/mds/stage-workflow/` is upstream-managed: do not edit it in an instance, `update.sh` overwrites it. So are `AGENTS.md` and `.cursor/rules/agent-instructions.mdc` — the same document twice, a body and a body with a rule header — which is why an update replaces them as a pair rather than letting the two drift; a project's own conventions belong in `.env` or in a file the update does not own. `.cursorignore` goes the other way: installed when it is absent, kept however far it drifts, and overwritten only by `--force`.
 
 ## Citation
 
