@@ -1,0 +1,107 @@
+{
+    // Aligns with execs/run.sh: manus/main.tex → wkdrs/builds/ (out-of-tree).
+    // extensions.latex
+    "[latex]": {
+        "editor.defaultFormatter": "James-Yu.latex-workshop",
+        "editor.formatOnSave": true
+    },
+    // Root search: a **/ glob so detection also works when the window is not
+    // opened at the repo root. A workspace-relative "manus/main.tex" matches
+    // nothing in that case and the extension refuses to build.
+    "latex-workshop.latex.search.rootFiles.include": [
+        "**/main.tex"
+    ],
+    "latex-workshop.hover.preview.mathjax.extensions": [
+        "boldsymbol"
+    ],
+    "latex-workshop.intellisense.package.enabled": true,
+    // Relative to the root file's directory (manus/), which is also the cwd
+    // LaTeX Workshop spawns latexmk in — so this lands in wkdrs/builds however
+    // the window was opened. %WORKSPACE_FOLDER% would not: it expands to
+    // workspaceFolders[0], which is the wrong folder in a multi-root workspace
+    // and an empty string with no folder open (outDir would become /wkdrs).
+    "latex-workshop.latex.outDir": "../wkdrs/builds",
+    "latex-workshop.mathpreviewpanel.cursor.enabled": true,
+    "latex-workshop.message.error.show": false,
+    "latex-workshop.message.warning.show": false,
+    "latex-workshop.showContextMenu": true,
+    "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
+    "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.latex.autoClean.run": "onBuilt",
+    "latex-workshop.formatting.latex": "latexindent",
+    "latex-workshop.formatting.latexindent.path": "latexindent",
+    // indent.log goes to the extension's tmp dir, not %OUTDIR%: wkdrs/builds is
+    // gitignored and absent in a fresh clone, and latexindent exits non-zero
+    // when -g points into a directory that does not exist yet — which surfaces
+    // as a "Formatting failed" popup on the first save, before any build.
+    "latex-workshop.formatting.latexindent.args": [
+        "-g",
+        "%TMPDIR%/indent.log",
+        "%TMPFILE%",
+        "-y=defaultIndent: '%INDENT%'"
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "PdfLaTeX",
+            "tools": [
+                "pdflatexmk"
+            ]
+        },
+        {
+            "name": "XeLaTeX",
+            "tools": [
+                "xelatexmk"
+            ]
+        },
+        {
+            "name": "LuaLaTeX",
+            "tools": [
+                "lualatexmk"
+            ]
+        }
+    ],
+    "latex-workshop.latex.tools": [
+        {
+            "name": "pdflatexmk",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-pdf",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-cd",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ],
+            "env": {}
+        },
+        {
+            "name": "xelatexmk",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-xelatex",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-cd",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ],
+            "env": {}
+        },
+        {
+            "name": "lualatexmk",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-lualatex",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-cd",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ],
+            "env": {}
+        }
+    ]
+}
