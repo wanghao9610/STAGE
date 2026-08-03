@@ -1,0 +1,6 @@
+interface:
+  display_name: "Story Coach"
+  short_description: "Turn results into a defensible pitch, claims, and a venue profile"
+  default_prompt: "Use $stage-stry-coach to turn my results into a paper pitch, contributions, and a target venue."
+policy:
+  allow_implicit_invocation: false

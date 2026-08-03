@@ -1,0 +1,23 @@
+# Builds and ephemeral reports are regenerable; keep the Markdown reports
+# indexable so the audits and the status skill can still read them.
+wkdrs/**
+!wkdrs/**/
+!wkdrs/**/*.md
+
+# Editor-side LaTeX build output beside the sources (run.sh builds out-of-tree).
+manus/out/
+.texpadtmp/
+.vscode/ltex*
+
+# LaTeX junk
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+.DS_Store

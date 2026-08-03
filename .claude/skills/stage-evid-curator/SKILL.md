@@ -2,12 +2,12 @@
 name: stage-evid-curator
 description: >-
   Curator of mates/, the read-only evidence store behind the paper's numbers — this skill and
-  execs/scpts/import.sh are the only two writers it has. `import` pulls or refreshes results from
+  execs/scpts/import.sh are the only writers it has. `import` pulls or refreshes results from
   the paired STAR repo by running the script, which pins each file's upstream commit in
   mates/MANIFEST.md and rewrites its source-type: star entries; `register <path>` adopts
   hand-dropped evidence under mates/manual/ as a source-type: manual entry — read in full,
   provenance asked, checksummed, dated; `check` (the default) reconciles disk against manifest
-  and grades every file ok, unregistered, missing, tampered, or stale, each with the one command
+  and grades every file ok, unregistered, missing, tampered, or stale, each with the command
   that fixes it. Evidence is read-only — a wrong number is fixed at its source and re-imported,
   never edited in place — and a file with no manifest entry does not exist to the writing
   skills. Use when the user runs /stage-evid-curator, wants STAR results imported or refreshed,
@@ -17,9 +17,13 @@ description: >-
 
 # Evidence Curator — the manifest and the files behind the numbers
 
-Match the user's language: reply in Chinese for Chinese dialogue. `mates/MANIFEST.md` and its entries are always written in English — every writing skill machine-reads them — and paths, hashes, and metric names stay English inside Chinese replies; the chat digest follows the dialogue language. `SKILL_zh.md` is this file's Chinese edition, kept in step for human readers only and never loaded at runtime; this SKILL.md stays authoritative.
+**Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. `mates/MANIFEST.md` and its entries are always written in English — every writing skill machine-reads them — and paths, hashes, and metric names stay English inside Chinese replies; the chat digest follows the dialogue language. `SKILL_zh.md` is this file's Chinese edition, kept in step for human readers only and never loaded at runtime; this SKILL.md stays authoritative.
 
 Invocation: `/stage-evid-curator [import | register <path> | check]` — no argument runs `check`; `import` passes any further arguments through to `execs/scpts/import.sh` unchanged; `register` takes the file to adopt (already under `mates/manual/`, or anywhere else to be copied in). An unrecognized token is asked about, never guessed.
+
+**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline every STAGE skill loads: read the whole file at the start of every run — v1 has no section-selective loading. It binds this skill hardest at §8 (the artifact registry, whose §8.2 is the manifest schema this file copies), §9 (the fabrication boundary — `mates/` is what every number in the manuscript is measured against), §4 (real dates, stamped into every entry), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
+
+**Reusing an earlier load.** A second STAGE skill in the same conversation does not pay for the conventions twice: skip the re-read only when the same file's text is still verbatim visible in this conversation. A summary that survived a context compaction, or a memory of having read it, does not count — when in doubt, read it again.
 
 ## Role
 

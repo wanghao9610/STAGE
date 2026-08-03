@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# execs/update.sh — sync STAGE-managed content from the upstream template
-# (.claude/skills/, .agents/skills/, docs/mds/stage-workflow/), or install the
+# execs/update.sh — sync STAGE-managed content from the upstream template (the
+# four per-harness skill trees and docs/mds/stage-workflow/), or install the
 # STAGE skeleton into an existing paper repo with --adopt.
 
 STAGE_REF="main"
@@ -15,11 +15,25 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 ROOT_DIR="$(cd -- "${SCRIPT_DIR}/.." && pwd -P)"
 
 # The STAGE-managed trees: overwritten on update, copy-if-absent on adopt.
+# One root per harness — same fifteen skills, harness-specific invocation
+# prefix and tool names.
 SKILL_ROOTS=(
     ".agents/skills"
     ".claude/skills"
+    ".cursor/skills"
+    ".kimi-code/skills"
 )
 DOCS_TREE="docs/mds/stage-workflow"
+
+# Harness configuration a project may have edited: installed only when missing
+# by --adopt, never overwritten by an update. The Cursor rule copies the body
+# of AGENTS.md, which an update also leaves alone, so the pair stays together.
+HARNESS_TREES=(
+    ".cursor/rules"
+)
+HARNESS_FILES=(
+    ".cursorignore"
+)
 
 log() {
     printf '[STAGE update] %s\n' "$*"
@@ -36,11 +50,16 @@ Usage: bash execs/update.sh [ref] [--skill NAME]
        bash execs/update.sh --diff [ref] [--skill NAME]
        bash update.sh --adopt
 
-Overwrite the STAGE-managed trees — .claude/skills/, .agents/skills/, and
+Overwrite the STAGE-managed trees — the four per-harness skill trees
+(.claude/skills/, .agents/skills/, .cursor/skills/, .kimi-code/skills/) and
 docs/mds/stage-workflow/ — with files from upstream. The default ref is main;
 a branch or tag may be supplied instead. Local edits under those trees are
 replaced; the manuscript, evidence, and notes are never touched. Use --skill
-to update only the named skill in both skill trees.
+to update only the named skill across all four skill trees.
+
+Harness configuration an instance may have edited — AGENTS.md, .cursor/rules/,
+.cursorignore — is installed by --adopt when absent and never overwritten by an
+update.
 
 --diff previews an update without changing anything: it lists upstream files
 that are new or differ from the local copies, plus project-local files an
@@ -116,10 +135,12 @@ if [[ "${ADOPT}" == true ]]; then
     # Directories merged file by file, and single files, all copy-if-absent.
     ADOPT_TREES=(
         "${SKILL_ROOTS[@]}"
+        "${HARNESS_TREES[@]}"
         "${DOCS_TREE}"
     )
     ADOPT_FILES=(
         "AGENTS.md"
+        "${HARNESS_FILES[@]}"
         ".env.example"
         ".gitignore"
         "execs/run.sh"
@@ -201,14 +222,10 @@ git clone \
     "${SOURCE_DIR}" || fail "Unable to fetch ref '${STAGE_REF}' from ${STAGE_REPOSITORY}. Check the ref exists (a branch or tag, not a commit SHA), that the network is reachable, and that git is 2.25 or newer — currently $(git --version 2>/dev/null || echo 'unknown')."
 
 if [[ "${ADOPT}" == false ]]; then
-    if [[ -n "${SKILL_NAME}" ]]; then
-        git -C "${SOURCE_DIR}" sparse-checkout set "${SYNC_PATHS[@]}"
-    else
-        # Directory arguments keep sparse-checkout correct in both cone and
-        # non-cone mode; the tar below still copies only SYNC_PATHS.
-        git -C "${SOURCE_DIR}" sparse-checkout set \
-            .agents/skills .claude/skills docs/mds/stage-workflow
-    fi
+    # Every SYNC_PATHS entry is a directory, which keeps sparse-checkout
+    # correct in both cone and non-cone mode; the tar below copies the same
+    # list, so the two can never name different sets.
+    git -C "${SOURCE_DIR}" sparse-checkout set "${SYNC_PATHS[@]}"
 
     for path in "${SYNC_PATHS[@]}"; do
         [[ -e "${SOURCE_DIR}/${path}" ]] || fail "Upstream ref is missing ${path}."

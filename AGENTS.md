@@ -10,7 +10,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 - Skip the re-read only when the same file's text is still verbatim visible in this conversation. Summaries and memories of having read it don't count.
 - Do not edit `docs/mds/stage-workflow/` — it is upstream-managed and `execs/update.sh` overwrites it.
 - What each skill does is in `docs/mds/stage-workflow/writing-workflow-skills.md`.
-- The `*.zh-CN.md` files beside the docs, and `SKILL_zh.md` beside each `SKILL.md`, are Chinese editions for human readers: never loaded at runtime, never authoritative. Load the English file and reply in the user's language.
+- The `*.zh-CN.md` files beside the docs, and `SKILL_zh.md` beside each `SKILL.md`, are Chinese editions for human readers: never loaded at runtime, never authoritative. Load the English file and reply per §8.
 
 ## 2. Core Principles
 
@@ -34,7 +34,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 
 ## 4. Writing Workflow Skills
 
-**Fifteen skills. Invoke as `/stage-<name>` in Claude Code, `$stage-<name>` in Codex.**
+**Fifteen skills. Invoke as `/stage-<name>` in Claude Code and Cursor, `$stage-<name>` in Codex, `/skill:stage-<name>` in Kimi Code.**
 
 | Skill | Role |
 | --- | --- |
@@ -54,10 +54,11 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 | `stage-subm-packer` † | preflight, package, submission record, freeze |
 | `stage-flow-status` | read-only status and the one next action |
 
-- The five marked † are slash-only: run them only when the user names them — never on your own initiative. They are the decision points (adoption, story, outline, response, submission).
+- The five marked † are slash-only: run them only when the user names them — never on your own initiative. They are the decision points (adoption, story, outline, response, submission). The † markers above are the source of truth: the guards enforcing them — `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests, `allow_implicit_invocation: false` in `.agents/skills/<name>/agents/openai.yaml` for Codex — are checked against this table, so marking a skill here without guarding it in all four trees fails CI.
 - `stage-flow-status` and `stage-peer-reviewer` never write to the manuscript; `stage-flow-status` writes nothing at all.
 - When you do not know where things stand, run the status skill first — it reads the outline, ledger, manifest, and cycle state, and names the single next action.
 - What each skill writes is the artifact registry, conventions §8. Do not hand-edit generated reports under `wkdrs/`.
+- The same fifteen skills ship once per harness — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — differing only in invocation prefix and tool names (`Bash` / `Shell`, `AskUserQuestion` / `AskQuestion` / `request_user_input`, `Read` / `ReadFile`). Load the copy under your own root and follow it; the trees are not interchangeable, and a listing that surfaces another root's copy is telling you where a file is, not which one binds you.
 
 ## 5. Git
 
@@ -83,5 +84,15 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 
 - `bash execs/run.sh` — latexmk, out-of-tree into `wkdrs/builds/`, engine from `.env` `LATEX_ENGINE`; prints the PDF path and page count.
 - `bash execs/scpts/lint.sh` — undefined references, `\todo` count, page count vs the active cycle's `venue.yml`, anonymity leaks when `ANON=true`. Hard failures exit non-zero.
-- Runtime configuration lives in `.env` (create from `.env.example`): `STAR_HOME` (optional — empty means standalone), `LATEX_ENGINE`, `ANON`, `STAGE_REPOSITORY`. Do not hardcode machine-specific paths.
+- Runtime configuration lives in `.env` (create from `.env.example`): `STAR_HOME` (optional — empty means standalone), `LATEX_ENGINE`, `ANON`, `STAGE_REPOSITORY`, `STAGE_LANG` (optional — empty means follow the conversation). Do not hardcode machine-specific paths.
 - Real dates only: every date written into an artifact comes from the system clock, never from memory or invention (conventions §4).
+
+## 8. Reply Language
+
+**`.env` `STAGE_LANG` sets the language of chat replies and of the Markdown a run writes** — `notes/`, `tasks/`, simulated reviews, `wkdrs/` reports. Full rule: conventions §7.6.
+
+- Set (`en` or `zh`) → use it, whatever the chat's language. Unset or empty → follow the user's dialogue language. An explicit in-conversation request wins over both.
+- Resolve it once at the start of a run: `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call.
+- **Always English, whatever it says**: everything under `manus/` (prose, captions, `% src:` comments, `\todo{}` text) and the response to reviewers under `cycls/<cycle>/response/` — both are read by people outside this repository.
+- **Structural literals are English inside a document written in any language**: frontmatter keys and values, ledger statuses, claim and point IDs, paths, bibkeys, venue, dataset, and metric names — anything a script greps.
+- An existing document keeps the language it was written in; `STAGE_LANG` governs what a run writes, never a retranslation.

@@ -48,12 +48,16 @@ STAGE 提供十五个彼此衔接的写作工作流 skill，把导入的证据�
 
 ## 怎么调用
 
-| 工具 | 调用方式 | 例子 |
-| --- | --- | --- |
-| Claude Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
-| Codex | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
+| 工具 | skill 目录 | 调用方式 | 例子 |
+| --- | --- | --- | --- |
+| Claude Code | `.claude/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Codex | `.agents/skills/` | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
+| Cursor | `.cursor/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Kimi Code | `.kimi-code/skills/` | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
 
-五个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。另外十个在任务明显匹配时也可以由 agent 自行拾起。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
+四份目录装着同样的十五个 skill，只差调用前缀与工具名（`Bash` / `Shell`、`AskUserQuestion` / `AskQuestion` / `request_user_input`、`Read` / `ReadFile`）。跟着你自己那套 harness 目录下的副本走；列表里冒出另一套目录的副本，说明的是文件在哪，不是哪一份对你有约束力。
+
+五个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。这一条按 harness 各自强制，不靠自觉——Claude、Cursor、Kimi 三份 manifest 里的 `disable-model-invocation: true`，以及 Codex 的 `.agents/skills/<name>/agents/openai.yaml` 里的 `allow_implicit_invocation: false`。另外十个在任务明显匹配时也可以由 agent 自行拾起。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
 
 ## 各个 skill
 

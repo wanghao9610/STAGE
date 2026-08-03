@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="docs/srcs/stage-project-icon.png" alt="STAGE project icon" width="128">
   <h1>STAGE</h1>
   <p><strong>Systematic Toolchain for Authoring, Guiding, and Editing</strong></p>
   <p><em>The academic-writing companion to STAR — every STAR needs a STAGE.</em></p>
@@ -43,7 +44,7 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - **Deterministic checks in scripts, judgment in skills**: `execs/scpts/lint.sh` catches undefined references, `\todo` markers, page-limit overruns, and anonymity leaks mechanically; the fifteen skills handle everything that needs judgment.
 - **A complete writing lifecycle** through fifteen complementary skills, in the order they run: wire the repo, curate evidence, shape the story, outline the paper, draft each section, build tables from evidence, design figures, curate references, polish the prose, audit every number, audit every citation, simulate review, write the response, pack the submission, and report status.
 - **Submission cycles as data**: each venue attempt lives in `cycls/<venue>_<year>/` with a user-confirmed `venue.yml` profile, received and simulated reviews, the response, and a frozen submission record.
-- **Dual agent trees**: the same fifteen skills for Claude Code (`.claude/skills/`) and Codex (`.agents/skills/`), plus one shared `AGENTS.md`.
+- **One workflow, four agent trees**: the same fifteen skills for Claude Code (`.claude/skills/`), Codex (`.agents/skills/`), Cursor (`.cursor/skills/`), and Kimi Code (`.kimi-code/skills/`), differing only in invocation prefix and tool names — plus one shared `AGENTS.md`, whose body is mirrored into `.cursor/rules/` as an always-on Cursor rule.
 - **zh-CN mirrors for human readers**: `SKILL_zh.md` beside every `SKILL.md`, `*_zh.md` beside the peer-reviewer references, and `*.zh-CN.md` beside the conventions and the skills guide — kept in step, never loaded at runtime, and the English files stay authoritative.
 
 See [Writing workflow](#writing-workflow) for what each skill does and how to invoke it. The [Writing Workflow Skills Guide](docs/mds/stage-workflow/writing-workflow-skills.md) adds a paragraph per skill and the pipeline diagram; the rules every skill shares are in the [Writing Workflow Conventions](docs/mds/stage-workflow/writing-workflow-conventions.md).
@@ -74,9 +75,16 @@ STAGE/
 │   ├── run.sh              # Build entrypoint (latexmk, out-of-tree)
 │   ├── update.sh           # Sync upstream STAGE skills and docs; --adopt installs the skeleton
 │   └── scpts/              # import.sh (evidence import), lint.sh (deterministic checks)
-├── docs/mds/stage-workflow/ # Conventions + skills guide (upstream-managed)
+├── docs/                   # Project documentation
+│   ├── mds/stage-workflow/ # Conventions + skills guide (upstream-managed)
+│   └── srcs/               # Documentation images and other static assets
 ├── .claude/skills/         # Writing workflow skills for Claude Code
-├── .agents/skills/         # Writing workflow skills for Codex
+├── .agents/skills/         # Writing workflow skills for Codex (+ agents/openai.yaml each)
+├── .cursor/
+│   ├── skills/             # Writing workflow skills for Cursor
+│   └── rules/              # Always-on rules: AGENTS.md body + skill-root ownership
+├── .kimi-code/skills/      # Writing workflow skills for Kimi Code
+├── .cursorignore           # Keeps builds and LaTeX junk out of Cursor's index
 ├── .env.example            # Local configuration example
 ├── AGENTS.md               # Shared instructions for AI writing agents
 ├── CLAUDE.md               # Symlink to AGENTS.md, so Claude Code loads the same rules
@@ -98,6 +106,7 @@ The abbreviated directory names follow STAR's convention:
 | `execs/` | Executions | Entrypoint scripts; `scpts/` the utilities |
 | `wkdrs/` | Work directories | Builds and ephemeral reports, never committed |
 | `mds/` | Markdowns | Markdown documentation, grouped by topic |
+| `srcs/` | Static sources | Images and other static assets the docs embed |
 
 Three rules the tree alone does not carry: `mates/` is read-only (`import.sh` and `/stage-evid-curator` are the only writers, adding or replacing whole files with fingerprints); `wkdrs/` is never committed (durable audit outcomes live as status flips in `notes/claims.md` and entries in `tasks/`, not in reports); and the `execs/` root is closed (`run.sh` + `update.sh` and nothing else — utilities go in `execs/scpts/`).
 
@@ -175,9 +184,13 @@ LATEX_ENGINE=pdflatex
 ANON=false
 # Upstream STAGE repo used by execs/update.sh
 STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
+# Optional. Reply and document language: en | zh; empty = follow the conversation
+STAGE_LANG=
 ```
 
 `STAR_HOME` decides which quick-start path you are on. The local `.env` is ignored by Git.
+
+`STAGE_LANG` (optional, `en` | `zh`) sets the language of chat replies and of the Markdown the workflow writes — `notes/`, `tasks/`, simulated reviews, `wkdrs/` reports. Left empty, everything follows the conversation's own language. Two things stay English whatever it says, because people outside the repository read them: the manuscript under `manus/`, and the response to reviewers. So do structural literals in any document — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names — which is what keeps a Chinese note machine-readable. Full rule: [conventions §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 ### 3. Path A: paired with a STAR repo
 
@@ -231,8 +244,10 @@ STAGE includes fifteen complementary skills that turn imported evidence and a st
 | --- | --- | --- |
 | Claude Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Codex | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
+| Cursor | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Kimi Code | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
 
-Five skills (marked † below) are slash-only: they run only when you name them explicitly, and the agent never starts them on its own initiative. They are the dialogue-heavy decision points — adoption, story, outline, response, submission — where an unrequested run would make choices that are yours to make.
+Five skills (marked † below) are slash-only: they run only when you name them explicitly, and the agent never starts them on its own initiative. They are the dialogue-heavy decision points — adoption, story, outline, response, submission — where an unrequested run would make choices that are yours to make. Each harness enforces it in its own way — `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests, `allow_implicit_invocation: false` in Codex's `agents/openai.yaml` — and the four are checked against this table in CI, so a skill cannot end up guarded on three harnesses and open on the fourth.
 
 | Skill | Purpose | Main output |
 | --- | --- | --- |
@@ -307,14 +322,16 @@ After creating a paper from STAGE, sync later STAGE releases without touching th
 bash execs/update.sh
 ```
 
-By default this updates `.claude/skills/`, `.agents/skills/`, and `docs/mds/stage-workflow/` from `STAGE_REPOSITORY`. The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`:
+By default this updates the four skill trees — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — and `docs/mds/stage-workflow/` from `STAGE_REPOSITORY`. The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`:
 
 - `--diff` previews without changing a file, and exits `1` when an update would change something — scriptable.
 - A `ref` pins the update to a tag or branch.
-- `--skill NAME` updates one skill across both trees.
+- `--skill NAME` updates one skill across all four trees.
 - `--adopt` installs the skeleton into an existing repository, copying only what is absent (see [step 1b](#1b-or-adopt-a-paper-repo-that-already-exists)).
 
-`docs/mds/stage-workflow/` is upstream-managed: do not edit it in an instance, `update.sh` overwrites it.
+Working on STAGE itself rather than on a paper? `bash .github/scripts/check_consistency.sh` holds the invariants four hand-maintained skill trees cannot hold on their own: same skill set and file inventory everywhere, the slash-only guards agreeing across all four harnesses, invocation tokens and tool names native to each tree, the Cursor rule still mirroring `AGENTS.md`, descriptions inside the 1024-character `SKILL.md` limit, the opening load intact, and every `conventions §n` citation still resolving. It runs in CI on every push and pull request, and is upstream-maintainer tooling — `.github/` is not synced into paper repositories.
+
+`docs/mds/stage-workflow/` is upstream-managed: do not edit it in an instance, `update.sh` overwrites it. The harness configuration goes the other way — `AGENTS.md`, `.cursor/rules/`, and `.cursorignore` are installed by `--adopt` only when absent and are never overwritten by an update, so a project may edit its own copies. `.cursor/rules/agent-instructions.mdc` is the body of `AGENTS.md` with a rule header; edit one and put the other in step.
 
 ## Roadmap
 

@@ -89,7 +89,7 @@ skill 可以改文本、跑构建、跑**轻量验证**。任何**重的、贵�
 
 ## 3. `.env` 与构建工具链
 
-四个变量，按 `.env.example` 出厂的样子：
+五个变量，按 `.env.example` 出厂的样子：
 
 ```bash
 # Paired STAR project repo (optional — leave empty when writing without one)
@@ -100,10 +100,14 @@ LATEX_ENGINE=pdflatex
 ANON=false
 # Upstream STAGE repo used by execs/update.sh
 STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
+# Optional. Reply and document language: en | zh; empty = follow the conversation
+STAGE_LANG=
 ```
 
+其中四个由入口脚本读取。`STAGE_LANG` 是例外：没有脚本读它，读它的是 skill（§7.6）。
+
 1. **仓库根目录的 `.env` 是这些取值的存放处**，而优先级是**环境变量 → `.env` → 文档写明的默认值**。每个入口脚本都是从文件里读出自己需要的键，而不是 source 整个文件，所以 `STAR_HOME=… bash execs/scpts/import.sh` 和 `LATEX_ENGINE=xelatex bash execs/run.sh` 说什么就是什么，不会被文件悄悄盖掉——这个顺序 `execs/update.sh` 处理 `STAGE_REPOSITORY` 时本来就在用，现在四个入口一致。临时覆盖用命令行变量，长期覆盖去改 `.env`。绝不猜某个本地路径，绝不硬编码，绝不凭对另一个项目的记忆填写。`.env` 本身被 git 忽略，且与机器绑定。
-2. **每个变量都有可用默认值**，所以缺 `.env` 从不阻塞构建：`LATEX_ENGINE` 回落到 pdflatex，`ANON` 回落到 false。`STAR_HOME` 为空是被支持的状态——没有配对仓库地写作——此时 `import.sh` 要求 `--source`，证据以人工投放的形式到达。需要 `STAR_HOME` 却找不到的 skill 会提问（§7）；它绝不臆造一个路径。
+2. **每个变量都有可用默认值**，所以缺 `.env` 从不阻塞构建：`LATEX_ENGINE` 回落到 pdflatex，`ANON` 回落到 false，`STAGE_LANG` 回落到对话本身的语言。`STAR_HOME` 为空是被支持的状态——没有配对仓库地写作——此时 `import.sh` 要求 `--source`，证据以人工投放的形式到达。需要 `STAR_HOME` 却找不到的 skill 会提问（§7）；它绝不臆造一个路径。
 3. **每次构建都走 `execs/run.sh`**，它以**树外**方式跑 latexmk：`latexmk -<engine> -interaction=nonstopmode -halt-on-error -outdir=wkdrs/builds manus/main.tex`，engine 取自 `LATEX_ENGINE`。绝不在源码树里裸跑 latexmk：`manus/` 要保持没有 `.aux`/`.log` 垃圾，并且每个构建产物都能随 `wkdrs/` 一起丢弃。成功时 `run.sh` 打印 PDF 路径与页数；`lint.sh` 在它之上做确定性检查。
 4. **`ANON=true` 表示仓库处于投稿匿名模式。** `lint.sh` 会额外搜捕身份泄漏——`\author` 内容、致谢、`github.com/<user>`、`\thanks`——泄漏即硬失败。venue 档案里的 `anonymized:` 记录的是 venue 的要求；`ANON` 是操作开关，由用户来拨。发现两者不一致的 skill 要说出来并提问（§7），而不是静默改掉其中任何一个。
 5. **没有任何 skill 安装东西。** 缺失的工具——latexmk、pdfinfo、texcount、bib 解析器——意味着一次**降级检查**：能跑的照跑，在报告里点名缺口，并把安装命令交给用户（§2 禁止代跑）。
@@ -146,7 +150,9 @@ STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
 3. **每个问题带 2–4 个具体选项并标出推荐**，用户始终可以在选项之外自由作答。**每个选项要写清它的后果，而不是把标题再说一遍**：选它会产出或改变什么、会排除掉什么，以及——当答案并非显然可撤销时——能否回退、回退代价多大。"双栏 teaser"是标题；"teaser 只占一栏，给 §4 腾出约 0.4 页，日后换回来意味着重排 intro"才是后果。确实开放的问题（这篇论文的 pitch 是什么？）可以不带选项。
 4. **如实汇报。** 缺口绝不往上凑。跳过或降级的检查绝不说成跑过——没跑过的 lint、没尝试过的构建、没有解析器却说解析过的 bib。状态写着 `drafted` 的主张绝不称作 `verified`，假设出来的数字绝不暗示成追溯过的（§9a）。
 5. **结论先行**，然后是证据，最后是转交给下一个 skill 的建议。
-6. **用用户的对话语言回复。** 中文对话得到中文回复。v1 里工作流写进仓库的一切都是英文——笔记、台账行、评审、报告；目前还没有语言覆盖变量（在路线图上）。中文回复里，技术名词、指标名、venue 名、文件路径以及 `reference.bib` 里的一切一律保留英文。手稿本身在这条规则之外：它的语言属于 venue 和用户，聊天用什么语言都不会改写它。
+6. **`STAGE_LANG` 决定回复和本次运行所写内容的语言。** `.env` 的 `STAGE_LANG=en|zh`（§3）同时决定两件事：聊天回复，以及一次运行新写的 Markdown——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。未设、为空或取任何其他值 → 跟随用户的对话语言，于是中文对话得到中文回复；运行中明确提出的语言要求优先于两者，并在本次运行的余下部分持续生效。skill 在**每次运行开始时解析一次**，只是一次一行的查询（`grep -sE '^STAGE_LANG=' .env || true`），搭在开场装载调用里，绝不为它单发一次调用。它管的是一次运行**写出**什么，而不是把已经落盘的东西重新翻译一遍：已有文档保持它写成时的语言，改一份文档的语言是用户明确提出的要求，不是翻变量的副作用。
+
+   **无论 `STAGE_LANG` 取什么值，这些一律英文。** 有两样东西会离开这个仓库、被并非作者的人读到，它们始终是英文：**`manus/` 下的一切**——正文、图表标题、`% src:` 注释、`\todo{}` 里的文字——以及**给评审的回复**（`cycls/<cycle>/response/`），那是程序委员会要读的。手稿的语言属于 venue 和用户；对话语言和 `STAGE_LANG` 都不会改写它。除此之外，**一切结构性字面量在任何语言写成的文档里都保持英文**：frontmatter 的键与取值、台账状态（`proposed` / `drafted` / `verified` / `unsourced` / `weakened` / `dropped`）、claim 与评审点的 ID、文件路径、bibkey 及 `reference.bib` 里的一切、venue 名、数据集名与指标名，以及一切被脚本 grep 的字符串。中文笔记配英文结构仍然可被机器读取；被翻译过的状态值会让 `lint.sh` 和每一个读这行的 skill 失灵。
 7. **参与度档位：问多少，由用户定。** 工作流提出的每个问题只属于三类之一。**必问确认点**任何档位都要问：红线上的一切（§2——尤其是提交投稿）、每一次提交提议（§1.6）、每一个把关删除或覆盖的确认、每一个以"已确认"身份进入 `venue.yml` 的取值（§9c）、以及对用户本意的任何歧义（§5.3 是章节名的情形）。**裁量题**——第 3 条要求标出推荐项、且怎么选都安全的问题——是档位真正拨动的部分。**可推导的细节**——凡有约定默认值的——任何档位都静默决定；它们从来就不是问题。
 
    档位由用户设定；skill 在**每次运行开始时、问出第一个问题之前解析一次**，按优先级从三个来源取值：用户加进 `.env` 的 `INVOLVE=` 行（`low` / `medium` / `high`；缺失、未设或非法 → `medium`——这一行是可选的，`.env.example` 不出厂带它），再被调用参数里的 `involve=<level>` 覆盖，再被运行中的自然语言（"少问点""都问我"）覆盖——最后一条指令在本次运行的余下部分生效。读它只是一次一行的查询（`grep -sE '^INVOLVE=' .env || true`），解析一次，搭在 skill 的开场装载调用里，绝不为它单发一次调用。

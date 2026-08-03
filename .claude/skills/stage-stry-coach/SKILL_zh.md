@@ -13,7 +13,7 @@ description: >-
 
 > 本文件是 `SKILL.md` 的中文对照版，随英文版同步维护，供人阅读；运行时装载的仍是 `SKILL.md`。两版冲突时，以 `SKILL.md` 为准。
 
-对话按用户的语言走：中文对话用中文回复。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
+**回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
 调用方式：`/stage-stry-coach [SECTION] [involve=low|medium|high]`——一个仓库一篇论文（规约 §5），所以没有"哪个故事"要点名：不带参数则接着未完成的故事往下走，或者开一个新的；给出小节 key（`pitch` / `problem` / `key-idea` / `contributions` / `venue`）则重新打开一份已定稿故事的那一部分，并清空 `finalized:`；可选的 `involve=` 记号设定本次运行的参与度档位（规约 §7），并在解析之前被剥离。
 

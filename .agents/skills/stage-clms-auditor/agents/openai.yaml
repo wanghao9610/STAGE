@@ -1,0 +1,6 @@
+interface:
+  display_name: "Claims Auditor"
+  short_description: "Trace every number in the manuscript to a fingerprinted source"
+  default_prompt: "Use $stage-clms-auditor to audit every number in the manuscript against the evidence store."
+policy:
+  allow_implicit_invocation: true

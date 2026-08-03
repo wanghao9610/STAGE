@@ -1,0 +1,6 @@
+interface:
+  display_name: "Peer Reviewer"
+  short_description: "Convene a simulated five-perspective review panel with an anchored rubric"
+  default_prompt: "Use $stage-peer-reviewer to review this draft as a program committee would, before I submit it."
+policy:
+  allow_implicit_invocation: true

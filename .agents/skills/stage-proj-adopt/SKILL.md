@@ -6,9 +6,9 @@ description: >-
   venue signals, git shape, and files that look like evidence rather than prose — then the mapping
   and the per-file move plan into manus/ are each confirmed before anything is touched; every
   \input, \graphicspath, and \bibliography edit is named in the plan before it is applied, and the
-  adopted tree is verified with an out-of-tree build. An external draft is copied in, its source
+  adopted tree is verified with a build. An external draft is copied in, its source
   tree never modified. Every number already in the prose is recorded as an unsourced claim — the
-  backlog $stage-clms-auditor ingests into the claim ledger and works down — and candidate
+  backlog $stage-clms-auditor works down — and candidate
   evidence files are routed to $stage-evid-curator, never copied into mates/ here. Use when the
   user invokes $stage-proj-adopt, wants to bring an existing paper, thesis chapter, or Overleaf
   export into STAGE, or asks how to onboard a draft that did not start from the template.
@@ -17,9 +17,13 @@ description: >-
 
 # Project Adopt — bring an in-progress manuscript into STAGE
 
-Match the user's language: reply in Chinese for Chinese dialogue. The adoption record is always written in English — every downstream skill reads it — with paths, metric names, and claims quoted verbatim in whatever language the draft uses; when the dialogue is Chinese, the closing digest in chat carries the summary in Chinese. `SKILL_zh.md` is this file's Chinese edition, kept in step for human readers only and never loaded at runtime; this SKILL.md stays authoritative.
+**Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. The adoption record is always written in English — every downstream skill reads it — with paths, metric names, and claims quoted verbatim in whatever language the draft uses; when the dialogue is Chinese, the closing digest in chat carries the summary in Chinese. `SKILL_zh.md` is this file's Chinese edition, kept in step for human readers only and never loaded at runtime; this SKILL.md stays authoritative.
 
 Invocation: `$stage-proj-adopt [SRC_PATH]` — no argument surveys this repository for a manuscript living outside `manus/` (the toolkit dropped onto an existing paper repo); a path adopts an external draft directory — an old project, an Overleaf export — by copying files in, and the source tree is never modified. Nothing to adopt either way is a valid answer: say so and stop rather than inventing work.
+
+**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline every STAGE skill loads: read the whole file at the start of every run — v1 has no section-selective loading. It binds this skill hardest at §9 (the fabrication boundary — a number already in the prose is an unsourced claim, never a sourced one), §10 (project layout, which the move plan targets), §8 (the artifact registry, including §8.2's manifest schema and §8.9's `backfilled:` gate), and §7 (dialogue — nothing moves before its confirmation point). This file states what is specific to this skill and wins wherever it is stricter.
+
+**Reusing an earlier load.** A second STAGE skill in the same conversation does not pay for the conventions twice: skip the re-read only when the same file's text is still verbatim visible in this conversation. A summary that survived a context compaction, or a memory of having read it, does not count — when in doubt, read it again.
 
 ## Role
 

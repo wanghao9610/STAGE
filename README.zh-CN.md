@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="docs/srcs/stage-project-icon.png" alt="STAGE 项目图标" width="128">
   <h1>STAGE</h1>
   <p><strong>Systematic Toolchain for Authoring, Guiding, and Editing</strong></p>
   <p><em>STAR 的学术写作伴侣 —— every STAR needs a STAGE。</em></p>
@@ -43,7 +44,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - **确定性检查放在脚本里，判断放在 skill 里**：`execs/scpts/lint.sh` 机械地抓未定义引用、`\todo` 标记、超页和匿名泄漏；十五个 skill 处理一切需要判断的事。
 - **完整的写作生命周期**：十五个相互配合的 skill，按运行顺序依次是——接线仓库、整理证据、打磨故事、规划提纲、逐节起草、由证据生成表格、设计图、维护参考文献、润色文字、审计每个数字、审计每条引用、模拟评审、撰写回复、打包投稿、汇报状态。
 - **投稿周期即数据**：每次投稿尝试都住在 `cycls/<venue>_<year>/` 里：经用户确认的 `venue.yml` 档案、真实与模拟评审、回复，以及冻结的投稿记录。
-- **双份 agent 目录**：同样的十五个 skill 分别供 Claude Code（`.claude/skills/`）和 Codex（`.agents/skills/`）使用，外加一份共享的 `AGENTS.md`。
+- **一套工作流，四份 agent 目录**：同样的十五个 skill 分别供 Claude Code（`.claude/skills/`）、Codex（`.agents/skills/`）、Cursor（`.cursor/skills/`）和 Kimi Code（`.kimi-code/skills/`）使用，彼此只差调用前缀与工具名；外加一份共享的 `AGENTS.md`，其正文被镜像进 `.cursor/rules/`，成为 Cursor 的常驻规则。
 - **供人阅读的中文镜像**：每个 `SKILL.md` 旁边一份 `SKILL_zh.md`、peer-reviewer 的 references 旁边一份 `*_zh.md`、规范与 skills 指南旁边一份 `*.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
 
 每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.md)中。
@@ -74,9 +75,16 @@ STAGE/
 │   ├── run.sh              # 构建入口（latexmk，树外构建）
 │   ├── update.sh           # 同步上游 STAGE skill 与文档；--adopt 安装骨架
 │   └── scpts/              # import.sh（证据导入）、lint.sh（确定性检查）
-├── docs/mds/stage-workflow/ # 规范 + skills 指南（由上游管理）
+├── docs/                   # 项目文档
+│   ├── mds/stage-workflow/ # 规范 + skills 指南（由上游管理）
+│   └── srcs/               # 文档图片及其他静态资源
 ├── .claude/skills/         # Claude Code 使用的写作工作流 skill
-├── .agents/skills/         # Codex 使用的写作工作流 skill
+├── .agents/skills/         # Codex 使用的写作工作流 skill（各带一份 agents/openai.yaml）
+├── .cursor/
+│   ├── skills/             # Cursor 使用的写作工作流 skill
+│   └── rules/              # 常驻规则：AGENTS.md 正文 + skill 目录归属
+├── .kimi-code/skills/      # Kimi Code 使用的写作工作流 skill
+├── .cursorignore           # 把构建产物与 LaTeX 垃圾挡在 Cursor 索引之外
 ├── .env.example            # 本地配置示例
 ├── AGENTS.md               # AI 写作助手共享的协作规范
 ├── CLAUDE.md               # 指向 AGENTS.md 的符号链接，供 Claude Code 加载同一份规范
@@ -98,6 +106,7 @@ STAGE/
 | `execs/` | Executions | 入口脚本；工具脚本放在 `scpts/` |
 | `wkdrs/` | Work directories | 构建产物与临时报告，永不提交 |
 | `mds/` | Markdowns | 按主题分组的 Markdown 文档 |
+| `srcs/` | Static sources | 文档引用的图片及其他静态资源 |
 
 三条目录树本身写不下的规则：`mates/` 只读（只有 `import.sh` 和 `/stage-evid-curator` 可以写入，且只做带指纹的整文件新增或替换）；`wkdrs/` 永不提交（可留存的审计结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目落盘，而不是报告文件）；`execs/` 根目录封闭（只有 `run.sh` + `update.sh`——工具脚本一律放 `execs/scpts/`）。
 
@@ -175,9 +184,13 @@ LATEX_ENGINE=pdflatex
 ANON=false
 # execs/update.sh 使用的上游 STAGE 仓库
 STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
+# 可选。回复与文档语言：en | zh；留空 = 跟随对话
+STAGE_LANG=
 ```
 
 `STAR_HOME` 决定你走哪条快速开始路径。本地 `.env` 已被 Git 忽略。
+
+`STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)。
 
 ### 3. 路径 A：与 STAR 仓库配对
 
@@ -231,8 +244,10 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 | --- | --- | --- |
 | Claude Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Codex | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
+| Cursor | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Kimi Code | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
 
-五个 skill（下表以 † 标注）仅限显式调用（slash-only）：只有你点名它们才会运行，agent 绝不会自作主张启动它们。它们是对话密集的决策点——接入、故事、提纲、回复、投稿——不请自来的一次运行会替你做本该由你做的决定。
+五个 skill（下表以 † 标注）仅限显式调用（slash-only）：只有你点名它们才会运行，agent 绝不会自作主张启动它们。它们是对话密集的决策点——接入、故事、提纲、回复、投稿——不请自来的一次运行会替你做本该由你做的决定。每套 harness 各按自己的方式强制这一条——Claude、Cursor、Kimi 三份 manifest 里的 `disable-model-invocation: true`，Codex 的 `agents/openai.yaml` 里的 `allow_implicit_invocation: false`——四者在 CI 里都要对着这张表核对，所以不会出现"三套挡住了、第四套敞着"的情况。
 
 | Skill | 用途 | 主要产出 |
 | --- | --- | --- |
@@ -307,14 +322,16 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 bash execs/update.sh
 ```
 
-默认从 `STAGE_REPOSITORY` 更新 `.claude/skills/`、`.agents/skills/` 和 `docs/mds/stage-workflow/`。完整形式是 `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`：
+默认从 `STAGE_REPOSITORY` 更新四份 skill 目录——`.claude/skills/`、`.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——以及 `docs/mds/stage-workflow/`。完整形式是 `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`：
 
 - `--diff` 只预览、不改任何文件，有更新会改动文件时以退出码 `1` 结束——便于脚本化。
 - `ref` 把更新钉在某个 tag 或分支上。
-- `--skill NAME` 只更新一个 skill，双目录同步。
+- `--skill NAME` 只更新一个 skill，四份目录同步。
 - `--adopt` 把骨架装进一个已有仓库，只复制缺失的文件（见[步骤 1b](#1b-或者接入一个已有的论文仓库)）。
 
-`docs/mds/stage-workflow/` 由上游管理：不要在实例里编辑它，`update.sh` 会覆盖。
+如果你改的是 STAGE 本身而不是某篇论文：`bash .github/scripts/check_consistency.sh` 守着四份手工维护的 skill 目录自己守不住的那些不变量——各处 skill 集合与文件清单一致、slash-only 守卫在四套 harness 上互相吻合、调用 token 与工具名各归其树、Cursor 规则仍与 `AGENTS.md` 逐行对齐、description 不超 `SKILL.md` 的 1024 字符上限、开场装载完整、每条 `规约 §n` 引用都还解析得到。它在每次 push 与 PR 时跑 CI，属于上游维护工具——`.github/` 不会同步进论文仓库。
+
+`docs/mds/stage-workflow/` 由上游管理：不要在实例里编辑它，`update.sh` 会覆盖。harness 配置反过来——`AGENTS.md`、`.cursor/rules/` 与 `.cursorignore` 只在缺失时由 `--adopt` 安装，更新永远不覆盖它们，所以项目可以改自己的副本。`.cursor/rules/agent-instructions.mdc` 就是 `AGENTS.md` 的正文加一段规则头；改了其中一份，就把另一份同步。
 
 ## 路线图
 

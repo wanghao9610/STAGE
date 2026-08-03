@@ -1,0 +1,6 @@
+interface:
+  display_name: "Response Writer"
+  short_description: "Turn reviews into a point ledger, a response, and promise checkboxes"
+  default_prompt: "Use $stage-resp-writer to turn these reviews into a point-by-point response and a promise list."
+policy:
+  allow_implicit_invocation: false

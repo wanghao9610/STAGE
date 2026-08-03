@@ -1,0 +1,6 @@
+interface:
+  display_name: "Citation Auditor"
+  short_description: "Verify citation keys and cited-work assertions against reading notes"
+  default_prompt: "Use $stage-cite-auditor to audit the citations and check every assertion about cited work."
+policy:
+  allow_implicit_invocation: true

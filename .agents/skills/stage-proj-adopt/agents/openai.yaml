@@ -1,0 +1,6 @@
+interface:
+  display_name: "Paper Project Adopt"
+  short_description: "Wire a new or existing paper repository into STAGE"
+  default_prompt: "Use $stage-proj-adopt to wire this paper repository into STAGE and record the adoption."
+policy:
+  allow_implicit_invocation: false

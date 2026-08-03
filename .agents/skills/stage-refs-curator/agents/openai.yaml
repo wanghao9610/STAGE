@@ -1,0 +1,6 @@
+interface:
+  display_name: "References Curator"
+  short_description: "Curate the bibliography and the reading notes behind every citation"
+  default_prompt: "Use $stage-refs-curator to add these references with fetched records and reading notes."
+policy:
+  allow_implicit_invocation: true

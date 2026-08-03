@@ -14,7 +14,7 @@ description: >-
 
 # Response Writer — point-by-point defense, promises on the books
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
+**Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
 Invocation: `/stage-resp-writer [CYCLE]` — with no argument, the active cycle from
 `notes/story.md` (conventions §5); a `CYCLE` argument names a directory under `cycls/` directly;
@@ -102,7 +102,8 @@ own wording; measure the draft against it, report the measurement, and trim unti
 ### Step 5: Write the artifacts
 
 - `cycls/<cycle>/response/RESPONSE_<date>.md` — real date (§4); create `response/` when absent;
-  shape below.
+  shape below. **Always English, whatever `STAGE_LANG` says (§7.6)** — a program committee reads
+  it. A Chinese dialogue still gets its chat report in Chinese; only the artifact is fixed.
 - `tasks/<cycle>_promises.md` — one `- [ ]` per promise. Merge on re-runs: never uncheck,
   reword, or delete an existing box; append new ones.
 - `notes/claims.md` — conceded claims flip to `weakened` and `updated:` is bumped. `weakened`

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Section Drafter"
+  short_description: "Draft or revise one manuscript section from evidence and claims"
+  default_prompt: "Use $stage-sect-drafter to draft this section from its outline brief, the claim ledger, and imported evidence."
+policy:
+  allow_implicit_invocation: true

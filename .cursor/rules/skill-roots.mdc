@@ -1,0 +1,51 @@
+---
+description: Skill root ownership and which copy Cursor Agent must follow
+alwaysApply: true
+---
+
+Guidelines for loading STAGE skills from tool-specific roots without mixing incompatible instructions.
+
+**Tradeoff:** These guidelines favor predictable tool behavior over treating every discovered skill as interchangeable.
+
+## 1. Respect Root Ownership
+
+**Use one authoritative copy per tool. Keep tool-specific instructions separate.**
+
+Cursor scans `.cursor/skills/` and `.agents/skills/` as native roots, plus `.claude/skills/` and `.codex/skills/` for compatibility. It surfaces one entry per skill `name`, so when the same skill exists in several roots only one copy is presented to the agent, and it is not necessarily the Cursor-owned one — in this repo all fifteen `stage-*` skills are surfaced from `.agents/skills/`, the Codex-worded copies. Section 2 is what corrects that. This repo assigns one owner per root:
+
+| Root | Owner tool | Adaptation |
+|------|------------|------------|
+| `.cursor/skills/` | **Cursor** | `/stage-*` invoke, `Shell`, `AskQuestion`, `Task` subagents, `SwitchMode` plan gate |
+| `.agents/skills/` | **Codex** | `$stage-*` invoke, shell prose, `request_user_input`, `spawn_agent`, `update_plan` |
+| `.claude/skills/` | **Claude Code** | `/stage-*` invoke, `Bash`, `AskUserQuestion`, `Read`, plan mode |
+| `.kimi-code/skills/` | **Kimi Code** | `/skill:stage-*` invoke, `Shell`, `AskUserQuestion`, `ReadFile` |
+
+Do not treat these four trees as interchangeable. Keep tool-specific wording in the matching root only. What the skills *do* is identical across all four — the same fifteen skills, the same conventions, the same artifacts — so a difference in behavior between trees is a bug, not a variant.
+
+## 2. Follow the Cursor-Owned Copy
+
+**When duplicate skills exist, Cursor Agent must use the copy under `.cursor/skills/`.**
+
+- For any `stage-*` skill that exists in multiple roots, read and follow `.cursor/skills/<name>/`.
+- This holds even when the surfaced entry points somewhere else: the path shown in the skill listing is where Cursor found a copy, not the copy to act on. Open `.cursor/skills/<name>/SKILL.md` yourself and follow that.
+- Ignore sibling copies under `.agents/skills/`, `.claude/skills/`, and `.kimi-code/skills/` unless the user explicitly asks for another tool's wording.
+- When linking hand-offs between skills, keep the `/stage-*` names, but still load instructions from `.cursor/skills/`.
+- `SKILL_zh.md` beside each `SKILL.md` is a Chinese edition for human readers: never loaded at runtime, never authoritative. Load the English file and reply per AGENTS.md §8.
+
+## 3. Reduce Duplicate Discovery in the Cursor UI
+
+**Hide compatible third-party copies where possible. Prefer this rule when duplicates remain.**
+
+- Turn **off** Settings → Rules, Skills and Subagents → **Include third-party Plugins, Skills, and other configs** so `.claude/skills/` (compatibility) is not ingested.
+- `.agents/skills/` is a **native** Cursor root, not third-party, so that toggle does not hide it, and it is the root that currently wins discovery. No setting resolves this; section 2 does, by instruction.
+- A project that only ever runs Cursor can delete the roots it does not use, which removes the competition at the source. This repo keeps all four because it ships them.
+
+## 4. Slash-Only Skills Stay Slash-Only
+
+**Five skills run only when the user names them.**
+
+`stage-proj-adopt`, `stage-stry-coach`, `stage-outl-planner`, `stage-resp-writer`, and `stage-subm-packer` carry `disable-model-invocation: true` and sit on decisions that belong to the author — adoption, story, outline, response, submission. Never start one on your own initiative, whichever root the listing surfaced it from.
+
+---
+
+**These guidelines are working if:** Cursor Agent consistently loads the Cursor-owned skill, preserves tool-specific wording, never auto-starts a slash-only skill, and avoids ambiguous duplicate entries where the UI allows it.

@@ -1,12 +1,12 @@
 ---
 name: stage-evid-curator
 description: >-
-  mates/ 的管理员——这是撑起论文数字的只读证据库，它只有两个写入者：本 skill 与
+  mates/ 的管理员——这是撑起论文数字的只读证据库，它的写入者只有：本 skill 与
   execs/scpts/import.sh。`import` 通过跑该脚本，从配对的 STAR 仓库拉取或刷新结果，脚本把每个文件的
   上游 commit 钉进 mates/MANIFEST.md 并整体重写它的 source-type: star 条目；`register <path>` 把
   手工投放的证据收进 mates/manual/，登记为一条 source-type: manual 条目——整份读完、问明出处、
   算好校验和、写上日期；`check`（默认）把磁盘与 manifest 对账，给每个文件评级 ok、unregistered、
-  missing、tampered 或 stale，每一级都附上修复它的那一条命令。证据是只读的——错数在它的来源处修好
+  missing、tampered 或 stale，每一级都附上修复它的命令。证据是只读的——错数在它的来源处修好
   再重新导入，绝不原地编辑——而没有 manifest 条目的文件，对写作类 skill 来说并不存在。只要用户运行
   $stage-evid-curator、想导入或刷新 STAR 结果、手上有一份结果文件要放到某条主张背后、或者询问论文的
   证据是否还是当前的，都应使用本 skill。Bilingual (en/zh)。
@@ -16,9 +16,13 @@ description: >-
 
 > 本文件是 `SKILL.md` 的中文对照版，随英文版同步维护，供人阅读；运行时装载的仍是 `SKILL.md`。两版冲突时，以 `SKILL.md` 为准。
 
-按用户的语言回复：中文对话用中文答。`mates/MANIFEST.md` 及其条目一律用英文写——每个写作类 skill 都要机器读它——中文回复里路径、哈希、指标名同样保留英文；聊天摘要跟随对话语言。
+**回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。`mates/MANIFEST.md` 及其条目一律用英文写——每个写作类 skill 都要机器读它——中文回复里路径、哈希、指标名同样保留英文；聊天摘要跟随对话语言。
 
 调用方式：`$stage-evid-curator [import | register <path> | check]`——不带参数跑 `check`；`import` 把后续参数原样透传给 `execs/scpts/import.sh`；`register` 接收要收编的文件（已经在 `mates/manual/` 下，或在别处、需要复制进来）。无法识别的记号要问，绝不猜。
+
+**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——v1 不做分节选读。它对本 skill 约束最紧的是 §8（产物登记表，其 §8.2 正是本文件抄下来的 manifest schema）、§9（编造边界——手稿里每个数字都拿 `mates/` 来量）、§4（真实日期，每条条目都要盖）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
+
+**复用上一次装载。** 同一轮对话里的第二个 STAGE skill 不必为规约付两次：只有当同一份文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要不算，“记得自己读过”也不算——拿不准就重读一遍。
 
 ## 角色
 

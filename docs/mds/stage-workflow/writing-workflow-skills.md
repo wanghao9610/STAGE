@@ -46,12 +46,16 @@ The list reads as one pass, but the workflow is not linear. `stage-proj-adopt` r
 
 ## Invoking the skills
 
-| Tool | Invocation | Example |
-| --- | --- | --- |
-| Claude Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
-| Codex | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
+| Tool | Skill root | Invocation | Example |
+| --- | --- | --- | --- |
+| Claude Code | `.claude/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Codex | `.agents/skills/` | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
+| Cursor | `.cursor/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Kimi Code | `.kimi-code/skills/` | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
 
-Five skills — `stage-proj-adopt`, `stage-stry-coach`, `stage-outl-planner`, `stage-resp-writer`, `stage-subm-packer` — are slash-only: they run only when named explicitly, never on the agent's own initiative, because each one sits on a decision that belongs to the author. The other ten may also be picked up by the agent when the task plainly matches. Section arguments resolve by number, file slug, or title against `notes/outline.md` (conventions §5); the active cycle is the `cycle:` field in `notes/story.md`.
+The four trees hold the same fifteen skills and differ only in invocation prefix and tool names (`Bash` / `Shell`, `AskUserQuestion` / `AskQuestion` / `request_user_input`, `Read` / `ReadFile`). Follow the copy under your own harness's root; a listing that surfaces another root's copy is telling you where a file is, not which one binds you.
+
+Five skills — `stage-proj-adopt`, `stage-stry-coach`, `stage-outl-planner`, `stage-resp-writer`, `stage-subm-packer` — are slash-only: they run only when named explicitly, never on the agent's own initiative, because each one sits on a decision that belongs to the author. It is enforced per harness, not by convention — `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests, `allow_implicit_invocation: false` in `.agents/skills/<name>/agents/openai.yaml` for Codex. The other ten may also be picked up by the agent when the task plainly matches. Section arguments resolve by number, file slug, or title against `notes/outline.md` (conventions §5); the active cycle is the `cycle:` field in `notes/story.md`.
 
 ## The skills
 
