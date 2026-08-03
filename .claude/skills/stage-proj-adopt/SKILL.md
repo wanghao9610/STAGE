@@ -18,7 +18,7 @@ description: >-
 
 # Project Adopt — bring an in-progress manuscript into STAGE
 
-Match the user's language: reply in Chinese for Chinese dialogue. The adoption record is always written in English — every downstream skill reads it — with paths, metric names, and claims quoted verbatim in whatever language the draft uses; when the dialogue is Chinese, the closing digest in chat carries the summary in Chinese.
+Match the user's language: reply in Chinese for Chinese dialogue. The adoption record is always written in English — every downstream skill reads it — with paths, metric names, and claims quoted verbatim in whatever language the draft uses; when the dialogue is Chinese, the closing digest in chat carries the summary in Chinese. `SKILL_zh.md` is this file's Chinese edition, kept in step for human readers only and never loaded at runtime; this SKILL.md stays authoritative.
 
 Invocation: `/stage-proj-adopt [SRC_PATH]` — no argument surveys this repository for a manuscript living outside `manus/` (the toolkit dropped onto an existing paper repo); a path adopts an external draft directory — an old project, an Overleaf export — by copying files in, and the source tree is never modified. Nothing to adopt either way is a valid answer: say so and stop rather than inventing work.
 
@@ -41,7 +41,7 @@ You are the on-ramp, not the editor. You do not judge the writing, you do not so
 
 ### Step 0: Resolve the source
 
-Parse the argument per the Invocation line. A `SRC_PATH` outside the repository → external mode: files are copied in, the source tree is read and never written. No argument → overlay mode: search this repository outside `manus/`, `mates/`, `notes/`, `cycls/`, `wkdrs/`, `execs/`, `docs/` for tex sources. Nothing found → report that the template layout already stands and stop. A re-run on an adopted repository re-probes and updates the record rather than starting over, and never re-proposes an executed move.
+Parse the argument per the Invocation line. A `SRC_PATH` outside the repository → external mode: files are copied in, the source tree is read and never written. No argument → overlay mode: search this repository outside `manus/`, `mates/`, `notes/`, `cycls/`, `wkdrs/`, `execs/`, `docs/` for tex sources. Nothing found means there is no draft to absorb — it does **not** mean there is nothing to do: fall through to Step 4.1 and wire the repository, which is the whole of adoption for a paper that starts here. `.env` from `.env.example`, `STAR_HOME` from the Step 2 pairing question, `LATEX_ENGINE` from the sources, and a `notes/adopt.md` that records the pairing and the venue target with an empty inventory and an empty backlog. Skip only when `notes/adopt.md` already exists and `.env` already carries the pairing: then say the layout stands and stop. A re-run on an adopted repository re-probes and updates the record rather than starting over, and never re-proposes an executed move.
 
 ### Step 1: Inventory (read-only)
 
@@ -56,7 +56,7 @@ Ask via AskUserQuestion, one question at a time, only about what the probe could
 Propose the plan as one table, one row per file — current path → target → the tex edits the move forces — then get it approved:
 
 1. Targets: the main file → `manus/main.tex`; sections → `manus/secs/`; rendered figures → `manus/figs/`; editable figure sources (`.svg`, `.drawio`, plot scripts) → `manus/figs/srcs/`; tables → `manus/tabs/`; bibliographies → `manus/bibs/`; local styles → `manus/stys/`.
-2. Edits: every `\input` / `\include` path, `\graphicspath`, `\bibliography` / `\addbibresource` the moves break, named in the row that breaks it — the plan shows each edit before any is applied.
+2. Edits: every `\input` / `\include` path, `\graphicspath`, `\bibliography` / `\addbibresource` the moves break, named in the row that breaks it — the plan shows each edit before any is applied. One edit is forced by the destination rather than by a broken path and is easy to miss: a draft's own main file arriving at `manus/main.tex` must keep `\usepackage{stys/stage}` from the placeholder it replaces. That package carries the `\todo` macro every downstream skill writes and `lint.sh` counts, plus graphicx/booktabs/xcolor/hyperref and `\graphicspath{{figs/}}`. Drop it and the tree still builds — the loss surfaces only when a drafter first needs a marker — so the row for the main file always names this edit, and a `\graphicspath` the move orphaned is replaced by it rather than kept.
 3. Exclusions: build junk gets no row (listed, left in place); evidence-looking files get no row (they are Step 6's list); a target that already holds real content is shown and asked about per file — only an untouched template placeholder is overwritten freely.
 4. Approval: one AskUserQuestion — approve all, approve by group (sections / figures / tables / bibs / styles), or abort. Unapproved rows do not move.
 
@@ -74,19 +74,22 @@ Propose the plan as one table, one row per file — current path → target → 
 
 Scan the adopted prose and tables: every number presented as a result — a metric value, a percentage, an "improves by", a speedup, a table cell — becomes one backlog row: the claim verbatim, its post-move `file:line`, and the suspected evidence source (a STAR run, a cited paper, a co-author's file) when the text hints at one, `unknown` otherwise. Setup numbers stay out — hyperparameters, equation constants, citation years — and when in doubt, in: an extra row costs one check, a missed one costs the paper's credibility. The backlog is recorded in the adoption record, not the ledger: `notes/claims.md` has one writer, `/stage-clms-auditor`, which ingests each row as an unsourced claim and works it down.
 
+Say plainly, in the record and in chat, what the backlog means until then: those numbers are the third state §9a forbids — neither traced nor marked — and `lint.sh`, which counts markers, will read the manuscript as **clean** while not one of them traces. The backlog is the only thing that knows. That is why `backfilled:` in the frontmatter is a gate and not a note: it stays empty here, only `/stage-clms-auditor` sets it, and `/stage-subm-packer` refuses to pack while it is empty (conventions §8.9, §9a).
+
 Alongside the backlog, list the candidate evidence files from Step 1 — the results dumps, CSVs, and run logs whose numbers back these claims. Each enters `mates/` only through `/stage-evid-curator` — `import` when the paired STAR repo produced it, `register` when it is hand-dropped — which writes the manifest entry, one `##` entry per file in `mates/MANIFEST.md`:
 
 ```
-## mates/<star|manual>/<path>
-source-type: star | manual
-source: <star: upstream repo-relative path · manual: origin — path, URL, or person>
-imported: <YYYY-MM-DD, real date>
-upstream-commit: <the SHA import.sh pinned — star entries only>
-sha256: <checksum of the file as it landed>
-shows: <one line — what this file evidences>
+## <slug>/<path as upstream has it>      # manual/<path> for hand-dropped files
+- source-type: star | manual
+- source: <star: $STAR_HOME/<rel> · manual: free text — path, URL, or person>
+- source-commit: <the SHA import.sh pinned | n/a>
+- source-stamp: <first generated:/updated:/finalized: value in source | n/a>
+- sha256: <checksum of the file as it landed>
+- imported: <YYYY-MM-DD, real date>
+- covers: <one line — what this file evidences>
 ```
 
-`source-type: star` entries and `mates/star/**` belong to `execs/scpts/import.sh` and are rewritten wholesale on re-import; `source-type: manual` entries and `mates/manual/**` belong to `/stage-evid-curator`, and the script never touches them. Evidence is read-only — a wrong number is fixed at its source (the STAR repo, the original document) and re-imported, never edited under `mates/` — and a file with no entry does not exist to the writing skills.
+This is conventions §8.2 copied, not a variant of it: the heading is the path **relative to `mates/`** with no `mates/` prefix (`xseg/wkdrs/results/main.md`, `manual/results.csv`), every field is a `- ` list item, and the field names are the ones `execs/scpts/import.sh` actually writes — `source-commit`, `source-stamp`, `covers`. `source-type: star` entries live under `mates/<slug>/**`, one slug per upstream source, and belong to that script, which rewrites them wholesale on re-import; `source-type: manual` entries live under `mates/manual/**` and belong to `/stage-evid-curator`, and the script never touches them. `source-stamp` answers "has upstream moved?" and needs a reachable source; `sha256` answers "did these bytes change here?" and needs only the file. Evidence is read-only — a wrong number is fixed at its source (the STAR repo, the original document) and re-imported, never edited under `mates/` — and a file with no entry does not exist to the writing skills.
 
 ### Step 7: Record, route, digest
 

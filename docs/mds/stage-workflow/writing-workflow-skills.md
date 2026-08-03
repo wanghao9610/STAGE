@@ -1,6 +1,6 @@
 # Writing Workflow Skills Guide
 
-**Language:** English — a 简体中文 edition is on the roadmap.
+**Language:** English | [简体中文](writing-workflow-skills.zh-CN.md)
 
 STAGE provides fifteen connected writing workflow skills that turn imported evidence and a story into a submitted paper with an auditable claim trail: a repo wired to its research project, a read-only evidence base with a fingerprint per file, a story whose contributions are tracked claims, an outline with page budgets, sections drafted against evidence, tables generated from evidence rather than typed, figures with editable sources, a verified bibliography, prose polished without touching numbers, every number and citation audited, a simulated review in the venue's own format, a response with tracked promises, and finally a frozen, packaged submission.
 
@@ -18,7 +18,7 @@ evidence (a paired STAR repo, or files dropped by hand)
 
 story
   → stage-stry-coach: story.md + seeded claim ledger + user-confirmed venue.yml
-  → stage-plan-outliner: outline with page budgets, section skeletons, notation seed
+  → stage-outl-planner: outline with page budgets, section skeletons, notation seed
   → stage-refs-curator: reading notes + a clean reference.bib
 
   ┌─ the drafting loop — re-entered per section, table, figure ──────────────────┐
@@ -51,7 +51,7 @@ The list reads as one pass, but the workflow is not linear. `stage-proj-adopt` r
 | Claude Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Codex | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
 
-Five skills — `stage-proj-adopt`, `stage-stry-coach`, `stage-plan-outliner`, `stage-resp-writer`, `stage-subm-packer` — are slash-only: they run only when named explicitly, never on the agent's own initiative, because each one sits on a decision that belongs to the author. The other ten may also be picked up by the agent when the task plainly matches. Section arguments resolve by number, file slug, or title against `notes/outline.md` (conventions §5); the active cycle is the `cycle:` field in `notes/story.md`.
+Five skills — `stage-proj-adopt`, `stage-stry-coach`, `stage-outl-planner`, `stage-resp-writer`, `stage-subm-packer` — are slash-only: they run only when named explicitly, never on the agent's own initiative, because each one sits on a decision that belongs to the author. The other ten may also be picked up by the agent when the task plainly matches. Section arguments resolve by number, file slug, or title against `notes/outline.md` (conventions §5); the active cycle is the `cycle:` field in `notes/story.md`.
 
 ## The skills
 
@@ -67,7 +67,7 @@ The evidence gate. Runs `execs/scpts/import.sh` for STAR sources; registers hand
 
 Slash-only. Dialogue-first story shaping: it reads imported idea docs and digests when a STAR pairing provides them, and interviews otherwise, until the pitch, problem, key idea, contributions, and venue rationale hold together in `notes/story.md`. Each contribution names its claim IDs, and the ledger `notes/claims.md` is seeded with those claims as `proposed`. It also creates `cycls/<cycle>/venue.yml` — page limits, deadlines, response format — from user-confirmed numbers only: a skill never invents venue rules (conventions §9c).
 
-### stage-plan-outliner
+### stage-outl-planner
 
 Slash-only. Turns the finalized story into the paper's skeleton: `notes/outline.md` with a section table whose page budgets sum within the venue limit, a figure plan, a table plan, and a claim→section assignment; skeleton files `manus/secs/<n>_<slug>.tex`, each opening with its section brief as a comment block, with their `\input` lines uncommented in `main.tex`; and a seeded `notes/notation.md`. After this run the paper builds with its real structure, and every later skill knows what belongs where and which claims each section must carry.
 
@@ -109,7 +109,7 @@ Slash-only. Parses reviews — real `received_*.md` files dropped into `cycls/<c
 
 ### stage-subm-packer
 
-Slash-only. Preflight and packaging: a `run.sh` build and `lint.sh` must pass, the venue checklist is walked, figures, tables, and bib are checked complete, and the package — camera PDF, supplementary, arXiv-ready source — lands under `wkdrs/builds/`. It writes `cycls/<cycle>/SUBMISSION_<date>.md` recording what was submitted where, and creates the git tag `freeze/<cycle>_<date>`, the one place freeze tags come from (conventions §1). Camera-ready mode additionally refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes: promises to reviewers are honored before anything ships.
+Slash-only. Preflight and packaging: a `run.sh` build and `lint.sh` must pass, the venue checklist is walked, figures, tables, and bib are checked complete, and the package — camera PDF, supplementary, arXiv-ready source — lands under `wkdrs/builds/`. It writes `cycls/<cycle>/SUBMISSION_<date>.md` recording what was submitted where, and creates the git tag `freeze/<cycle>_<date>`, the one place freeze tags come from (conventions §1). It also refuses an adopted repository whose `notes/adopt.md` still has an empty `backfilled:` — that is the one state where `lint.sh` reads clean over numbers that trace to nothing, so the marker count proves less than it looks (conventions §9a). Camera-ready mode additionally refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes: promises to reviewers are honored before anything ships.
 
 ### stage-flow-status
 
@@ -118,5 +118,5 @@ The read-only map of the whole flow: per-section, per-figure, per-table status f
 ## Where everything is defined
 
 - Shared rules and § numbers: [writing-workflow-conventions.md](writing-workflow-conventions.md) — the artifact registry is §8, the fabrication boundary §9, the layout §10.
-- The skills themselves: `.claude/skills/<name>/SKILL.md` (canonical) and `.agents/skills/<name>/SKILL.md` (derived), synced into instances by `execs/update.sh`.
+- The skills themselves: `.claude/skills/<name>/SKILL.md` (canonical) and `.agents/skills/<name>/SKILL.md` (derived), synced into instances by `execs/update.sh`; `SKILL_zh.md` beside each is its Chinese edition, kept in step for human readers and never loaded at runtime.
 - The user-facing overview, quick start, and roadmap: the repository [README](../../../README.md).

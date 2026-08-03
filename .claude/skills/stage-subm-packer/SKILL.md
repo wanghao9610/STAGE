@@ -15,9 +15,10 @@ description: >-
 
 # Submission Packer — preflight, package, freeze
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources
-(the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on
-the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources
+(the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md`
+beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in
+step for human readers only and are never loaded at runtime, so this SKILL.md stays
 authoritative.
 
 Invocation: `/stage-subm-packer [camera]` — no argument packs a review submission for the active
@@ -86,15 +87,23 @@ SUBMISSION record are yours; the click that submits is the user's.
    refuse: quote each open promise with the skill that closes it. A missing promises file beside
    an existing `cycls/<cycle>/response/` is an inconsistency — flag it and ask before treating it
    as "no promises made".
-4. **Hard gates.** Run `execs/run.sh` (record the PDF path and page count), then
+4. **Hard gates.** One is cheaper than the scripts and runs first: a `notes/adopt.md` whose
+   `backfilled:` is empty. That is the adopted-draft state in which the manuscript's pre-existing
+   numbers trace to nothing while `lint.sh` — which counts markers, and they carry none — reports
+   clean (conventions §9a, §8.9). The marker count proves less than it appears to, so refuse and
+   route to `/stage-clms-auditor` to work the backlog down and set the field. A repository with no
+   `notes/adopt.md` never started from a draft and skips this gate.
+   Then run `execs/run.sh` (record the PDF path and page count), then
    `execs/scpts/lint.sh --no-build`. Any hard failure stops the run and routes: `\todo` → the
    number's owner (/stage-sect-drafter or /stage-tabs-builder; /stage-clms-auditor when
    unclear); undefined citations → /stage-cite-auditor or /stage-refs-curator; over the page
    limit → /stage-copy-editor; identity leak → name the file and line.
 5. **Completeness sweep.** Check: outline Sections rows at `polished` or better, Figures and
    Tables rows at `final`; every `manus/figs/*.pdf` has a source under `figs/srcs/` or a
-   `mates/MANIFEST.md` entry; no claim stated in the manuscript sits at `unsourced` in
-   `notes/claims.md`; `import.sh --diff` reports no drift (skip with a note when `STAR_HOME` is
+   `mates/MANIFEST.md` entry; no claim stated in the manuscript sits at `unsourced` **or
+   `weakened`** in `notes/claims.md` — `weakened` means a response conceded it in writing, so a
+   manuscript still asserting it ships a claim its own authors have withdrawn, which reads worse
+   to a reviewer than the original overclaim; `import.sh --diff` reports no drift (skip with a note when `STAR_HOME` is
    unset). Each miss is a soft finding: present the list with a recommendation and ask via
    AskUserQuestion — proceed with named waivers, or abort — recording waivers per Principle 5.
 6. **Checklist walk.** Per `venue.yml` `checklist:` — `none` skips; otherwise walk the family's

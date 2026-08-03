@@ -13,7 +13,7 @@ description: >-
 
 # Response Writer — point-by-point defense, promises on the books
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources (the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays authoritative.
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
 Invocation: `$stage-resp-writer [CYCLE]` — with no argument, the active cycle from
 `notes/story.md` (conventions §5); a `CYCLE` argument names a directory under `cycls/` directly;

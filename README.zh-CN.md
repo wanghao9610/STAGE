@@ -43,6 +43,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - **完整的写作生命周期**：十五个相互配合的 skill，按运行顺序依次是——接线仓库、整理证据、打磨故事、规划提纲、逐节起草、由证据生成表格、设计图、维护参考文献、润色文字、审计每个数字、审计每条引用、模拟评审、撰写回复、打包投稿、汇报状态。
 - **投稿周期即数据**：每次投稿尝试都住在 `cycls/<venue>_<year>/` 里：经用户确认的 `venue.yml` 档案、真实与模拟评审、回复，以及冻结的投稿记录。
 - **双份 agent 目录**：同样的十五个 skill 分别供 Claude Code（`.claude/skills/`）和 Codex（`.agents/skills/`）使用，外加一份共享的 `AGENTS.md`。
+- **供人阅读的中文镜像**：每个 `SKILL.md` 旁边一份 `SKILL_zh.md`、peer-reviewer 的 references 旁边一份 `*_zh.md`、规范与 skills 指南旁边一份 `*.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
 
 每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.md)中。
 
@@ -184,7 +185,7 @@ bash execs/scpts/lint.sh   # 未定义引用、\todo 计数、页数上限、匿
 | --- | --- |
 | 新仓库，证据刚导入 | `/stage-stry-coach` |
 | 用步骤 1b 接入的已有草稿 | `/stage-proj-adopt` |
-| 故事已定稿，可以搭骨架 | `/stage-plan-outliner` |
+| 故事已定稿，可以搭骨架 | `/stage-outl-planner` |
 | 回到一篇写作中的论文 | `/stage-flow-status` |
 
 `/stage-flow-status` 是最值得记住的一个：它读取盘上的提纲、台账、manifest 和周期状态，给出唯一的下一步行动及其准确命令，你永远不必回忆上次写到哪里。
@@ -207,7 +208,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 | `stage-proj-adopt` † | 把新的或已有的论文仓库接进 STAGE：把配对 STAR 仓库写进 `.env`、确定目标 venue、盘点并映射已有 tex 树，把草稿里已有的数字转为 `unsourced` 论断进入审计待办 | `notes/adopt.md` |
 | `stage-evid-curator` | 证据接收与映射：运行 `import.sh`、登记 `mates/manual/` 下的手工文件、规整杂乱导出、提出论断⇄证据映射、暴露过期——绝不就地修改证据 | `mates/` 及 `mates/MANIFEST.md` 条目 |
 | `stage-stry-coach` † | 对话优先的故事打磨：pitch、问题、核心想法、带论断编号的贡献列表、venue 理由；播种论断台账和经用户确认的 venue 档案 | `notes/story.md`、播种的 `notes/claims.md`、`cycls/<cycle>/venue.yml` |
-| `stage-plan-outliner` † | 故事 → 骨架：页数预算合计不超 venue 上限的章节表、图和表的计划、论断→章节分配、骨架 `.tex` 文件、记号表种子 | `notes/outline.md`、`manus/secs/*.tex` 骨架、`notes/notation.md` |
+| `stage-outl-planner` † | 故事 → 骨架：页数预算合计不超 venue 上限的章节表、图和表的计划、论断→章节分配、骨架 `.tex` 文件、记号表种子 | `notes/outline.md`、`manus/secs/*.tex` 骨架、`notes/notation.md` |
 | `stage-sect-drafter` | 每次调用起草或修改一个章节，依据章节简报、映射的证据、论断和记号规范；没有指纹的数字一律写成 `\todo{}` | `manus/secs/<n>_<slug>.tex` |
 | `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<slug>.tex` |
 | `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<slug>.pdf` + 源文件 |
@@ -227,7 +228,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 1. **接线仓库** —— `/stage-proj-adopt`（新克隆的模板也可以只填 `.env`）：STAR 配对、目标 venue、已有内容盘点 → `notes/adopt.md`。
 2. **引入证据** —— STAR 来源用 `bash execs/scpts/import.sh`，手工文件用 `/stage-evid-curator`：`mates/` 下的带指纹快照，每个文件一条 `MANIFEST.md` 记录。
 3. **打磨故事** —— `/stage-stry-coach`：pitch、贡献、venue 理由写进 `notes/story.md`；每条贡献成为台账里一条 `proposed` 论断；venue 的页数上限和截稿日期以用户确认的事实写进 `cycls/<cycle>/venue.yml`。
-4. **搭论文骨架** —— `/stage-plan-outliner`：带页数预算的章节表、图表计划、论断→章节分配写进 `notes/outline.md`；骨架 `.tex` 文件出现在 `manus/secs/` 下，`main.tex` 中对应的 `\input` 行被取消注释；`notes/notation.md` 被播种。
+4. **搭论文骨架** —— `/stage-outl-planner`：带页数预算的章节表、图表计划、论断→章节分配写进 `notes/outline.md`；骨架 `.tex` 文件出现在 `manus/secs/` 下，`main.tex` 中对应的 `\input` 行被取消注释；`notes/notation.md` 被播种。
 5. **建参考文献基座** —— `/stage-refs-curator`：`notes/refs/` 里带可引用事实的阅读笔记、干净的 `reference.bib`、相关工作定位。
 6. **起草** —— `/stage-sect-drafter` 每次一个章节，依据简报、证据和论断；`/stage-tabs-builder` 从证据生成表格；`/stage-figs-designer` 把每张图从源文件做到渲染 PDF。台账状态翻到 `drafted`。
 7. **润色** —— `/stage-copy-editor`：清晰、流畅、记号一致；含义和数字碰不得。
@@ -288,7 +289,6 @@ bash execs/update.sh
 
 v1 未含、计划推进：
 
-- **skill 的中文镜像** —— 十五个 skill 与规范的 `SKILL.zh.md` 版本，与英文版保持同步，供人阅读（英文版始终是权威版本）。
 - **远程 git 导入源** —— `import.sh` 直接从 git URL 按钉住的 ref 拉取证据，不再要求本地检出。
 - **`.cursor/`、`.codex/`、`.kimi-code/` 目录** —— 对齐 STAR 的其余工具 skill 镜像。
 - **skill 级资产** —— venue 评分标准、回复模板、问题清单，作为 `references/` 放在使用它们的 skill 旁边。

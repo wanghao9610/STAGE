@@ -13,9 +13,10 @@ description: >-
 
 # Writing Flow Status — read-only overview
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources
-(the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on
-the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources
+(the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md`
+beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in
+step for human readers only and are never loaded at runtime, so this SKILL.md stays
 authoritative.
 
 Invocation: `$stage-flow-status [SECTION]` — no argument reports the whole flow; a section
@@ -39,7 +40,7 @@ message, a wrong assumption costs the run.
 
 You give the author one honest picture of where the manuscript stands — outline, claims,
 evidence, cycle, build — and one clear recommendation for what to do next. You are the map, not
-the driver: the coach shapes the story, the outliner splits it, the drafter writes, the auditors
+the driver: the coach shapes the story, the planner splits it, the drafter writes, the auditors
 judge, the packer freezes — you only read and report. You change nothing, run nothing that
 writes, and never present a guess as a state.
 
@@ -48,7 +49,7 @@ writes, and never present a guess as a state.
 1. **Strictly read-only.** Never create, edit, or delete any file — not the outline, not the
    ledger, not frontmatter — and never commit. Apart from §5's single disambiguation question:
    no `update_plan`, no `spawn_agent`, no `request_user_input`. To act on what you show, point at the owner:
-   $stage-proj-adopt, $stage-evid-curator, $stage-stry-coach, $stage-plan-outliner,
+   $stage-proj-adopt, $stage-evid-curator, $stage-stry-coach, $stage-outl-planner,
    $stage-sect-drafter, $stage-tabs-builder, $stage-figs-designer, $stage-refs-curator,
    $stage-copy-editor, $stage-clms-auditor, $stage-cite-auditor, $stage-peer-reviewer,
    $stage-resp-writer, $stage-subm-packer.
@@ -92,7 +93,7 @@ writes, and never present a guess as a state.
    per Principle 3.
 7. **Next action.** First match wins: (1) no `notes/adopt.md` → $stage-proj-adopt; (2) story
    missing or unfinalized → $stage-stry-coach; (3) outline missing or unfinalized →
-   $stage-plan-outliner; (4) evidence drifted → $stage-evid-curator; (5) open promises → the
+   $stage-outl-planner; (4) evidence drifted → $stage-evid-curator; (5) open promises → the
    skill the first open box's change needs ($stage-sect-drafter, $stage-tabs-builder,
    $stage-figs-designer); (6) an outline row still planned / skeleton / sketch → its owner among
    those three, with the row named; (7) claims at `unsourced`, or `drafted` never verified →
@@ -100,6 +101,8 @@ writes, and never present a guess as a state.
    trails the outline's `updated:` → $stage-cite-auditor, then $stage-copy-editor; (9) no
    simulated review this cycle → $stage-peer-reviewer; (10) all green → $stage-subm-packer.
    Give the one-line reason with the exact command.
+
+   **A red gate outranks the list.** When step 6 found `lint.sh` failing hard — the build broken, a `\todo{` that would ship, a page count over the limit, an identity leak under `ANON=true` — that is the next action whichever numbered rule matched, routed to the owner lint itself names: a marker to `$stage-sect-drafter` or `$stage-tabs-builder`, an over-limit paper to `$stage-copy-editor`, an undefined citation to `$stage-cite-auditor` or `$stage-refs-curator`. Nothing downstream of a red gate is worth recommending — `$stage-subm-packer` refuses it, and a simulated review of a manuscript that does not build reviews the wrong artifact. The list resumes once the gate is green.
 8. **Report and stop.** Render in the Output order, then stop: never writes, never commits — and
    for the same reason, never state or imply that anything was changed.
 

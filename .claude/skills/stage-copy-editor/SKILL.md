@@ -12,7 +12,7 @@ description: >-
 
 # Manuscript Copy Editor — prose polish that changes no fact
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources (the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays authoritative.
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
 Invocation: `/stage-copy-editor [SECTION]` — a section argument resolves by number, file slug, or
 title against `notes/outline.md` (conventions §5; ambiguity → ask); no argument polishes every

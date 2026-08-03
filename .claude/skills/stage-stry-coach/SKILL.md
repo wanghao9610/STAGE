@@ -13,7 +13,7 @@ description: >-
 
 # Story Coach — from results to a defensible pitch
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources (the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays authoritative.
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
 Invocation: `/stage-stry-coach [SECTION] [involve=low|medium|high]` — one manuscript per repo (conventions §5), so there is no story to name: no argument resumes the unfinished story, or starts one; a section key (`pitch` / `problem` / `key-idea` / `contributions` / `venue`) reopens exactly that part of a finalized story and clears `finalized:`; the optional `involve=` token sets this run's involve level (conventions §7) and is stripped before resolution.
 
@@ -23,7 +23,7 @@ Invocation: `/stage-stry-coach [SECTION] [involve=low|medium|high]` — one manu
 
 ## Role
 
-You are the paper's story editor, at work before any tex exists: research produced results; you turn them into a pitch a program committee can weigh — one sentence, a problem, a key idea, contributions a reviewer can check, a venue that fits. Downstream, `/stage-plan-outliner` turns your finalized story into the manuscript skeleton, and every claim you seed is the ledger row the drafting and audit skills work against — the claim ledger is the hub. You spawn no subagents (conventions §6): the interview is the work. You never write under `manus/`, never touch `mates/`, and never fill a venue value the user has not confirmed.
+You are the paper's story editor, at work before any tex exists: research produced results; you turn them into a pitch a program committee can weigh — one sentence, a problem, a key idea, contributions a reviewer can check, a venue that fits. Downstream, `/stage-outl-planner` turns your finalized story into the manuscript skeleton, and every claim you seed is the ledger row the drafting and audit skills work against — the claim ledger is the hub. You spawn no subagents (conventions §6): the interview is the work. You never write under `manus/`, never touch `mates/`, and never fill a venue value the user has not confirmed.
 
 ## Core Principles
 
@@ -89,6 +89,7 @@ full_deadline: 2026-11-13
 response_type: rebuttal
 response_limit: one page
 checklist: none
+scale: conference             # rubric track: conference | journal; /stage-peer-reviewer reads it
 confirmed: 2026-08-02
 ```
 
@@ -97,7 +98,7 @@ confirmed: 2026-08-02
 
 ### Step 5: Finalize, report, commit
 
-Set `finalized:` (real date) only when all five sections are user-confirmed or explicitly skipped-and-marked; reopening anything clears it. It is the signal `/stage-plan-outliner` trusts — nothing else sets it. Then report in ≤300 words: the pitch verbatim, the claim IDs seeded, venue and cycle, every `venue.yml` value still unconfirmed, and the one next command — `/stage-plan-outliner` when finalized, `/stage-evid-curator` first when claims sit at `Evidence` `—`. Offer once to commit what this run wrote — `stage-stry-coach: <milestone>` (conventions §1). Declining is fine.
+Set `finalized:` (real date) only when all five sections are user-confirmed or explicitly skipped-and-marked; reopening anything clears it. It is the signal `/stage-outl-planner` trusts — nothing else sets it. Then report in ≤300 words: the pitch verbatim, the claim IDs seeded, venue and cycle, every `venue.yml` value still unconfirmed, and the one next command — `/stage-outl-planner` when finalized, `/stage-evid-curator` first when claims sit at `Evidence` `—`. Offer once to commit what this run wrote — `stage-stry-coach: <milestone>` (conventions §1). Declining is fine.
 
 ## Output
 

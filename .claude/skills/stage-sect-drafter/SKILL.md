@@ -13,7 +13,7 @@ description: >-
 
 # Section Drafter — evidence-bound prose
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources (the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays authoritative.
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
 Invocation: `/stage-sect-drafter SECTION` — `SECTION` resolves per conventions §5 against the Sections table of `notes/outline.md`: a number (`3`), a file slug (`3_method` or `method`), or a title match; absent or ambiguous, list the sections with their statuses and ask (§7). One section per invocation — a request naming several sections is one run per section, in outline order, each with its own ledger and outline updates.
 
@@ -23,11 +23,11 @@ Invocation: `/stage-sect-drafter SECTION` — `SECTION` resolves per conventions
 
 ## Role
 
-You are the writer between skeleton and polish. `/stage-stry-coach` fixed the claims, `/stage-plan-outliner` fixed what each section argues and in how many pages, `/stage-evid-curator` imported what proves it; you turn one section's brief into prose that states its assigned claims and cites its evidence. Write like a reporter with a fact-checker on staff: the sentences are yours, but every number is on file or flagged.
+You are the writer between skeleton and polish. `/stage-stry-coach` fixed the claims, `/stage-outl-planner` fixed what each section argues and in how many pages, `/stage-evid-curator` imported what proves it; you turn one section's brief into prose that states its assigned claims and cites its evidence. Write like a reporter with a fact-checker on staff: the sentences are yours, but every number is on file or flagged.
 
-You draft; you do not re-plan or re-source. You never invent a number, never draft two sections in one pass, never edit `mates/`, and never touch `main.tex`'s `\input` wiring (that is `/stage-plan-outliner`'s).
+You draft; you do not re-plan or re-source. You never invent a number, never draft two sections in one pass, never edit `mates/`, and never touch `main.tex`'s `\input` wiring (that is `/stage-outl-planner`'s).
 
-Re-scoping is upstream's, not yours: a brief that cannot be drafted as written goes back to `/stage-plan-outliner`, a claim that cannot be stated honestly goes back to `/stage-stry-coach`.
+Re-scoping is upstream's, not yours: a brief that cannot be drafted as written goes back to `/stage-outl-planner`, a claim that cannot be stated honestly goes back to `/stage-stry-coach`.
 
 ## Core Principles
 
@@ -43,12 +43,12 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 ### Step 0: Load
 
 1. Read the conventions file (whole file, own `Read` call), then `notes/story.md` (pitch, active `cycle:`), `notes/outline.md`, `notes/claims.md`, and `notes/notation.md`.
-2. Missing story or outline means the pipeline is not ready for drafting: stop and route to `/stage-stry-coach` or `/stage-plan-outliner` rather than improvising a structure.
+2. Missing story or outline means the pipeline is not ready for drafting: stop and route to `/stage-stry-coach` or `/stage-outl-planner` rather than improvising a structure.
 
 ### Step 1: Resolve the section
 
 1. Interpret `SECTION` per §5 against the Sections table: number, file slug, or title match. Absent or ambiguous → list the rows with statuses and ask via AskUserQuestion (plain text when unavailable).
-2. A section with no outline row is an outline change first — route to `/stage-plan-outliner`; §5 resolves against the outline, not against whatever files sit in `manus/secs/`.
+2. A section with no outline row is an outline change first — route to `/stage-outl-planner`; §5 resolves against the outline, not against whatever files sit in `manus/secs/`.
 3. Read the target `manus/secs/<n>_<slug>.tex` in full — the leading brief comment block plus any existing text. Status `planned`/`skeleton` means first draft; `drafted`/`polished` means revision — say which mode this run is in and, for a revision, what the user wants changed.
 
 ### Step 2: Load the evidence
@@ -60,7 +60,7 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 ### Step 3: Announce the gaps
 
 1. Before writing, list what will be `\todo{}`: claims whose Evidence is `—`, evidence that lacks the specific number the brief needs, and anything the budget cannot fit.
-2. A section that would be mostly todos is not ready to draft: stop and route — missing evidence to `/stage-evid-curator`, a wrong-shaped brief to `/stage-plan-outliner`.
+2. A section that would be mostly todos is not ready to draft: stop and route — missing evidence to `/stage-evid-curator`, a wrong-shaped brief to `/stage-outl-planner`.
 
 ### Step 4: Draft or revise the tex
 

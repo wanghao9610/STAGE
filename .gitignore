@@ -5,6 +5,16 @@
 wkdrs/*
 !wkdrs/.gitkeep
 
+# Editor and IDE build directories inside the manuscript. run.sh builds
+# out-of-tree into wkdrs/, but LaTeX extensions (VS Code LaTeX Workshop and
+# friends) write beside the sources; manus/ has to stay free of build products
+# whatever produced them.
+manus/.temp/
+manus/.build/
+manus/out/
+.vscode/ltex*
+.texpadtmp/
+
 # LaTeX junk (belt and suspenders; run.sh builds out-of-tree)
 *.aux
 *.bbl

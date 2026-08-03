@@ -42,7 +42,12 @@ Build the manuscript (execs/run.sh), then run the deterministic checks:
 
   warnings and notes (reported, exit 0):
     - overfull hboxes
+    - sources newer than a reused build (--no-build only)
     - per-file word counts (when texcount is installed)
+
+A todo marker inside a LaTeX comment is not a failure: each candidate line has
+its comment stripped before the test, so only markers that would reach the PDF
+count.
 
 Options:
   --no-build    Reuse the latest wkdrs/builds/ output instead of rebuilding.
@@ -110,6 +115,18 @@ if [[ "${NO_BUILD}" == true ]]; then
     [[ -f "${LOG_FILE}" && -f "${PDF_FILE}" ]] || \
         fail "--no-build: no finished build under wkdrs/builds/. Run 'bash execs/run.sh' first."
     log "Reusing the existing build in wkdrs/builds/ (--no-build)."
+    # Build freshness is the one place mtime is the right signal. §8 bars mtime
+    # for evidence staleness, where the question is whether upstream bytes moved;
+    # here the question is only whether this PDF predates the sources the checks
+    # below describe. Reporting a reused build as current is the failure mode.
+    STALE_SRC="$(find "${MANU_DIR}" -type f \
+        \( -name '*.tex' -o -name '*.sty' -o -name '*.bib' \) \
+        -newer "${PDF_FILE}" 2>/dev/null || true)"
+    if [[ -n "${STALE_SRC}" ]]; then
+        log "warn: these sources changed after the reused build — the checks below describe an older PDF:"
+        show_hits "${STALE_SRC}"
+        WARNS=$(( WARNS + 1 ))
+    fi
 else
     bash "${ROOT_DIR}/execs/run.sh" || \
         fail "build failed — fix the manuscript first (see ${LOG_FILE})."
@@ -140,7 +157,15 @@ else
 fi
 
 # ---- 3. todo markers (hard; §9a) --------------------------------------------
-TODOS="$(grep -rn -F '\todo{' --include='*.tex' --include='*.sty' "${MANU_DIR}" 2>/dev/null || true)"
+# A marker counts only where LaTeX would typeset it. Each candidate line has its
+# comment stripped — from the first unescaped % to end of line — before the test,
+# so a commented-out marker, or a comment that merely names the macro, does not
+# fail the gate. Only what ships in the PDF is a §9a violation.
+TODOS="$(grep -rn -F '\todo{' --include='*.tex' --include='*.sty' "${MANU_DIR}" 2>/dev/null \
+    | awk '{ code = $0
+             gsub(/\\%/, "\002", code)
+             sub(/%.*/, "", code)
+             if (index(code, "\\todo{") > 0) print }' || true)"
 n="$(count_lines "${TODOS}")"
 if (( n > 0 )); then
     log "FAIL: ${n} todo marker(s) in manus/ — each is a number or passage still lacking evidence:"

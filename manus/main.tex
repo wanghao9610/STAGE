@@ -5,40 +5,90 @@
 %% Lint:  bash execs/scpts/lint.sh   deterministic checks; any todo marker in
 %%                                   manus/ fails it — that is the point.
 %%
-%% Venue class: `article` is a standalone-compiling placeholder. To adopt a
-%% venue template, drop its class/style files into manus/stys/ and swap the
-%% line below, e.g. \documentclass{stys/cvpr}. run.sh compiles with manus/ as
-%% the working directory and puts manus/stys/ on TEXINPUTS.
-\documentclass{article}
-
-%% STAGE base macros: the todo marker plus graphicx/booktabs/hyperref/xcolor.
+%% Two layers, in load order:
+%%
+%%   stys/arxiv.cls   the look — page geometry, the title panel, headings,
+%%                    captions, floats, bibliography style. This is the layer a
+%%                    venue swap replaces: drop the venue's class and style
+%%                    files into manus/stys/ and change the line below to, say,
+%%                    \documentclass{stys/cvpr}. run.sh compiles with manus/ as
+%%                    the working directory and puts manus/stys/ on TEXINPUTS.
+%%
+%%   stys/stage.sty   the authoring layer — \todo plus the macros the writing
+%%                    skills emit into secs/ and tabs/. It survives every venue
+%%                    swap; keep this line whatever the class becomes.
+%%
+%% Class options: onecolumn | twocolumn, plus anon and anything article takes.
+%% `anon` prints the title panel as "Anonymous Authors" and drops affiliations,
+%% contribution notes, and the links row. That is the PDF half of double-blind;
+%% the source half is ANON=true in .env, which makes lint.sh fail on identity
+%% anywhere under manus/ — comments included, because comments ship with a
+%% source upload. Keep the placeholders below anonymous until the camera-ready.
+\documentclass[twocolumn]{stys/arxiv}
 \usepackage{stys/stage}
 
+%% ── Title panel ────────────────────────────────────────────────────────────
+%% Panel style: fancy (framed, shadowed) | simple (flat).
+\paperstyle{fancy}
+%% Theme: green | blue | black.
+\papercolor{green}
+
 \title{Untitled STAGE Manuscript}
-%% Stays "Anonymous" while ANON=true in .env; lint.sh hunts identity leaks.
-\author{Anonymous}
-\date{}
 
-\begin{document}
-\maketitle
+%% One line per author, in order. The optional argument keys the superscripts to
+%% the affiliations and contribution notes; the placeholder names stay anonymous
+%% so that lint.sh passes while ANON=true, and so there is nothing to leak in a
+%% source upload:
+%%   \author[1,\ast]{Anonymous Author One}
+%%   \author[2,\dagger]{Anonymous Author Two}
+\author{Anonymous Authors}
+% \affiliation[1]{Anonymous Institution}
+% \affiliation[2]{Anonymous Institution}
+% \contribution[\ast]{Equal contribution}
+% \contribution[\dagger]{Corresponding author}
 
-\begin{abstract}
-%% Placeholder — /stage-stry-coach shapes the story behind this paragraph;
-%% /stage-plan-outliner may move the abstract into secs/0_abstract.tex.
+%% The links row under the abstract. Every URL here is public the moment the PDF
+%% is — a real code or project link during a double-blind cycle is an identity
+%% leak, and lint.sh treats a code-hosting URL under manus/ as one.
+% \paperdate{\today}
+% \code{https://anonymous.example.com/code}
+% \project{https://anonymous.example.com/project}
+% \dataset{https://anonymous.example.com/data}
+% \correspondence{\email{anonymous@example.com}}
+% \keywords{first keyword; second keyword}
+
+%% ── Abstract ───────────────────────────────────────────────────────────────
+%% This class takes the abstract as a preamble command, not a body environment,
+%% so section 0 is \input here rather than between \begin{document} and
+%% \end{document}. The later \abstract{} wins: /stage-outl-planner uncomments
+%% the input line below and moves this placeholder text into the skeleton.
+\abstract{
 This manuscript was scaffolded by STAGE, the academic-writing companion to
 STAR. Every number it will ever state either traces to fingerprinted evidence
 under \texttt{mates/} or stays a visible todo marker; the placeholder below
 demonstrates the second state, and the skeleton is expected to fail lint until
 it is gone.
-\end{abstract}
+}
+% \input{secs/0_abstract}
+
+%% ── Paper-wide macros ──────────────────────────────────────────────────────
+%% Project-specific commands belong here, never in stys/ — the class and the
+%% package are template layers and get replaced or updated under you. Symbols
+%% and abbreviations defined here are also rows in notes/notation.md.
+% \newcommand{\method}{MethodName\xspace}
+
+\begin{document}
+\maketitle
 
 %% Placeholder body — superseded by the secs/ inputs below as they come alive.
 \section{Introduction}
-\todo{No content yet: run /stage-stry-coach, then /stage-plan-outliner.}
+\todo{No content yet: run /stage-stry-coach, then /stage-outl-planner.}
 
-%% Section files — /stage-plan-outliner creates manus/secs/<n>_<slug>.tex
+%% Section files — /stage-outl-planner creates manus/secs/<n>_<slug>.tex
 %% skeletons and uncomments one \input line per created file, in the order
-%% notes/outline.md fixes. Example shape:
+%% notes/outline.md fixes. The <n>_ prefix is load-bearing (conventions §5):
+%% outline rows, the ledger's "Stated in" column, and this input order share it.
+%% Example shape:
 % \input{secs/1_intro}
 % \input{secs/2_related}
 % \input{secs/3_method}
@@ -47,8 +97,18 @@ it is gone.
 
 %% Bibliography — uncomment once manus/bibs/reference.bib exists
 %% (execs/scpts/import.sh seeds it from a paired STAR repo, or
-%% /stage-refs-curator starts one from scratch).
-% \bibliographystyle{plain}
+%% /stage-refs-curator starts one from scratch). The class loads natbib, so
+%% \citep / \citet work and unsrtnat numbers entries in citation order; swap the
+%% style for whatever the venue's class expects.
+% \bibliographystyle{unsrtnat}
 % \bibliography{bibs/reference}
+
+%% Appendix — \beginappendix breaks the page, prints the divider, and relabels
+%% sections A, B, C. Appendix sections keep the same secs/<n>_<slug>.tex naming
+%% and numbering, continuing after the last main-body section. Venues differ on
+%% whether the appendix precedes or follows the references: move this block
+%% above the bibliography when the venue's template does.
+% \beginappendix
+% \input{secs/6_appx_details}
 
 \end{document}

@@ -1,8 +1,8 @@
 # Writing Workflow Skill Conventions
 
-**Language:** English. v1 is English-only; a zh-CN edition is on the roadmap and, when it exists, is kept in step for human readers only — this file stays authoritative.
+**Language:** English | [简体中文](writing-workflow-conventions.zh-CN.md). The zh-CN edition is kept in step for human readers only and is never loaded at runtime — this file stays authoritative.
 
-The rules every STAGE writing workflow skill follows. The fifteen skills — `stage-proj-adopt`, `stage-evid-curator`, `stage-stry-coach`, `stage-plan-outliner`, `stage-sect-drafter`, `stage-tabs-builder`, `stage-figs-designer`, `stage-refs-curator`, `stage-copy-editor`, `stage-clms-auditor`, `stage-cite-auditor`, `stage-peer-reviewer`, `stage-resp-writer`, `stage-subm-packer`, `stage-flow-status` — each carry their own workflow, their own limit on what they may write, and their own rubric. What they share lives here, once. v1 has no section-selective loading: **every skill reads this whole file at the start of every run.**
+The rules every STAGE writing workflow skill follows. The fifteen skills — `stage-proj-adopt`, `stage-evid-curator`, `stage-stry-coach`, `stage-outl-planner`, `stage-sect-drafter`, `stage-tabs-builder`, `stage-figs-designer`, `stage-refs-curator`, `stage-copy-editor`, `stage-clms-auditor`, `stage-cite-auditor`, `stage-peer-reviewer`, `stage-resp-writer`, `stage-subm-packer`, `stage-flow-status` — each carry their own workflow, their own limit on what they may write, and their own rubric. What they share lives here, once. v1 has no section-selective loading: **every skill reads this whole file at the start of every run.**
 
 **Precedence.** This file is the **baseline**. A skill's `SKILL.md` may be **stricter** — a narrower write surface, a lower threshold, an extra confirmation point, a rule that it never commits at all — and the stricter rule wins. A skill never loosens what this file sets. Where a `SKILL.md` carries a one-line summary of a rule below, that line is the binding reminder and this file is the full rule. Skills cite these sections as "conventions §n"; the numbers are frozen and never renumbered.
 
@@ -32,16 +32,15 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 
 **The discipline is one commit per skill working session** — offered, never silent, staging only that session's work, with the subject prefix naming the skill: `stage-sect-drafter: 3_method — first full draft`, `stage-evid-curator: import xseg results`. One skill, one namespace in the log.
 
-**Skill that never commits** — git usage is read-only (`status` / `diff` / `log`): `stage-flow-status`, which writes nothing at all.
+**Skills that never commit** — two, for different reasons. `stage-flow-status` writes nothing at all, so its git usage is read-only (`status` / `diff` / `log`). `stage-proj-adopt` writes plenty — file moves, the tex edits those moves force, the adoption record — and still never commits: adoption rearranges a manuscript somebody else built, and reviewing that rearrangement is not a skill's to skip. `git mv` stages the renames it performs and nothing else is added; the commit is the user's.
 
 **Skills that may commit**, and what each may stage:
 
 | Skill | Commits | Stages |
 | --- | --- | --- |
-| `stage-proj-adopt` | offered once at the end of each phase | only the paths that phase wrote; in an adopted repository, pre-existing uncommitted work is named, never bundled |
 | `stage-evid-curator` | offered once when the session ends | the `mates/` files this run imported or registered, plus `mates/MANIFEST.md` |
 | `stage-stry-coach` | offered once when the session ends | `notes/story.md`, the seeded `notes/claims.md`, the cycle's `venue.yml` when created |
-| `stage-plan-outliner` | offered once when the session ends | `notes/outline.md`, `notes/notation.md`, new `manus/secs/` skeletons, the `\input` edits in `manus/main.tex` |
+| `stage-outl-planner` | offered once when the session ends | `notes/outline.md`, `notes/notation.md`, new `manus/secs/` skeletons, the `\input` edits in `manus/main.tex` |
 | `stage-sect-drafter` | offered once per drafted section | that section's `.tex`, plus its ledger, notation, and outline updates |
 | `stage-tabs-builder` | offered once when the session ends | the tables written, plus their outline and ledger updates |
 | `stage-figs-designer` | offered once when the session ends | `manus/figs/` renders, `manus/figs/srcs/` sources, outline updates |
@@ -121,7 +120,7 @@ STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
 2. **A section argument resolves against `notes/outline.md`'s Sections table**: by number (`3` matches the `#` column and the `<n>_` filename prefix), by file slug (`method`, `3_method`, or a `manus/secs/…` path), or by title match (case-insensitive substring of the Title column). Before the outline exists, only an explicit filename resolves.
 3. **Absent or ambiguous → list the nearest candidates** (number + file + status, one line each) and ask one direct question (§7.2). Never guess which section was meant. `involve=low` does not downgrade this: ambiguity about what the user meant is asked at every level (§7.7).
 4. **The active cycle is `cycle:` in `notes/story.md` frontmatter**, naming `cycls/<cycle>/`. An explicit cycle argument overrides it for that run. Neither present → ask, or route to `/stage-stry-coach`, which creates cycles; no skill invents a cycle directory as a side effect.
-5. **Never renumber sections in passing.** The `<n>_` prefix is load-bearing: outline rows, the ledger's `Stated in` column, and the `\input` order in `main.tex` are built on it. Renumbering is a deliberate `stage-plan-outliner` operation that updates files, outline, `main.tex`, and ledger together — never a drafting side effect.
+5. **Never renumber sections in passing.** The `<n>_` prefix is load-bearing: outline rows, the ledger's `Stated in` column, and the `\input` order in `main.tex` are built on it. Renumbering is a deliberate `stage-outl-planner` operation that updates files, outline, `main.tex`, and ledger together — never a drafting side effect.
 6. **Files and outline must agree.** A `manus/secs/` file with no outline row, or a row whose file is missing, is drift to report (`stage-flow-status` names it), not something to repair silently mid-task.
 
 ## 6. Delegation
@@ -159,7 +158,7 @@ The tool-neutral half. **How** to ask — AskUserQuestion, a structured user-inp
    For every question that is asked, item 2 holds unchanged: the level decides which judgment calls are asked at all, never whether an asked question may be assumed answered.
 8. **Decide-then-disclose.** Every run keeps a decisions record — inside its durable report where the skill writes one, otherwise a "Decisions taken" list in the final reply — one line per settled question, as `question → choice → what it set`. At `low` it captures every judgment call taken unasked, and the final reply states that count whenever it is nonzero: `low` moves review after the fact, it never removes it. At `medium` and `high` it captures what the user answered, so a long session's decisions outlive the scrollback. Lines are appended as questions settle — a running record, never a growing recap replayed before each question.
 9. **The level tightens per skill; it never loosens.** A `SKILL.md` may declare a judgment call it always asks, or flatten levels that make no sense for it (a story-coaching dialogue has no meaningful `low`). No skill treats a mandatory confirmation point as adjustable.
-10. **Carry the thread.** A user answering a long series of questions loses the thread. Three cheap habits, deliberately not a recap replayed before every question: **anchor the question** — one clause naming the earlier answer it rests on ("teaser spans one column → §4 gains 0.4 page; now: spend it on the ablation or the qualitative figure?"); **recap at boundaries** — at each section, table, or cycle-stage end, 2–3 sentences on what was decided, what it produced, what it opens next; **name the way back** — when a boundary closes something still changeable, say which skill and argument reopens it and what reopening costs ("budgets can be revisited with `/stage-plan-outliner`; after drafting, re-trimming is the cost").
+10. **Carry the thread.** A user answering a long series of questions loses the thread. Three cheap habits, deliberately not a recap replayed before every question: **anchor the question** — one clause naming the earlier answer it rests on ("teaser spans one column → §4 gains 0.4 page; now: spend it on the ablation or the qualitative figure?"); **recap at boundaries** — at each section, table, or cycle-stage end, 2–3 sentences on what was decided, what it produced, what it opens next; **name the way back** — when a boundary closes something still changeable, say which skill and argument reopens it and what reopening costs ("budgets can be revisited with `/stage-outl-planner`; after drafting, re-trimming is the cost").
 11. **Write the action, not its name.** The reader should never have to decode a term to know what happened, so a name that must appear brings its meaning with it, in the same sentence. This governs the prose a run writes into files as much as chat, and stops at structure: headings, table columns, field names, and every literal a skill matches byte-exactly stay verbatim, with explanation beside them, never in place of them. **A literal that is nothing but a pointer makes that explanation mandatory in chat**: `C4`, `W2`, `§9`, a cycle name — each stays verbatim and takes 3–8 words of what it points at, in parentheses, the first time each reply uses it: `C4 (the zero-shot transfer claim)`, `W2 (reviewer doubts the ablation coverage)`. First use in **each** reply, not once per conversation; later uses inside the same reply stand alone.
 
 ## 8. The artifact registry
@@ -173,8 +172,8 @@ Every skill's durable output, in one table. `stage-flow-status` reads this as th
 | Story | `stage-stry-coach` | `notes/story.md` | `finalized:`, `venue:`, `cycle:` |
 | Venue profile | `stage-stry-coach` (or `stage-proj-adopt`) | `cycls/<cycle>/venue.yml` | `confirmed:` |
 | Claim ledger | `stage-stry-coach` creates; `stage-sect-drafter`, `stage-tabs-builder`, `stage-clms-auditor`, `stage-resp-writer` update | `notes/claims.md` | per-claim `Status` column |
-| Outline | `stage-plan-outliner` creates; drafter / figs / tabs skills update their rows | `notes/outline.md` + `manus/secs/*.tex` skeletons | `finalized:`; per-row `Status` |
-| Notation | `stage-plan-outliner` creates; `stage-sect-drafter` appends; `stage-copy-editor` enforces | `notes/notation.md` | `updated:` |
+| Outline | `stage-outl-planner` creates; drafter / figs / tabs skills update their rows | `notes/outline.md` + `manus/secs/*.tex` skeletons | `finalized:`; per-row `Status` |
+| Notation | `stage-outl-planner` creates; `stage-sect-drafter` appends; `stage-copy-editor` enforces | `notes/notation.md` | `updated:` |
 | Section drafts | `stage-sect-drafter` | `manus/secs/<n>_<slug>.tex` | Sections row status in outline |
 | Tables | `stage-tabs-builder` | `manus/tabs/<slug>.tex` | per-data-row `% src:` comment; Tables row in outline |
 | Figures | `stage-figs-designer` | `manus/figs/<slug>.pdf`, `manus/figs/srcs/<slug>.*` | Figures row in outline |
@@ -215,11 +214,14 @@ Lifecycle: `proposed` (story) → `drafted` (stated in text) → `verified` (clm
 - source: $STAR_HOME/metds/overview.md        # or free text for manual ("results emailed by X, 2026-08-01")
 - source-commit: <sha | n/a>
 - source-stamp: <first `generated:`/`updated:`/`finalized:` value in source | n/a>
+- sha256: <checksum of the file as it landed>
 - imported: YYYY-MM-DD
 - covers: <one line: what this evidences>
 ```
 
-`star` entries are managed by `import.sh`; `manual` entries are written by `stage-evid-curator`.
+`star` entries are managed by `import.sh`; `manual` entries are written by `stage-evid-curator`. Both write all six fields.
+
+The two verification fields answer different questions and neither substitutes for the other. `source-stamp:` is about **upstream**: has the file this was taken from moved on? It is compared against the current upstream value, and `import.sh --diff` needs a reachable source to ask. `sha256:` is about **here**: do the bytes under `mates/` still match what was registered? It needs nothing but the file, so it catches the in-place edit §9d forbids even in a repository with no `STAR_HOME` set, on a machine that has never seen the upstream. A checksum is never quietly recomputed to match a file that changed — that would launder the edit into provenance; it moves only on a re-import or a re-registration.
 
 ### 8.3 `cycls/<cycle>/venue.yml` — flat `key: value`, grep-parseable
 
@@ -270,7 +272,9 @@ Note frontmatter: `title:`, `venue:`, `year:`, `bibkey:`, `added:`. Sections: `#
 
 ### 8.9 `notes/adopt.md`
 
-Frontmatter: `adopted:`, `backfilled:`. Sections: paired sources (STAR repos + slugs), venue target, existing-asset inventory (for adopted projects), backfill actions taken.
+Frontmatter: `adopted:`, `backfilled:`. Sections: paired sources (STAR repos + slugs), venue target, existing-asset inventory (for adopted projects), the unsourced-claims backlog, backfill actions taken.
+
+`backfilled:` is a gate, not a note (§9a). It stays empty while any backlog row is unresolved, and it is set — to the real date — only by `stage-clms-auditor`, when every row has either become a `verified` claim or an `unsourced` one carrying its `\todo`. `stage-subm-packer` refuses to pack a repository that has a `notes/adopt.md` with an empty `backfilled:`, because that is exactly the state in which `lint.sh` reads clean over numbers that trace to nothing.
 
 ### 8.10 `cycls/<cycle>/SUBMISSION_<date>.md`
 
@@ -284,6 +288,7 @@ A paper is a chain of checkable statements, and a writing agent's cheapest failu
 
 - **What counts as a number:** any digit-bearing value whose truth lives outside the manuscript — metrics, deltas, dataset sizes, parameter counts, runtimes, epochs, costs, "3× faster". Not the document's own machinery: section and equation numbers, figure references, citation years, subscript indices. The test is a reviewer asking "source?" — if the honest answer is a measurement or an external fact, the rule applies.
 - **Trace means the full chain.** In a table: the cell → its row's `% src: mates/<...>#<anchor>` comment → a fingerprinted MANIFEST entry → the value present in that evidence file. In prose: the sentence → the ledger row stating it (`Stated in` names this section) → the row's `Evidence` link → the fingerprint. `stage-clms-auditor` walks both chains for every number and verdicts each **matched / mismatched / unsourced**.
+- **A `% src:` comment covers exactly one sentence.** In `manus/tabs/` the unit is already unambiguous — one comment per data row, never shared, never blanket. In prose the unit is the **sentence the comment heads**: it starts at the first word after the comment and ends at that sentence's terminator, however many source lines the sentence wraps across. Two numbers in one sentence share its comment; a number in the next sentence needs its own. This is not pedantry — scope by line and scope by sentence give different verdicts on the same manuscript, and an audit is mechanical only where the unit is fixed.
 - **The todo discipline, concretely:**
 
   ```tex
@@ -301,7 +306,9 @@ A paper is a chain of checkable statements, and a writing agent's cheapest failu
 - **Camouflage is worse than fabrication.** `XX.X`, `TBD`, `99.9`, `\textbf{54.6}` as a "temporary" placeholder — anything that marks a hole without the `\todo{` macro is invisible to `lint.sh`'s count and will survive to a submitted PDF. One macro, greppable, red in every draft build: that is the whole point of `stage.sty` shipping it, and the fresh-clone `main.tex` compiles with one `\todo{}` precisely so the machinery is demonstrated on day one.
 - **Derived numbers inherit the rule.** A delta or an average traces when every operand traces and the derivation is named in the same `% src:` comment (`% src: delta of rows 2,5 — mates/xseg/.../results.md#tab-main`). One untraceable operand makes the derived number unsourced. Rounding is presentation — a sourced 54.62 may appear as 54.6; changing any digit is not rounding.
 - **A `\todo` leaves the manuscript in exactly two ways:** replaced by a value that traces (the import happened, the fingerprint exists), or the sentence is rewritten to not need the value. Deleting the macro and keeping its content is fabrication with extra steps.
-- **Enforcement:** `lint.sh` counts `\todo{` occurrences — nonzero is a hard failure, and `stage-subm-packer` refuses to pack over it; `stage-clms-auditor` traces every number and opens a `tasks/` item per failure; every known-but-unfingerprinted value carries an `unsourced` ledger row so the debt has a name.
+- **The marker is for a missing value, not for a thin section.** A paragraph that is merely underwritten, a method whose hyperparameters nobody has written down, an experiment section waiting on prose — none of these is a `\todo`. They are an outline status and a `tasks/` item. The distinction is load-bearing because `lint.sh` cannot see it: a content note parked in a marker blocks the pack exactly as hard as an invented metric would, and the author learns to read a red gate as noise. Marker for values; `tasks/` for everything else.
+- **An adopted draft starts outside this rule, and the gap is named rather than hidden.** `stage-proj-adopt` books every number a pre-existing manuscript already states as a row in `notes/adopt.md`'s unsourced backlog. It does not wrap them in `\todo{}` — it has no idea which are right, and rewriting somebody's results as markers is not adoption. So until `stage-clms-auditor` has worked that backlog down, those numbers *are* the third state this rule forbids, and `lint.sh` — which counts markers — reads the manuscript as clean while none of its numbers traces. That is the one moment the mechanical gate and the property diverge, so the backlog is a gate in its own right: `notes/adopt.md`'s `backfilled:` stays empty until every row is resolved, and `stage-subm-packer` refuses to pack an adopted repository while it is (§8.9).
+- **Enforcement:** `lint.sh` counts `\todo{` occurrences that LaTeX would actually typeset — each candidate line has its comment stripped from the first unescaped `%` before the test, so a commented-out marker, or a comment naming the macro, is not a failure — and nonzero is a hard failure that `stage-subm-packer` refuses to pack over; `stage-clms-auditor` traces every number and opens a `tasks/` item per failure; every known-but-unfingerprinted value carries an `unsourced` ledger row so the debt has a name.
 
 **(b) Every assertion about a cited paper must be checkable against a reading note** (`notes/refs/<ABBREV>.md` or imported refs under `mates/`).
 
@@ -313,7 +320,7 @@ A paper is a chain of checkable statements, and a writing agent's cheapest failu
 **(c) Venue rules in `venue.yml` are entered only as user-confirmed facts** — skills never invent page limits or deadlines.
 
 - Not from memory of last year, not from "CVPR is usually 8 pages", not from a fetched CFP page taken on faith — CFPs go stale and disagree with portals. A skill may fetch and *present* a venue page; the value enters the file only after the user confirms it.
-- `confirmed:` is the receipt: the date the **user** confirmed the numbers, never filled by a skill on its own (§8.3). A profile with empty `confirmed:` gates nothing — `stage-plan-outliner` will not budget against its page limit and `stage-subm-packer` will not pack against it without asking first. A wrong page budget discovered at pack time costs a rewrite; that is why this is a mandatory confirmation point (§7.7).
+- `confirmed:` is the receipt: the date the **user** confirmed the numbers, never filled by a skill on its own (§8.3). A profile with empty `confirmed:` gates nothing — `stage-outl-planner` will not budget against its page limit and `stage-subm-packer` will not pack against it without asking first. A wrong page budget discovered at pack time costs a rewrite; that is why this is a mandatory confirmation point (§7.7).
 
 **(d) Evidence files are immutable in place.**
 

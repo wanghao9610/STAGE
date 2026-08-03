@@ -1,22 +1,119 @@
-%% manus/stys/stage.sty — STAGE base macros, loaded by manus/main.tex as
-%% \usepackage{stys/stage}. Venue templates replace the document class in
-%% main.tex; this file stays, and stays small.
+%% manus/stys/stage.sty — STAGE's authoring layer, loaded by manus/main.tex as
+%% \usepackage{stys/stage}.
+%%
+%% This package owns what the writing skills WRITE INTO the manuscript, so it is
+%% the layer that must survive a venue swap: the document class changes when a
+%% cycle adopts CVPR or NeurIPS, this line does not. \todo above all — every
+%% unsourced value in the paper is one of these, and execs/scpts/lint.sh counts
+%% them — plus the small set of macros that section and table files use.
+%%
+%% The look lives in the class (manus/stys/arxiv.cls by default): geometry,
+%% fonts, the title panel, headings, captions, bibliography style. Nothing here
+%% styles a page; nothing there is safe to write into a section file.
+%%
+%% Provided here:
+%%   \todo{...}                 the unsourced-value marker (conventions §9a)
+%%   \parahead{...} \headbf{}   run-in paragraph heading, inline accent bold
+%%   \cmark \xmark              check and cross for comparison tables
+%%   \tablestyle{sep}{stretch}  compact table spacing, used inside a float
+%%   x{} y{} z{} P{} Y          fixed-width centered/left/right/tabularx columns
+%%   Light* colors              \rowcolor highlights that survive a venue swap
+%%   \figref \tabref \eqnref    cross-references that read the same everywhere
+%%   \algref                    one-argument fallback; the class extends it
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{stys/stage}[2026/08/02 v1 STAGE base macros]
+\ProvidesPackage{stys/stage}[2026/08/03 v2 STAGE authoring macros]
 
+%% ---------------------------------------------------------------------------
+%% Packages
+%% ---------------------------------------------------------------------------
+%% Content-level only, and all without options, so a second load under a class
+%% that already pulled them in is a silent no-op. stys/arxiv.cls loads these too
+%% and in the order cleveref needs; this list is what keeps a section or table
+%% file compiling under a venue class that loads none of them.
 \RequirePackage{graphicx}
+\RequirePackage{subcaption}
 \RequirePackage{booktabs}
+\RequirePackage{array}
+\RequirePackage{tabularx}
+\RequirePackage{multirow}
+\RequirePackage{makecell}
+\RequirePackage{colortbl}
+\RequirePackage{pifont}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{xspace}
 \RequirePackage{xcolor}
 \RequirePackage{hyperref}
-\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
 
-%% Rendered figures live in manus/figs/; their sources in manus/figs/srcs/.
+%% Rendered figures live in manus/figs/; their editable sources in
+%% manus/figs/srcs/, which is deliberately not on this path — \includegraphics
+%% reaches only what /stage-figs-designer has rendered.
 \graphicspath{{figs/}}
 
-%% The todo marker (conventions §9a): a number without a fingerprinted mates/
-%% source is written as a todo, never as plain prose — no third state. Red and
-%% bold so it cannot ship unseen; greppable so execs/scpts/lint.sh fails the
-%% manuscript while any remain.
+%% The class defines accentcolor as its theme color; a venue class does not, so
+%% fall back to black rather than failing to compile.
+\providecolor{accentcolor}{HTML}{000000}
+\hypersetup{colorlinks=true, linkcolor=accentcolor, citecolor=accentcolor, urlcolor=accentcolor}
+
+%% ---------------------------------------------------------------------------
+%% The todo marker (conventions §9a)
+%% ---------------------------------------------------------------------------
+%% A number without a fingerprinted mates/ source is written as a todo, never as
+%% plain prose — no third state. Red and bold so it cannot ship unseen;
+%% greppable so execs/scpts/lint.sh fails the manuscript while any remain.
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+
+%% ---------------------------------------------------------------------------
+%% Prose helpers
+%% ---------------------------------------------------------------------------
+%% \parahead{Setup} opens a paragraph with a run-in heading; \headbf{...} is the
+%% same accent bold inline.
+\newcommand{\headbf}[1]{{\sffamily\bfseries\color{accentcolor}#1}}
+\newcommand{\parahead}[1]{\par\noindent{\sffamily\bfseries\color{accentcolor}\spaceskip=0.35em #1.}\hspace{0.35em}\ignorespaces}
+
+%% ---------------------------------------------------------------------------
+%% Table helpers
+%% ---------------------------------------------------------------------------
+%% \cmark / \xmark for ablation and comparison columns.
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+%% \tablestyle{4pt}{1.15} inside a float: column separation, row stretch,
+%% centered and small. Set it per table, never globally.
+\newcommand{\tablestyle}[2]{\setlength{\tabcolsep}{#1}\renewcommand{\arraystretch}{#2}\centering\small}
+
+%% Fixed-width columns: x centered, y ragged right, z ragged left (widths in pt);
+%% P{2cm} takes any length; Y is a centered tabularx column.
+\newcolumntype{x}[1]{>{\centering\arraybackslash}p{#1pt}}
+\newcolumntype{y}[1]{>{\raggedright\arraybackslash}p{#1pt}}
+\newcolumntype{z}[1]{>{\raggedleft\arraybackslash}p{#1pt}}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+%% Row highlights. These live here, not in the class, because a table file that
+%% says \rowcolor{LightGreen} has to keep compiling after a venue swap.
+\definecolor{LightYellow}{HTML}{FEFBE8}
+\definecolor{LightGreen}{HTML}{EAF6EE}
+\definecolor{LightRed}{HTML}{FDECEA}
+\definecolor{LightCyan}{HTML}{E6F6FA}
+\definecolor{LightBlue}{HTML}{EAF1FB}
+\definecolor{LightIndigo}{HTML}{EEF0FB}
+\definecolor{LightGray}{HTML}{F2F4F7}
+
+%% ---------------------------------------------------------------------------
+%% Cross-references
+%% ---------------------------------------------------------------------------
+%% One spelling per float type across the whole manuscript, so a copy-editing
+%% pass never has to normalize "Fig." against "Figure".
+\providecommand{\figref}[1]{}
+\renewcommand{\figref}[1]{Figure~\ref{#1}}
+\providecommand{\tabref}[1]{}
+\renewcommand{\tabref}[1]{Table~\ref{#1}}
+\providecommand{\eqnref}[1]{}
+\renewcommand{\eqnref}[1]{Equation~\eqref{#1}}
+%% \algref is left to the class where one defines it (stys/arxiv.cls extends
+%% algorithmicx's two-argument form for line references); this is the fallback
+%% for a venue class that ships no algorithm support.
+\providecommand{\algref}[1]{Algorithm~\ref{#1}\xspace}
 
 \endinput

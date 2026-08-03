@@ -10,6 +10,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 - Skip the re-read only when the same file's text is still verbatim visible in this conversation. Summaries and memories of having read it don't count.
 - Do not edit `docs/mds/stage-workflow/` — it is upstream-managed and `execs/update.sh` overwrites it.
 - What each skill does is in `docs/mds/stage-workflow/writing-workflow-skills.md`.
+- The `*.zh-CN.md` files beside the docs, and `SKILL_zh.md` beside each `SKILL.md`, are Chinese editions for human readers: never loaded at runtime, never authoritative. Load the English file and reply in the user's language.
 
 ## 2. Core Principles
 
@@ -39,7 +40,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 | `stage-proj-adopt` † | wire a new or existing paper repo into STAGE |
 | `stage-evid-curator` | import, register, and map evidence |
 | `stage-stry-coach` † | shape the story; seed claims and the venue profile |
-| `stage-plan-outliner` † | outline, budgets, section skeletons, notation |
+| `stage-outl-planner` † | outline, budgets, section skeletons, notation |
 | `stage-sect-drafter` | draft one section per invocation |
 | `stage-tabs-builder` | generate tables from evidence only |
 | `stage-figs-designer` | figure inventory, sources, rendered PDFs |

@@ -43,6 +43,7 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - **A complete writing lifecycle** through fifteen complementary skills, in the order they run: wire the repo, curate evidence, shape the story, outline the paper, draft each section, build tables from evidence, design figures, curate references, polish the prose, audit every number, audit every citation, simulate review, write the response, pack the submission, and report status.
 - **Submission cycles as data**: each venue attempt lives in `cycls/<venue>_<year>/` with a user-confirmed `venue.yml` profile, received and simulated reviews, the response, and a frozen submission record.
 - **Dual agent trees**: the same fifteen skills for Claude Code (`.claude/skills/`) and Codex (`.agents/skills/`), plus one shared `AGENTS.md`.
+- **zh-CN mirrors for human readers**: `SKILL_zh.md` beside every `SKILL.md`, `*_zh.md` beside the peer-reviewer references, and `*.zh-CN.md` beside the conventions and the skills guide — kept in step, never loaded at runtime, and the English files stay authoritative.
 
 See [Writing workflow](#writing-workflow) for what each skill does and how to invoke it. The [Writing Workflow Skills Guide](docs/mds/stage-workflow/writing-workflow-skills.md) adds a paragraph per skill and the pipeline diagram; the rules every skill shares are in the [Writing Workflow Conventions](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
@@ -184,7 +185,7 @@ The skeleton stands on its own — the layout, `.env`, `run.sh`, and `import.sh`
 | --- | --- |
 | Fresh repo, evidence just imported | `/stage-stry-coach` |
 | A draft adopted in step 1b | `/stage-proj-adopt` |
-| Story finalized, ready to skeleton | `/stage-plan-outliner` |
+| Story finalized, ready to skeleton | `/stage-outl-planner` |
 | Returning to a paper under way | `/stage-flow-status` |
 
 `/stage-flow-status` is the one to remember: it reads the outline, ledger, manifest, and cycle state on disk and names the single next action with its exact command, so you never have to recall where you left off.
@@ -207,7 +208,7 @@ Five skills (marked † below) are slash-only: they run only when you name them 
 | `stage-proj-adopt` † | Wire a new or existing paper repo into STAGE: pair STAR repo(s) into `.env`, set the target venue, inventory and map an existing tex tree, and turn pre-existing draft numbers into `unsourced` claims for the audit backlog | `notes/adopt.md` |
 | `stage-evid-curator` | Evidence intake and mapping: run `import.sh`, register hand-dropped files under `mates/manual/`, normalize messy exports, propose claim⇄evidence mappings, surface staleness — never edit evidence in place | `mates/` entries in `mates/MANIFEST.md` |
 | `stage-stry-coach` † | Dialogue-first story shaping: pitch, problem, key idea, contributions with claim IDs, venue rationale; seeds the claim ledger and the user-confirmed venue profile | `notes/story.md`, seeded `notes/claims.md`, `cycls/<cycle>/venue.yml` |
-| `stage-plan-outliner` † | Story → skeleton: section table with page budgets that sum within the venue limit, figure and table plans, claim→section assignment, skeleton `.tex` files, notation seed | `notes/outline.md`, `manus/secs/*.tex` skeletons, `notes/notation.md` |
+| `stage-outl-planner` † | Story → skeleton: section table with page budgets that sum within the venue limit, figure and table plans, claim→section assignment, skeleton `.tex` files, notation seed | `notes/outline.md`, `manus/secs/*.tex` skeletons, `notes/notation.md` |
 | `stage-sect-drafter` | Draft or revise one section per invocation from its brief, mapped evidence, claims, and the notation canon; numbers without a fingerprint become `\todo{}` | `manus/secs/<n>_<slug>.tex` |
 | `stage-tabs-builder` | Generate tables from `mates/` evidence only — booktabs style, one `% src:` fingerprint comment per data row, `\todo` cells for missing data. Hand-typed numbers are the failure mode this skill exists to kill | `manus/tabs/<slug>.tex` |
 | `stage-figs-designer` | Own the figure inventory and each figure end to end: purpose, editable source under `figs/srcs/`, rendered PDF; the teaser figure gets its own checklist | `manus/figs/<slug>.pdf` + sources |
@@ -227,7 +228,7 @@ The skills chain into one path from evidence to a frozen submission. Steps 5–7
 1. **Wire the repo** — `/stage-proj-adopt` (or just fill `.env` on a fresh clone): STAR pairing, target venue, inventory of anything already written → `notes/adopt.md`.
 2. **Bring in evidence** — `bash execs/scpts/import.sh` for STAR sources, `/stage-evid-curator` for hand-dropped files: fingerprinted snapshots under `mates/`, one `MANIFEST.md` entry each.
 3. **Shape the story** — `/stage-stry-coach`: the pitch, contributions, and venue rationale in `notes/story.md`; each contribution becomes a `proposed` claim in the ledger; the venue's page limits and deadlines land in `cycls/<cycle>/venue.yml` as user-confirmed facts.
-4. **Skeleton the paper** — `/stage-plan-outliner`: section table with page budgets, figure and table plans, claim→section assignment in `notes/outline.md`; skeleton `.tex` files appear under `manus/secs/` and their `\input` lines are uncommented in `main.tex`; `notes/notation.md` is seeded.
+4. **Skeleton the paper** — `/stage-outl-planner`: section table with page budgets, figure and table plans, claim→section assignment in `notes/outline.md`; skeleton `.tex` files appear under `manus/secs/` and their `\input` lines are uncommented in `main.tex`; `notes/notation.md` is seeded.
 5. **Build the reference base** — `/stage-refs-curator`: reading notes with citable facts in `notes/refs/`, a clean `reference.bib`, related-work positioning.
 6. **Draft** — `/stage-sect-drafter`, one section per run, from the brief, evidence, and claims; `/stage-tabs-builder` generates the tables from evidence; `/stage-figs-designer` takes each figure from source to rendered PDF. Ledger statuses flip to `drafted`.
 7. **Polish** — `/stage-copy-editor`: clarity, flow, and notation consistency, with meaning and numbers untouchable.
@@ -288,7 +289,6 @@ By default this updates `.claude/skills/`, `.agents/skills/`, and `docs/mds/stag
 
 Not in v1, planned next:
 
-- **zh-CN skill mirrors** — `SKILL.zh.md` editions of the fifteen skills and the conventions, kept in step for human readers (the English files stay authoritative).
 - **Remote git import sources** — `import.sh` fetching evidence straight from a git URL at a pinned ref, instead of requiring a local checkout.
 - **`.cursor/`, `.codex/`, `.kimi-code/` trees** — STAR-parity skill mirrors for the remaining tools.
 - **Per-skill assets** — venue rubrics, response templates, and question banks as `references/` beside the skills that use them.

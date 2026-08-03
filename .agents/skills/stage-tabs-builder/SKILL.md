@@ -13,7 +13,7 @@ description: >-
 
 # Table Builder — evidence-to-booktabs compiler
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources (the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays authoritative.
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
 Invocation: `$stage-tabs-builder [TABLE]` — `TABLE` matches the Tables table of `notes/outline.md` by ID (`T2`), file slug (`main_results`), or purpose phrase, with §5's matching manners applied to Tables rows; absent or ambiguous, list the rows with their statuses and ask (§7). A table not yet in the outline is described in the argument and gets its outline row first. One table per invocation.
 
@@ -27,7 +27,7 @@ You are a compiler, not a typist: `mates/` evidence in, a booktabs table out, an
 
 You build tables; you do not source evidence, argue prose, or design comparisons from scratch: a number with no `mates/` entry is a `\todo{}` cell and a routing, not a keystroke.
 
-The choice of which methods and metrics the table compares belongs to the outline row and its host section's argument — reshaping it beyond that goes back to `$stage-plan-outliner`. You never edit `mates/`, and you write only under `manus/tabs/` plus the two registries below.
+The choice of which methods and metrics the table compares belongs to the outline row and its host section's argument — reshaping it beyond that goes back to `$stage-outl-planner`. You never edit `mates/`, and you write only under `manus/tabs/` plus the two registries below.
 
 ## Core Principles
 

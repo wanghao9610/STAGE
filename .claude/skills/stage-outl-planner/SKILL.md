@@ -1,21 +1,21 @@
 ---
-name: stage-plan-outliner
+name: stage-outl-planner
 disable-model-invocation: true
 description: >-
   Turns the finalized story into a compilable manuscript skeleton: writes notes/outline.md — a
   section table whose page budgets sum within the venue page limit, a figure plan, a table plan,
   and a claim-to-section assignment — creates manus/secs/<n>_<slug>.tex skeletons whose leading
   comment block is the section brief, uncomments their \input lines in manus/main.tex so the
-  build stays green, and seeds notes/notation.md. Use when the user runs /stage-plan-outliner,
+  build stays green, and seeds notes/notation.md. Use when the user runs /stage-outl-planner,
   or asks to outline the paper, budget sections against the page limit, set up section files, or
   turn the story into a skeleton.
 ---
 
 # Plan Outliner — story to compilable skeleton
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources (the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays authoritative.
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `/stage-plan-outliner [involve=low|medium|high]` — one manuscript per repo (conventions §5): there is no target argument; the story is `notes/story.md`, the active cycle is its `cycle:` frontmatter, and the page limit is that cycle's `venue.yml`; the optional `involve=` token sets this run's involve level (conventions §7) and is stripped.
+Invocation: `/stage-outl-planner [involve=low|medium|high]` — one manuscript per repo (conventions §5): there is no target argument; the story is `notes/story.md`, the active cycle is its `cycle:` frontmatter, and the page limit is that cycle's `venue.yml`; the optional `involve=` token sets this run's involve level (conventions §7) and is stripped.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline every STAGE skill shares. Read the whole file at the start of every run — v1 has no section-selective loading — as its own `Read`, never `cat`-ed through Bash. The sections that bind this skill hardest: conventions §5 (manuscript and cycle resolution), §7 (dialogue), §8 (the registry and the outline / notation schemas), and §9 (the fabrication boundary: §9(a) — skeletons state no facts and no numbers; §9(c) — an unconfirmed page limit is not a limit). This file states what is specific to this skill and wins wherever it is stricter.
 
@@ -42,7 +42,8 @@ You give the finalized story its load-bearing frame: which sections exist, what 
 1. Opening load, one message where possible: the conventions file (its own `Read`); `notes/story.md`; `notes/claims.md`; `notes/outline.md` and `notes/notation.md` where present; `manus/main.tex`; one Bash call for `date +%F` (conventions §4) plus a listing of `manus/secs/` and `cycls/`. Then read the active cycle's `cycls/<cycle>/venue.yml`.
 2. Gate on the story: missing, or `finalized:` empty → the outline would be guesswork; recommend `/stage-stry-coach` and stop unless the user explicitly proceeds — then the report names what the outline was built on.
 3. Gate on the limit per Principle 2.
-4. An existing `notes/outline.md` → ask which re-run this is, via AskUserQuestion: **reconcile** (repair rows against the files that actually exist — recommended once drafting has started), **extend** (add sections, figures, or tables; keep the rest), or **re-outline** (from scratch — confirm file by file before touching any `manus/secs/` file whose outline Status has moved past `skeleton` or whose content has outgrown its brief; drafted prose is never overwritten).
+4. **Drafted prose is never overwritten, outline or no outline.** Before anything is created, list what `manus/secs/` already holds and read every file that is more than a skeleton — an adopted repository arrives with real sections and no `notes/outline.md`, so a guard attached only to the re-run branch below would not fire exactly where it is needed most. Any such file keeps its content: it enters the Sections table at the status its text has earned, its `<n>_` prefix is assigned or corrected by a rename this run records, and a skeleton is created only where no file exists. Overwriting one is a per-file question, never a default.
+5. An existing `notes/outline.md` → ask which re-run this is, via AskUserQuestion: **reconcile** (repair rows against the files that actually exist — recommended once drafting has started), **extend** (add sections, figures, or tables; keep the rest), or **re-outline** (from scratch — confirm file by file before touching any `manus/secs/` file whose outline Status has moved past `skeleton` or whose content has outgrown its brief; drafted prose is never overwritten).
 
 ### Step 1: Propose the section plan
 
@@ -72,7 +73,7 @@ Per Sections row, in order:
 1. Create `manus/secs/<n>_<slug>.tex`. The leading comment block is the section brief — purpose, claims (state vs support), evidence paths, budget, figures and tables landing here; the body is one `\section{<Title>}` line (`0_abstract` carries abstract text instead of a `\section`) and one `\todo{...}` — nothing else (Principle 5):
 
 ```tex
-% ---- Section brief: 3_method (stage-plan-outliner, 2026-08-02) ----
+% ---- Section brief: 3_method (stage-outl-planner, 2026-08-02) ----
 % Purpose: present the decoupled two-stage decoder; argue why decoupling wins.
 % Claims: states C2; supports C1.
 % Evidence: mates/<slug>/metds/framework.md#decoder; mates/<slug>/wkdrs/digests/abl_decoder.md
@@ -92,7 +93,7 @@ Per the conventions §8 schema, seeded small — `/stage-sect-drafter` appends, 
 
 ### Step 6: Finalize, report, commit
 
-Set outline `finalized:` (real date) only when all of: both plans user-confirmed, the budget sum within the confirmed limit, every skeleton created with its `\input` uncommented, and the build green — otherwise leave it empty and say exactly what blocks it. Report in ≤300 words: the budget arithmetic, claim coverage (any homeless claim by ID), files created, the build result, notation rows seeded, and the one next command — `/stage-sect-drafter <section>` for the first section (resolved per conventions §5), `/stage-tabs-builder` and `/stage-figs-designer` once their evidence lands, `/stage-flow-status` for the whole map. Offer once to commit what this run wrote — `stage-plan-outliner: <N> sections for <cycle>` (conventions §1). Declining is fine.
+Set outline `finalized:` (real date) only when all of: both plans user-confirmed, the budget sum within the confirmed limit, every skeleton created with its `\input` uncommented, and the build green — otherwise leave it empty and say exactly what blocks it. Report in ≤300 words: the budget arithmetic, claim coverage (any homeless claim by ID), files created, the build result, notation rows seeded, and the one next command — `/stage-sect-drafter <section>` for the first section (resolved per conventions §5), `/stage-tabs-builder` and `/stage-figs-designer` once their evidence lands, `/stage-flow-status` for the whole map. Offer once to commit what this run wrote — `stage-outl-planner: <N> sections for <cycle>` (conventions §1). Declining is fine.
 
 ## Output
 

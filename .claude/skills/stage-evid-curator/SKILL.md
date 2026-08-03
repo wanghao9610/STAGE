@@ -17,7 +17,7 @@ description: >-
 
 # Evidence Curator — the manifest and the files behind the numbers
 
-Match the user's language: reply in Chinese for Chinese dialogue. `mates/MANIFEST.md` and its entries are always written in English — every writing skill machine-reads them — and paths, hashes, and metric names stay English inside Chinese replies; the chat digest follows the dialogue language.
+Match the user's language: reply in Chinese for Chinese dialogue. `mates/MANIFEST.md` and its entries are always written in English — every writing skill machine-reads them — and paths, hashes, and metric names stay English inside Chinese replies; the chat digest follows the dialogue language. `SKILL_zh.md` is this file's Chinese edition, kept in step for human readers only and never loaded at runtime; this SKILL.md stays authoritative.
 
 Invocation: `/stage-evid-curator [import | register <path> | check]` — no argument runs `check`; `import` passes any further arguments through to `execs/scpts/import.sh` unchanged; `register` takes the file to adopt (already under `mates/manual/`, or anywhere else to be copied in). An unrecognized token is asked about, never guessed.
 
@@ -29,7 +29,7 @@ You are the gatekeeper of `mates/` — the store of result files this paper's cl
 
 ## Core Principles
 
-1. **Two writers, only ever two.** `execs/scpts/import.sh` owns `mates/star/**` and every `source-type: star` manifest entry — rewritten wholesale on re-import. This skill owns `mates/manual/**` and every `source-type: manual` entry — the script never touches them. Nothing else writes under `mates/`: not the drafting skills, not a quick hand edit. A write from anywhere else is a defect to report, never a state to accommodate.
+1. **Two writers, only ever two.** `execs/scpts/import.sh` owns `mates/<slug>/**` — one slug per upstream source, never a literal `mates/star/` — and every `source-type: star` manifest entry — rewritten wholesale on re-import. This skill owns `mates/manual/**` and every `source-type: manual` entry — the script never touches them. Nothing else writes under `mates/`: not the drafting skills, not a quick hand edit. A write from anywhere else is a defect to report, never a state to accommodate.
 2. **Evidence is read-only: fix upstream, re-import.** A registered file is never edited — not a typo, not a rounding, not formatting. A wrong number is wrong at its source: fix it there (the STAR repo, the original document), then re-import or re-drop and re-register. Evidence exists so a number in the draft traces to something outside the draft that still says it; one in-place edit ends that.
 3. **No entry, no evidence.** A file under `mates/` with no manifest entry does not exist to the writing skills. Registration is deliberate — the file read in full, provenance asked, stamp pinned — never a bulk sweep that blesses whatever is lying around.
 4. **Provenance is pinned, not remembered.** A star entry carries the upstream path and the commit `import.sh` pinned; a manual entry carries the origin the user named, the date, the checksum. An entry that cannot say where its file came from is not written.
@@ -41,16 +41,17 @@ You are the gatekeeper of `mates/` — the store of result files this paper's cl
 Every mode reads or writes manifest entries, so the entry is the whole interface — one `##` entry per file in `mates/MANIFEST.md`:
 
 ```
-## mates/<star|manual>/<path>
-source-type: star | manual
-source: <star: upstream repo-relative path · manual: origin — path, URL, or person>
-imported: <YYYY-MM-DD, real date>
-upstream-commit: <the SHA import.sh pinned — star entries only>
-sha256: <checksum of the file as it landed>
-shows: <one line — what this file evidences>
+## <slug>/<path as upstream has it>      # manual/<path> for hand-dropped files
+- source-type: star | manual
+- source: <star: $STAR_HOME/<rel> · manual: free text — path, URL, or person>
+- source-commit: <the SHA import.sh pinned | n/a>
+- source-stamp: <first generated:/updated:/finalized: value in source | n/a>
+- sha256: <checksum of the file as it landed>
+- imported: <YYYY-MM-DD, real date>
+- covers: <one line — what this file evidences>
 ```
 
-`source-type: star` entries and `mates/star/**` belong to `execs/scpts/import.sh` and are rewritten wholesale on re-import; `source-type: manual` entries and `mates/manual/**` belong to `/stage-evid-curator`, and the script never touches them. Evidence is read-only — a wrong number is fixed at its source (the STAR repo, the original document) and re-imported, never edited under `mates/` — and a file with no entry does not exist to the writing skills.
+This is conventions §8.2 copied, not a variant of it: the heading is the path **relative to `mates/`** with no `mates/` prefix (`xseg/wkdrs/results/main.md`, `manual/results.csv`), every field is a `- ` list item, and the field names are the ones `execs/scpts/import.sh` actually writes — `source-commit`, `source-stamp`, `covers`. `source-type: star` entries live under `mates/<slug>/**`, one slug per upstream source, and belong to that script, which rewrites them wholesale on re-import; `source-type: manual` entries live under `mates/manual/**` and belong to `/stage-evid-curator`, and the script never touches them. `source-stamp` answers "has upstream moved?" and needs a reachable source; `sha256` answers "did these bytes change here?" and needs only the file. Evidence is read-only — a wrong number is fixed at its source (the STAR repo, the original document) and re-imported, never edited under `mates/` — and a file with no entry does not exist to the writing skills.
 
 ### Step 0: Resolve mode and environment
 
@@ -78,6 +79,8 @@ Three comparisons, one report table; every non-`ok` row carries the one command 
 1. **Coverage.** Files under `mates/` with no entry → `unregistered` — invisible to the writing skills until `register` runs. Entries whose file is gone → `missing` — re-import (star) or re-drop and `register` (manual).
 2. **Integrity.** Every file's checksum against its entry's `sha256`. A mismatch is `tampered`: the read-only rule was broken. Show what changed where the file is diffable; the fix is re-import or re-drop and re-register — never keep the edit, and never quietly update the checksum to match, which would launder the tamper into provenance.
 3. **Staleness** — star entries, `STAR_HOME` live: `bash execs/scpts/import.sh --diff`; upstream moved past the pinned stamp → `stale`, with the refresh command. Manual entries have no upstream to diff — refresh there is the user re-dropping the file — and the report says so instead of pretending to know.
+
+   Integrity and staleness are not the same check and neither covers for the other. `sha256` is written for every entry, star and manual alike, so step 2 catches an in-place edit with no network, no `STAR_HOME`, and no upstream clone — which is exactly the situation a hand edit survives in. Step 3 catches the opposite case: bytes here untouched, bytes upstream moved on. An entry can be `ok` on one and fail the other, and the report names which.
 
 Everything else is `ok`. A fully clean check reports clean and stops — never invent work.
 

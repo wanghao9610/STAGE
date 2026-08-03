@@ -13,7 +13,7 @@ description: >-
 
 # Claims Auditor — every number traced to a fingerprint, or caught
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources (the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays authoritative.
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
 Invocation: `/stage-clms-auditor [SECTION | CLAIM_ID]` — a section argument resolves per
 conventions §5 and audits that section's numbers; a claim ID (`C7`) audits one ledger claim
@@ -97,6 +97,14 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    trace found an anchor the ledger's Evidence column lacked, record it; set frontmatter
    `updated:` to the real date. Ledger flips are the audit's durable outcome (conventions §10:
    `wkdrs/` is never committed).
+
+   When `notes/adopt.md` exists and this run audited the whole manuscript, close the adoption loop
+   in the same pass: every row of its unsourced backlog must by now be either a `verified` claim or
+   an `unsourced` one whose statement carries its `\todo`. All resolved → set that file's
+   `backfilled:` to the real date, which is what releases `/stage-subm-packer`'s adoption gate
+   (conventions §8.9); any row still a naked number → leave it empty and name those rows in the
+   report. `backfilled:` is the only field of `notes/adopt.md` this skill writes, and no other skill
+   writes it at all.
 8. **File failures.** Append one `- [ ]` per mismatch, naked-unsourced number, stale-tainted
    match, or dead evidence link to `tasks/claims_followups.md` under a `## <date>` heading —
    location, value, verdict, route: wrong or missing upstream number → fix in STAR, re-import via
@@ -105,8 +113,9 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
 9. **Report.** Write `wkdrs/reports/CLAIMS_<date>.md` (`mkdir -p` first) per Output.
 10. **Digest in chat.** ≤300 words: counts per verdict, staleness state, ledger flips, tasks
     filed, and the one next action.
-11. **Commit (conventions §1).** One commit — `notes/claims.md` and `tasks/claims_followups.md`
-    — subject naming this skill. Never `wkdrs/`.
+11. **Commit (conventions §1).** One commit — `notes/claims.md`, `tasks/claims_followups.md`, and
+    `notes/adopt.md` when this run set its `backfilled:` — subject naming this skill. Never
+    `wkdrs/`.
 
 ## Output
 

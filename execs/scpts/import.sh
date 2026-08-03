@@ -33,9 +33,10 @@ Usage: bash execs/scpts/import.sh [--source PATH] [--slug NAME] [--diff]
 
 Snapshot evidence from a paired STAR repo into mates/<slug>/, mirroring the
 upstream paths, and record every file in mates/MANIFEST.md with its
-fingerprint (the first generated:/updated:/finalized: line) and the source
-commit. Evidence flows one way: to fix a number, fix it upstream and
-re-import — never edit mates/ in place.
+fingerprint: the source commit, the stamp (the first
+generated:/updated:/finalized: line), and the sha256 of the file as it landed.
+Evidence flows one way: to fix a number, fix it upstream and re-import — never
+edit mates/ in place, which the checksum is there to catch.
 
 Options:
   --source PATH   Source repo (default: STAR_HOME from .env).
@@ -201,6 +202,21 @@ extract_stamp() {
     fi
 }
 
+# Checksum of the file as it landed — the integrity half of a fingerprint
+# (conventions §8.2). Without it /stage-evid-curator's `check` has nothing to
+# compare a star entry against, and a hand-edit under mates/ is only detectable
+# while STAR_HOME is reachable. A missing tool is a degraded check to report,
+# never a guessed value (conventions §3.5).
+file_sha256() {
+    if command -v shasum >/dev/null 2>&1; then
+        shasum -a 256 "$1" | awk '{print $1}'
+    elif command -v sha256sum >/dev/null 2>&1; then
+        sha256sum "$1" | awk '{print $1}'
+    else
+        printf 'n/a (no sha256 tool on this host)'
+    fi
+}
+
 # One line saying what a path evidences; a curator may sharpen it later and
 # re-imports keep the sharpened wording.
 default_covers() {
@@ -335,6 +351,7 @@ while IFS= read -r rel; do
     cp -p "${src}" "${dst}"
 
     stamp="$(extract_stamp "${src}")"
+    checksum="$(file_sha256 "${dst}")"
     covers="$(awk -v key="## ${key}" '
         $0 == key { f = 1; next }
         /^## /    { f = 0 }
@@ -350,6 +367,7 @@ while IFS= read -r rel; do
         printf -- '- source: %s/%s\n' "${SRC_PREFIX}" "${rel}"
         printf -- '- source-commit: %s\n' "${SOURCE_COMMIT}"
         printf -- '- source-stamp: %s\n' "${stamp}"
+        printf -- '- sha256: %s\n' "${checksum}"
         printf -- '- imported: %s\n' "${TODAY}"
         printf -- '- covers: %s\n' "${covers}"
     } > "${TEMP_DIR}/block"

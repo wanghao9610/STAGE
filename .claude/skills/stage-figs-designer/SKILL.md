@@ -15,7 +15,7 @@ description: >-
 
 # Figure Designer — sourced figures, no orphan PDFs
 
-Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. All repo resources (the conventions, this skill) are English-only in v1 and are loaded as-is; zh-CN editions are on the roadmap and, when they exist, are kept in step for human readers only — this SKILL.md stays authoritative.
+Match the user's language in dialogue: for Chinese dialogue, reply in Chinese. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
 Invocation: `/stage-figs-designer [FIGURE | plan | teaser]` — no argument audits the Figures table in `notes/outline.md` against the files on disk and proposes one next action; `plan` creates or revises the Figures table from the story and section briefs; `teaser` resolves to the teaser figure and runs its checklist; anything else names one figure, resolved by outline ID (`F1`), file slug, or purpose/section text against `notes/outline.md` (conventions §5 — ambiguity is asked about, never guessed). Build work is one figure per invocation.
 
@@ -42,7 +42,7 @@ You never hand-type data into artwork, never write section prose, never place `\
 
 ### Step 0: Load
 
-Read the conventions (whole file), then `notes/outline.md`, `notes/story.md`, `notes/notation.md`, `notes/claims.md`, and `mates/MANIFEST.md`; list `manus/figs/` and `manus/figs/srcs/`. Note `LATEX_ENGINE` and `ANON` from `.env` (§3). No `notes/outline.md` yet → say so and route to `/stage-plan-outliner`; the Figures table lives there, so stop.
+Read the conventions (whole file), then `notes/outline.md`, `notes/story.md`, `notes/notation.md`, `notes/claims.md`, and `mates/MANIFEST.md`; list `manus/figs/` and `manus/figs/srcs/`. Note `LATEX_ENGINE` and `ANON` from `.env` (§3). No `notes/outline.md` yet → say so and route to `/stage-outl-planner`; the Figures table lives there, so stop.
 
 ### Step 1: Resolve the mode
 
