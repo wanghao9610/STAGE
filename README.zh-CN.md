@@ -259,7 +259,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 | Cursor | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Kimi Code | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
 
-五个 skill（下表以 † 标注）仅限显式调用（slash-only）：只有你点名它们才会运行，agent 绝不会自作主张启动它们。它们是对话密集的决策点——接入、故事、提纲、回复、投稿——不请自来的一次运行会替你做本该由你做的决定。每套 harness 各按自己的方式强制这一条——Claude、Cursor、Kimi 三份 manifest 里的 `disable-model-invocation: true`，Codex 的 `agents/openai.yaml` 里的 `allow_implicit_invocation: false`——四者在 CI 里都要对着这张表核对，所以不会出现"三套挡住了、第四套敞着"的情况。
+五个 skill（下表以 † 标注）仅限显式调用（slash-only）：只有你点名它们才会运行，agent 绝不会自作主张启动它们。它们是对话密集的决策点——接入、故事、提纲、回复、投稿——不请自来的一次运行会替你做本该由你做的决定。每套 harness 各按自己的方式强制这一条——Claude、Cursor、Kimi 三份 manifest 里的 `disable-model-invocation: true`，Codex 的 `agents/openai.yaml` 里的 `allow_implicit_invocation: false`——CI 会拿这四处去对 [规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md) 的 skill 一览——† 标记是在那里定的——所以不会出现"三套挡住了、第四套敞着"的情况。下表就是那份一览，外加一列"它写出什么"；按产物来看的同一批 skill 是产物登记表（规约 §8）。
 
 <div align="center">
   <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE 写作工作流：十五个 skill 分成五条相位带——建仓、规划、写作、润色与审计、投稿周期——各自写出什么，以及起草循环与拒稿回流如何闭合" width="100%">
@@ -268,18 +268,18 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 | Skill | 用途 | 主要产出 |
 | --- | --- | --- |
 | `stage-proj-adopt` † | 把新的或已有的论文仓库接进 STAGE：把配对 STAR 仓库写进 `.env`、确定目标 venue、盘点并映射已有 tex 树，把草稿里已有的数字转为 `unsourced` 论断进入审计待办 | `notes/adopt.md` |
-| `stage-evid-curator` | 证据接收与映射：运行 `import.sh`、登记 `mates/manual/` 下的手工文件、规整杂乱导出、提出论断⇄证据映射、暴露过期——绝不就地修改证据 | `mates/` 及 `mates/MANIFEST.md` 条目 |
+| `stage-evid-curator` | 证据接收与映射：运行 `import.sh`、登记 `mates/manual/` 下的手工文件、规整杂乱导出、提出论断⇄证据映射、暴露过期——绝不就地修改证据 | `mates/<slug>/**`、`mates/manual/**`、`mates/MANIFEST.md` 条目 |
 | `stage-stry-coach` † | 对话优先的故事打磨：pitch、问题、核心想法、带论断编号的贡献列表、venue 理由；播种论断台账和经用户确认的 venue 档案 | `notes/story.md`、播种的 `notes/claims.md`、`cycls/<cycle>/venue.yml` |
 | `stage-outl-planner` † | 故事 → 骨架：页数预算合计不超 venue 上限的章节表、图和表的计划、论断→章节分配、骨架 `.tex` 文件、记号表种子 | `notes/outline.md`、`manus/secs/*.tex` 骨架、`notes/notation.md` |
 | `stage-sect-drafter` | 每次调用起草或修改一个章节，依据章节简报、映射的证据、论断和记号规范；没有指纹的数字一律写成 `\todo{}` | `manus/secs/<n>_<slug>.tex` |
 | `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<slug>.tex` |
 | `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<slug>.pdf` + 源文件 |
-| `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子 | `manus/bibs/reference.bib`、`notes/refs/` |
-| `stage-copy-editor` | 对一个章节或全稿做润色：清晰、流畅、记号一致、按预算删减——绝不改技术含义和任何数字 | `wkdrs/reports/POLISH_<date>.md` |
-| `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转台账状态，检查证据过期 | `wkdrs/reports/CLAIMS_<date>.md` + `tasks/` 条目 |
-| `stage-cite-auditor` | 每个 `\cite` key 都能解析；关于被引论文的每个断言都能对上一份阅读笔记——对不上的断言被标记，绝不悄悄改掉 | `wkdrs/reports/CITES_<date>.md` |
+| `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子 | `manus/bibs/reference.bib`、`notes/refs/<ABBREV>.md`、`notes/refs/refs_index.md` |
+| `stage-copy-editor` | 对一个章节或全稿做润色：清晰、流畅、记号一致、按预算删减——绝不改技术含义和任何数字 | `manus/` 下被润色的正文、`wkdrs/reports/POLISH_<date>.md` |
+| `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转台账状态，检查证据过期 | `notes/claims.md` 的状态翻转、`wkdrs/reports/CLAIMS_<date>.md`、`tasks/` 条目 |
+| `stage-cite-auditor` | 每个 `\cite` key 都能解析；关于被引论文的每个断言都能对上一份阅读笔记——对不上的断言被标记，绝不悄悄改掉 | `wkdrs/reports/CITES_<date>.md`、`tasks/` 条目 |
 | `stage-peer-reviewer` | 模拟程序委员会：五视角评审团（新颖性与相关工作、技术正确性、实验严谨性、清晰度、魔鬼代言人），引用只认 whitelist/verified，按锚定评分带 + 封顶规则打分；`quick` 为单遍精简模式；绝不修改稿件 | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
-| `stage-resp-writer` † | 把真实与模拟评审解析成逐点台账，把每个攻击映射到论断和证据，在 venue 限制内起草回复，把每个承诺的修改记为复选框 | `cycls/<cycle>/response/RESPONSE_<date>.md`、`tasks/<cycle>_promises.md` |
+| `stage-resp-writer` † | 把真实与模拟评审解析成逐点台账，把每个攻击映射到论断和证据，在 venue 限制内起草回复，把每个承诺的修改记为复选框 | `cycls/<cycle>/response/RESPONSE_<date>.md`、`tasks/<cycle>_promises.md`、`notes/claims.md` 里降级为 `weakened` 的行 |
 | `stage-subm-packer` † | 投稿前检查与打包：build + lint 必须通过、走查检查单、完整性扫描、依官方模板包转成 venue 自己的版式、打包、投稿记录、冻结标签——camera-ready 模式在承诺未清空前拒绝打包 | `cycls/<cycle>/SUBMISSION_<date>.md`、标签 `freeze/<cycle>_<date>`、`cycls/<cycle>/template/` 下的模板包、`tasks/<cycle>_venue.md` 里的 venue 待办 |
 | `stage-flow-status` | 全流程的只读地图：章节/图/表状态、按状态统计的论断覆盖、证据新鲜度、周期状态、最近一次构建——以及唯一的下一步行动和它的准确命令 | 聊天内报告；从不写文件 |
 
