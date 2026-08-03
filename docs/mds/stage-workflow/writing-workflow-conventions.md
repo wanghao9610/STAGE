@@ -372,3 +372,20 @@ Rules the table alone does not carry:
 2. **`wkdrs/` is never committed.** Durable audit outcomes live as status flips in `notes/claims.md`
    and entries in `tasks/`, not in reports.
 3. **`execs/` root is closed** (STAR's rule): `run.sh` + `update.sh` and nothing else.
+4. **The manuscript always compiles as the preprint; a venue's format is a generated copy.**
+   `manus/stys/` holds two layers and the split is load-bearing: `arxiv.cls` owns the look and is
+   what a venue class replaces; `stage.sty` owns `\todo` plus the macros skills write into `secs/`
+   and `tabs/` (`\parahead`, `\cmark`, `\tablestyle`, `\figref` …) and survives every swap.
+   Project-specific macros go in `main.tex`, never in `stys/`. An official venue kit unpacks whole
+   and unedited into `cycls/<cycle>/template/`, beside that cycle's `venue.yml` — never under
+   `manus/`, a scanned namespace where a kit's example `.tex` would trip `lint.sh`'s `\todo` count
+   and its identity-leak scan. `template:` in `venue.yml` names the class inside the kit;
+   `stage-subm-packer convert` reads it and regenerates a standalone copy under `wkdrs/` that
+   compiles under that class. `manus/main.tex` keeps its `\documentclass{stys/arxiv}`: there is no
+   in-place swap and no second source of truth.
+5. **The four harness trees are copies, not alternatives.** The same fifteen skills ship once per
+   harness — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` —
+   differing only in invocation prefix and tool names (`Bash` / `Shell`, `AskUserQuestion` /
+   `AskQuestion` / `request_user_input`, `Read` / `ReadFile`). Load the copy under your own root and
+   follow it; a listing that surfaces another root's copy is telling you where a file is, not which
+   one binds you.

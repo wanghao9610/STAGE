@@ -30,7 +30,7 @@ Do not treat these four trees as interchangeable. Keep tool-specific wording in 
 - This holds even when the surfaced entry points somewhere else: the path shown in the skill listing is where Cursor found a copy, not the copy to act on. Open `.cursor/skills/<name>/SKILL.md` yourself and follow that.
 - Ignore sibling copies under `.agents/skills/`, `.claude/skills/`, and `.kimi-code/skills/` unless the user explicitly asks for another tool's wording.
 - When linking hand-offs between skills, keep the `/stage-*` names, but still load instructions from `.cursor/skills/`.
-- `SKILL_zh.md` beside each `SKILL.md` is a Chinese edition for human readers: never loaded at runtime, never authoritative. Load the English file and reply per AGENTS.md §8.
+- `SKILL_zh.md` beside each `SKILL.md` is a Chinese edition for human readers: never loaded at runtime, never authoritative. Load the English file and reply per AGENTS.md §6.
 
 ## 3. Reduce Duplicate Discovery in the Cursor UI
 

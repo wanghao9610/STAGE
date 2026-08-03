@@ -372,3 +372,15 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 1. **`mates/` 是只读的。** `import.sh` 与 `/stage-evid-curator` 是仅有的两个写入者，且只整文件地新增/替换并附指纹。内容层面的修正发生在上游，然后重新导入。
 2. **`wkdrs/` 永不提交。** 审计真正留下的东西是 `notes/claims.md` 里的状态翻转和 `tasks/` 里的条目，不是报告。
 3. **`execs/` 根目录是封闭的**（沿用 STAR 的规则）：`run.sh` + `update.sh`，此外什么都没有。
+4. **稿件永远编译成预印本；venue 的版式是一份生成出来的副本。** `manus/stys/` 分两层，这条分界是承重的：`arxiv.cls`
+   管外观，是 venue 的 class 要**替换**掉的那一层；`stage.sty` 管 `\todo`，以及各 skill 会写进 `secs/` 和 `tabs/`
+   的那些宏（`\parahead`、`\cmark`、`\tablestyle`、`\figref` …），每次换模板都**活下来**。项目自己的宏写在
+   `main.tex` 里，绝不写进 `stys/`。官方 venue 模板包整份、不加编辑地解包进 `cycls/<cycle>/template/`，与该周期的
+   `venue.yml` 并列——绝不放进 `manus/`：那是 `lint.sh` 扫描的命名空间，模板包自带的示例 `.tex` 会污染它的 `\todo`
+   计数和身份泄漏扫描。`venue.yml` 里的 `template:` 指名模板包中的那个 class；`stage-subm-packer convert` 读它，
+   在 `wkdrs/` 下重新生成一份能在该 class 下编译的独立副本。`manus/main.tex` 始终保持
+   `\documentclass{stys/arxiv}`：没有就地替换，也没有第二份事实来源。
+5. **四棵 harness 目录树是副本，不是备选项。** 同样的十五个 skill 每套 harness 各发一份——`.claude/skills/`、
+   `.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——彼此只差调用前缀和工具名（`Bash` / `Shell`、
+   `AskUserQuestion` / `AskQuestion` / `request_user_input`、`Read` / `ReadFile`）。装载你自己那棵树下的副本并遵循它；
+   某次列目录列出了别的树里的副本，那只是告诉你文件在哪，不是告诉你哪一份约束你。

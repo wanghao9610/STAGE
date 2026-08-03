@@ -1,41 +1,52 @@
 # Agent Instructions
 
-This is a STAGE repository — the paper-writing companion to STAR. One repo, one paper. The manuscript cites evidence; it never contains unsourced numbers. These rules bind every agent working here.
+Behavioral guidelines to reduce common LLM writing mistakes. They bias toward caution over speed; for trivial tasks, use judgment. This is a STAGE repository: one repo, one paper, and every number in the manuscript traces to evidence or is visibly marked as missing.
 
-## 1. Read the Conventions First
+## 1. Think Before Writing
 
-**`docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline for all writing-workflow work.**
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
 
-- Read the whole file at the start of every skill run. Skills cite its § numbers (§0 vocabulary … §9 fabrication boundary, §10 layout) and state only what is specific to themselves; where a skill is stricter, the skill wins.
-- Skip the re-read only when the same file's text is still verbatim visible in this conversation. Summaries and memories of having read it don't count.
-- Do not edit `docs/mds/stage-workflow/` — it is upstream-managed and `execs/update.sh` overwrites it. The same holds for the four skill trees, both `execs/` entrypoints (`update.sh` syncs itself), and this file with the Cursor rule that copies it; project-specific settings belong in `.env`, which is never synced.
-- What each skill does is in `docs/mds/stage-workflow/writing-workflow-skills.md`.
-- The `*.zh-CN.md` files beside the docs, and `SKILL_zh.md` beside each `SKILL.md`, are Chinese editions for human readers: never loaded at runtime, never authoritative. Load the English file and reply per §8.
+- State your assumptions explicitly. When the target is ambiguous — which section, which figure, which claim, which cycle — stop, list the candidates, and ask. Never guess which one was meant.
+- If a result admits more than one reading, present them - don't pick silently.
+- If the evidence supports less than the sentence would claim, say so before writing it. Push back when warranted.
 
-## 2. Core Principles
+## 2. Evidence Before Prose
 
-**Evidence flows one way. The claim ledger is the hub. Deterministic checks live in scripts, judgment lives in skills.**
+**Nothing in the manuscript pretends to be sourced.** Full rule: conventions §9.
 
-- **A — Evidence flows one way.** STAR artifacts (or hand-registered drops) are snapshotted into read-only `mates/` with a fingerprint, recorded in `mates/MANIFEST.md`; the manuscript only cites them. Numbers live upstream: to fix a number, fix it in STAR and re-import — never edit `mates/`.
-- **B — The claim ledger is the hub.** `notes/claims.md` links every claim's statements ⇄ evidence ⇄ status (`proposed → drafted → verified / unsourced / weakened / dropped`). Writing states claims, audits verify them, responses defend them. Keep the ledger current in the same change as the text it tracks.
-- **C — Deterministic checks live in scripts, judgment lives in skills.** What `lint.sh` or `import.sh --diff` can decide is never re-decided by prose; what needs judgment is never reduced to a grep.
+- Every number in `manus/` either traces to a fingerprinted `mates/` entry read this run or is written as `\todo{...}` — no third state. A visible todo is a state; a plausible invented number is a defect.
+- Every assertion about a cited paper is checkable against a reading note in `notes/refs/`, or against imported refs under `mates/`.
+- Venue rules — page limits, deadlines, checklists — are entered only as user-confirmed facts. A venue's LaTeX class is the same kind of fact: it comes from the official kit the user supplies, copied byte-for-byte, never fetched and never written from memory.
+- Evidence is immutable in place. A wrong number is fixed at its source and re-imported, or a corrected file is registered; never "correct" one.
+- Nothing may weaken these rules to be helpful. Deadline pressure is what they are calibrated for.
 
-## 3. Project Layout
+## 3. Surgical Changes
 
-**Keep files in their designated directories.** Full table and rules: conventions §10.
+**Touch only what you must. Say it once, plainly.**
 
-- Manuscript under `manus/`: entry `main.tex`; sections `secs/<n>_<slug>.tex`; figures `figs/` with sources in `figs/srcs/`; tables `tabs/`; bibliography `bibs/reference.bib`; venue styles `stys/`.
-- Two template layers in `manus/stys/`, and the split is load-bearing: `arxiv.cls` owns the look and is what a venue class **replaces**; `stage.sty` owns `\todo` plus the macros skills write into `secs/` and `tabs/` (`\parahead`, `\cmark`, `\tablestyle`, `\figref` …) and **survives** every swap. Extend accordingly; project-specific macros go in `main.tex`, never in `stys/`.
-- **The manuscript always compiles as the preprint; the venue's format is a generated copy.** An official venue kit unpacks whole and unedited into `cycls/<cycle>/template/` — beside that cycle's `venue.yml`, never under `manus/`, which is a scanned namespace where a kit's example `.tex` would trip `lint.sh`'s `\todo` count and its identity-leak scan. `template:` in `venue.yml` names the class inside the kit; `/stage-subm-packer convert` reads it and regenerates a standalone copy under `wkdrs/` that compiles under the venue's class. `manus/main.tex` keeps its `\documentclass{stys/arxiv}` — there is no in-place swap, and no second source of truth. Never fetch a venue template or write one from memory (§6).
-- Evidence under `mates/` — **read-only**. `execs/scpts/import.sh` and `/stage-evid-curator` are the only writers, and they only add or replace whole files with fingerprints.
-- Writing metadata under `notes/` — fixed files `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`; reading notes in `notes/refs/`.
-- Submission cycles under `cycls/<venue>_<year>/` — `venue.yml`, `template/` (the official venue kit), `reviews/`, `response/`, `SUBMISSION_<date>.md`. Revision scratch, promise lists, and venue follow-ups in `tasks/`: `<cycle>_promises.md` blocks a camera-ready until every box is kept; `<cycle>_venue.md` collects what a conversion left for a human and blocks nothing.
-- Builds and ephemeral reports under `wkdrs/` — gitignored and regenerable; durable outcomes go to the ledger and `tasks/`, not reports.
-- `execs/` root is closed: `run.sh` and `update.sh` only. Utilities (`import.sh`, `lint.sh`) live in `execs/scpts/`.
+- Don't "improve" adjacent prose, captions, or formatting; don't rewrite what isn't broken. Match the manuscript's voice, even if you'd write it differently.
+- Never renumber sections in passing: the `<n>_` prefix binds outline rows, the ledger's `Stated in` column, and the `\input` order in `main.tex` together (conventions §5.5).
+- Minimum prose that makes the point: no filler, no padding toward a page budget, no second sentence restating the first.
+- The registry moves with the text it tracks — the claim row, the outline row, the notation entry — in the same change, not as cleanup after it.
 
-## 4. Writing Workflow Skills
+The test: every changed line traces to the user's request, and every number in it to a fingerprint.
 
-**Fifteen skills. Invoke as `/stage-<name>` in Claude Code and Cursor, `$stage-<name>` in Codex, `/skill:stage-<name>` in Kimi Code.**
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+- Turn the task into a check you can run: "draft the experiments section" -> the build passes and every number carries a `% src:` anchor or a `\todo`; "cut it to eight pages" -> `lint.sh` reports the page count under the active cycle's `page_limit_main`; "answer the reviewers" -> every point in the ledger has a response or a promise.
+- For multi-step tasks, state the steps and the check that closes each one.
+
+## 5. Writing Workflow
+
+**This project uses the STAGE writing workflow. Its records are files, not chat history.**
+
+- **Evidence flows one way.** STAR artifacts and hand-registered drops are snapshotted into read-only `mates/` with a fingerprint, recorded in `mates/MANIFEST.md`; the manuscript only cites them.
+- **The claim ledger is the hub.** `notes/claims.md` links every claim's statements ⇄ evidence ⇄ status (`proposed → drafted → verified / unsourced / weakened / dropped`). Writing states claims, audits verify them, responses defend them.
+- **Deterministic checks live in scripts, judgment lives in skills.** What `lint.sh` or `import.sh --diff` can decide is never re-decided in prose; what needs judgment is never reduced to a grep.
+
+Fifteen skills. Invoke as `/stage-<name>` in Claude Code and Cursor, `$stage-<name>` in Codex, `/skill:stage-<name>` in Kimi Code.
 
 | Skill | Role |
 | --- | --- |
@@ -52,48 +63,60 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 | `stage-cite-auditor` | verify citations against reading notes |
 | `stage-peer-reviewer` | simulated five-perspective review panel |
 | `stage-resp-writer` † | reviews → point ledger → response + promises |
-| `stage-subm-packer` † | preflight, venue-template conversion, package, submission record, freeze |
+| `stage-subm-packer` † | preflight, venue conversion, package, freeze |
 | `stage-flow-status` | read-only status and the one next action |
 
-- The five marked † are slash-only: run them only when the user names them — never on your own initiative. They are the decision points (adoption, story, outline, response, submission). The † markers above are the source of truth: the guards enforcing them — `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests, `allow_implicit_invocation: false` in `.agents/skills/<name>/agents/openai.yaml` for Codex — are checked against this table, so marking a skill here without guarding it in all four trees fails CI.
-- `stage-flow-status` and `stage-peer-reviewer` never write to the manuscript; `stage-flow-status` writes nothing at all.
-- When you do not know where things stand, run the status skill first — it reads the outline, ledger, manifest, and cycle state, and names the single next action.
-- What each skill writes is the artifact registry, conventions §8. Do not hand-edit generated reports under `wkdrs/`.
-- The same fifteen skills ship once per harness — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — differing only in invocation prefix and tool names (`Bash` / `Shell`, `AskUserQuestion` / `AskQuestion` / `request_user_input`, `Read` / `ReadFile`). Load the copy under your own root and follow it; the trees are not interchangeable, and a listing that surfaces another root's copy is telling you where a file is, not which one binds you.
+- Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at the start of every skill run; skills cite its § numbers and state only what is specific to themselves, and where a skill is stricter, the skill wins. Skip the re-read only while that file's text is still verbatim visible in this conversation.
+- The five marked † are slash-only: run them only when the user names them. They are the decision points — adoption, story, outline, response, submission — and this table is the source of truth CI checks the per-harness guards against.
+- `stage-flow-status` and `stage-peer-reviewer` never write to the manuscript; `stage-flow-status` writes nothing at all. Run it first when you do not know where things stand — it reads the outline, ledger, manifest, and cycle state, and names the single next action.
+- What each skill writes is the artifact registry, conventions §8; what each skill is for is `writing-workflow-skills.md`. Do not hand-edit generated reports under `wkdrs/`.
+- One commit per skill working session, at that skill's documented commit step, with the skill named in the subject. Outside a skill run, do not commit, tag, or push unless asked; never commit `wkdrs/` or `.env`. Full rule: conventions §1.
+- Upstream-managed and overwritten by `execs/update.sh`: `docs/mds/stage-workflow/`, the four skill trees, both `execs/` entrypoints, and this file with the Cursor rule that copies it. Project-specific settings belong in `.env`, which is never synced. Load the skill copy under your own harness's root — the trees are not interchangeable (conventions §10.5).
 
-## 5. Git
-
-**One commit per skill working session; the subject names the skill.** Full rule: conventions §1.
-
-- Commit only at a skill's documented commit step. Outside a skill run, do not commit, tag, or push unless the user asks.
-- Never commit `wkdrs/` or `.env`. Everything else — manuscript, notes, evidence, cycles, tasks — is tracked.
-- Freeze tags `freeze/<cycle>_<date>` are created only by `stage-subm-packer`.
-
-## 6. The Fabrication Boundary
-
-**Nothing in the manuscript pretends to be sourced.** Full rule: conventions §9.
-
-- Every number in `manus/` either traces to a fingerprinted `mates/` entry or is written as `\todo{...}` — no third state.
-- Every assertion about a cited paper must be checkable against a reading note (`notes/refs/` or imported refs under `mates/`).
-- Venue rules in `venue.yml` are entered only as user-confirmed facts — never invent page limits, deadlines, or checklist requirements. The venue's LaTeX template is the same kind of fact: it comes from an official kit the user supplies, is copied byte-for-byte, and is never fetched, patched, or written from memory of what a venue's class looks like.
-- Evidence files are immutable in place: register new files or re-import; never "correct" one.
-- Nothing may weaken these rules to be helpful. A visible `\todo` is a state; a plausible invented number is a defect.
-
-## 7. Build, Checks, and Dates
-
-**`execs/run.sh` is the only build entrypoint.**
-
-- `bash execs/run.sh` — latexmk, out-of-tree into `wkdrs/builds/`, engine from `.env` `LATEX_ENGINE`; prints the PDF path and page count.
-- `bash execs/scpts/lint.sh` — undefined references, `\todo` count, page count vs the active cycle's `venue.yml`, anonymity leaks when `ANON=true`. Hard failures exit non-zero.
-- Runtime configuration lives in `.env` (create from `.env.example`): `STAR_HOME` (optional — empty means standalone), `LATEX_ENGINE`, `ANON`, `STAGE_REPOSITORY`, `STAGE_LANG` (optional — empty means follow the conversation). Do not hardcode machine-specific paths.
-- Real dates only: every date written into an artifact comes from the system clock, never from memory or invention (conventions §4).
-
-## 8. Reply Language
+## 6. Reply Language
 
 **`.env` `STAGE_LANG` sets the language of chat replies and of the Markdown a run writes** — `notes/`, `tasks/`, simulated reviews, `wkdrs/` reports. Full rule: conventions §7.6.
 
-- Set (`en` or `zh`) → use it, whatever the chat's language. Unset or empty → follow the user's dialogue language. An explicit in-conversation request wins over both.
-- Resolve it once at the start of a run: `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call.
-- **Always English, whatever it says**: everything under `manus/` (prose, captions, `% src:` comments, `\todo{}` text) and the response to reviewers under `cycls/<cycle>/response/` — both are read by people outside this repository.
-- **Structural literals are English inside a document written in any language**: frontmatter keys and values, ledger statuses, claim and point IDs, paths, bibkeys, venue, dataset, and metric names — anything a script greps.
-- An existing document keeps the language it was written in; `STAGE_LANG` governs what a run writes, never a retranslation.
+- Set (`en` or `zh`) → use it, whatever the chat's language. Unset or empty → follow the user's dialogue language; an explicit in-conversation request wins over both. Resolve it once per run: `grep -sE '^STAGE_LANG=' .env || true`.
+- Always English whatever it says: everything under `manus/` — prose, captions, `% src:` comments, `\todo{}` text — and the response to reviewers under `cycls/<cycle>/response/`. Both are read by people outside this repository.
+- Structural literals stay English inside a document written in any language: frontmatter keys and values, ledger statuses, claim and point IDs, paths, bibkeys, venue, dataset, and metric names — anything a script greps.
+- An existing document keeps the language it was written in; `STAGE_LANG` governs what a run writes, never a retranslation. The `*.zh-CN.md` docs and `SKILL_zh.md` files are editions for human readers: never loaded at runtime, never authoritative.
+
+## 7. Reply Wording
+
+**Write the action, not its name, in any language. The reader should never have to decode a term to know what you did.**
+
+- A name that must appear brings its meaning with it, in the same sentence.
+- Exception: strings matched literally — ledger statuses, IDs, field names, paths — stay verbatim. Explain beside one, never in place of it.
+- A pointer that says nothing on its own — `§9`, `C4`, `R2.W1`, a cycle name — stays verbatim and takes a few words of what it points at, in parentheses: `C4 (the zero-shot transfer claim)`. First use in every reply, not once per conversation; the reader does not scroll back.
+- Technical prose, no filler and no emoji. Plain does not mean chatty.
+
+## 8. Project Layout
+
+**Keep files in their designated directories.** Full table and rules: conventions §10.
+
+- Manuscript under `manus/`: entry `main.tex`; sections `secs/<n>_<slug>.tex`; figures `figs/` with sources in `figs/srcs/`; tables `tabs/`; bibliography `bibs/reference.bib`; template layers `stys/`.
+- The manuscript always compiles as the preprint, and a venue's format is a generated copy: the official kit unpacks whole into `cycls/<cycle>/template/`, never under `manus/`, which `lint.sh` scans (conventions §10.4).
+- Evidence under `mates/` — read-only. `execs/scpts/import.sh` and `/stage-evid-curator` are its only writers, and they only add or replace whole files with fingerprints.
+- Writing metadata under `notes/`: `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`, and reading notes in `notes/refs/`.
+- Submission cycles under `cycls/<venue>_<year>/`. Revision scratch, promise lists, and venue follow-ups in `tasks/`: `<cycle>_promises.md` blocks a camera-ready until every box is kept; `<cycle>_venue.md` blocks nothing.
+- Builds and ephemeral reports under `wkdrs/` — gitignored and regenerable. Durable outcomes go to the ledger and `tasks/`, not to reports.
+- `execs/` root is closed: `run.sh` and `update.sh` only. Utilities (`import.sh`, `lint.sh`) live in `execs/scpts/`.
+
+## 9. Project Runtime
+
+**Use the project's entrypoints. Do not guess local paths.**
+
+- `bash execs/run.sh` is the only build: latexmk, out-of-tree into `wkdrs/builds/`, engine from `.env` `LATEX_ENGINE`. It prints the PDF path and the page count.
+- `bash execs/scpts/lint.sh` is the deterministic gate: undefined references, `\todo` count, page count against the active cycle's `venue.yml`, identity leaks when `ANON=true`. Hard failures exit non-zero.
+- Runtime configuration lives in `.env`, created from `.env.example`: `STAR_HOME` (empty means standalone), `LATEX_ENGINE`, `ANON`, `STAGE_REPOSITORY`, `STAGE_LANG`. Do not hardcode machine-specific paths.
+- Real dates only: every date written into an artifact comes from the system clock, never from memory or invention (conventions §4).
+
+## 10. Verification
+
+**Prove the change works before calling it done.**
+
+- Build after touching anything under `manus/`; prose that has not compiled is not finished. Run `lint.sh` when the change could move a reference, a todo count, or a page.
+- Re-read every number you cite from its `mates/` file in the same run. A fingerprint you remember is not a fingerprint you checked.
+- If a check cannot be run, say why and name the remaining risk.
+- Report what was verified, with evidence — the PDF path and page count, the lint verdict, the ledger rows that moved — not just that it "works".
