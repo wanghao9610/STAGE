@@ -37,8 +37,8 @@ STAGE 提供十五个彼此衔接的写作工作流 skill，把导入的证据�
 投稿周期 —— 每个 cycls/<venue>_<year>/ 对应一次 venue 尝试
   → stage-peer-reviewer: 五视角模拟评审组，真实评审的格式
   → stage-resp-writer: 评审 → 逐点台账 → 回复 + 承诺复选框
-  → stage-subm-packer: 构建+lint 把关、清单、打包、SUBMISSION 记录、
-    freeze/<cycle>_<date> tag
+  → stage-subm-packer: 构建+lint 把关、清单、转成 venue 自己的模板、打包、
+    SUBMISSION 记录、freeze/<cycle>_<date> tag
 
   ⌾ stage-flow-status: 任何时刻读上面的一切 ——
     现在到哪了，以及唯一的下一步动作连同它的确切命令
@@ -117,7 +117,9 @@ Slash-only。把评审解析成一本逐点台账——真实的 `received_*.md`
 
 ### stage-subm-packer
 
-Slash-only。预检与打包：`run.sh` 构建与 `lint.sh` 必须通过、venue 清单逐条走完、图表与 bib 检查齐备，然后把包——camera PDF、补充材料、arXiv 可用源码——落到 `wkdrs/builds/` 下。它写 `cycls/<cycle>/SUBMISSION_<date>.md` 记录什么投到了哪里，并创建 git tag `freeze/<cycle>_<date>`——冻结 tag 唯一的出处（规约 §1）。它同样拒绝一个 `notes/adopt.md` 的 `backfilled:` 仍为空的被接入仓库——那是唯一一种 `lint.sh` 会在一堆追不到任何东西的数字之上读出"干净"的状态，标记计数在那里能证明的比它看上去的少（规约 §9a）。camera-ready 模式还会在 `tasks/<cycle>_promises.md` 仍有未勾选的框时拒绝打包：对评审人的承诺要在任何东西发出去之前兑现。
+Slash-only。预检与打包：`run.sh` 构建与 `lint.sh` 必须通过、venue 清单逐条走完、图表与 bib 检查齐备，然后把包——camera PDF、补充材料、可直接投稿的源码——落到 `wkdrs/builds/` 下。它写 `cycls/<cycle>/SUBMISSION_<date>.md` 记录什么投到了哪里，并创建 git tag `freeze/<cycle>_<date>`——冻结 tag 唯一的出处（规约 §1）。它同样拒绝一个 `notes/adopt.md` 的 `backfilled:` 仍为空的被接入仓库——那是唯一一种 `lint.sh` 会在一堆追不到任何东西的数字之上读出"干净"的状态，标记计数在那里能证明的比它看上去的少（规约 §9a）。camera-ready 模式还会在 `tasks/<cycle>_promises.md` 仍有未勾选的框时拒绝打包：对评审人的承诺要在任何东西发出去之前兑现。
+
+论文取得 venue 自己的形状也在这里发生。`convert` 模式读用户提供的官方模板包——解包进 `cycls/<cycle>/template/`，与该周期的 `venue.yml` 并列，而 `template:` 指名的是模板包里那个 class——并在 `wkdrs/` 下生成一份能在 venue 的 class 下编译的独立副本：标题、作者与 abstract 用模板包自己的宏，`stys/arxiv.cls` 提供过而 venue class 没有的那一小撮由一个精简的 `compat.sty` 补上，`stys/stage.sty` 则逐字带过去——那一层本来就是为跨模板存活而建的。`manus/` 永不被编辑，也不往里新增任何东西——模板包待在 `lint.sh` 会扫 `\todo` 与身份泄漏的那棵树之外——而副本每次运行都从头重新生成，所以没有第二份真值源，也没有漂移。模板绝不去抓、也绝不凭记忆重建——管数字的那条边界同样管版式（规约 §9）。`convert` 刻意跳过所有冻结关口：把论文塞进页数上限要转很多次，而每一次都发生在手稿里还有 `\todo` 的时候。`page_limit_main` 量的是转换出的副本的页数，不是预印本构建的页数。转换替你做不了的事——被丢掉的 `\keywords`、需要拍板的附录顺序——会变成 `tasks/<cycle>_venue.md` 里的一行 `- [ ]`，各自点名由哪个 skill 来修。那份清单是被更新而不是被重新生成的，所以拍板过的条目不会再冒出来；而且与 `tasks/<cycle>_promises.md` 不同，它里面未勾选的框不阻断任何东西：那些是发现，不是对评审人的承诺。
 
 ### stage-flow-status
 

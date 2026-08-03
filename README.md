@@ -69,7 +69,7 @@ STAGE/
 │   ├── story.md            # Also: claims.md, outline.md, notation.md, adopt.md
 │   └── refs/               # Reading notes per paper + refs_index.md
 ├── cycls/                  # Submission cycles
-│   └── <venue>_<year>/     # venue.yml, reviews/, response/, SUBMISSION_<date>.md
+│   └── <venue>_<year>/     # venue.yml, template/ (the venue kit), reviews/, response/, SUBMISSION_<date>.md
 ├── tasks/                  # Revision scratch and promise lists
 ├── wkdrs/                  # Builds and ephemeral reports (gitignored, regenerable)
 ├── execs/
@@ -103,7 +103,7 @@ The abbreviated directory names follow STAR's convention:
 | `figs/` | Figures | Rendered PDFs; `srcs/` their editable sources |
 | `tabs/` | Tables | Table `.tex` files, generated from evidence |
 | `bibs/` | Bibliographies | `reference.bib` |
-| `stys/` | Styles | `arxiv.cls`, `stage.sty`, and any venue class/style files |
+| `stys/` | Styles | `arxiv.cls` and `stage.sty` — venue kits live in `cycls/<cycle>/template/`, not here |
 | `mates/` | Materials | Imported evidence snapshots — read-only |
 | `cycls/` | Cycles | One directory per submission attempt |
 | `execs/` | Executions | Entrypoint scripts; `scpts/` the utilities |
@@ -117,12 +117,20 @@ Three rules the tree alone does not carry: `mates/` is read-only (`import.sh` an
 
 `manus/` ships a compact, arXiv-style preprint template, split into two layers, because one of them has to survive a venue swap and the other is the thing being swapped:
 
-| Layer | File | Owns | On a venue swap |
+| Layer | File | Owns | In the venue's format |
 | --- | --- | --- | --- |
-| The look | `manus/stys/arxiv.cls` | page geometry, fonts, the title panel, headings, captions, floats, bibliography style | **replaced** — drop the venue's class into `manus/stys/` and change one line: `\documentclass{stys/cvpr}` |
-| The authoring layer | `manus/stys/stage.sty` | `\todo{...}` plus the macros the writing skills emit into `secs/` and `tabs/` | **kept** — the line `\usepackage{stys/stage}` stays whatever the class becomes |
+| The look | `manus/stys/arxiv.cls` | page geometry, fonts, the title panel, headings, captions, floats, bibliography style | **replaced** by the venue's own class |
+| The authoring layer | `manus/stys/stage.sty` | `\todo{...}` plus the macros the writing skills emit into `secs/` and `tabs/` | **carried over verbatim** — the line `\usepackage{stys/stage}` stays whatever the class becomes |
 
 Keep that split when you extend either file: anything a section or table file writes belongs in the package; anything only the page look needs belongs in the class. Project-specific macros (`\newcommand{\method}{...}`) go in `main.tex`, never in `stys/` — both template files get replaced or updated under you.
+
+**Getting into a conference template.** You do not swap the class in place. `manus/main.tex` always compiles as the preprint; the venue's format is a **generated copy**:
+
+1. Download the venue's official author kit (CVPR, NeurIPS, ACL, an IEEE journal — whatever it ships as).
+2. `/stage-subm-packer convert kit=<path-to-zip-or-dir>` — the kit unpacks whole and unedited into `cycls/<cycle>/template/`, beside that cycle's `venue.yml`. It stays out of `manus/` deliberately: that tree is scanned by `lint.sh`, and a kit's own example `.tex` would trip the `\todo` count and the identity-leak scan. `template:` in `venue.yml` names the class inside the kit.
+3. The run reads the kit's own example `.tex` for the macros it wants, writes a standalone copy under `wkdrs/` — the venue's class, `stage.sty` verbatim, a small generated `compat.sty` for what `arxiv.cls` provided and the venue class does not, a `main.tex` re-emitting your title/authors/abstract through the venue's macros, and `secs/`, `tabs/`, `figs/`, `bibs/` unchanged — then builds it and reports the page count **in that format**, which is the number `page_limit_main` actually means.
+
+`manus/` is never edited, the copy is regenerated from scratch every run, and the template is never fetched or written from memory: an official kit is the only source. Whatever the conversion cannot do for you lands as a `- [ ]` line in `tasks/<cycle>_venue.md`, naming the skill that fixes it — a tracked list rather than a note in a chat window. Re-run `convert` as often as you like while trimming to the page limit — it skips every freeze gate, so it works on a manuscript that still has `\todo` markers in it.
 
 **Class options** — `\documentclass[twocolumn]{stys/arxiv}`: `onecolumn` | `twocolumn`, plus `anon` and anything `article` takes. Inside the preamble, `\paperstyle{fancy|simple}` picks a framed or flat title panel and `\papercolor{green|blue|black}` sets the theme.
 
@@ -271,8 +279,16 @@ Five skills (marked † below) are slash-only: they run only when you name them 
 | `stage-cite-auditor` | Every `\cite` key resolves; every assertion about a cited work is checkable against a reading note — unverifiable assertions get flagged, never silently fixed | `wkdrs/reports/CITES_<date>.md` |
 | `stage-peer-reviewer` | Simulated program committee: a five-perspective panel (novelty & related work, soundness, experimental rigor, clarity, devil's advocate) under a whitelist-or-verified citation contract, scored by anchored rubric bands with hard caps; `quick` runs a single-pass version; never edits the manuscript | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
 | `stage-resp-writer` † | Parse real and simulated reviews into a point ledger, map each attack to claims and evidence, draft the response within the venue's limit, record every promised change as a checkbox | `cycls/<cycle>/response/RESPONSE_<date>.md`, `tasks/<cycle>_promises.md` |
-| `stage-subm-packer` † | Preflight and packaging: build + lint must pass, checklist walk, completeness sweep, camera/supp/arXiv package, submission record, freeze tag — camera-ready refuses to pack while promises sit unchecked | `cycls/<cycle>/SUBMISSION_<date>.md`, tag `freeze/<cycle>_<date>` |
+| `stage-subm-packer` † | Preflight and packaging: build + lint must pass, checklist walk, completeness sweep, conversion into the venue's own template from an official kit, package, submission record, freeze tag — camera-ready refuses to pack while promises sit unchecked | `cycls/<cycle>/SUBMISSION_<date>.md`, tag `freeze/<cycle>_<date>`, the kit at `cycls/<cycle>/template/`, venue follow-ups in `tasks/<cycle>_venue.md` |
 | `stage-flow-status` | Read-only map of the whole flow: section/figure/table status, claim coverage by status, evidence freshness, cycle state, latest build — and the one next action with its exact command | Chat report; never writes |
+
+**Targeting more than one venue.** One venue is one cycle. `cycls/<venue>_<year>/` owns that attempt's `venue.yml`, its official kit under `template/`, its reviews, its response, its `SUBMISSION_<date>.md`, and its freeze tag; the manuscript, the evidence, and the claim ledger are shared across all attempts.
+
+- **In sequence** — rejected, then resubmitted elsewhere — is the native path. `/stage-stry-coach` creates the next cycle with that venue's confirmed profile, and `/stage-subm-packer convert kit=<path>` registers the new kit into it. Nothing in the old cycle moves, so which format went where stays reproducible from its freeze tag, and the `weakened` and `unsourced` claims in the shared ledger are the first things the next attempt fixes.
+- **In parallel** — a CVPR copy and a NeurIPS copy at once, or just comparing page counts — works the same way, one cycle per venue: point `cycle:` in `notes/story.md` at the one you want, then convert. Copies land in `wkdrs/builds/<cycle>_<template>_<date>/`, named by cycle and template, so they never overwrite each other.
+- **Two kits in one cycle** is not supported, deliberately. `cycls/<cycle>/template/` is singular and `venue.yml`'s `template:` names one class inside it; replacing a kit under a live cycle shows you the diff and asks first, because it changes the page budget every earlier decision was made against.
+
+Two things to know when venues run in parallel. `notes/outline.md` carries one set of page budgets, so it can only be planned against one venue's limit — for the other, the page count `convert` reports is the check, which is exactly why conversion skips every gate and can be re-run at will. And `.env`'s `ANON` is one global flag while `anonymized:` is per cycle, so flip it when you switch; forgetting does not produce a wrongly formatted package, the run stops and names the line to change.
 
 ## The ten-step path to a submission
 
@@ -287,7 +303,7 @@ The skills chain into one path from evidence to a frozen submission. Steps 5–7
 7. **Polish** — `/stage-copy-editor`: clarity, flow, and notation consistency, with meaning and numbers untouchable.
 8. **Audit** — `/stage-clms-auditor` traces every number to a fingerprint; `/stage-cite-auditor` checks every citation and assertion; each failure becomes a `tasks/` item and a ledger status, not a buried report line.
 9. **Review and respond** — `/stage-peer-reviewer` convenes a five-perspective simulated panel (or a `quick` single pass) and writes its meta-review into `cycls/<cycle>/reviews/`; real reviews are dropped there as `received_<id>.md`; `/stage-resp-writer` turns them all into a point ledger, a response within the venue's limit, and promise checkboxes in `tasks/`.
-10. **Pack and freeze** — `/stage-subm-packer`: build and lint must pass, checklist walked, package under `wkdrs/builds/`, `SUBMISSION_<date>.md` written, tag `freeze/<cycle>_<date>` created. Camera-ready mode refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes.
+10. **Pack and freeze** — `/stage-subm-packer`: build and lint must pass, checklist walked, the paper converted into the venue's own template from the registered kit, package under `wkdrs/builds/`, `SUBMISSION_<date>.md` written, tag `freeze/<cycle>_<date>` created. Camera-ready mode refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes. Run `/stage-subm-packer convert kit=<path>` first, and as often as you need — conversion alone skips every freeze gate, so it works while the paper is still being trimmed to the page limit.
 
 ## Evidence, fingerprints, and the claim ledger
 
@@ -296,7 +312,7 @@ Three principles carry the whole design:
 **A. Evidence flows one way.** STAR artifacts (or hand-registered drops) are snapshotted into read-only `mates/` and the manuscript only cites them. Numbers live upstream: to fix one, fix it in STAR and re-import — never edit `mates/`. Every evidence file has an entry in `mates/MANIFEST.md`:
 
 ```markdown
-## xsam/wkdrs/results/results.md
+## proj/wkdrs/results/results.md
 - source-type: star
 - source: $STAR_HOME/wkdrs/results/results.md
 - source-commit: 3f2a91c
@@ -312,7 +328,7 @@ The `source-stamp` is the fingerprint: the upstream file's own `generated:`/`upd
 ```markdown
 | ID | Claim | Type | Stated in | Evidence | Status |
 |----|-------|------|-----------|----------|--------|
-| C3 | +2.1 mask AP over X on LVIS | performance | `4_expts`, `tabs/main` | `mates/xsam/wkdrs/results/results.md#lvis` | verified |
+| C3 | +2.1 mask AP over X on LVIS | performance | `4_expts`, `tabs/main` | `mates/proj/wkdrs/results/results.md#lvis` | verified |
 ```
 
 Lifecycle: `proposed` (story) → `drafted` (stated in text) → `verified` (auditor matched evidence) / `unsourced` (stated with no fingerprint — must carry `\todo`) / `weakened` (conceded in a response) / `dropped`. The story seeds claims, the drafter states them, the auditor verifies them, the response defends them: the same rows, all the way to submission.
@@ -329,11 +345,11 @@ After creating a paper from STAGE, sync later STAGE releases without touching th
 bash execs/update.sh
 ```
 
-By default this updates the four skill trees — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — and `docs/mds/stage-workflow/` from `STAGE_REPOSITORY`. The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`:
+By default this updates the four skill trees — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — plus `docs/mds/stage-workflow/` and the build entrypoint `execs/run.sh`, from `STAGE_REPOSITORY`. `run.sh` is included because the skills call it by name and by flag, and it holds no project configuration: everything an instance sets lives in `.env`, which is git-ignored and never synced. `execs/update.sh` is deliberately excluded — a running script must not be rewritten underneath itself. The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`:
 
 - `--diff` previews without changing a file, and exits `1` when an update would change something — scriptable.
 - A `ref` pins the update to a tag or branch.
-- `--skill NAME` updates one skill across all four trees.
+- `--skill NAME` updates one skill across all four trees, leaving the docs and `execs/run.sh` alone.
 - `--adopt` installs the skeleton into an existing repository, copying only what is absent (see [step 1b](#1b-or-adopt-a-paper-repo-that-already-exists)).
 
 Working on STAGE itself rather than on a paper? `bash .github/scripts/check_consistency.sh` holds the invariants four hand-maintained skill trees cannot hold on their own: same skill set and file inventory everywhere, the slash-only guards agreeing across all four harnesses, invocation tokens and tool names native to each tree, the Cursor rule still mirroring `AGENTS.md`, descriptions inside the 1024-character `SKILL.md` limit, the opening load intact, and every `conventions §n` citation still resolving. It runs in CI on every push and pull request, and is upstream-maintainer tooling — `.github/` is not synced into paper repositories.

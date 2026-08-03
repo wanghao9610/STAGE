@@ -50,7 +50,7 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 | `stage-cite-auditor` | offered only when the run fixed bib fields | `manus/bibs/reference.bib` — findings stay in the `wkdrs/` report |
 | `stage-peer-reviewer` | offered once per review | the one `SIM_REVIEW_*` file it wrote |
 | `stage-resp-writer` | offered once when the session ends | the `RESPONSE_*` file, `tasks/<cycle>_promises.md`, ledger downgrades |
-| `stage-subm-packer` | one at pack time | `cycls/<cycle>/SUBMISSION_<date>.md`; the `freeze/<cycle>_<date>` tag then lands on that commit — the package itself stays in `wkdrs/builds/` |
+| `stage-subm-packer` | one at pack time; one more when a `convert` run registers a venue template kit | `cycls/<cycle>/SUBMISSION_<date>.md`; the `freeze/<cycle>_<date>` tag then lands on that commit — the package itself stays in `wkdrs/builds/`. The `convert` commit is separate and stages only what that run wrote outside `wkdrs/` — the kit under `cycls/<cycle>/template/` and `tasks/<cycle>_venue.md` — so the freeze commit stays the one file it claims to be |
 
 **Universal rules:**
 
@@ -187,7 +187,7 @@ Every skill's durable output, in one table. `stage-flow-status` reads this as th
 | Audit reports | `stage-clms-auditor`, `stage-cite-auditor`, `stage-copy-editor` | `wkdrs/reports/CLAIMS_<date>.md`, `CITES_<date>.md`, `POLISH_<date>.md` (ephemeral) | date in filename |
 | Simulated review | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` — the panel meta-review; per-perspective working files in `wkdrs/reports/peer_<cycle>_<date>/` | date in filename |
 | Response | `stage-resp-writer` | `cycls/<cycle>/response/RESPONSE_<date>.md`, promises in `tasks/<cycle>_promises.md` | promise checkboxes |
-| Submission | `stage-subm-packer` | `cycls/<cycle>/SUBMISSION_<date>.md`, git tag `freeze/<cycle>_<date>`, package under `wkdrs/builds/` | `frozen:` |
+| Submission | `stage-subm-packer` | `cycls/<cycle>/SUBMISSION_<date>.md`, git tag `freeze/<cycle>_<date>`, package under `wkdrs/builds/`, the registered venue template kit at `cycls/<cycle>/template/`, venue follow-ups in `tasks/<cycle>_venue.md` | `frozen:`; venue follow-up checkboxes |
 | Status | `stage-flow-status` | — (read-only; reports in chat) | — |
 
 Real reviews from a venue are dropped by the user into `cycls/<cycle>/reviews/` as
@@ -235,7 +235,9 @@ The two verification fields answer different questions and neither substitutes f
 venue: CVPR
 year: 2027
 cycle: cvpr_2027
-template: cvpr2027            # matching files under manus/stys/
+template: cvpr                # the class inside the kit at cycls/<cycle>/template/,
+                              # so the generated copy says \documentclass{stys/cvpr};
+                              # empty or arxiv = ship the preprint form, no conversion
 page_limit_main: 8            # content pages
 references_in_limit: false
 page_limit_supp: 0            # 0 = unlimited
@@ -284,7 +286,9 @@ Frontmatter: `adopted:`, `backfilled:`. Sections: paired sources (STAR repos + s
 
 ### 8.10 `cycls/<cycle>/SUBMISSION_<date>.md`
 
-Frontmatter: `cycle:`, `date:`, `frozen:` (tag name), `package:` (path under `wkdrs/builds/`). Body: lint summary, checklist outcome, page counts, what was submitted where.
+Frontmatter: `cycle:`, `date:`, `frozen:` (tag name), `package:` (path under `wkdrs/builds/`), `template:` (the venue template the package was formatted in, or `arxiv`). Body: lint summary, checklist outcome, page counts — the converted copy's, with the preprint build's beside it when they differ — what the conversion dropped or left for a human, and what was submitted where.
+
+The same producer's other durable artifact is `tasks/<cycle>_venue.md`, the venue follow-up list a `convert` run maintains. Frontmatter: `cycle:`, `template:`, `updated:`. Body: one `- [ ]` line per finding, each carrying a stable `V<n>` id and the skill that owns the fix. It is updated, never regenerated — a checked item stays checked and is never re-raised, new findings append with the next free id, and an item that no longer applies is checked with its reason rather than deleted. These are findings, not promises: an open box never blocks a pack, which is what separates this list from `tasks/<cycle>_promises.md`.
 
 ## 9. The fabrication boundary
 
@@ -353,13 +357,13 @@ Where a skill puts what it writes. Each destination is exclusive — a file belo
 | Figures | `manus/figs/<slug>.pdf` rendered; `manus/figs/srcs/<slug>.*` sources — every figure has a source file or a MANIFEST entry |
 | Tables | `manus/tabs/<slug>.tex` |
 | Bibliography | `manus/bibs/reference.bib` |
-| Venue styles / templates | `manus/stys/` |
+| Venue styles | `manus/stys/`: `arxiv.cls` and `stage.sty`, and nothing else — `manus/` is scanned by `lint.sh` and holds only files this workflow owns |
 | Imported evidence (read-only) | `mates/<source-slug>/**` mirroring upstream paths; hand-registered drops in `mates/manual/**`; ledger `mates/MANIFEST.md` |
 | Writing metadata | `notes/` fixed files: `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`; reading notes in `notes/refs/` |
-| Submission cycles | `cycls/<venue>_<year>/`: `venue.yml`, `reviews/`, `response/`, `SUBMISSION_<date>.md` |
+| Submission cycles | `cycls/<venue>_<year>/`: `venue.yml`, `template/` (the official venue kit, unpacked whole, byte-for-byte, never edited), `reviews/`, `response/`, `SUBMISSION_<date>.md` |
 | Revision scratch, promise lists | `tasks/` |
 | Builds and ephemeral reports | `wkdrs/builds/`, `wkdrs/reports/` (gitignored, regenerable) |
-| Entrypoints | `execs/run.sh`, `execs/update.sh` — **execs/ root is closed**; utilities go in `execs/scpts/` |
+| Entrypoints | `execs/run.sh`, `execs/update.sh` — **execs/ root is closed**; utilities go in `execs/scpts/`. `run.sh` is upstream-managed and `execs/update.sh` overwrites it; per-project settings live in `.env` |
 | Workflow docs (upstream-managed) | `docs/mds/stage-workflow/` |
 
 Rules the table alone does not carry:

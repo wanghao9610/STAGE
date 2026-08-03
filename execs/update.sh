@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # execs/update.sh — sync STAGE-managed content from the upstream template (the
-# four per-harness skill trees and docs/mds/stage-workflow/), or install the
-# STAGE skeleton into an existing paper repo with --adopt.
+# four per-harness skill trees, docs/mds/stage-workflow/, and execs/run.sh), or
+# install the STAGE skeleton into an existing paper repo with --adopt.
 
 STAGE_REF="main"
 SKILL_NAME=""
@@ -24,6 +24,21 @@ SKILL_ROOTS=(
     ".kimi-code/skills"
 )
 DOCS_TREE="docs/mds/stage-workflow"
+
+# Single STAGE-managed files an update overwrites alongside the trees above.
+# execs/run.sh is here because the skills call it by name and by flag — a paper
+# repo that syncs a skill using `run.sh --main` while keeping a run.sh that
+# predates the flag gets a run that fails at its build step. The file carries no
+# project configuration: everything an instance sets lives in .env, which is
+# git-ignored and never synced (conventions §3.1).
+#
+# execs/update.sh is deliberately NOT here. Rewriting a running shell script
+# underneath itself is undefined: bash reads the file incrementally, so an
+# extract that truncates and rewrites it can resume parsing into different
+# bytes. It updates by --adopt into a fresh tree, or by hand.
+SYNC_FILES=(
+    "execs/run.sh"
+)
 
 # Harness configuration a project may have edited: installed only when missing
 # by --adopt, never overwritten by an update. The Cursor rule copies the body
@@ -50,12 +65,18 @@ Usage: bash execs/update.sh [ref] [--skill NAME]
        bash execs/update.sh --diff [ref] [--skill NAME]
        bash update.sh --adopt
 
-Overwrite the STAGE-managed trees — the four per-harness skill trees
-(.claude/skills/, .agents/skills/, .cursor/skills/, .kimi-code/skills/) and
-docs/mds/stage-workflow/ — with files from upstream. The default ref is main;
-a branch or tag may be supplied instead. Local edits under those trees are
-replaced; the manuscript, evidence, and notes are never touched. Use --skill
-to update only the named skill across all four skill trees.
+Overwrite the STAGE-managed content — the four per-harness skill trees
+(.claude/skills/, .agents/skills/, .cursor/skills/, .kimi-code/skills/),
+docs/mds/stage-workflow/, and the build entrypoint execs/run.sh — with files
+from upstream. The default ref is main; a branch or tag may be supplied
+instead. Local edits to those paths are replaced; the manuscript, evidence, and
+notes are never touched. Use --skill to update only the named skill across all
+four skill trees (it leaves execs/run.sh and the docs alone).
+
+execs/run.sh is synced because the skills call it by name and by flag, and it
+holds no project configuration — everything an instance sets lives in .env,
+which is git-ignored and never synced. execs/update.sh is not synced: a running
+script must not be rewritten underneath itself.
 
 Harness configuration an instance may have edited — AGENTS.md, .cursor/rules/,
 .cursorignore — is installed by --adopt when absent and never overwritten by an
@@ -173,6 +194,7 @@ elif [[ -n "${SKILL_NAME}" ]]; then
     for root in "${SKILL_ROOTS[@]}"; do
         SYNC_PATHS+=("${root}/${SKILL_NAME}")
     done
+    SPARSE_PATHS=("${SYNC_PATHS[@]}")
 
     if [[ "${DIFF}" == true ]]; then
         log "Diffing skill: ${SKILL_NAME}"
@@ -180,10 +202,25 @@ elif [[ -n "${SKILL_NAME}" ]]; then
         log "Updating skill: ${SKILL_NAME}"
     fi
 else
+    # SYNC_PATHS is what gets diffed, dirty-checked, archived, and extracted —
+    # directories and single files alike. SPARSE_PATHS is what the sparse
+    # checkout materializes, and it holds directories only: `sparse-checkout
+    # set` is cone-mode by default, where every argument is read as a directory,
+    # so naming a file there would match nothing. A file's parent directory goes
+    # in instead; fetching a few siblings we do not copy is cheaper than getting
+    # this subtly wrong.
     SYNC_PATHS=(
         "${SKILL_ROOTS[@]}"
         "${DOCS_TREE}"
+        "${SYNC_FILES[@]}"
     )
+    SPARSE_PATHS=(
+        "${SKILL_ROOTS[@]}"
+        "${DOCS_TREE}"
+    )
+    for f in "${SYNC_FILES[@]}"; do
+        SPARSE_PATHS+=("$(dirname -- "${f}")")
+    done
 fi
 
 # Without --adopt this script rewrites the project it lives in, derived from
@@ -222,10 +259,11 @@ git clone \
     "${SOURCE_DIR}" || fail "Unable to fetch ref '${STAGE_REF}' from ${STAGE_REPOSITORY}. Check the ref exists (a branch or tag, not a commit SHA), that the network is reachable, and that git is 2.25 or newer — currently $(git --version 2>/dev/null || echo 'unknown')."
 
 if [[ "${ADOPT}" == false ]]; then
-    # Every SYNC_PATHS entry is a directory, which keeps sparse-checkout
-    # correct in both cone and non-cone mode; the tar below copies the same
-    # list, so the two can never name different sets.
-    git -C "${SOURCE_DIR}" sparse-checkout set "${SYNC_PATHS[@]}"
+    # SPARSE_PATHS is directories only (see above); the existence check below
+    # then runs over SYNC_PATHS, which is the exact list the tar copies — so a
+    # file that the sparse checkout failed to materialize stops the run here
+    # instead of being silently skipped.
+    git -C "${SOURCE_DIR}" sparse-checkout set "${SPARSE_PATHS[@]}"
 
     for path in "${SYNC_PATHS[@]}"; do
         [[ -e "${SOURCE_DIR}/${path}" ]] || fail "Upstream ref is missing ${path}."

@@ -52,7 +52,7 @@ STAGE 写作工作流中每个 skill 都遵守的规则。十五个 skill——`
 | `stage-cite-auditor` | 仅当本次运行修过 bib 字段时提供 | `manus/bibs/reference.bib`——发现的问题留在 `wkdrs/` 报告里 |
 | `stage-peer-reviewer` | 每份评审提供一次 | 它写出的那一个 `SIM_REVIEW_*` 文件 |
 | `stage-resp-writer` | 会话结束时提供一次 | `RESPONSE_*` 文件、`tasks/<cycle>_promises.md`、台账里的降级 |
-| `stage-subm-packer` | 打包时一次 | `cycls/<cycle>/SUBMISSION_<date>.md`；`freeze/<cycle>_<date>` tag 随后落在这个提交上——包本身留在 `wkdrs/builds/` |
+| `stage-subm-packer` | 打包时一次；`convert` 运行注册 venue 模板包时再一次 | `cycls/<cycle>/SUBMISSION_<date>.md`；`freeze/<cycle>_<date>` tag 随后落在这个提交上——包本身留在 `wkdrs/builds/`。`convert` 的提交是单独一次，只暂存那次运行在 `wkdrs/` 之外写下的东西——`cycls/<cycle>/template/` 下的模板包与 `tasks/<cycle>_venue.md`——好让冻结提交保持它自称的那一个文件 |
 
 **通用规则：**
 
@@ -189,7 +189,7 @@ STAGE_LANG=
 | 审计报告 | `stage-clms-auditor`、`stage-cite-auditor`、`stage-copy-editor` | `wkdrs/reports/CLAIMS_<date>.md`、`CITES_<date>.md`、`POLISH_<date>.md`（临时） | 文件名里的日期 |
 | 模拟评审 | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md`——评审组的综合评审；各视角的工作文件在 `wkdrs/reports/peer_<cycle>_<date>/` | 文件名里的日期 |
 | 回复 | `stage-resp-writer` | `cycls/<cycle>/response/RESPONSE_<date>.md`，承诺在 `tasks/<cycle>_promises.md` | 承诺复选框 |
-| 投稿 | `stage-subm-packer` | `cycls/<cycle>/SUBMISSION_<date>.md`、git tag `freeze/<cycle>_<date>`、`wkdrs/builds/` 下的包 | `frozen:` |
+| 投稿 | `stage-subm-packer` | `cycls/<cycle>/SUBMISSION_<date>.md`、git tag `freeze/<cycle>_<date>`、`wkdrs/builds/` 下的包、注册在 `cycls/<cycle>/template/` 的 venue 模板包、`tasks/<cycle>_venue.md` 里的 venue 待办 | `frozen:`；venue 待办复选框 |
 | 状态 | `stage-flow-status` | ——（只读；在聊天里汇报） | —— |
 
 来自 venue 的真实评审由用户投放到 `cycls/<cycle>/reviews/`，命名为
@@ -237,7 +237,9 @@ updated: YYYY-MM-DD
 venue: CVPR
 year: 2027
 cycle: cvpr_2027
-template: cvpr2027            # matching files under manus/stys/
+template: cvpr                # the class inside the kit at cycls/<cycle>/template/,
+                              # so the generated copy says \documentclass{stys/cvpr};
+                              # empty or arxiv = ship the preprint form, no conversion
 page_limit_main: 8            # content pages
 references_in_limit: false
 page_limit_supp: 0            # 0 = unlimited
@@ -286,7 +288,9 @@ frontmatter：`adopted:`、`backfilled:`。小节：配对来源（STAR 仓库 +
 
 ### 8.10 `cycls/<cycle>/SUBMISSION_<date>.md`
 
-frontmatter：`cycle:`、`date:`、`frozen:`（tag 名）、`package:`（`wkdrs/builds/` 下的路径）。正文：lint 摘要、清单结论、页数、什么投到了哪里。
+frontmatter：`cycle:`、`date:`、`frozen:`（tag 名）、`package:`（`wkdrs/builds/` 下的路径）、`template:`（这个包被排成的 venue 模板，或 `arxiv`）。正文：lint 摘要、清单结论、页数——取转换出的副本的页数，两者不同时把预印本构建的页数并列在旁——转换丢掉了什么或留给了人什么，以及什么投到了哪里。
+
+同一个产出者的另一份持久产物是 `tasks/<cycle>_venue.md`，由 `convert` 运行维护的 venue 待办清单。frontmatter：`cycle:`、`template:`、`updated:`。正文：一条发现一行 `- [ ]`，各带一个稳定的 `V<n>` 编号和拥有这个修法的 skill。它是被更新的，不是被重新生成的——已勾选的条目保持勾选、永不被重新提出，新发现以下一个空闲编号追加，不再适用的条目连同理由勾掉而不是删除。它们是发现，不是承诺：一个未勾选的框永不阻断打包，这正是它与 `tasks/<cycle>_promises.md` 的分界。
 
 ## 9. 编造边界
 
@@ -355,13 +359,13 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 | 图 | 渲染产物 `manus/figs/<slug>.pdf`；源文件 `manus/figs/srcs/<slug>.*`——每张图要么有源文件，要么有一条 MANIFEST 条目 |
 | 表格 | `manus/tabs/<slug>.tex` |
 | 参考文献 | `manus/bibs/reference.bib` |
-| venue 样式 / 模板 | `manus/stys/` |
+| venue 样式 | `manus/stys/`：只有 `arxiv.cls` 与 `stage.sty`，别无他物——`manus/` 会被 `lint.sh` 扫描，只放本工作流自己拥有的文件 |
 | 导入的证据（只读） | `mates/<source-slug>/**`，镜像上游路径；手工登记的投放在 `mates/manual/**`；台账 `mates/MANIFEST.md` |
 | 写作元数据 | `notes/` 下的固定文件：`story.md`、`claims.md`、`outline.md`、`notation.md`、`adopt.md`；阅读笔记在 `notes/refs/` |
-| 投稿周期 | `cycls/<venue>_<year>/`：`venue.yml`、`reviews/`、`response/`、`SUBMISSION_<date>.md` |
+| 投稿周期 | `cycls/<venue>_<year>/`：`venue.yml`、`template/`（官方 venue 模板包，整份解包，逐字节，永不编辑）、`reviews/`、`response/`、`SUBMISSION_<date>.md` |
 | 修订草稿、承诺清单 | `tasks/` |
 | 构建与临时报告 | `wkdrs/builds/`、`wkdrs/reports/`（gitignore，可重新生成） |
-| 入口脚本 | `execs/run.sh`、`execs/update.sh`——**execs/ 根目录是封闭的**；工具脚本放 `execs/scpts/` |
+| 入口脚本 | `execs/run.sh`、`execs/update.sh`——**execs/ 根目录是封闭的**；工具脚本放 `execs/scpts/`。`run.sh` 由上游管理，`execs/update.sh` 会覆盖它；每个项目自己的设置住在 `.env` 里 |
 | 工作流文档（上游管理） | `docs/mds/stage-workflow/` |
 
 光有表格带不出来的规则：

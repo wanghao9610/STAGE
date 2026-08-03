@@ -35,8 +35,8 @@ audits — cheap, repeat at will
 the submission cycle — one venue attempt per cycls/<venue>_<year>/
   → stage-peer-reviewer: five-perspective simulated panel, real-review format
   → stage-resp-writer: reviews → point ledger → response + promise checkboxes
-  → stage-subm-packer: build+lint gate, checklist, package, SUBMISSION record,
-    freeze/<cycle>_<date> tag
+  → stage-subm-packer: build+lint gate, checklist, conversion into the venue's
+    own template, package, SUBMISSION record, freeze/<cycle>_<date> tag
 
   ⌾ stage-flow-status: reads all of the above at any point —
     where things stand, and the one next action with its exact command
@@ -115,7 +115,9 @@ Slash-only. Parses reviews — real `received_*.md` files dropped into `cycls/<c
 
 ### stage-subm-packer
 
-Slash-only. Preflight and packaging: a `run.sh` build and `lint.sh` must pass, the venue checklist is walked, figures, tables, and bib are checked complete, and the package — camera PDF, supplementary, arXiv-ready source — lands under `wkdrs/builds/`. It writes `cycls/<cycle>/SUBMISSION_<date>.md` recording what was submitted where, and creates the git tag `freeze/<cycle>_<date>`, the one place freeze tags come from (conventions §1). It also refuses an adopted repository whose `notes/adopt.md` still has an empty `backfilled:` — that is the one state where `lint.sh` reads clean over numbers that trace to nothing, so the marker count proves less than it looks (conventions §9a). Camera-ready mode additionally refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes: promises to reviewers are honored before anything ships.
+Slash-only. Preflight and packaging: a `run.sh` build and `lint.sh` must pass, the venue checklist is walked, figures, tables, and bib are checked complete, and the package — camera PDF, supplementary, submission-ready source — lands under `wkdrs/builds/`. It writes `cycls/<cycle>/SUBMISSION_<date>.md` recording what was submitted where, and creates the git tag `freeze/<cycle>_<date>`, the one place freeze tags come from (conventions §1). It also refuses an adopted repository whose `notes/adopt.md` still has an empty `backfilled:` — that is the one state where `lint.sh` reads clean over numbers that trace to nothing, so the marker count proves less than it looks (conventions §9a). Camera-ready mode additionally refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes: promises to reviewers are honored before anything ships.
+
+It is also where the paper takes the venue's own shape. `convert` mode reads the official template kit the user supplies — unpacked into `cycls/<cycle>/template/`, beside that cycle's `venue.yml`, whose `template:` names the class inside it — and generates a standalone copy under `wkdrs/` that compiles under the venue's class: the kit's own macros for title, authors, and abstract, a small `compat.sty` for what `stys/arxiv.cls` provided and the venue class does not, and `stys/stage.sty` carried over verbatim, since that layer was built to survive the swap. `manus/` is never edited and nothing is added to it — the kit stays out of a tree `lint.sh` scans for `\todo` markers and identity leaks — and the copy is regenerated from scratch every run, so there is no second source of truth and no drift. The template is never fetched or reconstructed from memory — the same boundary that governs numbers governs formats (conventions §9). `convert` skips every freeze gate on purpose: fitting a paper into a page limit takes many conversions, and all of them happen while `\todo` markers are still in the manuscript. The converted copy's page count, not the preprint build's, is what `page_limit_main` measures. What the conversion cannot do for you — a dropped `\keywords`, an appendix ordering that needs a decision — becomes a `- [ ]` line in `tasks/<cycle>_venue.md`, each naming the skill that owns the fix. That list is updated rather than regenerated, so a settled item never comes back, and unlike `tasks/<cycle>_promises.md` an open box there blocks nothing: these are findings, not promises to a reviewer.
 
 ### stage-flow-status
 

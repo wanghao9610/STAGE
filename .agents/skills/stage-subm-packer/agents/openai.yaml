@@ -1,6 +1,6 @@
 interface:
   display_name: "Submission Packer"
-  short_description: "Preflight, package, record, and freeze a submission"
-  default_prompt: "Use $stage-subm-packer to preflight and package this submission, then freeze the record."
+  short_description: "Preflight, convert to the venue template, package, record, and freeze a submission"
+  default_prompt: "Use $stage-subm-packer to preflight and package this submission, then freeze the record; $stage-subm-packer convert reformats the paper into the cycle's venue template without any freeze gate."
 policy:
   allow_implicit_invocation: false

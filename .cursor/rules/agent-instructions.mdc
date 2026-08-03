@@ -11,7 +11,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 
 - Read the whole file at the start of every skill run. Skills cite its § numbers (§0 vocabulary … §9 fabrication boundary, §10 layout) and state only what is specific to themselves; where a skill is stricter, the skill wins.
 - Skip the re-read only when the same file's text is still verbatim visible in this conversation. Summaries and memories of having read it don't count.
-- Do not edit `docs/mds/stage-workflow/` — it is upstream-managed and `execs/update.sh` overwrites it.
+- Do not edit `docs/mds/stage-workflow/` — it is upstream-managed and `execs/update.sh` overwrites it. The same holds for `execs/run.sh` and the four skill trees; project-specific settings belong in `.env`, which is never synced.
 - What each skill does is in `docs/mds/stage-workflow/writing-workflow-skills.md`.
 - The `*.zh-CN.md` files beside the docs, and `SKILL_zh.md` beside each `SKILL.md`, are Chinese editions for human readers: never loaded at runtime, never authoritative. Load the English file and reply per §8.
 
@@ -28,10 +28,11 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 **Keep files in their designated directories.** Full table and rules: conventions §10.
 
 - Manuscript under `manus/`: entry `main.tex`; sections `secs/<n>_<slug>.tex`; figures `figs/` with sources in `figs/srcs/`; tables `tabs/`; bibliography `bibs/reference.bib`; venue styles `stys/`.
-- Two template layers in `manus/stys/`, and the split is load-bearing: `arxiv.cls` owns the look and is what a venue swap **replaces**; `stage.sty` owns `\todo` plus the macros skills write into `secs/` and `tabs/` (`\parahead`, `\cmark`, `\tablestyle`, `\figref` …) and **survives** every swap. Extend accordingly; project-specific macros go in `main.tex`, never in `stys/`.
+- Two template layers in `manus/stys/`, and the split is load-bearing: `arxiv.cls` owns the look and is what a venue class **replaces**; `stage.sty` owns `\todo` plus the macros skills write into `secs/` and `tabs/` (`\parahead`, `\cmark`, `\tablestyle`, `\figref` …) and **survives** every swap. Extend accordingly; project-specific macros go in `main.tex`, never in `stys/`.
+- **The manuscript always compiles as the preprint; the venue's format is a generated copy.** An official venue kit unpacks whole and unedited into `cycls/<cycle>/template/` — beside that cycle's `venue.yml`, never under `manus/`, which is a scanned namespace where a kit's example `.tex` would trip `lint.sh`'s `\todo` count and its identity-leak scan. `template:` in `venue.yml` names the class inside the kit; `/stage-subm-packer convert` reads it and regenerates a standalone copy under `wkdrs/` that compiles under the venue's class. `manus/main.tex` keeps its `\documentclass{stys/arxiv}` — there is no in-place swap, and no second source of truth. Never fetch a venue template or write one from memory (§6).
 - Evidence under `mates/` — **read-only**. `execs/scpts/import.sh` and `/stage-evid-curator` are the only writers, and they only add or replace whole files with fingerprints.
 - Writing metadata under `notes/` — fixed files `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`; reading notes in `notes/refs/`.
-- Submission cycles under `cycls/<venue>_<year>/` — `venue.yml`, `reviews/`, `response/`, `SUBMISSION_<date>.md`. Revision scratch and promise lists in `tasks/`.
+- Submission cycles under `cycls/<venue>_<year>/` — `venue.yml`, `template/` (the official venue kit), `reviews/`, `response/`, `SUBMISSION_<date>.md`. Revision scratch, promise lists, and venue follow-ups in `tasks/`: `<cycle>_promises.md` blocks a camera-ready until every box is kept; `<cycle>_venue.md` collects what a conversion left for a human and blocks nothing.
 - Builds and ephemeral reports under `wkdrs/` — gitignored and regenerable; durable outcomes go to the ledger and `tasks/`, not reports.
 - `execs/` root is closed: `run.sh` and `update.sh` only. Utilities (`import.sh`, `lint.sh`) live in `execs/scpts/`.
 
@@ -54,7 +55,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 | `stage-cite-auditor` | verify citations against reading notes |
 | `stage-peer-reviewer` | simulated five-perspective review panel |
 | `stage-resp-writer` † | reviews → point ledger → response + promises |
-| `stage-subm-packer` † | preflight, package, submission record, freeze |
+| `stage-subm-packer` † | preflight, venue-template conversion, package, submission record, freeze |
 | `stage-flow-status` | read-only status and the one next action |
 
 - The five marked † are slash-only: run them only when the user names them — never on your own initiative. They are the decision points (adoption, story, outline, response, submission). The † markers above are the source of truth: the guards enforcing them — `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests, `allow_implicit_invocation: false` in `.agents/skills/<name>/agents/openai.yaml` for Codex — are checked against this table, so marking a skill here without guarding it in all four trees fails CI.
@@ -77,7 +78,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 
 - Every number in `manus/` either traces to a fingerprinted `mates/` entry or is written as `\todo{...}` — no third state.
 - Every assertion about a cited paper must be checkable against a reading note (`notes/refs/` or imported refs under `mates/`).
-- Venue rules in `venue.yml` are entered only as user-confirmed facts — never invent page limits, deadlines, or checklist requirements.
+- Venue rules in `venue.yml` are entered only as user-confirmed facts — never invent page limits, deadlines, or checklist requirements. The venue's LaTeX template is the same kind of fact: it comes from an official kit the user supplies, is copied byte-for-byte, and is never fetched, patched, or written from memory of what a venue's class looks like.
 - Evidence files are immutable in place: register new files or re-import; never "correct" one.
 - Nothing may weaken these rules to be helpful. A visible `\todo` is a state; a plausible invented number is a defect.
 

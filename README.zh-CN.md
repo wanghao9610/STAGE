@@ -69,7 +69,7 @@ STAGE/
 │   ├── story.md            # 另有：claims.md、outline.md、notation.md、adopt.md
 │   └── refs/               # 逐篇阅读笔记 + refs_index.md
 ├── cycls/                  # 投稿周期
-│   └── <venue>_<year>/     # venue.yml、reviews/、response/、SUBMISSION_<date>.md
+│   └── <venue>_<year>/     # venue.yml、template/（venue 模板包）、reviews/、response/、SUBMISSION_<date>.md
 ├── tasks/                  # 修改暂存与承诺清单
 ├── wkdrs/                  # 构建产物与临时报告（gitignore，可再生）
 ├── execs/
@@ -103,7 +103,7 @@ STAGE/
 | `figs/` | Figures | 渲染好的 PDF；`srcs/` 存放可编辑的源文件 |
 | `tabs/` | Tables | 表格 `.tex` 文件，由证据生成 |
 | `bibs/` | Bibliographies | `reference.bib` |
-| `stys/` | Styles | `arxiv.cls`、`stage.sty`，以及 venue 的 class/style 文件 |
+| `stys/` | Styles | `arxiv.cls` 与 `stage.sty`——venue 模板包放在 `cycls/<cycle>/template/`，不在这里 |
 | `mates/` | Materials | 导入的证据快照——只读 |
 | `cycls/` | Cycles | 每次投稿尝试一个目录 |
 | `execs/` | Executions | 入口脚本；工具脚本放在 `scpts/` |
@@ -117,12 +117,20 @@ STAGE/
 
 `manus/` 自带一套紧凑的 arXiv 风格预印本模板，拆成两层，因为换 venue 模板时，一层必须被替换，另一层必须活下来：
 
-| 分层 | 文件 | 负责 | 换 venue 模板时 |
+| 分层 | 文件 | 负责 | 在 venue 版式里 |
 | --- | --- | --- | --- |
-| 版式层 | `manus/stys/arxiv.cls` | 页面尺寸、字体、标题面板、标题层级、图表标题、浮动体、参考文献样式 | **被替换**——把 venue 的 class 放进 `manus/stys/`，改一行：`\documentclass{stys/cvpr}` |
-| 写作层 | `manus/stys/stage.sty` | `\todo{...}`，以及写作 skill 会写进 `secs/`、`tabs/` 的那些宏 | **保留**——不论 class 换成什么，`\usepackage{stys/stage}` 这一行都留着 |
+| 版式层 | `manus/stys/arxiv.cls` | 页面尺寸、字体、标题面板、标题层级、图表标题、浮动体、参考文献样式 | 被 venue 自己的 class **替换** |
+| 写作层 | `manus/stys/stage.sty` | `\todo{...}`，以及写作 skill 会写进 `secs/`、`tabs/` 的那些宏 | **逐字带过去**——不论 class 换成什么，`\usepackage{stys/stage}` 这一行都留着 |
 
 扩展这两个文件时请守住这条分界：章节或表格文件里会出现的东西放进 package，只有页面外观需要的东西放进 class。项目自己的宏（`\newcommand{\method}{...}`）写在 `main.tex` 里，不要写进 `stys/`——模板文件会被替换或更新。
+
+**怎么转成会议模板。** 不是就地换 class。`manus/main.tex` 永远编译成预印本；venue 版式是一份**生成出来的副本**：
+
+1. 下载 venue 的官方作者模板包（CVPR、NeurIPS、ACL、某个 IEEE 期刊——它以什么形式发布就是什么）。
+2. `/stage-subm-packer convert kit=<zip 或目录的路径>`——模板包整份、不加编辑地解包进 `cycls/<cycle>/template/`，与该周期的 `venue.yml` 并列。它刻意不放进 `manus/`：那棵树会被 `lint.sh` 扫描，而模板包自带的示例 `.tex` 会触发 `\todo` 计数和身份泄漏扫描。`venue.yml` 的 `template:` 指名的是模板包里那个 class。
+3. 这次运行会读模板包自带的示例 `.tex` 以取得它要的宏，在 `wkdrs/` 下写出一份独立副本——venue 的 class、逐字带过去的 `stage.sty`、一个为"`arxiv.cls` 提供过而 venue class 没有"的部分生成的精简 `compat.sty`、一份用 venue 的宏重新发射你的标题/作者/abstract 的 `main.tex`，以及原封不动的 `secs/`、`tabs/`、`figs/`、`bibs/`——然后构建它，并报出**该版式下**的页数，那才是 `page_limit_main` 真正指的那个数。
+
+`manus/` 永不被编辑，副本每次运行都从头重新生成，模板也绝不去抓、绝不凭记忆写：官方模板包是唯一来源。转换替你做不了的事，会落成 `tasks/<cycle>_venue.md` 里的一行 `- [ ]`，点名由哪个 skill 来修——是一份被跟踪的清单，而不是聊天窗口里的一句话。压页数期间想跑多少次 `convert` 就跑多少次——它跳过所有冻结关口，所以在手稿里还有 `\todo` 时照样能用。
 
 **class 选项**——`\documentclass[twocolumn]{stys/arxiv}`：`onecolumn` | `twocolumn`，外加 `anon`，以及 `article` 支持的其他选项。导言区中，`\paperstyle{fancy|simple}` 选择带框或平铺的标题面板，`\papercolor{green|blue|black}` 选择配色。
 
@@ -271,8 +279,16 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 | `stage-cite-auditor` | 每个 `\cite` key 都能解析；关于被引论文的每个断言都能对上一份阅读笔记——对不上的断言被标记，绝不悄悄改掉 | `wkdrs/reports/CITES_<date>.md` |
 | `stage-peer-reviewer` | 模拟程序委员会：五视角评审团（新颖性与相关工作、技术正确性、实验严谨性、清晰度、魔鬼代言人），引用只认 whitelist/verified，按锚定评分带 + 封顶规则打分；`quick` 为单遍精简模式；绝不修改稿件 | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
 | `stage-resp-writer` † | 把真实与模拟评审解析成逐点台账，把每个攻击映射到论断和证据，在 venue 限制内起草回复，把每个承诺的修改记为复选框 | `cycls/<cycle>/response/RESPONSE_<date>.md`、`tasks/<cycle>_promises.md` |
-| `stage-subm-packer` † | 投稿前检查与打包：build + lint 必须通过、走查检查单、完整性扫描、camera/补充材料/arXiv 包、投稿记录、冻结标签——camera-ready 模式在承诺未清空前拒绝打包 | `cycls/<cycle>/SUBMISSION_<date>.md`、标签 `freeze/<cycle>_<date>` |
+| `stage-subm-packer` † | 投稿前检查与打包：build + lint 必须通过、走查检查单、完整性扫描、依官方模板包转成 venue 自己的版式、打包、投稿记录、冻结标签——camera-ready 模式在承诺未清空前拒绝打包 | `cycls/<cycle>/SUBMISSION_<date>.md`、标签 `freeze/<cycle>_<date>`、`cycls/<cycle>/template/` 下的模板包、`tasks/<cycle>_venue.md` 里的 venue 待办 |
 | `stage-flow-status` | 全流程的只读地图：章节/图/表状态、按状态统计的论断覆盖、证据新鲜度、周期状态、最近一次构建——以及唯一的下一步行动和它的准确命令 | 聊天内报告；从不写文件 |
+
+**投给多个会议。** 一个 venue 就是一个 cycle。`cycls/<venue>_<year>/` 拥有这次尝试的 `venue.yml`、`template/` 下的官方模板包、评审、回复、`SUBMISSION_<date>.md` 和冻结 tag；稿件、证据和论断台账则由所有尝试共享。
+
+- **顺序投**——被拒之后改投别家——是原生路径。`/stage-stry-coach` 用那个 venue 经确认的档案建出下一个 cycle，`/stage-subm-packer convert kit=<path>` 把新模板包注册进去。旧 cycle 里的东西一样不动，所以"当时投的是哪个版式"永远能从它的冻结 tag 复现；共享台账里 `weakened` 和 `unsourced` 的论断，就是下一轮最先要修的东西。
+- **并行投**——同时要一份 CVPR 版和一份 NeurIPS 版，或者只是想比页数——做法一样，仍然一个 venue 一个 cycle：把 `notes/story.md` 的 `cycle:` 指向你要的那个，再转换。副本落在 `wkdrs/builds/<cycle>_<template>_<date>/`，目录名带 cycle 和 template，所以彼此不会覆盖。
+- **同一个 cycle 里挂两套模板包**不支持，而且是刻意的。`cycls/<cycle>/template/` 是单数目录，`venue.yml` 的 `template:` 指名的是包里的某一个 class；往一个正在用的 cycle 上换模板包，会先给你看差异再询问，因为它会改变此前每个决定所依据的页数预算。
+
+并行时有两件事要知道。`notes/outline.md` 只有一套页数预算，所以只能照着某一个 venue 的限制来规划——另一个靠 `convert` 报出来的页数来判断，这正是转换跳过所有关口、可以随便重跑的原因。另外 `.env` 的 `ANON` 是一个全局开关，而 `anonymized:` 是每个 cycle 各自的，切换时记得翻；忘了不会产出版式错误的包——运行会停下来，并告诉你该改哪一行。
 
 ## 通往投稿的十步路径
 
@@ -287,7 +303,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 7. **润色** —— `/stage-copy-editor`：清晰、流畅、记号一致；含义和数字碰不得。
 8. **审计** —— `/stage-clms-auditor` 把每个数字追溯到指纹；`/stage-cite-auditor` 核查每条引用和断言；每个失败都变成一条 `tasks/` 条目和一个台账状态，而不是埋在报告里的一行。
 9. **评审与回复** —— `/stage-peer-reviewer` 召集五视角模拟评审团（或用 `quick` 单遍模式），把 meta-review 写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点台账、一份不超 venue 限制的回复，以及 `tasks/` 里的承诺复选框。
-10. **打包冻结** —— `/stage-subm-packer`：build 和 lint 必须通过、走查检查单、包放到 `wkdrs/builds/` 下、写出 `SUBMISSION_<date>.md`、打出标签 `freeze/<cycle>_<date>`。camera-ready 模式在 `tasks/<cycle>_promises.md` 还有未勾选项时拒绝打包。
+10. **打包冻结** —— `/stage-subm-packer`：build 和 lint 必须通过、走查检查单、依已注册的模板包把论文转成 venue 自己的版式、包放到 `wkdrs/builds/` 下、写出 `SUBMISSION_<date>.md`、打出标签 `freeze/<cycle>_<date>`。camera-ready 模式在 `tasks/<cycle>_promises.md` 还有未勾选项时拒绝打包。先跑 `/stage-subm-packer convert kit=<path>`，并按需要跑很多次——单独的转换跳过所有冻结关口，所以在论文还在压页数时照样能用。
 
 ## 证据、指纹与论断台账
 
@@ -296,7 +312,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 **A. 证据单向流动。** STAR 产物（或人工登记的文件）被快照进只读的 `mates/`，稿件只引用它们。数字住在上游：要改一个数字，去 STAR 改好再重新导入——绝不编辑 `mates/`。每个证据文件在 `mates/MANIFEST.md` 里都有一条记录：
 
 ```markdown
-## xsam/wkdrs/results/results.md
+## proj/wkdrs/results/results.md
 - source-type: star
 - source: $STAR_HOME/wkdrs/results/results.md
 - source-commit: 3f2a91c
@@ -312,7 +328,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 ```markdown
 | ID | Claim | Type | Stated in | Evidence | Status |
 |----|-------|------|-----------|----------|--------|
-| C3 | +2.1 mask AP over X on LVIS | performance | `4_expts`, `tabs/main` | `mates/xsam/wkdrs/results/results.md#lvis` | verified |
+| C3 | +2.1 mask AP over X on LVIS | performance | `4_expts`, `tabs/main` | `mates/proj/wkdrs/results/results.md#lvis` | verified |
 ```
 
 生命周期：`proposed`（故事提出）→ `drafted`（写进正文）→ `verified`（审计对上了证据）/ `unsourced`（写了但没有指纹——必须带 `\todo`）/ `weakened`（回复中让步）/ `dropped`（放弃）。故事播种论断，起草陈述论断，审计验证论断，回复捍卫论断：同一批行，一路走到投稿。
@@ -329,11 +345,11 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 bash execs/update.sh
 ```
 
-默认从 `STAGE_REPOSITORY` 更新四份 skill 目录——`.claude/skills/`、`.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——以及 `docs/mds/stage-workflow/`。完整形式是 `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`：
+默认从 `STAGE_REPOSITORY` 更新四份 skill 目录——`.claude/skills/`、`.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——以及 `docs/mds/stage-workflow/` 和构建入口 `execs/run.sh`。`run.sh` 之所以在内，是因为 skill 会按名字、按参数调用它，而它不承载任何项目配置：实例要设的一切都在 `.env` 里，而 `.env` 被 git 忽略、从不同步。`execs/update.sh` 被刻意排除在外——一个正在运行的脚本不能被就地改写。完整形式是 `bash execs/update.sh [--diff] [ref] [--skill NAME] [--adopt]`：
 
 - `--diff` 只预览、不改任何文件，有更新会改动文件时以退出码 `1` 结束——便于脚本化。
 - `ref` 把更新钉在某个 tag 或分支上。
-- `--skill NAME` 只更新一个 skill，四份目录同步。
+- `--skill NAME` 只更新一个 skill，四份目录同步；不动文档与 `execs/run.sh`。
 - `--adopt` 把骨架装进一个已有仓库，只复制缺失的文件（见[步骤 1b](#1b-或者接入一个已有的论文仓库)）。
 
 如果你改的是 STAGE 本身而不是某篇论文：`bash .github/scripts/check_consistency.sh` 守着四份手工维护的 skill 目录自己守不住的那些不变量——各处 skill 集合与文件清单一致、slash-only 守卫在四套 harness 上互相吻合、调用 token 与工具名各归其树、Cursor 规则仍与 `AGENTS.md` 逐行对齐、description 不超 `SKILL.md` 的 1024 字符上限、开场装载完整、每条 `规约 §n` 引用都还解析得到。它在每次 push 与 PR 时跑 CI，属于上游维护工具——`.github/` 不会同步进论文仓库。
