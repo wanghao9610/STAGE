@@ -17,6 +17,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - [目录](#目录)
 - [STAGE 提供什么](#stage-提供什么)
 - [项目结构](#项目结构)
+- [论文模板](#论文模板)
 - [快速开始](#快速开始)
   - [1. 创建论文仓库](#1-创建论文仓库)
   - [1b. 或者：接入一个已有的论文仓库](#1b-或者接入一个已有的论文仓库)
@@ -57,7 +58,7 @@ STAGE/
 │   ├── figs/               # 渲染好的图（PDF）；figs/srcs/ 存放每张图的源文件
 │   ├── tabs/               # 表格，由证据生成
 │   ├── bibs/               # reference.bib
-│   └── stys/               # venue 样式与 stage.sty（定义 \todo{...}）
+│   └── stys/               # arxiv.cls（版式）+ stage.sty（\todo 与写作宏）
 ├── mates/                  # 导入的证据——只读
 │   ├── <source-slug>/      # 按上游 STAR 路径镜像的快照
 │   ├── manual/             # 人工登记的证据文件
@@ -91,7 +92,7 @@ STAGE/
 | `figs/` | Figures | 渲染好的 PDF；`srcs/` 存放可编辑的源文件 |
 | `tabs/` | Tables | 表格 `.tex` 文件，由证据生成 |
 | `bibs/` | Bibliographies | `reference.bib` |
-| `stys/` | Styles | venue 的 class/style 文件与 `stage.sty` |
+| `stys/` | Styles | `arxiv.cls`、`stage.sty`，以及 venue 的 class/style 文件 |
 | `mates/` | Materials | 导入的证据快照——只读 |
 | `cycls/` | Cycles | 每次投稿尝试一个目录 |
 | `execs/` | Executions | 入口脚本；工具脚本放在 `scpts/` |
@@ -99,6 +100,36 @@ STAGE/
 | `mds/` | Markdowns | 按主题分组的 Markdown 文档 |
 
 三条目录树本身写不下的规则：`mates/` 只读（只有 `import.sh` 和 `/stage-evid-curator` 可以写入，且只做带指纹的整文件新增或替换）；`wkdrs/` 永不提交（可留存的审计结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目落盘，而不是报告文件）；`execs/` 根目录封闭（只有 `run.sh` + `update.sh`——工具脚本一律放 `execs/scpts/`）。
+
+## 论文模板
+
+`manus/` 自带一套紧凑的 arXiv 风格预印本模板，拆成两层，因为换 venue 模板时，一层必须被替换，另一层必须活下来：
+
+| 分层 | 文件 | 负责 | 换 venue 模板时 |
+| --- | --- | --- | --- |
+| 版式层 | `manus/stys/arxiv.cls` | 页面尺寸、字体、标题面板、标题层级、图表标题、浮动体、参考文献样式 | **被替换**——把 venue 的 class 放进 `manus/stys/`，改一行：`\documentclass{stys/cvpr}` |
+| 写作层 | `manus/stys/stage.sty` | `\todo{...}`，以及写作 skill 会写进 `secs/`、`tabs/` 的那些宏 | **保留**——不论 class 换成什么，`\usepackage{stys/stage}` 这一行都留着 |
+
+扩展这两个文件时请守住这条分界：章节或表格文件里会出现的东西放进 package，只有页面外观需要的东西放进 class。项目自己的宏（`\newcommand{\method}{...}`）写在 `main.tex` 里，不要写进 `stys/`——模板文件会被替换或更新。
+
+**class 选项**——`\documentclass[twocolumn]{stys/arxiv}`：`onecolumn` | `twocolumn`，外加 `anon`，以及 `article` 支持的其他选项。导言区中，`\paperstyle{fancy|simple}` 选择带框或平铺的标题面板，`\papercolor{green|blue|black}` 选择配色。
+
+**标题面板**——在导言区收集，由 `\maketitle` 一次排版：
+
+| 命令 | 说明 |
+| --- | --- |
+| `\title{...}` | 过长的标题会自动降一号字，而不是把整个面板往下挤 |
+| `\author[1,\ast]{Name}` | 可重复，按顺序；可选参数对应上标 |
+| `\affiliation[1]{...}`、`\contribution[\ast]{...}` | 可重复 |
+| `\abstract{...}` | 是**命令而非环境**——所以 `secs/0_abstract.tex` 在导言区 `\input`，不在正文里 |
+| `\keywords{...}` | 排在摘要下方 |
+| `\code{}` `\project{}` `\dataset{}` `\demo{}` `\correspondence{}` `\paperdate{}` | 链接行；`\metadata[label]{value}` 可自定义任意一条 |
+
+**写作宏**来自 `stage.sty`，在任何 class 下都可用：`\todo{...}`（`lint.sh` 统计的未溯源标记）、`\parahead{...}` 与 `\headbf{...}`、`\cmark` / `\xmark`、`\tablestyle{sep}{stretch}`、定宽列 `x{}` `y{}` `z{}` `P{}` 与 `tabularx` 的 `Y` 列、`Light*` 行底色，以及 `\figref` `\tabref` `\eqnref` `\algref`——让每类浮动体在全文只有一种写法。
+
+**匿名有两半，两半都要。** class 的 `anon` 选项负责 PDF 那一半：面板只印 "Anonymous Authors"，并隐去单位、贡献说明和链接行。`.env` 里的 `ANON=true` 负责源文件那一半：`lint.sh` 会对 `manus/` 下任何身份信息报错——包括注释，因为上传源码时注释会一起交上去。仓库自带的 `main.tex` 连占位符都是匿名的，所以新仓库第一天就能通过源文件这一半。
+
+**环境要求**——较完整的 TeX Live（2022+）：class 使用 `tcolorbox`、`titlesec`、`cleveref`、`natbib`、`nicematrix`、`siunitx`。`fontawesome5` 可选，缺失时链接行退回纯文字标签。
 
 ## 快速开始
 

@@ -25,6 +25,7 @@ This is a STAGE repository — the paper-writing companion to STAR. One repo, on
 **Keep files in their designated directories.** Full table and rules: conventions §10.
 
 - Manuscript under `manus/`: entry `main.tex`; sections `secs/<n>_<slug>.tex`; figures `figs/` with sources in `figs/srcs/`; tables `tabs/`; bibliography `bibs/reference.bib`; venue styles `stys/`.
+- Two template layers in `manus/stys/`, and the split is load-bearing: `arxiv.cls` owns the look and is what a venue swap **replaces**; `stage.sty` owns `\todo` plus the macros skills write into `secs/` and `tabs/` (`\parahead`, `\cmark`, `\tablestyle`, `\figref` …) and **survives** every swap. Extend accordingly; project-specific macros go in `main.tex`, never in `stys/`.
 - Evidence under `mates/` — **read-only**. `execs/scpts/import.sh` and `/stage-evid-curator` are the only writers, and they only add or replace whole files with fingerprints.
 - Writing metadata under `notes/` — fixed files `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`; reading notes in `notes/refs/`.
 - Submission cycles under `cycls/<venue>_<year>/` — `venue.yml`, `reviews/`, `response/`, `SUBMISSION_<date>.md`. Revision scratch and promise lists in `tasks/`.

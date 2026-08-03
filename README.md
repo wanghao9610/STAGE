@@ -17,6 +17,7 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - [Contents](#contents)
 - [What STAGE provides](#what-stage-provides)
 - [Project structure](#project-structure)
+- [Manuscript template](#manuscript-template)
 - [Quick start](#quick-start)
   - [1. Create the paper repo](#1-create-the-paper-repo)
   - [1b. Or adopt a paper repo that already exists](#1b-or-adopt-a-paper-repo-that-already-exists)
@@ -57,7 +58,7 @@ STAGE/
 │   ├── figs/               # Rendered figures (PDF); figs/srcs/ holds every figure's source
 │   ├── tabs/               # Tables, generated from evidence
 │   ├── bibs/               # reference.bib
-│   └── stys/               # Venue styles and stage.sty (defines \todo{...})
+│   └── stys/               # arxiv.cls (the look) + stage.sty (\todo and authoring macros)
 ├── mates/                  # Imported evidence — read-only
 │   ├── <source-slug>/      # Snapshots mirroring upstream STAR paths
 │   ├── manual/             # Hand-registered evidence drops
@@ -91,7 +92,7 @@ The abbreviated directory names follow STAR's convention:
 | `figs/` | Figures | Rendered PDFs; `srcs/` their editable sources |
 | `tabs/` | Tables | Table `.tex` files, generated from evidence |
 | `bibs/` | Bibliographies | `reference.bib` |
-| `stys/` | Styles | Venue class/style files and `stage.sty` |
+| `stys/` | Styles | `arxiv.cls`, `stage.sty`, and any venue class/style files |
 | `mates/` | Materials | Imported evidence snapshots — read-only |
 | `cycls/` | Cycles | One directory per submission attempt |
 | `execs/` | Executions | Entrypoint scripts; `scpts/` the utilities |
@@ -99,6 +100,36 @@ The abbreviated directory names follow STAR's convention:
 | `mds/` | Markdowns | Markdown documentation, grouped by topic |
 
 Three rules the tree alone does not carry: `mates/` is read-only (`import.sh` and `/stage-evid-curator` are the only writers, adding or replacing whole files with fingerprints); `wkdrs/` is never committed (durable audit outcomes live as status flips in `notes/claims.md` and entries in `tasks/`, not in reports); and the `execs/` root is closed (`run.sh` + `update.sh` and nothing else — utilities go in `execs/scpts/`).
+
+## Manuscript template
+
+`manus/` ships a compact, arXiv-style preprint template, split into two layers, because one of them has to survive a venue swap and the other is the thing being swapped:
+
+| Layer | File | Owns | On a venue swap |
+| --- | --- | --- | --- |
+| The look | `manus/stys/arxiv.cls` | page geometry, fonts, the title panel, headings, captions, floats, bibliography style | **replaced** — drop the venue's class into `manus/stys/` and change one line: `\documentclass{stys/cvpr}` |
+| The authoring layer | `manus/stys/stage.sty` | `\todo{...}` plus the macros the writing skills emit into `secs/` and `tabs/` | **kept** — the line `\usepackage{stys/stage}` stays whatever the class becomes |
+
+Keep that split when you extend either file: anything a section or table file writes belongs in the package; anything only the page look needs belongs in the class. Project-specific macros (`\newcommand{\method}{...}`) go in `main.tex`, never in `stys/` — both template files get replaced or updated under you.
+
+**Class options** — `\documentclass[twocolumn]{stys/arxiv}`: `onecolumn` | `twocolumn`, plus `anon` and anything `article` takes. Inside the preamble, `\paperstyle{fancy|simple}` picks a framed or flat title panel and `\papercolor{green|blue|black}` sets the theme.
+
+**Title panel** — collected in the preamble, typeset once by `\maketitle`:
+
+| Command | Notes |
+| --- | --- |
+| `\title{...}` | an over-long title drops one font size automatically rather than pushing the panel down the page |
+| `\author[1,\ast]{Name}` | repeatable, in order; the optional argument keys the superscripts |
+| `\affiliation[1]{...}`, `\contribution[\ast]{...}` | repeatable |
+| `\abstract{...}` | a **command, not an environment** — so `secs/0_abstract.tex` is `\input` in the preamble, not in the body |
+| `\keywords{...}` | printed under the abstract |
+| `\code{}` `\project{}` `\dataset{}` `\demo{}` `\correspondence{}` `\paperdate{}` | the links row; `\metadata[label]{value}` adds an arbitrary one |
+
+**Authoring macros** from `stage.sty`, available under any class: `\todo{...}` (the unsourced-value marker `lint.sh` counts), `\parahead{...}` and `\headbf{...}`, `\cmark` / `\xmark`, `\tablestyle{sep}{stretch}`, the fixed-width columns `x{}` `y{}` `z{}` `P{}` and the `tabularx` column `Y`, the `Light*` row-highlight colors, and `\figref` `\tabref` `\eqnref` `\algref` so one spelling per float type holds across the manuscript.
+
+**Anonymity has two halves, and you want both.** The `anon` class option is the PDF half: the panel prints "Anonymous Authors" and drops affiliations, contribution notes, and the links row. `ANON=true` in `.env` is the source half: `lint.sh` then fails on identity anywhere under `manus/` — comments included, because comments ship with a source upload. The stock `main.tex` is anonymous by construction, placeholders included, so a fresh repo passes the source half on day one.
+
+**Requirements** — a reasonably complete TeX Live (2022+): the class uses `tcolorbox`, `titlesec`, `cleveref`, `natbib`, `nicematrix`, and `siunitx`. `fontawesome5` is optional; without it the links row falls back to plain text labels.
 
 ## Quick start
 
