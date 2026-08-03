@@ -102,7 +102,7 @@ ANON=false
 STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
 ```
 
-1. **仓库根目录的 `.env` 是这些取值的唯一来源。** 绝不猜某个本地路径，绝不硬编码，绝不凭对另一个项目的记忆填写。`.env` 本身被 git 忽略，且与机器绑定。
+1. **仓库根目录的 `.env` 是这些取值的存放处**，而优先级是**环境变量 → `.env` → 文档写明的默认值**。每个入口脚本都是从文件里读出自己需要的键，而不是 source 整个文件，所以 `STAR_HOME=… bash execs/scpts/import.sh` 和 `LATEX_ENGINE=xelatex bash execs/run.sh` 说什么就是什么，不会被文件悄悄盖掉——这个顺序 `execs/update.sh` 处理 `STAGE_REPOSITORY` 时本来就在用，现在四个入口一致。临时覆盖用命令行变量，长期覆盖去改 `.env`。绝不猜某个本地路径，绝不硬编码，绝不凭对另一个项目的记忆填写。`.env` 本身被 git 忽略，且与机器绑定。
 2. **每个变量都有可用默认值**，所以缺 `.env` 从不阻塞构建：`LATEX_ENGINE` 回落到 pdflatex，`ANON` 回落到 false。`STAR_HOME` 为空是被支持的状态——没有配对仓库地写作——此时 `import.sh` 要求 `--source`，证据以人工投放的形式到达。需要 `STAR_HOME` 却找不到的 skill 会提问（§7）；它绝不臆造一个路径。
 3. **每次构建都走 `execs/run.sh`**，它以**树外**方式跑 latexmk：`latexmk -<engine> -interaction=nonstopmode -halt-on-error -outdir=wkdrs/builds manus/main.tex`，engine 取自 `LATEX_ENGINE`。绝不在源码树里裸跑 latexmk：`manus/` 要保持没有 `.aux`/`.log` 垃圾，并且每个构建产物都能随 `wkdrs/` 一起丢弃。成功时 `run.sh` 打印 PDF 路径与页数；`lint.sh` 在它之上做确定性检查。
 4. **`ANON=true` 表示仓库处于投稿匿名模式。** `lint.sh` 会额外搜捕身份泄漏——`\author` 内容、致谢、`github.com/<user>`、`\thanks`——泄漏即硬失败。venue 档案里的 `anonymized:` 记录的是 venue 的要求；`ANON` 是操作开关，由用户来拨。发现两者不一致的 skill 要说出来并提问（§7），而不是静默改掉其中任何一个。

@@ -48,14 +48,22 @@ case "${1:-}" in
         ;;
 esac
 
-# .env is optional here: a fresh clone must build with the pdflatex default.
-if [[ -f "${ENV_FILE}" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${ENV_FILE}"
-    set +a
-fi
+# One value out of .env, without sourcing the file: sourcing would overwrite a
+# variable the caller set on the command line, and the precedence every STAGE
+# entrypoint follows is environment, then .env, then the default (conventions
+# §3.1) — the same order execs/update.sh uses for STAGE_REPOSITORY.
+env_value() {
+    local key="$1" val
+    [[ -f "${ENV_FILE}" ]] || return 0
+    val="$(sed -n "s/^[[:space:]]*${key}=//p" "${ENV_FILE}" | tail -1)"
+    val="${val%$'\r'}"                   # tolerate a CRLF .env
+    val="${val%\"}"; val="${val#\"}"     # and a quoted value
+    val="${val%\'}"; val="${val#\'}"
+    printf '%s' "${val}"
+}
 
+# .env is optional here: a fresh clone must build with the pdflatex default.
+LATEX_ENGINE="${LATEX_ENGINE:-$(env_value LATEX_ENGINE)}"
 LATEX_ENGINE="${LATEX_ENGINE:-pdflatex}"
 case "${LATEX_ENGINE}" in
     pdflatex) ENGINE_FLAG="-pdf" ;;

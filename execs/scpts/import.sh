@@ -95,10 +95,22 @@ while (( $# > 0 )); do
     shift
 done
 
-if [[ -f "${ENV_FILE}" ]]; then
-    # shellcheck source=/dev/null
-    source "${ENV_FILE}"
-fi
+# One value out of .env, without sourcing the file: sourcing would overwrite a
+# variable the caller set on the command line, and the precedence every STAGE
+# entrypoint follows is environment, then .env, then the default (conventions
+# §3.1) — the same order execs/update.sh uses for STAGE_REPOSITORY. It is what
+# makes a one-off `STAR_HOME=… bash execs/scpts/import.sh` mean what it says.
+env_value() {
+    local key="$1" val
+    [[ -f "${ENV_FILE}" ]] || return 0
+    val="$(sed -n "s/^[[:space:]]*${key}=//p" "${ENV_FILE}" | tail -1)"
+    val="${val%$'\r'}"                   # tolerate a CRLF .env
+    val="${val%\"}"; val="${val#\"}"     # and a quoted value
+    val="${val%\'}"; val="${val#\'}"
+    printf '%s' "${val}"
+}
+
+STAR_HOME="${STAR_HOME:-$(env_value STAR_HOME)}"
 
 SOURCE_INPUT="${OPT_SOURCE:-${STAR_HOME:-}}"
 [[ -n "${SOURCE_INPUT}" ]] || \
