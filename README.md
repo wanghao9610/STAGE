@@ -32,6 +32,8 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - [The ten-step path to a submission](#the-ten-step-path-to-a-submission)
 - [Evidence, fingerprints, and the claim ledger](#evidence-fingerprints-and-the-claim-ledger)
 - [Updating STAGE skills and workflow docs](#updating-stage-skills-and-workflow-docs)
+- [Project conventions](#project-conventions)
+- [Adapting STAGE to a new paper](#adapting-stage-to-a-new-paper)
 - [Citation](#citation)
 - [License](#license)
 
@@ -373,6 +375,32 @@ The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--force
 Files at matching paths are overwritten and new upstream files are added. Project-specific files that exist only in the updated directories are preserved. To avoid deleting custom content, files removed upstream are not removed locally. The update does not modify other directories, the current branch, Git remotes, or the staging area — the manuscript, `mates/`, `notes/`, and `cycls/` are never in scope. Commit current work before updating, then review and commit the result with `git status` and `git diff`.
 
 Working on STAGE itself rather than on a paper? `bash .github/scripts/check_consistency.sh` holds the invariants four hand-maintained skill trees cannot hold on their own: same skill set and file inventory everywhere, the slash-only guards agreeing across all four harnesses, invocation tokens and tool names native to each tree, the Cursor rule still mirroring `AGENTS.md`, descriptions inside the 1024-character `SKILL.md` limit, the opening load intact, and every `conventions §n` citation still resolving. It runs in CI on every push and pull request, and is upstream-maintainer tooling — `.github/` is not synced into paper repositories.
+
+## Project conventions
+
+1. The manuscript lives under `manus/`: `main.tex` is the entry point, sections are `secs/<n>_<slug>.tex`, figures go in `figs/` with editable sources in `figs/srcs/`, tables in `tabs/`, the bibliography is `bibs/reference.bib`, and the template layers are in `stys/`.
+2. Evidence lives under `mates/` and is read-only — `execs/scpts/import.sh` and `/stage-evid-curator` are its only writers. A wrong number is fixed at its source and re-imported, never edited in place.
+3. Writing metadata lives under `notes/`: the fixed files `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`, and reading notes in `notes/refs/`.
+4. Submission cycles live under `cycls/<venue>_<year>/`, with the venue's official kit unpacked whole into that cycle's `template/`; revision scratch, promise lists, and venue follow-ups go in `tasks/`.
+5. Builds and ephemeral reports live under `wkdrs/` and are never committed; durable outcomes land as status flips in `notes/claims.md` and entries in `tasks/`, not as report files.
+6. Use `execs/run.sh` as the single build entrypoint and keep utilities in `execs/scpts/`; read runtime paths from `.env` rather than hardcoding machine-specific ones.
+7. Every number in `manus/` either traces to a fingerprinted `mates/` entry or is written as `\todo{...}` — no third state — and every date written into an artifact comes from the system clock.
+
+The full collaboration and writing conventions are in [`AGENTS.md`](AGENTS.md) and [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md).
+
+## Adapting STAGE to a new paper
+
+When you start a paper from STAGE, these are the adjustments worth making:
+
+- Replace the title, authors, and affiliations in `manus/main.tex` with the real ones. Keep the anonymous placeholders during a double-blind cycle — `ANON=true` in `.env` makes `lint.sh` hunt identity leaks anywhere under `manus/`, comments included.
+- Copy `.env.example` to `.env` and set `STAR_HOME` (empty when you are not pairing with a STAR repository), `LATEX_ENGINE`, `ANON`, and the optional `STAGE_LANG`.
+- Create the first submission cycle and its `venue.yml` with `/stage-stry-coach`. Page limits, deadlines, and checklist requirements are entered only as facts you confirmed — never invented.
+- Unpack the venue's official kit whole into `cycls/<cycle>/template/`, not into `manus/`: that tree is the namespace `lint.sh` scans, and a kit's example `.tex` would trip its `\todo` count and its identity scan.
+- Update the year and copyright holder in `LICENSE`.
+- Replace `docs/htmls/stage.html`, `docs/htmls/stage_zh.html`, and `docs/srcs/` — they are STAGE's own landing pages and images, not your paper's. `docs/index.html` and `docs/index_zh.html` are the symlinks that mount those pages at the site root. The language switch between them uses absolute links (`/STAGE/index_zh.html`), so change the `/STAGE` prefix to your own repository name or the switch breaks. Leave `docs/mds/stage-workflow/` alone — `execs/update.sh` keeps it current.
+- Delete the tool directories you do not use. `.agents/` (Codex), `.claude/`, `.cursor/`, and `.kimi-code/` are each a complete copy of the same fifteen skills, 40–55 files apiece; keep the one your agent reads and `rm -rf` the rest.
+
+The skeleton stands on its own: the directory layout, `.env`, `execs/run.sh`, and `execs/scpts/lint.sh` all work with no skills installed at all, so deleting every tool directory is a supported way to use it. One paper, one repository — a second paper is a second instance of the template, not a second tree here.
 
 ## Citation
 

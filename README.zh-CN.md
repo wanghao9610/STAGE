@@ -32,6 +32,8 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - [通往投稿的十步路径](#通往投稿的十步路径)
 - [证据、指纹与论断台账](#证据指纹与论断台账)
 - [更新 STAGE 的 skill 与工作流文档](#更新-stage-的-skill-与工作流文档)
+- [项目约定](#项目约定)
+- [将 STAGE 用于新论文](#将-stage-用于新论文)
 - [引用](#引用)
 - [许可证](#许可证)
 
@@ -373,6 +375,32 @@ curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update
 上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。为避免误删自定义内容，上游已删除的文件不会在本地自动删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
 如果你改的是 STAGE 本身而不是某篇论文：`bash .github/scripts/check_consistency.sh` 守着四份手工维护的 skill 目录自己守不住的那些不变量——各处 skill 集合与文件清单一致、slash-only 守卫在四套 harness 上互相吻合、调用 token 与工具名各归其树、Cursor 规则仍与 `AGENTS.md` 逐行对齐、description 不超 `SKILL.md` 的 1024 字符上限、开场装载完整、每条 `规约 §n` 引用都还解析得到。它在每次 push 与 PR 时跑 CI，属于上游维护工具——`.github/` 不会同步进论文仓库。
+
+## 项目约定
+
+1. 稿件放在 `manus/`：入口是 `main.tex`，章节是 `secs/<n>_<slug>.tex`，图放 `figs/`（可编辑源在 `figs/srcs/`），表放 `tabs/`，参考文献是 `bibs/reference.bib`，模板层在 `stys/`。
+2. 证据放在 `mates/`，且只读——`execs/scpts/import.sh` 与 `/stage-evid-curator` 是仅有的两个写入者。数字错了，去它的源头改再重新导入，绝不就地编辑证据文件。
+3. 写作元数据放在 `notes/`：固定文件 `story.md`、`claims.md`、`outline.md`、`notation.md`、`adopt.md`，阅读笔记放 `notes/refs/`。
+4. 投稿周期放在 `cycls/<venue>_<year>/`，venue 官方模板包整包解压进该周期的 `template/`；修订便签、承诺清单与 venue 跟进项放 `tasks/`。
+5. 构建产物与临时报告放在 `wkdrs/`，永不提交；可留存的结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目落盘，而不是报告文件。
+6. 用 `execs/run.sh` 作为唯一构建入口，工具脚本放 `execs/scpts/`；运行环境路径从 `.env` 读取，不要在脚本里硬编码本机路径。
+7. `manus/` 里的每个数字，要么可追溯到一条带指纹的 `mates/` 记录，要么写成 `\todo{...}`——没有第三种状态；写进文档的日期一律取自系统时钟。
+
+完整的协作与写作规范见 [`AGENTS.md`](AGENTS.md) 与 [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md)（中文对照版 [`writing-workflow-conventions.zh-CN.md`](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)）。
+
+## 将 STAGE 用于新论文
+
+基于 STAGE 开始写一篇新论文时，建议完成以下调整：
+
+- 把 `manus/main.tex` 里的标题、作者、机构换成真实信息。双盲周期内保持匿名占位——`.env` 里 `ANON=true` 会让 `lint.sh` 在 `manus/` 下搜身份泄漏，注释也算。
+- 复制 `.env.example` 为 `.env`，设好 `STAR_HOME`（不与 STAR 配对就留空）、`LATEX_ENGINE`、`ANON` 与可选的 `STAGE_LANG`。
+- 用 `/stage-stry-coach` 建立第一个投稿周期和它的 `venue.yml`；页数上限、截止日期与检查单只以你确认的事实录入，绝不臆造。
+- venue 官方模板包整包解压到 `cycls/<cycle>/template/`，不要放进 `manus/`——那是 `lint.sh` 扫描的命名空间，模板包自带的示例 `.tex` 会污染 `\todo` 计数和身份扫描。
+- 更新 `LICENSE` 中的年份和版权所有者。
+- 替换 `docs/htmls/stage.html`、`docs/htmls/stage_zh.html` 与 `docs/srcs/`——它们是 STAGE 自己的落地页和图片，不属于你的论文。`docs/index.html` 和 `docs/index_zh.html` 是把这两个页面挂到站点根目录的软链接。两个页面之间的中英切换用的是绝对链接（`/STAGE/index_zh.html`），要把其中的 `/STAGE` 前缀改成你自己的仓库名，否则语言切换会失效。`docs/mds/stage-workflow/` 保持不动，`execs/update.sh` 会负责更新它。
+- 删掉用不到的工具目录。`.agents/`（Codex）、`.claude/`、`.cursor/`、`.kimi-code/` 各自是同一套十五个 skill 的完整副本，每套 40–55 个文件；留下你所用 agent 会读的那一套，其余 `rm -rf` 即可。
+
+骨架本身可独立使用：目录布局、`.env`、`execs/run.sh` 与 `execs/scpts/lint.sh` 在完全不装任何 skill 的情况下也能工作，因此删掉全部工具目录同样是受支持的用法。一篇论文一个仓库——第二篇论文是模板的第二个实例，而不是这里的第二棵目录树。
 
 ## 引用
 
