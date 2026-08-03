@@ -20,7 +20,7 @@ Invocation: `$stage-resp-writer [CYCLE]` — with no argument, the active cycle 
 no match → list the candidates and ask (§7).
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
-every STAGE skill shares — read the whole file at the start of every run; v1 has no
+every STAGE skill shares — read the whole file at the start of every run; there is no
 section-selective loading. The sections that bind this skill hardest: §5 cycle resolution, §7
 dialogue, §8 the artifact registry (the response and promise schemas), §9 the fabrication
 boundary.

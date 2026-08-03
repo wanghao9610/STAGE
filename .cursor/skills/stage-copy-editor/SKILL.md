@@ -19,7 +19,7 @@ title against `notes/outline.md` (conventions §5; ambiguity → ask); no argume
 section the outline lists as `drafted` or later, in outline order.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
-every STAGE skill shares — read the whole file at the start of every run (v1 has no
+every STAGE skill shares — read the whole file at the start of every run (there is no
 section-selective loading). The sections that bind this skill hardest: §5 section resolution, §9
 the fabrication boundary (numbers are not prose), §1 git, §7 dialogue. This file states what is
 specific to this skill and wins wherever it is stricter.

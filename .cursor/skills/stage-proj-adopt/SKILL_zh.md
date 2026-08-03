@@ -21,7 +21,7 @@ description: >-
 
 调用方式：`/stage-proj-adopt [SRC_PATH]`——不带参数时，在本仓库里搜寻住在 `manus/` 之外的手稿（工具箱被丢进了一个已有的论文仓库）；给了路径则接入一个外部草稿目录——一个旧项目、一份 Overleaf 导出——做法是把文件复制进来，源码树绝不被修改。两种情况下"没有可接入的东西"都是合法答案：说出来然后停下，而不是发明工作。
 
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——v1 不做分节选读。它对本 skill 约束最紧的是 §9（编造边界——正文里已有的数字是一条 unsourced 主张，绝不是有来源的）、§10（项目布局，也就是搬迁计划的落点）、§8（产物登记表，含 §8.2 的 manifest schema 与 §8.9 的 `backfilled:` 关口）、§7（对话——任何东西都要过了确认点才动）。本文件只写本 skill 特有的部分，更严处以本文件为准。
+**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——不做分节选读。它对本 skill 约束最紧的是 §9（编造边界——正文里已有的数字是一条 unsourced 主张，绝不是有来源的）、§10（项目布局，也就是搬迁计划的落点）、§8（产物登记表，含 §8.2 的 manifest schema 与 §8.9 的 `backfilled:` 关口）、§7（对话——任何东西都要过了确认点才动）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 同一轮对话里的第二个 STAGE skill 不必为规约付两次：只有当同一份文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要不算，“记得自己读过”也不算——拿不准就重读一遍。
 

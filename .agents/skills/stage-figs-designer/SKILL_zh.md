@@ -19,7 +19,7 @@ description: >-
 
 调用方式：`$stage-figs-designer [FIGURE | plan | teaser]`——不带参数时，对着磁盘上的文件审计 `notes/outline.md` 里的 Figures 表并提出唯一的下一步动作；`plan` 从故事与各节简介出发创建或修订 Figures 表；`teaser` 解析到 teaser 图并跑它的检查清单；其他内容点名一张图，按提纲 ID（`F1`）、文件 slug 或用途/章节文字对着 `notes/outline.md` 解析（规约 §5——有歧义就问，绝不猜）。建图的活儿是一次调用一张。
 
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——v1 不做分节选读。它对本 skill 约束最紧的是 §5（解析指的是哪张图）、§8（产物登记表及其过期规则）、§9（编造边界——图同样在陈述主张）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
+**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——不做分节选读。它对本 skill 约束最紧的是 §5（解析指的是哪张图）、§8（产物登记表及其过期规则）、§9（编造边界——图同样在陈述主张）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 同一轮对话里的第二个 STAGE skill 不必为规约付两次：只有当同一份文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要不算，"记得自己读过"也不算——拿不准就重读一遍。
 

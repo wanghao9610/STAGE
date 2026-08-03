@@ -40,7 +40,7 @@ owns and a venue class must replace, the abstract relocation, `compat.sty`, and 
 mapping. Read it before converting; it is not needed on a run that does not convert.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` in full at
-the start of every run — v1 has no section-selective loading. It is the baseline every STAGE
+the start of every run — there is no section-selective loading. It is the baseline every STAGE
 skill shares; the sections that bind this skill hardest are §1 git (freeze tags
 `freeze/<cycle>_<date>` are created only here), §3 the build toolchain and `ANON`, §5 cycle
 resolution, and §9 the fabrication boundary. This file states what is specific to this skill and

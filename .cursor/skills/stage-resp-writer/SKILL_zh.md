@@ -19,7 +19,7 @@ description: >-
 
 调用方式：`/stage-resp-writer [CYCLE]`——不带参数时取 `notes/story.md` 里的当前周期（规约 §5）；给出 `CYCLE` 参数则直接点名 `cycls/` 下的一个目录；对不上 → 列出候选并提问（§7）。
 
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完；v1 不做分节选读。对本 skill 约束最紧的几节：§5 周期解析、§7 对话、§8 产物登记表（回复与承诺的 schema）、§9 编造边界。
+**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完；不做分节选读。对本 skill 约束最紧的几节：§5 周期解析、§7 对话、§8 产物登记表（回复与承诺的 schema）、§9 编造边界。
 本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 只有当规约文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要不算，"记得自己读过"也不算——拿不准就重读一遍。

@@ -18,7 +18,7 @@ description: >-
 
 调用方式：`/stage-sect-drafter SECTION`——`SECTION` 按规约 §5 对着 `notes/outline.md` 的 Sections 表解析：一个编号（`3`）、一个文件 slug（`3_method` 或 `method`）、或标题匹配；缺失或有歧义时，列出各节及其状态并提问（§7）。一次调用一节——一条点名了好几节的请求就是每节一次运行，按提纲顺序，各自带上自己的台账与提纲更新。
 
-**通用规约。** 动手之前先读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份读，每次运行开始时；v1 不做分节选读。它通过自己的 `Read` 调用到达，绝不被 `cat` 进一条 Bash 命令。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §5（章节与周期解析）、§8（产物登记表及其过期规则）、§9（编造边界）。本文件只写本 skill 特有的部分，更严处以本文件为准。
+**通用规约。** 动手之前先读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份读，每次运行开始时；不做分节选读。它通过自己的 `Read` 调用到达，绝不被 `cat` 进一条 Bash 命令。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §5（章节与周期解析）、§8（产物登记表及其过期规则）、§9（编造边界）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 同一轮对话里的第二个 STAGE skill 不必为此付两次：只有当同一份文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要不算，"记得自己读过"也不算。拿不准就重读一遍——多读一次只花一条消息，判断错了要赔上整轮运行。
 

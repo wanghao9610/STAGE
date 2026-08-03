@@ -20,7 +20,7 @@ description: >-
 
 调用方式：`/skill:stage-refs-curator [PAPER | add PAPER [PAPER …] | seed | tidy | position]`——不带参数时普查 `manus/bibs/reference.bib`、`notes/refs/` 与索引，审查卫生状况，并提出唯一的下一步动作；一个光秃秃的 arXiv id、DOI、论文 URL 或带引号的标题，是把那一篇收进来，而 `add` 接收多篇（按换行与逗号切分；不属于上述任何形式的片段整体当作一个标题读）；`seed` 从 `mates/` 转换导入的 STAR refs；`tidy` 是离线的 bib 卫生整理；`position` 为相关工作给底盘聚类。一个标题解析到多条记录、或者没有一条干净地对上，要提问（§7），绝不猜。
 
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——v1 不做分节选读。它对本 skill 约束最紧的是 §4（真实日期——每个 `added:` 与抓取日期都是真的）、§8（产物登记表与文件 schema）、§9（编造边界——尤其 §9b：关于被引论文的每条断言都必须能对着一份阅读笔记核查）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
+**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——不做分节选读。它对本 skill 约束最紧的是 §4（真实日期——每个 `added:` 与抓取日期都是真的）、§8（产物登记表与文件 schema）、§9（编造边界——尤其 §9b：关于被引论文的每条断言都必须能对着一份阅读笔记核查）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 同一轮对话里的第二个 STAGE skill 不必为规约付两次：只有当同一份文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要不算，"记得自己读过"也不算——拿不准就重读一遍。
 

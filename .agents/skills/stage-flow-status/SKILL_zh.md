@@ -17,7 +17,7 @@ description: >-
 
 调用方式：`$stage-flow-status [SECTION]`——不带参数汇报整条流程；带章节参数时，按规约 §5 以编号、文件 slug 或标题对着 `notes/outline.md` 解析，把提纲面板与主张明细收敛到该节。`involve=<level>` 记号在解析 SECTION 之前就被剥离（§7），除此之外在这里不改变任何行为。章节参数有歧义是本 skill 唯一可以问的问题（§5）；除此之外它什么都不问。
 
-**通用规约。** 每次运行开始时整份读完 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——v1 不做分节选读。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §0 词汇表、§5 章节与周期解析、§7 对话纪律里的汇报规则、以及 §8 产物登记表连同它的过期判定规则。本文件只写本 skill 特有的部分，更严处以本文件为准。
+**通用规约。** 每次运行开始时整份读完 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——不做分节选读。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §0 词汇表、§5 章节与周期解析、§7 对话纪律里的汇报规则、以及 §8 产物登记表连同它的过期判定规则。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 只有当规约文件本身的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要，以及"记得自己读过"，两者都不满足这个判据——拿不准就重读一遍；多读一次只花一条消息，判断错了要赔上整轮运行。
 

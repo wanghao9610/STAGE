@@ -31,7 +31,7 @@ stripped before SECTION resolves (§7) and changes nothing else here. An ambiguo
 argument is the one question this skill may ask (§5); it asks nothing else.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` in full at
-the start of every run — v1 has no section-selective loading. It is the baseline every STAGE
+the start of every run — there is no section-selective loading. It is the baseline every STAGE
 skill shares; the sections that bind this skill hardest are §0 vocabulary, §5 section and cycle
 resolution, §7 dialogue's reporting rules, and §8 the artifact registry with its staleness rule.
 This file states what is specific to this skill and wins wherever it is stricter.

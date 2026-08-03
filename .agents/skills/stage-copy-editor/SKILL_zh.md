@@ -17,7 +17,7 @@ description: >-
 
 调用方式：`$stage-copy-editor [SECTION]`——章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5；有歧义 → 提问）；不带参数则按提纲顺序，打磨提纲里状态为 `drafted` 或更靠后的每一节。
 
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完（v1 不做分节选读）。对本 skill 约束最紧的几节：§5 章节解析、§9 编造边界（数字不是散文）、§1 git、§7 对话。本文件只写本 skill 特有的部分，更严处以本文件为准。
+**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完（不做分节选读）。对本 skill 约束最紧的几节：§5 章节解析、§9 编造边界（数字不是散文）、§1 git、§7 对话。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 只有当同一份规约文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。压缩后幸存的摘要不算，"记得自己读过"也不算。拿不准就重读一遍——多读一次只花一条消息，判断错了要赔上整轮运行。
 

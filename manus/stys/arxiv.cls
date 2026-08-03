@@ -19,7 +19,7 @@
 %%                           notes, and the links row are suppressed
 %%   everything else         forwarded to article unchanged (e.g. 11pt, letterpaper)
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{stys/arxiv}[2026/08/03 v1 STAGE preprint class]
+\ProvidesClass{stys/arxiv}[2026/08/03 STAGE preprint class]
 
 %% ---------------------------------------------------------------------------
 %% Options

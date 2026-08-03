@@ -22,7 +22,7 @@ description: >-
 
 **转换流程。** `references/venue-convert.md`——模板包契约、`stys/arxiv.cls` 独占而 venue class 必须替换掉的那些命令、abstract 的搬家、`compat.sty`、匿名映射。转换之前读它；不做转换的运行不需要它。
 
-**通用规约。** 每次运行开始时整份读完 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——v1 不做分节选读。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §1 git（冻结 tag `freeze/<cycle>_<date>` 只在这里创建）、§3 构建工具链与 `ANON`、§5 周期解析、§9 编造边界。本文件只写本 skill 特有的部分，更严处以本文件为准。
+**通用规约。** 每次运行开始时整份读完 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——不做分节选读。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §1 git（冻结 tag `freeze/<cycle>_<date>` 只在这里创建）、§3 构建工具链与 `ANON`、§5 周期解析、§9 编造边界。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 只有当规约文件本身的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要，以及"记得自己读过"，两者都不满足这个判据——拿不准就重读一遍；多读一次只花一条消息，判断错了要赔上这次冻结。
 

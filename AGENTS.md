@@ -12,7 +12,7 @@ Behavioral guidelines to reduce common LLM writing mistakes. They bias toward ca
 
 ## 2. Evidence Before Prose
 
-**Nothing in the manuscript pretends to be sourced.** Full rule: conventions §9.
+**Nothing in the manuscript pretends to be sourced.**
 
 - Every number in `manus/` either traces to a fingerprinted `mates/` entry read this run or is written as `\todo{...}` — no third state. A visible todo is a state; a plausible invented number is a defect.
 - Every assertion about a cited paper is checkable against a reading note in `notes/refs/`, or against imported refs under `mates/`.

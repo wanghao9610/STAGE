@@ -18,7 +18,7 @@ description: >-
 
 调用方式：`/stage-tabs-builder [TABLE]`——`TABLE` 按 ID（`T2`）、文件 slug（`main_results`）或用途短语，对着 `notes/outline.md` 的 Tables 表匹配，§5 的匹配方式套用到 Tables 行上；缺失或有歧义时，列出各行及其状态并提问（§7）。还不在提纲里的表格，在参数里描述它，先给它一行提纲行。一次调用一张表。
 
-**通用规约。** 动手之前先读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份读，每次运行开始时；v1 不做分节选读。它通过自己的 `Read` 调用到达，绝不被 `cat` 进一条 Bash 命令。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §9（编造边界——本 skill 就是它在表格层面的执行者）、§8（产物登记表及其过期规则）、§5（解析）。本文件只写本 skill 特有的部分，更严处以本文件为准。
+**通用规约。** 动手之前先读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份读，每次运行开始时；不做分节选读。它通过自己的 `Read` 调用到达，绝不被 `cat` 进一条 Bash 命令。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §9（编造边界——本 skill 就是它在表格层面的执行者）、§8（产物登记表及其过期规则）、§5（解析）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 同一轮对话里的第二个 STAGE skill 不必为此付两次：只有当同一份文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要不算，"记得自己读过"也不算。拿不准就重读一遍——多读一次只花一条消息，判断错了要赔上整轮运行。
 

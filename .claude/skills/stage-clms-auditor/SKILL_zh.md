@@ -17,7 +17,7 @@ description: >-
 
 调用方式：`/stage-clms-auditor [SECTION | CLAIM_ID]`——章节参数按规约 §5 解析，审计那一节的数字；给出 claim ID（`C7`）则在它 `Stated in` 触及的每一处审计那一条台账主张（ID 不认识 → 提问，规约 §7）；不带参数则审计 `manus/tabs/` 与 `manus/secs/` 的全部。
 
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完（v1 不做分节选读）。对本 skill 约束最紧的几节：§8 产物登记表及其过期规则、§9 编造边界（§9a 就是本 skill 的授权书）、§5 解析、§1 git。本文件只写本 skill 特有的部分，更严处以本文件为准。
+**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完（不做分节选读）。对本 skill 约束最紧的几节：§8 产物登记表及其过期规则、§9 编造边界（§9a 就是本 skill 的授权书）、§5 解析、§1 git。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 只有当同一份规约文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。压缩后幸存的摘要不算，"记得自己读过"也不算。拿不准就重读一遍——多读一次只花一条消息，判断错了要赔上整轮运行。
 

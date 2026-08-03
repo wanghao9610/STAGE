@@ -21,7 +21,7 @@ everywhere its `Stated in` reaches (unknown ID → ask, conventions §7); no arg
 `manus/tabs/` and `manus/secs/`.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
-every STAGE skill shares — read the whole file at the start of every run (v1 has no
+every STAGE skill shares — read the whole file at the start of every run (there is no
 section-selective loading). The sections that bind this skill hardest: §8 the artifact registry
 and its staleness rule, §9 the fabrication boundary (§9a is this skill's charter), §5 resolution,
 §1 git. This file states what is specific to this skill and wins wherever it is stricter.

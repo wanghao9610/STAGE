@@ -23,7 +23,7 @@ the active one from `notes/story.md` (conventions §5); an `involve=<level>` tok
 before the mode is read (§7.7).
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
-every STAGE skill shares — read the whole file at the start of every run; v1 has no
+every STAGE skill shares — read the whole file at the start of every run; there is no
 section-selective loading. The sections that bind this skill hardest: §2 the STOP line (the
 search budget below is this skill's polite rate), §5 cycle resolution, §6 delegation (the panel
 is this workflow's largest sanctioned fan-out), §8 the artifact registry, §9 the fabrication
