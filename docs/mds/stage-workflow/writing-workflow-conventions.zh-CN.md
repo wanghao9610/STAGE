@@ -384,3 +384,29 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
    `.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——彼此只差调用前缀和工具名（`Bash` / `Shell`、
    `AskUserQuestion` / `AskQuestion` / `request_user_input`、`Read` / `ReadFile`）。装载你自己那棵树下的副本并遵循它；
    某次列目录列出了别的树里的副本，那只是告诉你文件在哪，不是告诉你哪一份约束你。
+
+## 11. Skill 一览
+
+十五个 skill，调用方式：Claude Code 与 Cursor 里是 `/stage-<name>`，Codex 里是 `$stage-<name>`，Kimi Code 里是 `/skill:stage-<name>`。每个 skill 的完整说明见 [writing-workflow-skills.zh-CN.md](writing-workflow-skills.zh-CN.md)（英文：[writing-workflow-skills.md](writing-workflow-skills.md)）；每个 skill 写出什么见 §8。
+
+| Skill | 职责 |
+| --- | --- |
+| `stage-proj-adopt` † | 把一个新的或已有的论文仓库接进 STAGE |
+| `stage-evid-curator` | 导入、登记、映射证据 |
+| `stage-stry-coach` † | 打磨故事；播下论断与 venue 档案 |
+| `stage-outl-planner` † | 提纲、篇幅预算、章节骨架、记号表 |
+| `stage-sect-drafter` | 每次调用起草一节 |
+| `stage-tabs-builder` | 只从证据生成表格 |
+| `stage-figs-designer` | 图的清单、源文件、渲染出的 PDF |
+| `stage-refs-curator` | 参考文献、阅读笔记、定位 |
+| `stage-copy-editor` | 润色文字；不碰含义，不碰数字 |
+| `stage-clms-auditor` | 把每个数字追到一枚指纹 |
+| `stage-cite-auditor` | 对着阅读笔记核验引用 |
+| `stage-peer-reviewer` | 模拟的五视角评审小组 |
+| `stage-resp-writer` † | 评审意见 → 要点台账 → 回复 + 承诺 |
+| `stage-subm-packer` † | 预检、venue 版式转换、打包、冻结 |
+| `stage-flow-status` | 只读的状态与唯一的下一步 |
+
+1. **标 † 的五个是 slash-only。** 只有用户点名时才跑：它们是决策点——接入、故事、提纲、回复、投稿——而一个由 agent 自作主张走到的决策点，等于没有人做过这个决策。这张表是事实来源；执行它的守卫是 Claude、Cursor、Kimi 清单里的 `disable-model-invocation: true`，以及 Codex 的 `.agents/skills/<name>/agents/openai.yaml` 里的 `allow_implicit_invocation: false`，CI 会拿这四处与这里的标记逐一比对，所以在这里标了却没在四处都加守卫会让构建失败。
+2. **两个 skill 从不碰稿件。** `stage-peer-reviewer` 只写 `cycls/<cycle>/reviews/` 下的评审；`stage-flow-status` 什么都不写。只要不知道进展到哪了，先跑状态 skill——它读提纲、台账、清单与周期状态，给出唯一的下一步和它确切的命令。
+3. **一次调用一个 skill，一个 skill 一件事。** 一节、一张表、一张图、一份回复——一次运行悄悄扩大范围正是这条规则针对的失败；下一件事是下一次调用。

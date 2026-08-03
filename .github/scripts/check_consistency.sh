@@ -90,17 +90,18 @@ done < <(printf '%s\n' "${SKILLS}")
 (( parity_errors == 0 )) && note "file sets match across all four trees"
 
 # 4. The slash-only set is one decision expressed in three places, and they must
-#    agree. AGENTS.md marks it with † and is what a human reads; the Claude,
-#    Cursor and Kimi trees enforce it with `disable-model-invocation: true`;
+#    agree. The conventions roster (§11) marks it with † and is what every skill
+#    run loads; the Claude, Cursor and Kimi trees enforce it with
+#    `disable-model-invocation: true`;
 #    Codex enforces it with `allow_implicit_invocation: false` in
 #    agents/openai.yaml. A skill guarded in one place and not the others runs
 #    unrequested on exactly the harnesses that forgot it — the failure mode is
 #    silent, and it is the mode this check exists for.
 section "Slash-only guard agreement"
 guard_errors=0
-SLASH_ONLY="$(sed -nE 's/^\| `(stage-[a-z-]+)` † \|.*/\1/p' AGENTS.md | sort)"
+SLASH_ONLY="$(sed -nE 's/^\| `(stage-[a-z-]+)` † \|.*/\1/p' "${CONV_EN}" | sort)"
 if [[ -z "${SLASH_ONLY}" ]]; then
-    fail "AGENTS.md marks no skill with †; the slash-only set cannot be resolved"
+    fail "${CONV_EN} marks no skill with † in its §11 roster; the slash-only set cannot be resolved"
     guard_errors=1
 fi
 
@@ -122,11 +123,11 @@ while IFS= read -r skill; do
     grep -qxF "${skill}" <<< "${SLASH_ONLY}" && want_guarded=true
 
     if [[ "${want_guarded}" == true && "${policy}" != "false" ]]; then
-        fail "${manifest}: ${skill} is slash-only in AGENTS.md but allows implicit invocation"
+        fail "${manifest}: ${skill} is slash-only in the conventions roster but allows implicit invocation"
         guard_errors=1
     fi
     if [[ "${want_guarded}" == false && "${policy}" != "true" ]]; then
-        fail "${manifest}: ${skill} is not slash-only in AGENTS.md but forbids implicit invocation"
+        fail "${manifest}: ${skill} is not slash-only in the conventions roster but forbids implicit invocation"
         guard_errors=1
     fi
 
@@ -136,9 +137,9 @@ while IFS= read -r skill; do
             frontmatter_has_line "${root}/${skill}/${f}" "disable-model-invocation: true" && has=true
             if [[ "${want_guarded}" != "${has}" ]]; then
                 if [[ "${want_guarded}" == true ]]; then
-                    fail "${root}/${skill}/${f}: slash-only in AGENTS.md but no 'disable-model-invocation: true'"
+                    fail "${root}/${skill}/${f}: slash-only in the conventions roster but no 'disable-model-invocation: true'"
                 else
-                    fail "${root}/${skill}/${f}: carries 'disable-model-invocation: true' but is not slash-only in AGENTS.md"
+                    fail "${root}/${skill}/${f}: carries 'disable-model-invocation: true' but is not slash-only in the conventions roster"
                 fi
                 guard_errors=1
             fi
@@ -464,9 +465,10 @@ CONV_HEADINGS=(
     '8. The artifact registry'
     '9. The fabrication boundary'
     '10. Project layout'
+    '11. The skill roster'
 )
 # section|numbered top-level items
-CONV_ITEMS=("1|6" "3|6" "4|4" "5|6" "6|9" "7|11" "10|5")
+CONV_ITEMS=("1|6" "3|6" "4|4" "5|6" "6|9" "7|11" "10|5" "11|3")
 CONV_SUBHEADS=("8|10")    # ### 8.n subheadings
 CONV_LETTERS=("9|5")      # **(a) ... **(e) rules
 
@@ -538,7 +540,7 @@ while IFS= read -r cite; do
     c_sec="${cite%%.*}"
     c_item=""
     [[ "${cite}" == *.* ]] && c_item="${cite#*.}"
-    if (( c_sec > 10 )); then
+    if (( c_sec > 11 )); then
         fail "conventions §${cite} is cited, but the document has no §${c_sec}"
         conv_errors=1
         continue
@@ -564,7 +566,8 @@ section "Docs cover every skill"
 doc_errors=0
 for guide in docs/mds/stage-workflow/writing-workflow-skills.md \
              docs/mds/stage-workflow/writing-workflow-skills.zh-CN.md \
-             README.md README.zh-CN.md AGENTS.md; do
+             "${CONV_EN}" "${CONV_ZH}" \
+             README.md README.zh-CN.md; do
     [[ -f "${guide}" ]] || { fail "${guide} is missing"; doc_errors=1; continue; }
     while IFS= read -r skill; do
         # The name must end where the skill's name ends: a plain substring match

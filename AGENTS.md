@@ -42,36 +42,11 @@ The test: every changed line traces to the user's request, and every number in i
 
 **This project uses the STAGE writing workflow. Its records are files, not chat history.**
 
-- **Evidence flows one way.** STAR artifacts and hand-registered drops are snapshotted into read-only `mates/` with a fingerprint, recorded in `mates/MANIFEST.md`; the manuscript only cites them.
-- **The claim ledger is the hub.** `notes/claims.md` links every claim's statements ⇄ evidence ⇄ status (`proposed → drafted → verified / unsourced / weakened / dropped`). Writing states claims, audits verify them, responses defend them.
-- **Deterministic checks live in scripts, judgment lives in skills.** What `lint.sh` or `import.sh --diff` can decide is never re-decided in prose; what needs judgment is never reduced to a grep.
-
-Fifteen skills. Invoke as `/stage-<name>` in Claude Code and Cursor, `$stage-<name>` in Codex, `/skill:stage-<name>` in Kimi Code.
-
-| Skill | Role |
-| --- | --- |
-| `stage-proj-adopt` † | wire a new or existing paper repo into STAGE |
-| `stage-evid-curator` | import, register, and map evidence |
-| `stage-stry-coach` † | shape the story; seed claims and the venue profile |
-| `stage-outl-planner` † | outline, budgets, section skeletons, notation |
-| `stage-sect-drafter` | draft one section per invocation |
-| `stage-tabs-builder` | generate tables from evidence only |
-| `stage-figs-designer` | figure inventory, sources, rendered PDFs |
-| `stage-refs-curator` | bibliography, reading notes, positioning |
-| `stage-copy-editor` | polish prose; never meaning, never numbers |
-| `stage-clms-auditor` | trace every number to a fingerprint |
-| `stage-cite-auditor` | verify citations against reading notes |
-| `stage-peer-reviewer` | simulated five-perspective review panel |
-| `stage-resp-writer` † | reviews → point ledger → response + promises |
-| `stage-subm-packer` † | preflight, venue conversion, package, freeze |
-| `stage-flow-status` | read-only status and the one next action |
-
-- Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at the start of every skill run; skills cite its § numbers and state only what is specific to themselves, and where a skill is stricter, the skill wins. Skip the re-read only while that file's text is still verbatim visible in this conversation.
-- The five marked † are slash-only: run them only when the user names them. They are the decision points — adoption, story, outline, response, submission — and this table is the source of truth CI checks the per-harness guards against.
-- `stage-flow-status` and `stage-peer-reviewer` never write to the manuscript; `stage-flow-status` writes nothing at all. Run it first when you do not know where things stand — it reads the outline, ledger, manifest, and cycle state, and names the single next action.
-- What each skill writes is the artifact registry, conventions §8; what each skill is for is `writing-workflow-skills.md`. Do not hand-edit generated reports under `wkdrs/`.
-- One commit per skill working session, at that skill's documented commit step, with the skill named in the subject. Outside a skill run, do not commit, tag, or push unless asked; never commit `wkdrs/` or `.env`. Full rule: conventions §1.
-- Upstream-managed and overwritten by `execs/update.sh`: `docs/mds/stage-workflow/`, the four skill trees, both `execs/` entrypoints, and this file with the Cursor rule that copies it. Project-specific settings belong in `.env`, which is never synced. Load the skill copy under your own harness's root — the trees are not interchangeable (conventions §10.5).
+- Evidence is snapshotted into read-only `mates/` with a fingerprint in `mates/MANIFEST.md` and only ever cited; `notes/claims.md` is the hub, linking every claim's statements ⇄ evidence ⇄ status; `lint.sh` and `import.sh --diff` decide what is deterministic, and nothing decided there is re-decided in prose.
+- The rules every workflow skill follows are in `docs/mds/stage-workflow/writing-workflow-conventions.md` — read it whole at the start of every skill run; the fifteen skills and the five that are slash-only are its §11, and what each one does is in `writing-workflow-skills.md`.
+- Run `/stage-flow-status` first when you do not know where things stand — it reads the outline, ledger, manifest, and cycle state, and names the single next action.
+- One commit per skill working session, at that skill's documented commit step; outside a skill run, do not commit, tag, or push unless asked. Never commit `wkdrs/` or `.env` (conventions §1).
+- Do not hand-edit generated reports under `wkdrs/`, and do not edit `docs/mds/stage-workflow/`, the four skill trees, either `execs/` entrypoint, or this file — `execs/update.sh` overwrites them. Project settings live in `.env`, which is never synced.
 
 ## 6. Reply Language
 

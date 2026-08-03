@@ -389,3 +389,29 @@ Rules the table alone does not carry:
    `AskQuestion` / `request_user_input`, `Read` / `ReadFile`). Load the copy under your own root and
    follow it; a listing that surfaces another root's copy is telling you where a file is, not which
    one binds you.
+
+## 11. The skill roster
+
+Fifteen skills, invoked as `/stage-<name>` in Claude Code and Cursor, `$stage-<name>` in Codex, `/skill:stage-<name>` in Kimi Code. What each one does in full is [writing-workflow-skills.md](writing-workflow-skills.md); what each one writes is §8.
+
+| Skill | Role |
+| --- | --- |
+| `stage-proj-adopt` † | wire a new or existing paper repo into STAGE |
+| `stage-evid-curator` | import, register, and map evidence |
+| `stage-stry-coach` † | shape the story; seed claims and the venue profile |
+| `stage-outl-planner` † | outline, budgets, section skeletons, notation |
+| `stage-sect-drafter` | draft one section per invocation |
+| `stage-tabs-builder` | generate tables from evidence only |
+| `stage-figs-designer` | figure inventory, sources, rendered PDFs |
+| `stage-refs-curator` | bibliography, reading notes, positioning |
+| `stage-copy-editor` | polish prose; never meaning, never numbers |
+| `stage-clms-auditor` | trace every number to a fingerprint |
+| `stage-cite-auditor` | verify citations against reading notes |
+| `stage-peer-reviewer` | simulated five-perspective review panel |
+| `stage-resp-writer` † | reviews → point ledger → response + promises |
+| `stage-subm-packer` † | preflight, venue conversion, package, freeze |
+| `stage-flow-status` | read-only status and the one next action |
+
+1. **The five marked † are slash-only.** Run them only when the user names them: they are the decision points — adoption, story, outline, response, submission — and a decision point reached on an agent's own initiative is a decision nobody made. This table is the source of truth; the guards enforcing it are `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests and `allow_implicit_invocation: false` in `.agents/skills/<name>/agents/openai.yaml` for Codex, and CI checks all four against these markers, so marking a skill here without guarding it everywhere fails the build.
+2. **Two skills never touch the manuscript.** `stage-peer-reviewer` writes only its review under `cycls/<cycle>/reviews/`; `stage-flow-status` writes nothing at all. Run the status skill first whenever you do not know where things stand — it reads the outline, the ledger, the manifest, and the cycle state, and names the single next action with its exact command.
+3. **One skill per invocation, and one unit of work inside it.** A section, a table, a figure, a response — a run that quietly widens its scope is the failure this rule exists for; the next unit is the next invocation.
