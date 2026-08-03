@@ -338,23 +338,41 @@ The fabrication boundary (conventions §9) closes the loop: every number in `man
 
 ## Updating STAGE skills and workflow docs
 
-After creating a paper from STAGE, sync later STAGE releases without touching the manuscript:
+After creating a paper from STAGE, you can sync later STAGE skill and writing workflow doc releases without touching the manuscript, the evidence, the notes, or Git remotes:
 
 ```bash
 bash execs/update.sh
 ```
 
-By default this updates the four skill trees — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — plus `docs/mds/stage-workflow/`, the shared agent instructions (`AGENTS.md` and the Cursor rule that copies its body), and both `execs/` entrypoints, from `STAGE_REPOSITORY`. Neither entrypoint holds project configuration — everything an instance sets lives in `.env`, which is git-ignored and never synced — so both are safe to replace: `run.sh` because the skills call it by name and by flag, and `update.sh` so that no repository strands on an update mechanism too old to fetch its successor. `update.sh` installs its own replacement by rename, which leaves the running process on the old file and gives the next invocation the new one. The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--force] [--adopt]`:
+By default, the command updates these paths from STAGE's `main` branch:
 
-- `--diff` previews without changing a file. It exits `0` when everything matches, `2` when an update would change something, and `1` on error — so a script can tell "an update is available" from "the check itself failed".
+- `AGENTS.md` and `.cursor/rules/` — the shared agent instructions and the Cursor rule that copies their body; your own edits to them are replaced, and the two move as a pair, since one is the other's body and they must not drift
+- `.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — the same fifteen skills once per harness
+- `docs/mds/stage-workflow/` — the workflow conventions and the skill guide, in both editions
+- `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
+- `execs/update.sh` — the updater itself, so that no repository strands on an update mechanism too old to fetch its successor. It is installed by rename: the run doing the update finishes on the old file, and the next invocation uses the new one
+
+The repository it pulls from is `STAGE_REPOSITORY`, resolved in that order: the environment, then `.env`, then the default `https://github.com/wanghao9610/STAGE.git`. Set it in `.env` to track a fork permanently, or prefix a single command — `STAGE_REPOSITORY=… bash execs/update.sh` — to override it once. Nothing else in `.env` is ever synced, which is why both entrypoints are safe to replace: an instance's configuration does not live in them.
+
+Harness configuration — `.cursorignore` — is installed only when missing, and never overwritten unless you pass `--force`. When a kept file differs from upstream, the command prints a note naming how many. Papers created before the updater learned to sync itself should refresh it once by hand, since an older `execs/update.sh` never overwrites itself:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update.sh -o execs/update.sh
+```
+
+The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--force] [--adopt]`:
+
+- `--diff` previews an update without changing a file, and exits `2` when one is available, `0` when everything already matches, `1` on error — so a script can tell an available update from a failed check. Harness configuration that differs is listed as kept rather than counted, unless `--force` puts it back in scope.
 - A `ref` pins the update to a tag or branch.
-- `--skill NAME` updates one skill across all four trees, leaving the docs, the agent instructions, and the entrypoints alone.
-- `--force` lifts both refusals: uncommitted changes under the synced paths are overwritten instead of stopping the command, and `.cursorignore` is overwritten instead of kept. It widens nothing else.
-- `--adopt` installs the skeleton into an existing repository, copying only what is absent (see [step 1b](#1b-or-adopt-a-paper-repo-that-already-exists)).
+- `--skill NAME` updates that one skill across all four skill trees, and leaves the agent instructions, the workflow docs, and both entrypoints alone. An invalid name, or one missing from any of the four upstream skill directories, stops the command without overwriting anything.
+- `--force` updates the same paths with both refusals lifted: uncommitted changes under them are overwritten instead of stopping the command, and the harness configuration is overwritten instead of kept. It widens nothing — a file upstream does not have is still left alone, so your own skills and documents under those directories stay.
+- `--adopt` installs the skeleton into a paper repository that already exists, copying only what is absent (see [step 1b](#1b-or-adopt-a-paper-repo-that-already-exists)). It cannot be combined with `--force`: never touching an existing file is the whole contract.
+
+`bash execs/update.sh --help` carries the full usage summary, so it stays correct when the flags change.
+
+Files at matching paths are overwritten and new upstream files are added. Project-specific files that exist only in the updated directories are preserved. To avoid deleting custom content, files removed upstream are not removed locally. The update does not modify other directories, the current branch, Git remotes, or the staging area — the manuscript, `mates/`, `notes/`, and `cycls/` are never in scope. Commit current work before updating, then review and commit the result with `git status` and `git diff`.
 
 Working on STAGE itself rather than on a paper? `bash .github/scripts/check_consistency.sh` holds the invariants four hand-maintained skill trees cannot hold on their own: same skill set and file inventory everywhere, the slash-only guards agreeing across all four harnesses, invocation tokens and tool names native to each tree, the Cursor rule still mirroring `AGENTS.md`, descriptions inside the 1024-character `SKILL.md` limit, the opening load intact, and every `conventions §n` citation still resolving. It runs in CI on every push and pull request, and is upstream-maintainer tooling — `.github/` is not synced into paper repositories.
-
-`docs/mds/stage-workflow/` is upstream-managed: do not edit it in an instance, `update.sh` overwrites it. So are `AGENTS.md` and `.cursor/rules/agent-instructions.mdc` — the same document twice, a body and a body with a rule header — which is why an update replaces them as a pair rather than letting the two drift; a project's own conventions belong in `.env` or in a file the update does not own. `.cursorignore` goes the other way: installed when it is absent, kept however far it drifts, and overwritten only by `--force`.
 
 ## Citation
 

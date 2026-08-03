@@ -338,23 +338,41 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 
 ## 更新 STAGE 的 skill 与工作流文档
 
-从 STAGE 创建论文之后，可以随时同步 STAGE 的后续版本，而不碰你的稿件：
+基于 STAGE 创建论文后，可以只同步 STAGE 后续发布的 skill 与写作工作流文档，而不改动你的稿件、证据、笔记或 Git remote：
 
 ```bash
 bash execs/update.sh
 ```
 
-默认从 `STAGE_REPOSITORY` 更新四份 skill 目录——`.claude/skills/`、`.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——以及 `docs/mds/stage-workflow/`、共享的 agent 指令（`AGENTS.md` 与照抄其正文的 Cursor 规则），和 `execs/` 下的两个入口脚本。两个入口都不承载项目配置——实例要设的一切都在 `.env` 里，而 `.env` 被 git 忽略、从不同步——所以都可以放心替换：`run.sh` 是因为 skill 会按名字、按参数调用它；`update.sh` 自同步，是为了不让任何仓库卡在一个老到取不回后继版本的更新机制上。`update.sh` 用重命名的方式装上自己的新版：正在运行的进程继续读旧文件，下一次调用才用上新的。完整形式是 `bash execs/update.sh [--diff] [ref] [--skill NAME] [--force] [--adopt]`：
+该命令默认从 STAGE 的 `main` 分支更新以下路径：
 
-- `--diff` 只预览、不改任何文件。全部一致时退出码 `0`，有更新会改动文件时 `2`，出错时 `1`——脚本因此能区分"有更新可用"与"检查本身失败"。
-- `ref` 把更新钉在某个 tag 或分支上。
-- `--skill NAME` 只更新一个 skill，四份目录同步；不动文档、agent 指令与两个入口脚本。
-- `--force` 解除两道拒绝：同步路径下未提交的改动被直接覆盖而不是中止命令，`.cursorignore` 被覆盖而不是保留。除此之外不扩大任何范围。
-- `--adopt` 把骨架装进一个已有仓库，只复制缺失的文件（见[步骤 1b](#1b-或者接入一个已有的论文仓库)）。
+- `AGENTS.md` 与 `.cursor/rules/`——共享的 agent 指令，以及抄录其正文的 Cursor 规则；你对它们的改动会被替换，且两者成对移动——一份就是另一份的正文，不能各走各的
+- `.agents/skills/`、`.claude/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——同样的十五个 skill，每套 harness 一份
+- `docs/mds/stage-workflow/`——工作流规约与 skill 指南，中英两版
+- `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
+- `execs/update.sh`——更新脚本自己，为的是不让任何仓库卡在一个老到取不回后继版本的更新机制上。它用重命名装上：执行更新的那一次仍读旧文件跑完，下一次调用才用上新的
+
+拉取来源由 `STAGE_REPOSITORY` 指定，取值顺序为：环境变量、`.env`、内置默认值 `https://github.com/wanghao9610/STAGE.git`。想长期跟随某个 fork，就写进 `.env`；只想临时改一次，在命令前加变量即可——`STAGE_REPOSITORY=… bash execs/update.sh`。`.env` 里的其余内容从不同步——这也正是两个入口脚本可以放心替换的原因：实例的配置不住在它们里面。
+
+harness 配置——`.cursorignore`——仅在缺失时安装，除非加 `--force`，否则绝不覆盖。若保留下来的文件与上游有差异，命令会打印一条提示说明有几处。如果论文仓库是在更新脚本学会自同步之前创建的，请先手动刷新它一次——旧版 `execs/update.sh` 不会覆盖自己：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update.sh -o execs/update.sh
+```
+
+命令的通用形式为 `bash execs/update.sh [--diff] [ref] [--skill NAME] [--force] [--adopt]`：
+
+- `--diff` 在不改动任何文件的情况下预览更新，有可更新内容时以 `2` 退出，完全一致时以 `0` 退出，出错时以 `1` 退出——脚本因此能区分“有更新”与“检查本身失败”。有差异的 harness 配置只列为保留、不计入数量，除非 `--force` 把它重新纳入范围。
+- `ref` 把更新固定到某个 tag 或分支。
+- `--skill NAME` 只更新四份 skill 目录中的这一个 skill，不动 agent 指令、工作流文档和两个入口脚本。名称无效、或上游四份 skill 目录中有任何一处缺少它，命令会停止且不覆盖任何文件。
+- `--force` 更新同样这批路径，但解除两处拦截：这些路径下的未提交改动直接被覆盖而不再中止命令，harness 配置也改为覆盖而不再保留。它不扩大范围——上游没有的文件依旧原样保留，你自己放在这些目录下的 skill 和文档不会丢。
+- `--adopt` 把骨架装进一个已经存在的论文仓库，只复制缺失的文件（见[步骤 1b](#1b-或者接入一个已有的论文仓库)）。它不能与 `--force` 同用：绝不碰已有文件正是它的全部契约。
+
+`bash execs/update.sh --help` 里有完整的用法摘要——选项变了它也跟着变，不会过期。
+
+上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。为避免误删自定义内容，上游已删除的文件不会在本地自动删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
 如果你改的是 STAGE 本身而不是某篇论文：`bash .github/scripts/check_consistency.sh` 守着四份手工维护的 skill 目录自己守不住的那些不变量——各处 skill 集合与文件清单一致、slash-only 守卫在四套 harness 上互相吻合、调用 token 与工具名各归其树、Cursor 规则仍与 `AGENTS.md` 逐行对齐、description 不超 `SKILL.md` 的 1024 字符上限、开场装载完整、每条 `规约 §n` 引用都还解析得到。它在每次 push 与 PR 时跑 CI，属于上游维护工具——`.github/` 不会同步进论文仓库。
-
-`docs/mds/stage-workflow/` 由上游管理：不要在实例里编辑它，`update.sh` 会覆盖。`AGENTS.md` 与 `.cursor/rules/agent-instructions.mdc` 同理——它们是同一份文档的两副本，一份正文、一份正文加规则头——所以更新把它们成对替换，不留下互相漂移的空间；项目自己的约定该写进 `.env`，或写进一个更新不接管的文件。`.cursorignore` 反过来：缺失时安装，之后无论漂多远都保留，只有 `--force` 会覆盖它。
 
 ## 引用
 
