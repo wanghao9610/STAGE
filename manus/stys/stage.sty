@@ -1,0 +1,22 @@
+%% manus/stys/stage.sty — STAGE base macros, loaded by manus/main.tex as
+%% \usepackage{stys/stage}. Venue templates replace the document class in
+%% main.tex; this file stays, and stays small.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{stys/stage}[2026/08/02 v1 STAGE base macros]
+
+\RequirePackage{graphicx}
+\RequirePackage{booktabs}
+\RequirePackage{xcolor}
+\RequirePackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+
+%% Rendered figures live in manus/figs/; their sources in manus/figs/srcs/.
+\graphicspath{{figs/}}
+
+%% The todo marker (conventions §9a): a number without a fingerprinted mates/
+%% source is written as a todo, never as plain prose — no third state. Red and
+%% bold so it cannot ship unseen; greppable so execs/scpts/lint.sh fails the
+%% manuscript while any remain.
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+
+\endinput

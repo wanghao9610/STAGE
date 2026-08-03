@@ -1,0 +1,122 @@
+# Writing Workflow Skills Guide
+
+**Language:** English — a 简体中文 edition is on the roadmap.
+
+STAGE provides fifteen connected writing workflow skills that turn imported evidence and a story into a submitted paper with an auditable claim trail: a repo wired to its research project, a read-only evidence base with a fingerprint per file, a story whose contributions are tracked claims, an outline with page budgets, sections drafted against evidence, tables generated from evidence rather than typed, figures with editable sources, a verified bibliography, prose polished without touching numbers, every number and citation audited, a simulated review in the venue's own format, a response with tracked promises, and finally a frozen, packaged submission.
+
+This guide is one tight paragraph per skill. The rules every skill shares — git, the STOP line, `.env` and the build toolchain, dates, resolution, delegation, dialogue, the artifact registry, the fabrication boundary, and the layout — live in [writing-workflow-conventions.md](writing-workflow-conventions.md); skills cite its § numbers. This directory is upstream-managed: edit it only in the STAGE template repo, never in a paper instance — `execs/update.sh` overwrites it.
+
+## The pipeline
+
+```text
+an existing draft, or a fresh repo
+  → stage-proj-adopt: wire it into STAGE — STAR pairing, venue, asset inventory,
+    pre-existing numbers booked as unsourced claims
+
+evidence (a paired STAR repo, or files dropped by hand)
+  → stage-evid-curator: snapshot and register — fingerprints in mates/MANIFEST.md
+
+story
+  → stage-stry-coach: story.md + seeded claim ledger + user-confirmed venue.yml
+  → stage-plan-outliner: outline with page budgets, section skeletons, notation seed
+  → stage-refs-curator: reading notes + a clean reference.bib
+
+  ┌─ the drafting loop — re-entered per section, table, figure ──────────────────┐
+  │  → stage-sect-drafter: draft one section; unfingerprinted numbers → \todo    │
+  │  → stage-tabs-builder: tables from mates/ evidence only, % src: per row      │
+  │  → stage-figs-designer: figure source → rendered PDF                         │
+  │  → stage-copy-editor: polish — never meaning, never numbers                  │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+audits — cheap, repeat at will
+  → stage-clms-auditor: every manuscript number ⇄ a fingerprinted evidence entry
+  → stage-cite-auditor: every \cite key and every assertion ⇄ a reading note
+
+the submission cycle — one venue attempt per cycls/<venue>_<year>/
+  → stage-peer-reviewer: simulated review, one lens per run, real-review format
+  → stage-resp-writer: reviews → point ledger → response + promise checkboxes
+  → stage-subm-packer: build+lint gate, checklist, package, SUBMISSION record,
+    freeze/<cycle>_<date> tag
+
+  ⌾ stage-flow-status: reads all of the above at any point —
+    where things stand, and the one next action with its exact command
+```
+
+The list reads as one pass, but the workflow is not linear. `stage-proj-adopt` runs once, and only matters beyond `.env` when there is an existing draft to absorb. Evidence import repeats whenever upstream results move — that is what the fingerprints and `import.sh --diff` are for. The drafting loop is re-entered per section and again per review promise; the audits are designed to be re-run after every change that touches numbers or citations. The cycle skills repeat per venue attempt: a rejection starts a new `cycls/<venue>_<year>/` against the same ledger, where `weakened` and `unsourced` claims are the first things to fix. `stage-flow-status` is the way back in after any absence.
+
+## Invoking the skills
+
+| Tool | Invocation | Example |
+| --- | --- | --- |
+| Claude Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Codex | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
+
+Five skills — `stage-proj-adopt`, `stage-stry-coach`, `stage-plan-outliner`, `stage-resp-writer`, `stage-subm-packer` — are slash-only: they run only when named explicitly, never on the agent's own initiative, because each one sits on a decision that belongs to the author. The other ten may also be picked up by the agent when the task plainly matches. Section arguments resolve by number, file slug, or title against `notes/outline.md` (conventions §5); the active cycle is the `cycle:` field in `notes/story.md`.
+
+## The skills
+
+### stage-proj-adopt
+
+Slash-only. Wires a new or existing paper repo into STAGE through an interview: paired STAR repo(s) into `.env` `STAR_HOME`, the target venue, and what already exists. For an adopted tex project it inventories the files, proposes how they map into the layout — confirming before touching anything — and then offers a first `import.sh` run. Numbers already sitting in the draft are booked as `unsourced` claims, which makes the existing text an explicit audit backlog instead of silent debt. Writes `notes/adopt.md`; may create the first `cycls/<cycle>/venue.yml`, from user-confirmed values only.
+
+### stage-evid-curator
+
+The evidence gate. Runs `execs/scpts/import.sh` for STAR sources; registers hand-dropped files under `mates/manual/` with `manual` entries in `mates/MANIFEST.md` whose source is stated in free text ("results emailed by X, 2026-08-01"); normalizes messy evidence — a CSV or wandb export gets a results-shaped `.md` beside it, marked `normalized-from:`, and the original stays untouched; proposes claim⇄evidence mappings ("results.md rows 3–7 → Table 1"); surfaces staleness via `import.sh --diff`. It never edits evidence content in place — an evidence problem is fixed at its source and re-imported, or it stays visible.
+
+### stage-stry-coach
+
+Slash-only. Dialogue-first story shaping: it reads imported idea docs and digests when a STAR pairing provides them, and interviews otherwise, until the pitch, problem, key idea, contributions, and venue rationale hold together in `notes/story.md`. Each contribution names its claim IDs, and the ledger `notes/claims.md` is seeded with those claims as `proposed`. It also creates `cycls/<cycle>/venue.yml` — page limits, deadlines, response format — from user-confirmed numbers only: a skill never invents venue rules (conventions §9c).
+
+### stage-plan-outliner
+
+Slash-only. Turns the finalized story into the paper's skeleton: `notes/outline.md` with a section table whose page budgets sum within the venue limit, a figure plan, a table plan, and a claim→section assignment; skeleton files `manus/secs/<n>_<slug>.tex`, each opening with its section brief as a comment block, with their `\input` lines uncommented in `main.tex`; and a seeded `notes/notation.md`. After this run the paper builds with its real structure, and every later skill knows what belongs where and which claims each section must carry.
+
+### stage-sect-drafter
+
+Drafts or revises **one section per invocation**, resolved per conventions §5. It loads the section brief, the evidence mapped to the section's claims, the relevant ledger rows, and `notes/notation.md`, then writes the tex. Any number lacking a `mates/` fingerprint is written as `\todo{...}` — no third state (conventions §9a). On the way out it updates the ledger (`Stated in`, status → `drafted`), appends new symbols to the notation file, and updates the section's outline row, so drafting a section moves the whole bookkeeping with it.
+
+### stage-tabs-builder
+
+Generates `manus/tabs/*.tex` **from `mates/` evidence only**: booktabs style, one `% src: mates/<...>#<anchor>` comment per data row, and a `\todo` cell for every missing value, each opening an `unsourced` claim. It updates the outline's Tables rows and the ledger. Hand-typing numbers into a table is the failure mode this skill exists to kill — a table it built can be re-audited row by row by `stage-clms-auditor` without a human remembering where anything came from.
+
+### stage-figs-designer
+
+Owns the figure inventory (the outline's Figures table) and each figure end to end: its purpose, its editable source under `manus/figs/srcs/` (tikz, python, drawio — or a MANIFEST entry for imported artwork), and its rendered PDF under `manus/figs/`. Every figure has a source file or a manifest entry; a PDF with no origin does not happen. The teaser figure gets a dedicated checklist — it must tell the story alone, with a self-contained caption — because it is the one figure every reviewer reads.
+
+### stage-refs-curator
+
+Bibliography hygiene and the reading-note base. It dedupes `manus/bibs/reference.bib`, keeps keys and venue fields consistent, takes in newly read papers as `notes/refs/<ABBREV>.md` notes (with a Citable facts section precise enough to audit against) plus an index row and a bib entry, and does related-work positioning: which cluster a work belongs to and what is claimable about it. When a STAR pairing imported `metds/refs/`, it seeds from those notes instead of starting cold.
+
+### stage-copy-editor
+
+The polish pass, over one section or the whole manuscript: clarity, flow, consistency against `notes/notation.md` (terminology canon, abbreviation first-use), and length trimmed toward the outline's budgets. It never changes technical meaning and never touches a number — numbers are not prose (conventions §9a). Systematic issues it cannot fix in place go to `wkdrs/reports/POLISH_<date>.md` so they can be handled deliberately rather than smoothed over.
+
+### stage-clms-auditor
+
+The mechanical heart of STAGE. It extracts every number from `manus/tabs/` and `manus/secs/`, traces each through `% src:` comments and ledger evidence links to a fingerprinted `mates/` entry, and issues a verdict per number: matched, mismatched, or unsourced. It flips ledger statuses accordingly (`verified` / `unsourced`), checks evidence staleness with `import.sh --diff`, writes `wkdrs/reports/CLAIMS_<date>.md`, and opens a `tasks/` item per failure. Run it whenever numbers moved — it is cheap, and it is the reason the final paper's numbers can be trusted.
+
+### stage-cite-auditor
+
+The citation counterpart: every `\cite` key must resolve in the bib; every assertion the manuscript makes about a cited work must be checkable against a reading note (`notes/refs/` or refs imported under `mates/`) — unverifiable assertions are flagged, never silently fixed; a missing-citation scan covers claims that obviously need support; bib fields get a hygiene pass. Writes `wkdrs/reports/CITES_<date>.md`. Together with `stage-clms-auditor` it closes the fabrication boundary from both ends: our numbers and our statements about everyone else's.
+
+### stage-peer-reviewer
+
+A simulated review, one lens per run — novelty, rigor, clarity, or related-work — with the rubric taken from the active cycle's `venue.yml`. Output goes to `cycls/<cycle>/reviews/SIM_REVIEW_<lens>_<date>.md` in the same format as a real review (summary, strengths, weaknesses, questions, rating), with each weakness naming the claim IDs it attacks — which is what lets `stage-resp-writer` treat simulated and real reviews identically. It never edits the manuscript: it attacks, and the drafting loop answers.
+
+### stage-resp-writer
+
+Slash-only. Parses reviews — real `received_*.md` files dropped into `cycls/<cycle>/reviews/` and/or `SIM_*` files — into a point ledger mapping every reviewer point to the claims it attacks and the evidence that answers it; drafts the response within the venue's official `response_limit`; records every promised change as a `- [ ]` checkbox in `tasks/<cycle>_promises.md`; and downgrades conceded claims to `weakened` in the ledger. Writes `cycls/<cycle>/response/RESPONSE_<date>.md`. A promise made to a reviewer becomes a tracked task, not a hope.
+
+### stage-subm-packer
+
+Slash-only. Preflight and packaging: a `run.sh` build and `lint.sh` must pass, the venue checklist is walked, figures, tables, and bib are checked complete, and the package — camera PDF, supplementary, arXiv-ready source — lands under `wkdrs/builds/`. It writes `cycls/<cycle>/SUBMISSION_<date>.md` recording what was submitted where, and creates the git tag `freeze/<cycle>_<date>`, the one place freeze tags come from (conventions §1). Camera-ready mode additionally refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes: promises to reviewers are honored before anything ships.
+
+### stage-flow-status
+
+The read-only map of the whole flow: per-section, per-figure, per-table status from the outline; claim coverage counts by status; evidence freshness; refs count; cycle state; the latest build and lint result; and **one** next action with its exact `/stage-*` command. It never writes — not even a report. Run it when returning to the paper, before deciding what to do next, or whenever the state in your head and the state on disk might have drifted.
+
+## Where everything is defined
+
+- Shared rules and § numbers: [writing-workflow-conventions.md](writing-workflow-conventions.md) — the artifact registry is §8, the fabrication boundary §9, the layout §10.
+- The skills themselves: `.claude/skills/<name>/SKILL.md` (canonical) and `.agents/skills/<name>/SKILL.md` (derived), synced into instances by `execs/update.sh`.
+- The user-facing overview, quick start, and roadmap: the repository [README](../../../README.md).

@@ -1,0 +1,54 @@
+%% manus/main.tex — STAGE manuscript entry point (one paper = one repo).
+%%
+%% Build: bash execs/run.sh          latexmk, out-of-tree; the PDF lands in
+%%                                   wkdrs/builds/, never next to the sources.
+%% Lint:  bash execs/scpts/lint.sh   deterministic checks; any todo marker in
+%%                                   manus/ fails it — that is the point.
+%%
+%% Venue class: `article` is a standalone-compiling placeholder. To adopt a
+%% venue template, drop its class/style files into manus/stys/ and swap the
+%% line below, e.g. \documentclass{stys/cvpr}. run.sh compiles with manus/ as
+%% the working directory and puts manus/stys/ on TEXINPUTS.
+\documentclass{article}
+
+%% STAGE base macros: the todo marker plus graphicx/booktabs/hyperref/xcolor.
+\usepackage{stys/stage}
+
+\title{Untitled STAGE Manuscript}
+%% Stays "Anonymous" while ANON=true in .env; lint.sh hunts identity leaks.
+\author{Anonymous}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+%% Placeholder — /stage-stry-coach shapes the story behind this paragraph;
+%% /stage-plan-outliner may move the abstract into secs/0_abstract.tex.
+This manuscript was scaffolded by STAGE, the academic-writing companion to
+STAR. Every number it will ever state either traces to fingerprinted evidence
+under \texttt{mates/} or stays a visible todo marker; the placeholder below
+demonstrates the second state, and the skeleton is expected to fail lint until
+it is gone.
+\end{abstract}
+
+%% Placeholder body — superseded by the secs/ inputs below as they come alive.
+\section{Introduction}
+\todo{No content yet: run /stage-stry-coach, then /stage-plan-outliner.}
+
+%% Section files — /stage-plan-outliner creates manus/secs/<n>_<slug>.tex
+%% skeletons and uncomments one \input line per created file, in the order
+%% notes/outline.md fixes. Example shape:
+% \input{secs/1_intro}
+% \input{secs/2_related}
+% \input{secs/3_method}
+% \input{secs/4_experiments}
+% \input{secs/5_conclusion}
+
+%% Bibliography — uncomment once manus/bibs/reference.bib exists
+%% (execs/scpts/import.sh seeds it from a paired STAR repo, or
+%% /stage-refs-curator starts one from scratch).
+% \bibliographystyle{plain}
+% \bibliography{bibs/reference}
+
+\end{document}

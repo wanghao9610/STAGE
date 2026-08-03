@@ -1,0 +1,19 @@
+# local runtime config
+.env
+
+# builds and ephemeral reports live out-of-tree
+wkdrs/*
+!wkdrs/.gitkeep
+
+# LaTeX junk (belt and suspenders; run.sh builds out-of-tree)
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+.DS_Store
