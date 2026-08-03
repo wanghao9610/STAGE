@@ -249,6 +249,10 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 
 五个 skill（下表以 † 标注）仅限显式调用（slash-only）：只有你点名它们才会运行，agent 绝不会自作主张启动它们。它们是对话密集的决策点——接入、故事、提纲、回复、投稿——不请自来的一次运行会替你做本该由你做的决定。每套 harness 各按自己的方式强制这一条——Claude、Cursor、Kimi 三份 manifest 里的 `disable-model-invocation: true`，Codex 的 `agents/openai.yaml` 里的 `allow_implicit_invocation: false`——四者在 CI 里都要对着这张表核对，所以不会出现"三套挡住了、第四套敞着"的情况。
 
+<div align="center">
+  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE 写作工作流：十五个 skill 分成五条相位带——建仓、规划、写作、润色与审计、投稿周期——各自写出什么，以及起草循环与拒稿回流如何闭合" width="100%">
+</div>
+
 | Skill | 用途 | 主要产出 |
 | --- | --- | --- |
 | `stage-proj-adopt` † | 把新的或已有的论文仓库接进 STAGE：把配对 STAR 仓库写进 `.env`、确定目标 venue、盘点并映射已有 tex 树，把草稿里已有的数字转为 `unsourced` 论断进入审计待办 | `notes/adopt.md` |

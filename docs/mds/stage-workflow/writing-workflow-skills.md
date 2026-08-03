@@ -44,6 +44,8 @@ the submission cycle — one venue attempt per cycls/<venue>_<year>/
 
 The list reads as one pass, but the workflow is not linear. `stage-proj-adopt` runs once, and only matters beyond `.env` when there is an existing draft to absorb. Evidence import repeats whenever upstream results move — that is what the fingerprints and `import.sh --diff` are for. The drafting loop is re-entered per section and again per review promise; the audits are designed to be re-run after every change that touches numbers or citations. The cycle skills repeat per venue attempt: a rejection starts a new `cycls/<venue>_<year>/` against the same ledger, where `weakened` and `unsourced` claims are the first things to fix. `stage-flow-status` is the way back in after any absence.
 
+![STAGE writing workflow: fifteen skills in five phase bands — set up, plan, write, polish and audit, submission cycle — what each one writes, and how the drafting loop and the rejection loop close](../../srcs/stage-writing-workflow.png)
+
 ## Invoking the skills
 
 | Tool | Skill root | Invocation | Example |

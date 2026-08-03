@@ -249,6 +249,10 @@ STAGE includes fifteen complementary skills that turn imported evidence and a st
 
 Five skills (marked † below) are slash-only: they run only when you name them explicitly, and the agent never starts them on its own initiative. They are the dialogue-heavy decision points — adoption, story, outline, response, submission — where an unrequested run would make choices that are yours to make. Each harness enforces it in its own way — `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests, `allow_implicit_invocation: false` in Codex's `agents/openai.yaml` — and the four are checked against this table in CI, so a skill cannot end up guarded on three harnesses and open on the fourth.
 
+<div align="center">
+  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE writing workflow: fifteen skills in five phase bands — set up, plan, write, polish and audit, submission cycle — what each one writes, and how the drafting loop and the rejection loop close" width="100%">
+</div>
+
 | Skill | Purpose | Main output |
 | --- | --- | --- |
 | `stage-proj-adopt` † | Wire a new or existing paper repo into STAGE: pair STAR repo(s) into `.env`, set the target venue, inventory and map an existing tex tree, and turn pre-existing draft numbers into `unsourced` claims for the audit backlog | `notes/adopt.md` |
