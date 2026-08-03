@@ -42,11 +42,11 @@ The test: every changed line traces to the user's request, and every number in i
 
 **This project uses the STAGE writing workflow. Its records are files, not chat history.**
 
-- Evidence is snapshotted into read-only `mates/` with a fingerprint in `mates/MANIFEST.md` and only ever cited; `notes/claims.md` is the hub, linking every claim's statements ⇄ evidence ⇄ status; `lint.sh` and `import.sh --diff` decide what is deterministic, and nothing decided there is re-decided in prose.
-- The rules every workflow skill follows are in `docs/mds/stage-workflow/writing-workflow-conventions.md` — read it whole at the start of every skill run; the fifteen skills and the five that are slash-only are its §11, and what each one does is in `writing-workflow-skills.md`.
-- Run `/stage-flow-status` first when you do not know where things stand — it reads the outline, ledger, manifest, and cycle state, and names the single next action.
-- One commit per skill working session, at that skill's documented commit step; outside a skill run, do not commit, tag, or push unless asked. Never commit `wkdrs/` or `.env` (conventions §1).
-- Do not hand-edit generated reports under `wkdrs/`, and do not edit `docs/mds/stage-workflow/`, the four skill trees, either `execs/` entrypoint, or this file — `execs/update.sh` overwrites them. Project settings live in `.env`, which is never synced.
+- Evidence lives read-only under `mates/`, fingerprinted in `mates/MANIFEST.md`; every claim's statements, evidence, and status are one row in `notes/claims.md`.
+- Run `/stage-flow-status` first when you do not know where things stand — it reads the outline, the ledger, the manifest, and the cycle state, and names the single next action.
+- The rules every workflow skill follows are in `docs/mds/stage-workflow/writing-workflow-conventions.md`, read whole at the start of every run; the skill roster is its §11, and what each skill does is in `writing-workflow-skills.md`.
+- Commit once per skill run, at that skill's commit step, and not otherwise (conventions §1).
+- Do not hand-edit generated reports under `wkdrs/`, and do not edit `docs/mds/stage-workflow/`, the skill trees, or the `execs/` entrypoints — `execs/update.sh` overwrites them, this file included.
 
 ## 6. Reply Language
 
