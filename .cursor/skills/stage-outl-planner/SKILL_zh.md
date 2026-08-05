@@ -56,7 +56,7 @@ description: >-
 
 ### Step 2：提出图与表计划
 
-图，teaser 优先：`F1` 是那张能独自把故事讲清楚的图——它的行在任何结果图之前就存在。行的格式按规约 §8——`ID`、`File`（`manus/figs/<slug>.pdf`）、`Purpose`（它必须展示什么，不是怎么画）、`Section`、`Source`（`manus/figs/srcs/` 下计划中的源文件，或导入美术素材的 `mates/` 路径）、`Status` 为 `planned`。表——`ID`、`File`（`manus/tabs/<slug>.tex`）、`Purpose`、`Section`、`Evidence`（数据将来自的 `mates/` 路径；还没有任何导入内容覆盖它时写 `—`，每个 `—` 都点名交给 `/stage-evid-curator`）、`Status` 为 `planned`。经 AskQuestion 确认。
+图，teaser 优先：`F1` 是那张能独自把故事讲清楚的图——它的行在任何结果图之前就存在。行的格式按规约 §8——`ID`、`File`（`manus/figs/<slug>.pdf`）、`Purpose`（它必须展示什么，不是怎么画）、`Section`、`Source`（`manus/figs/srcs/` 下计划中的源文件，或导入美术素材的 `mates/` 路径）、`Status` 为 `planned`。表——`ID`、`File`（`manus/tabs/<slug>.tex`）、`Purpose`、`Section`、`Evidence`（数据将来自的 `mates/` 路径；还没有任何导入内容覆盖它时写 `—`，每个 `—` 都点名交给 `/stage-evid-curator`）、`Status` 为 `planned`。两张表都引进回复，再经 AskQuestion 确认（规约 §7.12：用户看不见的行，也就没有人审阅过）。
 
 ### Step 3：写 `notes/outline.md`
 

@@ -54,7 +54,8 @@ prove.
    promise — the paper will change, a checkbox is born; concede — the claim cannot be defended,
    its status drops to `weakened`. Concessions and promises always go through the user, one
    point at a time via AskQuestion (§7); evidence-backed rebuttals may proceed and are
-   listed for review afterwards.
+   listed for review afterwards. The question quotes the reviewer's point and the wording
+   you would send, neither of them summarized (§7.12).
 4. **Response numbers obey §9a.** A number quoted to a reviewer either traces to a fingerprinted
    `mates/` entry or it does not enter the draft. "New results" without imported evidence are a
    promise to produce them — never a figure minted mid-rebuttal.

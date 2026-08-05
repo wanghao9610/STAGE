@@ -59,7 +59,7 @@ Show the full table with the budget arithmetic (Principle 2) — e.g. `sum 7.75 
 
 ### Step 2: Propose the figure and table plan
 
-Figures, teaser first: `F1` is the figure that tells the story alone — its row exists before any results figure. Rows per conventions §8 — `ID`, `File` (`manus/figs/<slug>.pdf`), `Purpose` (what it must show, not how), `Section`, `Source` (the planned source under `manus/figs/srcs/`, or the `mates/` path for imported artwork), `Status` `planned`. Tables — `ID`, `File` (`manus/tabs/<slug>.tex`), `Purpose`, `Section`, `Evidence` (the `mates/` path the data will come from; `—` when nothing imported covers it yet, each `—` named for `$stage-evid-curator`), `Status` `planned`. Confirm via the `request_user_input` tool.
+Figures, teaser first: `F1` is the figure that tells the story alone — its row exists before any results figure. Rows per conventions §8 — `ID`, `File` (`manus/figs/<slug>.pdf`), `Purpose` (what it must show, not how), `Section`, `Source` (the planned source under `manus/figs/srcs/`, or the `mates/` path for imported artwork), `Status` `planned`. Tables — `ID`, `File` (`manus/tabs/<slug>.tex`), `Purpose`, `Section`, `Evidence` (the `mates/` path the data will come from; `—` when nothing imported covers it yet, each `—` named for `$stage-evid-curator`), `Status` `planned`. Show both tables in the reply, then confirm via the `request_user_input` tool (conventions §7.12: rows the user cannot see are rows nobody reviewed).
 
 ### Step 3: Write `notes/outline.md`
 
