@@ -15,9 +15,11 @@ model_trail:                    # append-only: one entry per write session, neve
 ## 1. Scope
 
 <!-- What drove this run: the paper's story and claim ledger, an imported refs tree under mates/,
-     or a topic the user gave. The queries that were run. The run cache holding the raw
-     payloads: wkdrs/refs_<date>/raw/. Mode: survey | intake | add | seed | tidy | position |
-     score | verify. -->
+     or a topic the user gave. The run cache holding the raw payloads: wkdrs/refs_<date>/raw/.
+     Mode: survey | intake | add | discover | seed | tidy | position | score | verify.
+     Every query that was run, each with the number of hits it returned — the zero-hit ones
+     too: "we looked and found nothing" is a result, and only the log tells it apart from
+     "we never looked". A discover run also states its request budget and how much it spent. -->
 
 ## 2. Papers with notes
 
@@ -78,8 +80,11 @@ model_trail:                    # append-only: one entry per write session, neve
 ## 8. Next actions
 
 <!-- Gaps worth another pass (a thin category, a cited work with no note, a legacy citekey the
-     scheme did not touch). Routing: verifying manuscript assertions against these notes →
+     scheme did not touch), and every candidate a discover run surfaced that nobody took in —
+     the query that found it and why it was passed over, so the next run proposes something new
+     instead of the same list. Routing: verifying manuscript assertions against these notes →
      $stage-cite-auditor; drafting Related Work from the clusters → $stage-sect-drafter; one more
-     paper later → $stage-refs-curator <arxiv-id>; re-checking the whole bib →
+     paper later → $stage-refs-curator <arxiv-id>; searching for work nobody has named →
+     $stage-refs-curator discover; re-checking the whole bib →
      $stage-refs-curator verify; refreshing drifted citation and star metrics →
      $stage-refs-curator score. -->

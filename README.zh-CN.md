@@ -288,7 +288,7 @@ STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事�
 | `stage-sect-drafter` | 每次调用起草或修改一个章节，依据章节简报、映射的证据、论断和记号规范；没有指纹的数字一律写成 `\todo{}` | `manus/secs/<n>_<slug>.tex` |
 | `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<slug>.tex` |
 | `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<slug>.pdf` + 源文件 |
-| `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子 | `manus/bibs/reference.bib`、`notes/refs/<ABBREV>.md`、`notes/refs/refs_index.md` |
+| `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子，没有时用 `discover` 按主题检索并提议候选 | `manus/bibs/reference.bib`、`notes/refs/<ABBREV>.md`、`notes/refs/refs_index.md` |
 | `stage-copy-editor` | 对一个章节或全稿做润色：清晰、流畅、记号一致、按预算删减——绝不改技术含义和任何数字 | `manus/` 下被润色的正文、`wkdrs/reports/POLISH_<date>.md` |
 | `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转台账状态，检查证据过期 | `notes/claims.md` 的状态翻转、`wkdrs/reports/CLAIMS_<date>.md`、`tasks/` 条目 |
 | `stage-cite-auditor` | 每个 `\cite` key 都能解析；关于被引论文的每个断言都能对上一份阅读笔记——对不上的断言被标记，绝不悄悄改掉 | `wkdrs/reports/CITES_<date>.md`、`tasks/` 条目 |

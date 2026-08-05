@@ -27,6 +27,25 @@ Per paper, stop at the first source that yields a matching record:
 
 Cache every fetched payload under `wkdrs/refs_<date>/raw/<citekey>.<source>.<ext>` **before** using it. `wkdrs/` is regenerable and never committed (conventions §1.2), so the cache is what makes the run's own self-audit and a same-day re-run cheap; what outlives it is the `% src:` line in the bib and the entry's row in `notes/refs/refs_index.md`, which are tracked.
 
+## Discovery — finding candidates by topic
+
+Everything above answers "what is the authoritative record for *this* paper". This section answers the question before it — which papers are worth looking at at all, when nobody has named one — and it is the only place in this skill where a query describes a topic instead of identifying a paper. The record rules do not loosen for it: a candidate becomes an entry only by going back through the search order above.
+
+**Endpoints.** Relevance search, not record lookup:
+
+- **Semantic Scholar relevance search** — `https://api.semanticscholar.org/graph/v1/paper/search?query=<q>&limit=20&fields=title,abstract,year,venue,authors,externalIds,citationCount` — the primary. Its `externalIds` hop straight back up to DBLP or Crossref when a candidate is taken in, and its `citationCount` gives the provisional score without a second call.
+- **Citation-graph expansion**, once a few candidates are in hand — `https://api.semanticscholar.org/graph/v1/paper/<id>/references` and `/citations?fields=title,year,venue,citationCount` — what a close paper builds on, and what answered it. This reaches work no keyword query would surface, and it is how a thin result set is grown: more synonyms invent coverage, the citation graph finds it.
+- **DBLP publication search** — `https://dblp.org/search/publ/api?q=<q>&format=json&h=20` — better recall on venue- and author-shaped queries.
+- **arXiv full-text query** — `http://export.arxiv.org/api/query?search_query=all:<q>&max_results=20` — reaches work too recent for the others to have indexed.
+
+**Queries.** 5–8 per run, built from the search profile and varied in kind rather than in wording: the task's own terms, the mechanism's terms, the synonyms the field actually uses (a query in only your vocabulary finds only the papers that share it), benchmark and dataset names, and the "X for Y" shape papers title themselves with. Log every query with the number of hits it returned — the zero-hit ones included, because "we looked and found nothing" and "we never looked" are different states and only one of them is a reason to stop.
+
+**Budget.** At most 25 remote requests per `discover` run, serialized at the per-host rates below; this is a share of the same polite budget, not an extra allowance. Hitting the cap ends the search and is reported as a cap, never quietly topped up from memory.
+
+**Anonymity.** When the active cycle's `venue.yml` carries `anonymized: true`, or `.env` sets `ANON=true`, queries carry topic terms only: never the manuscript's title, never a verbatim sentence from it, never a guess at an author. A query leaves this machine, and one built out of the paper's own sentences can identify an anonymous submission to whoever holds the logs.
+
+**A search hit is a lead, not a fact.** Nothing from a search payload is transcribed into `reference.bib`: the title in a hit is often the preprint's, the venue field is often empty or wrong, and the author list is often truncated. A candidate the user picks is re-fetched from the top of the search order and matched on all three fields like any other paper, and one whose authoritative record then fails to resolve does not become an entry. Absence is symmetrical — nothing returned is a fetch outcome, never evidence that no such work exists.
+
 ## Matching a record to the paper
 
 A record matches only when all three agree:

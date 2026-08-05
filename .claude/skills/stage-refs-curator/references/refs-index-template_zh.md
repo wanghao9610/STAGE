@@ -15,8 +15,10 @@ model_trail:                    # append-only: one entry per write session, neve
 ## 1. 范围
 
 <!-- 驱动本次运行的是什么：论文的 story 与主张台账、mates/ 下导入的 refs 树，或用户给的
-     topic。跑了哪些检索式。存放原始内容的运行缓存：wkdrs/refs_<date>/raw/。
-     模式：survey | intake | add | seed | tidy | position | score | verify。 -->
+     topic。存放原始内容的运行缓存：wkdrs/refs_<date>/raw/。
+     模式：survey | intake | add | discover | seed | tidy | position | score | verify。
+     跑过的每一条检索式，各自带上返回了多少条命中——命中为零的也写：查了没有是一个结果，
+     只有这份记录能把它和"根本没查"分开。discover 那一轮还要写明请求预算与实际用掉多少。 -->
 
 ## 2. 有笔记的论文
 
@@ -71,7 +73,10 @@ model_trail:                    # append-only: one entry per write session, neve
 
 ## 8. 下一步
 
-<!-- 值得再跑一轮补的缺口（某个类别偏薄、被引却没有笔记的工作、方案没碰的历史 citekey）。
+<!-- 值得再跑一轮补的缺口（某个类别偏薄、被引却没有笔记的工作、方案没碰的历史 citekey），
+     以及 discover 翻出来但没人收的每一条候选——是哪条检索式找到它的、为什么被放过，好让
+     下一次运行提议点新的、而不是同一份清单。
      转交：拿这些笔记核验稿件里的断言 → /stage-cite-auditor；按聚类起草 Related Work →
-     /stage-sect-drafter；以后单加一篇 → /stage-refs-curator <arxiv-id>；重查整个 bib →
+     /stage-sect-drafter；以后单加一篇 → /stage-refs-curator <arxiv-id>；去找没人点过名的
+     工作 → /stage-refs-curator discover；重查整个 bib →
      /stage-refs-curator verify；引用与星标漂了 → /stage-refs-curator score。 -->
