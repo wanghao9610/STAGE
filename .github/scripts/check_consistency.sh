@@ -604,7 +604,7 @@ for guide in docs/mds/stage-workflow/writing-workflow-skills.md \
 done
 (( doc_errors == 0 )) && note "guides and landing pages name every skill; workflow docs paired en/zh; links resolve"
 
-# 16. Chinese descriptions carry no space between two Chinese characters.
+# 16. Chinese text carries no space between two Chinese characters.
 #     A folded scalar turns every line break into a space, which is what English
 #     descriptions want and Chinese ones never do: wrapping 中文 across two lines
 #     puts a space inside a word, and the next rewrap bakes that space in and
@@ -615,7 +615,7 @@ done
 #     scan is non-ASCII-space-non-ASCII, which also catches "——" carrying a
 #     space on one side only; a space between Chinese and Latin (`notes/` 里的)
 #     is correct style and has an ASCII character on one side, so it passes.
-section "Chinese description spacing (SKILL_zh.md)"
+section "Chinese spacing (descriptions, skill bodies, zh docs)"
 zh_desc_errors=0
 while IFS= read -r manifest; do
     verdict="$(perl -CSD -Mutf8 -0777 -ne '
@@ -632,7 +632,35 @@ while IFS= read -r manifest; do
         zh_desc_errors=1
     done <<< "${verdict}"
 done < <(find "${SKILL_ROOTS[@]}" -name 'SKILL_zh.md' | sort)
-(( zh_desc_errors == 0 )) && note "every Chinese description is one line with no space inside a word"
+
+# Everywhere else Chinese is written — skill bodies, reference files, the two
+# workflow documents, the memory spec, README.zh-CN.md and the landing pages —
+# no fold is involved, so only a hand-typed space can land between two Chinese
+# characters. The scan is therefore narrower than the description one: Han and
+# CJK punctuation only. A Chinese character beside a *symbol* is correct
+# typography and stays free — 规约 §9, 评审意见 → 要点台账, 陈述处 ⇄ 证据,
+# 标 † 的五个, "# 2 · 配置", 回到顶部 ↑, the box-drawing rules in the workflow
+# diagram, and "——" spaced on both sides.
+#     One exception, and it is a real one: 中文要点摘要 is a section title, and
+#     the spaces around it set it off from the sentence carrying it, the way
+#     backticks would in English. Both spaces must be there — a title that lost
+#     one is a typo the scan should still catch — so the pair is dropped before
+#     matching rather than the pattern being loosened.
+while IFS= read -r zhfile; do
+    while IFS= read -r hit; do
+        [[ -n "${hit}" ]] || continue
+        fail "${zhfile}:${hit} — space between two Chinese characters"
+        zh_desc_errors=1
+    done < <(perl -CSD -Mutf8 -ne '
+        BEGIN { $CJK = qr/[\p{Han}\p{Block=CJK_Symbols_and_Punctuation}\p{Block=Halfwidth_and_Fullwidth_Forms}]/ }
+        my $line = $_;
+        $line =~ s/ 中文要点摘要 //g;
+        print "$.: $&\n" while $line =~ /$CJK $CJK/g;
+    ' "${zhfile}")
+done < <(find . -path ./.git -prune -o -path ./wkdrs -prune -o \
+              \( -name '*_zh.md' -o -name '*.zh-CN.md' -o -name '*_zh.html' \) -print |
+         sed 's|^\./||' | sort)
+(( zh_desc_errors == 0 )) && note "every Chinese description is one line; no space inside a word in any Chinese file"
 
 printf '\n'
 if (( FAILURES > 0 )); then
