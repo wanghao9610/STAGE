@@ -125,8 +125,12 @@ Mode: <online | OFFLINE — degradation notice: reviews name whitelist reference
 | <name> | <review file / weakness #> | whitelist | — | — | — |
 | <name> | <…> | verified | "<query>" | <url> | <YYYY-MM-DD> |
 
-## Spot-Check
-Re-fetched: <which entries> → <match | MISMATCH → action taken>.
+## Leads
+<!-- 评审员返回的每条线索一行。判据是那位评审员在主席去跑这条查询之前就写下的——由它决定结果，
+     而不是看到命中之后再下的判断。 -->
+| Lead (query) | Raised by | What it would settle | Settled as |
+|---|---|---|---|
+| "<query>" | <perspective> | <criterion, written before the result> | <verified ref \| direction \| no result> |
 
 ## Searches With No Usable Result
 | Query | By | Hits | Outcome |
@@ -134,7 +138,7 @@ Re-fetched: <which entries> → <match | MISMATCH → action taken>.
 | "<query>" | <perspective> | 0 | comment rewritten as direction |
 
 ## Rewritten or Dropped
-- <comment> — <reason: unverifiable reference | failed spot-check>
+- <comment> — <reason: unverifiable reference | lead that missed its criterion>
 ```
 
 每一份评审产物陈述的都是本次运行产生的事实；模板里没有任何一处邀请来自记忆的内容。如果某一列无法从本次运行自己的记录里填出来，那一行就不该出现在文件里。

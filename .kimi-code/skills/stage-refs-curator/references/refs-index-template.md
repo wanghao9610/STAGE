@@ -19,9 +19,10 @@ model_trail:                    # append-only: one entry per write session, neve
      Mode: survey | intake | add | discover | seed | tidy | position | score | verify.
      Every query that was run, each with the number of hits it returned — the zero-hit ones
      too: "we looked and found nothing" is a result, and only the log tells it apart from
-     "we never looked". A discover run also states both bounds against what it actually did:
-     queries run out of 5–8, and seed papers expanded through the citation graph out of 3, one
-     hop. Both are counted from this log rather than asserted beside it. -->
+     "we never looked". A discover run also names what ended its sweep — a query that came back
+     entirely already-seen, or the profile's query kinds all spent — and which candidates the
+     citation graph was run over, since expansion may only touch what the sweep produced. Both
+     are read off this log rather than asserted beside it. -->
 
 ## 2. Papers with notes
 

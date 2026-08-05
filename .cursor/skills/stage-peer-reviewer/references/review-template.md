@@ -129,8 +129,12 @@ Mode: <online | OFFLINE — degradation notice: reviews name whitelist reference
 | <name> | <review file / weakness #> | whitelist | — | — | — |
 | <name> | <…> | verified | "<query>" | <url> | <YYYY-MM-DD> |
 
-## Spot-Check
-Re-fetched: <which entries> → <match | MISMATCH → action taken>.
+## Leads
+<!-- One row per lead a panelist returned. The criterion is what that panelist wrote before
+     the chair ran the query — it decides the outcome, not a judgement made after the hit. -->
+| Lead (query) | Raised by | What it would settle | Settled as |
+|---|---|---|---|
+| "<query>" | <perspective> | <criterion, written before the result> | <verified ref \| direction \| no result> |
 
 ## Searches With No Usable Result
 | Query | By | Hits | Outcome |
@@ -138,7 +142,7 @@ Re-fetched: <which entries> → <match | MISMATCH → action taken>.
 | "<query>" | <perspective> | 0 | comment rewritten as direction |
 
 ## Rewritten or Dropped
-- <comment> — <reason: unverifiable reference | failed spot-check>
+- <comment> — <reason: unverifiable reference | lead that missed its criterion>
 ```
 
 Every review artifact states facts the run produced; nothing in a template invites content from

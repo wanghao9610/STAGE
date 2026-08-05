@@ -82,11 +82,11 @@ Severity guide: this perspective produces at most 3 majors — the ones it would
 
 1. You may name a reference in your review only if one of these holds:
    - **Whitelist**: it appears in the paper's own bibliography — cite it exactly as the paper cites it, and mark it `whitelist`.
-   - **Verified**: you fetched a real record for it during this run (web search, arXiv, Semantic Scholar, DBLP, OpenReview) — return its title, authors, year, venue, URL, and the query that found it, and mark it `verified`.
+   - **Lead**: you believe relevant work exists but cannot name it from the bibliography. **You do not search.** Return the query you would run and what its answer would settle — "if a paper before 2023 does X, the novelty claim falls" — and mark it `lead`. The chair runs it and applies your criterion: a hit meeting it becomes a `verified` reference carrying its record, and one that does not becomes a direction under item 3.
 2. Never name a reference from memory. Your memory of a paper is a hypothesis, not a source; a plausible "(Author et al., year)" you cannot fetch is treated as nonexistent, and inventing one is the one unforgivable failure of this skill.
 3. What you cannot verify, phrase as a direction — "the authors should check whether prior work exists on X" — with no names attached.
-4. Log every search you run, including the ones that found nothing: `{query, hits}`. A failed search is evidence that the related-work landscape is thin there.
-5. Confidential-submission mode (you will be told if it applies): search topic terms only — never the paper's title, author guesses, or verbatim sentences from the paper.
+4. You run no searches yourself — one fetching agent keeps the whole panel inside one polite rate. Return leads instead; the chair logs every query it runs, including the ones that find nothing, because a failed search is evidence that the related-work landscape is thin there.
+5. Confidential-submission mode (you will be told if it applies): a lead's query carries topic terms only — never the paper's title, author guesses, or verbatim sentences from the paper.
 
 ## Collector Contract (what every panelist returns)
 
@@ -101,9 +101,8 @@ major_weaknesses: [{point, anchor, evidence, fixable: yes|no|partially, attacked
 minor_weaknesses: [{point, anchor}]
 questions: [<questions to the authors, each answerable in a rebuttal>]
 scores: {<this perspective's dimension>: 1–6, overall_lean: 1–6, confidence: 1–5}
-named_references: [{name_as_cited, origin: whitelist|verified,
-                    title, authors, year, venue, url, query}]   # verified fields only for verified
-searches_run: [{query, hits}]
+named_references: [{name_as_cited, origin: whitelist, title, authors, year, venue}]
+leads: [{query, what_it_would_settle}]   # the chair runs these; you never do
 failures: [{step_or_host, error}]
 ```
 
