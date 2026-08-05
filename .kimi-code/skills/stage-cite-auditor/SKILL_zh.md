@@ -22,7 +22,7 @@ description: >-
 
 ## 核心原则
 
-1. **§9b 就是授权书。** 关于某个被引工作的断言——它做什么、展示了什么、达到了什么、在什么上失败——只有对着一份阅读笔记才可核查：`notes/refs/<ABBREV>.md`（经 `refs_index.md` 的 citekey 行找到：§2 是有笔记的论文，§4 是每条条目），或 `mates/<slug>/metds/refs/` 下一份导入的笔记。没有笔记 → `unverifiable`；有笔记但它不承载这条事实 → `unsupported`。绝不用记忆去搭这座桥：模型对一篇论文的回忆不是阅读笔记（§9e）。`notes/refs/` 为空或缺失，会让每条断言都变成 unverifiable——那就是发现本身，不是一个错误。
+1. **§9b 就是授权书。** 关于某个被引工作的断言——它做什么、展示了什么、达到了什么、在什么上失败——只有对着一份阅读笔记才可核查：`notes/refs/<ABBREV>.md`（经 `refs_index.md` 的 citekey 行找到：§2 是有笔记的论文，§4 是每条条目），或 `mates/<slug>/metds/refs/` 下一份导入的笔记。没有笔记 → `unverifiable`；有笔记但它不承载这条事实 → `unsupported`。绝不用记忆去搭这座桥：模型对一篇论文的回忆不是阅读笔记（§9e）。`notes/refs/` 为空或缺失，会让每条断言都变成 unverifiable——那就是发现本身，不是一个错误。带 `depth:` 的笔记是从上游 STAR 笔记转换来的，不是在这里读出来的：判定仍然由它承载的事实决定，但 Note 一栏要把那个深度写出来，而 `abstract-and-intro` 意味着这条断言靠的是一次只读到摘要的阅读——无论判定如何都要立项去正式读一遍。
 2. **只标，不修。** 判定落在报告与 `tasks/` 里；手稿、bib、笔记与台账离开本 skill 时逐字节相同。哪怕一个字符的 key 拼写错误也只立项、不更正——静默修复正是错误引用活到 camera-ready 的方式。
 3. **三项检查，一遍走完。** (a) 解析：`manus/` 里用到的每个引用 key 都存在于 `manus/bibs/reference.bib`；没被引用的 bib 条目是一条卫生备注，不是失败。(b) 断言：范围内每个有可核查内容的引用句都得到一个判定——supported / unsupported / unverifiable；纯指针式引用（一串没有谓语的 `\citep`）不需要判定即通过。(c) 缺失的引用：关于前作的说法却没有 `\cite`、首次使用处未引用的具名方法与数据集、归功于他人却没有 key 的数字。
 4. **与数字审计的边界。** 归属于某个被引工作的数字是一条断言——在这里对着笔记的事实审计（§9b）。关于本工作的数字追溯到 `mates/` 指纹——那是 `/skill:stage-clms-auditor` 的赛道（§9a）。两次审计在句子的 `\cite` 处相遇，而任何一方都不会因为"看着像对方的活"就跳过一个数字。
@@ -34,17 +34,17 @@ description: >-
 1. **装载。** 整份读完规约；然后读 `notes/refs/refs_index.md`（缺失 → 记下来；原则 1 生效）、bib 的 key 与字段，以及 `notes/claims.md`——factual 类主张可能点名被引工作；交叉引用它们的 ID，但绝不翻转它们（本 skill 不是台账的写入者）。真实日期取自系统时钟（规约 §4）。
 2. **解析范围（规约 §5）。** 给出章节 → 那个 `secs/` 文件加上它那些表的 caption；不带参数 → `manus/secs/` 与 `manus/tabs/` 的全部。
 3. **解析 key。** 从整个 `manus/` 抽出每个引用命令（`\cite`、`\citep`、`\citet`、`\citealp`，带星号与带可选参数的形式；多 key 参数要拆开）。与 bib 双向比对：未定义的 key → 带位置的失败；未被引用的条目 → 卫生清单。
-4. **审计断言。** 逐个范围内的引用句：抽出可核查的内容；找到笔记（先索引，再 `mates/` 里导入的笔记——说清每个判定是由哪一类撑住的；导入的笔记是带指纹的证据）；按原则 1 给出判定，并引上那一行支撑或推翻它的笔记文字。
+4. **审计断言。** 逐个范围内的引用句：抽出可核查的内容；找到笔记（先索引，再 `mates/` 里导入的笔记——说清每个判定是由哪一类撑住的，播种来的笔记连它的 `depth:` 一并说明；导入的笔记是带指纹的证据）；按原则 1 给出判定，并引上那一行支撑或推翻它的笔记文字。
 5. **扫描缺失的引用。** 关于前作的说法、方法与数据集的首次使用名、以及借用却没有 key 的数字——各自带位置，并在 bib 里已经有对应条目时把它一并给出。
 6. **检查卫生。** 对整份 bib 走一遍原则 5 的各个类别，并把条目引上。
-7. **立项失败。** 为每个未定义 key、每条 unsupported 或 unverifiable 断言、每处缺失引用、每个卫生缺陷，在 `tasks/cites_followups.md` 的 `## <date>` 标题下追加一条 `- [ ]`——位置、原文、判定、路由：没有笔记 → `/skill:stage-refs-curator` 把论文读成一份；句子写错了 → `/skill:stage-sect-drafter`；bib 要修 → `/skill:stage-refs-curator`。重跑时把能证明已解决的条目勾掉。
+7. **立项失败。** 为每个未定义 key、每条 unsupported 或 unverifiable 断言、每处缺失引用、每个卫生缺陷，在 `tasks/cites_followups.md` 的 `## <date>` 标题下追加一条 `- [ ]`——位置、原文、判定、路由：没有笔记 → `/skill:stage-refs-curator` 把论文读成一份；播种来的笔记标着 `abstract-and-intro` → 同上，这次正式读一遍；句子写错了 → `/skill:stage-sect-drafter`；bib 要修 → `/skill:stage-refs-curator`。重跑时把能证明已解决的条目勾掉。
 8. **写报告。** 按 Output 写 `wkdrs/reports/CITES_<date>.md`（先 `mkdir -p`）。
 9. **在聊天里给摘要。** ≤300 词：各项检查的计数、最严重的发现在前、立了哪些任务、唯一的下一步动作。
 10. **提交（规约 §1）。** 一次提交——`tasks/cites_followups.md`——标题点名本 skill；什么都没立项 → 就没有可提交的，说明这一点。`wkdrs/` 永不提交（规约 §10）。
 
 ## 输出
 
-- `wkdrs/reports/CITES_<date>.md`——登记表行：Audit reports，生产者 `stage-cite-auditor`，临时，日期在文件名里。frontmatter `date:`、`scope:`；小节：`## Verdict`（检查了多少 key / 多少未定义；断言 supported / unsupported / unverifiable；缺引用与卫生问题的计数）、`## Keys`（未定义的及其位置；未被引用的条目）、`## Assertions`——`| Where | Assertion | Key | Note | Verdict |`，失败在前、`## Missing citations`、`## Bib hygiene`（把条目引上）、`## Tasks filed`。
+- `wkdrs/reports/CITES_<date>.md`——登记表行：Audit reports，生产者 `stage-cite-auditor`，临时，日期在文件名里。frontmatter `date:`、`scope:`；小节：`## Verdict`（检查了多少 key / 多少未定义；断言 supported / unsupported / unverifiable；缺引用与卫生问题的计数）、`## Keys`（未定义的及其位置；未被引用的条目）、`## Assertions`——`| Where | Assertion | Key | Note | Verdict |`（Note 一栏写笔记文件名，播种来的笔记再带上它的 `depth:`），失败在前、`## Missing citations`、`## Bib hygiene`（把条目引上）、`## Tasks filed`。
 - `tasks/cites_followups.md`——在带日期的标题下，每个失败一个复选框：那份持久成果。
 - 手稿、`manus/bibs/reference.bib`、`notes/refs/` 与台账在这里都是只读的——标出的问题与路由就是全部产物。
 - 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

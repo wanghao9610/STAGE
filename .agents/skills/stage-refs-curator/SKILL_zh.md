@@ -31,7 +31,7 @@ description: >-
 3. **先播种，再抓取。** `mates/` 里带着导入的 STAR refs 树时，它就是起始底盘：上游 bibkey 保持稳定，笔记转换时带上 `(via mates/<...>)` 的出处，上游已经核实过的条目不再重新抓取。每次运行都是增量的——补缺口，绝不重新生成 bib；一篇论文一份笔记，已经有笔记的论文除非被要求刷新，否则跳过。
 4. **key 是承重的。** citekey 一律是 `<Year>_<Method>_<FirstAuthorSurname>`——`2021_CLIP_Radford`——按 `references/source-policy_zh.md` 生成，在全文件唯一；它也是本 skill 唯一自己拟定的字段。有两类 key 它绝不改写：播种来的（逐字节保留上游形状），以及文件里已有的历史 key（接入时随论文仓库进来的，或这套方案之前写下的）。`manus/` 已经引用的 key 绝不在这里改名——先 grep，然后报出来——两种 key 并存的状态写进 index 的 §8，不静默修补。阅读笔记仍用它自己的 `ABBREV` 作文件名（`notes/refs/CLIP.md`），完整 citekey 记在它 frontmatter 的 `bibkey:` 里。用户提供的条目绝不删除：至多重新归类并标注。
 5. **只维护，不审计也不起草。** 核查不了的手稿断言、缺失的引用、bib 与正文的漂移，都是 `$stage-cite-auditor` 的发现；相关工作的散文是 `$stage-sect-drafter` 的；导入上游树是 `import.sh` + `$stage-evid-curator` 的。
-6. **计数要诚实。** 直白报出 fetched / seeded / failed / needs-manual-check；缺口绝不往上凑，也绝不把一份笔记说得比实际读过的更深。
+6. **计数要诚实。** 直白报出 fetched / seeded / failed / needs-manual-check；缺口绝不往上凑，也绝不把一份笔记说得比实际读过的更深。播种来的笔记逐字带上上游笔记的 `depth:`，比 Step 3 那条底线更浅的阅读因此仍然看得见，不会混成我们自己读出来的。
 7. **发现只提议，决定权在作者（§9b）。** `discover` 是本 skill 唯一一次主题检索，边界和模拟评审那次完全一样：一条候选只有带着本次运行抓到的记录才被点名，每条查询连同命中数一并记录——命中为零的也记——凭记忆想起来但没抓到的论文按不存在处理，写成"去查一查"的方向，而不是端上来当候选。检索翻出来的东西，在用户从清单里挑中之前，一律不进 `reference.bib`，也不进任何笔记；用户放过的那些要记下来，好让下一次运行提议点新的。检索结果稀薄就如实说稀薄：什么都没返回是一次抓取的结果，绝不是"不存在这样的工作"的证据。
 8. **影响力分只分配注意力，不决定去留。** 每条条目在 index 里带一个 0–10 的分数——年均引用、发表档、代码采用，按 `references/source-policy_zh.md` 那套固定算式，取自本次运行抓取并注明日期的指标。它决定一簇里哪些工作打头、相关工作必须先接住谁；它绝不决定什么能进这个底盘，任何一个分量也绝不进 `reference.bib`。没抓到的分量弃权、剩余权重归一化、总分带 `*`——残缺就标，绝不猜，也绝不凭印象。
 
@@ -49,7 +49,7 @@ description: >-
 
 1. 经 `mates/MANIFEST.md` 定位导入的 refs 树（`<slug>/metds/refs/**`）。一个都没有 → 说出来，路由到 `$stage-evid-curator`（或 `execs/scpts/import.sh`），然后停下。
 2. 把 `manus/bibs/reference.bib` 里没有的上游 `reference.bib` 条目逐字节合并进来，每条都置于一行 `% src: mates/<slug>/metds/refs/reference.bib (seeded YYYY-MM-DD)` 之下——上游 key 保持不变。每条合并进来的条目同一次运行就补上它的 index §4 行：来源写 `mates/<slug>`，没有记录 URL，日期写播种日。
-3. 把每份上游的单篇笔记转换成 `notes/refs/<ABBREV>.md`，按 §8 的笔记 schema：`## What it does` 取自上游笔记；`## Relation to ours` 对着本文的 `notes/story.md` 与主张台账重写——STAR 笔记关联的是一个方法，这份笔记关联的是一篇手稿；`## Citable facts` 只取上游笔记自身陈述过的事实，每条标注 `(via mates/<slug>/...)`。已经有笔记的论文跳过并点名。
+3. 把每份上游的单篇笔记转换成 `notes/refs/<ABBREV>.md`，按 §8 的笔记 schema：`## What it does` 取自上游笔记；`## Relation to ours` 对着本文的 `notes/story.md` 与主张台账重写——STAR 笔记关联的是一个方法，这份笔记关联的是一篇手稿；`## Citable facts` 只取上游笔记自身陈述过的事实，每条标注 `(via mates/<slug>/...)`。转换出来的笔记逐字带上上游笔记的 `depth:`——只有播种来的笔记才有这个字段——标着 `abstract-and-intro` 的那些进索引 §8 的待读清单，因为上游读到的还不够这里 Step 3 所要求的。已经有笔记的论文跳过并点名。
 4. 每份转换出来的笔记加一行索引。`mates/` 本身绝不被编辑——只读（§10）。
 
 ### Step 2a：发现候选（`discover`）
@@ -112,7 +112,7 @@ description: >-
 ## 输出
 
 - `manus/bibs/reference.bib`——条目以 `<Year>_<Method>_<FirstAuthorSurname>` 为 key，各自置于它那行 `% src:` 之下，可选的 `%%` 簇块，末尾是给抓不到记录的论文用的 `%% Needs manual check` 块；只追加与重排，绝不从头重新生成。确切形状见 `references/source-policy_zh.md`。
-- `notes/refs/<ABBREV>.md`——每篇读过的论文一份笔记：frontmatter `title:`、`venue:`、`year:`、`bibkey:`（完整 citekey）、`added:`；`## What it does`、`## Relation to ours`、精确到足以被拿来审计的 `## Citable facts`（§9b）。
+- `notes/refs/<ABBREV>.md`——每篇读过的论文一份笔记：frontmatter `title:`、`venue:`、`year:`、`bibkey:`（完整 citekey）、`added:`，播种来的笔记另加 `depth:`；`## What it does`、`## Relation to ours`、精确到足以被拿来审计的 `## Citable facts`（§9b）。
 - `notes/refs/refs_index.md`——bib 的审计线索，按 `references/refs-index-template_zh.md` 的八个小节写：范围、有笔记的论文、类别、出处（每条条目一行，100% 覆盖，自拟标 †、预印本标 ‡）、带子指标与抓取日期的影响力评分、待人工核对的细节、自查、下一步。索引在不在册就是本 skill 的登记表状态字段（§8）。`discover` 那一轮的全部线索只落在这里：查询与命中数进 §1，没人收的候选进 §8。
 - 按 Step 7 给出的聊天摘要。`manus/secs/` 里什么都不写，`mates/` 下什么都不写，`wkdrs/` 里不留报告。
 - 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

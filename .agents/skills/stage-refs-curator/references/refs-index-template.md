@@ -24,11 +24,14 @@ model_trail:                    # append-only: one entry per write session, neve
 ## 2. Papers with notes
 
 <!-- One row per reading note under notes/refs/. "Why it is cited here" is this manuscript's
-     reason, not the paper's abstract. Score is section 5's total, repeated for reading. -->
+     reason, not the paper's abstract. Score is section 5's total, repeated for reading. Depth is
+     `—` for a note written here, where the read is a floor rather than a scale; for a seeded note
+     it is the upstream note's depth verbatim, and `abstract-and-intro` there marks a paper still
+     worth reading properly. -->
 
-| Citekey | Note | Venue | Why it is cited here | Score | Model |
-| --- | --- | --- | --- | --- | --- |
-| `<2021_CLIP_Radford>` | [CLIP.md](CLIP.md) | <ICML 2021> | <one clause> | <9.6> | <model id> |
+| Citekey | Note | Venue | Why it is cited here | Depth | Score | Model |
+| --- | --- | --- | --- | --- | --- | --- |
+| `<2021_CLIP_Radford>` | [CLIP.md](CLIP.md) | <ICML 2021> | <one clause> | — | <9.6> | <model id> |
 
 ## 3. Categories
 

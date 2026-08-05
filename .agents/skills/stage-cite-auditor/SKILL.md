@@ -47,7 +47,10 @@ re-reading routes to `$stage-refs-curator`.
    citekey rows of `refs_index.md` (§2 for notes, §4 for entries), or an imported note under `mates/<slug>/metds/refs/`. No note →
    `unverifiable`; a note that does not carry the fact → `unsupported`. Never bridge the gap from
    memory: model recall of a paper is not a reading note (§9e). An empty or missing `notes/refs/`
-   makes every assertion unverifiable — that is the finding, not an error.
+   makes every assertion unverifiable — that is the finding, not an error. A note carrying `depth:`
+   was converted from an upstream STAR note rather than read here: the verdict is still whatever its
+   facts decide, but the Note cell names that depth, and `abstract-and-intro` means the assertion
+   rests on a read that stopped at the abstract — filed for a proper read either way.
 2. **Flag, never fix.** Verdicts land in the report and `tasks/`; the manuscript, the bib, the
    notes, and the ledger leave this skill byte-identical. Even a one-character key typo is filed,
    not corrected — silent fixes are how wrong citations survive to camera-ready.
@@ -79,9 +82,9 @@ re-reading routes to `$stage-refs-curator`.
    `\citet`, `\citealp`, starred and optioned forms; split multi-key arguments). Diff both ways
    against the bib: undefined key → failure with location; uncited entry → hygiene list.
 4. **Audit assertions.** Per in-scope citing sentence: extract the checkable content; find the
-   note (index first, imported `mates/` notes second — say which kind backed each verdict; an
-   imported note is fingerprinted evidence); verdict per Principle 1, quoting the note line that
-   supports or fails it.
+   note (index first, imported `mates/` notes second — say which kind backed each verdict, and a
+   seeded note's `depth:` with it; an imported note is fingerprinted evidence); verdict per
+   Principle 1, quoting the note line that supports or fails it.
 5. **Scan for missing citations.** Prior-work claims, first-use method and dataset names, and
    borrowed numbers with no key — each with location, and the matching bib entry when one already
    exists.
@@ -89,7 +92,8 @@ re-reading routes to `$stage-refs-curator`.
 7. **File failures.** Append one `- [ ]` per undefined key, unsupported or unverifiable
    assertion, missing citation, and hygiene defect to `tasks/cites_followups.md` under a
    `## <date>` heading — location, quote, verdict, route: no note → `$stage-refs-curator` reads
-   the paper into one; wrong sentence → `$stage-sect-drafter`; bib repair → `$stage-refs-curator`.
+   the paper into one; a seeded note marked `abstract-and-intro` → the same, read properly this
+   time; wrong sentence → `$stage-sect-drafter`; bib repair → `$stage-refs-curator`.
    A re-run checks off items it can prove resolved.
 8. **Report.** Write `wkdrs/reports/CITES_<date>.md` (`mkdir -p` first) per Output.
 9. **Digest in chat.** ≤300 words: counts per check, worst findings first, tasks filed, the one
@@ -104,7 +108,8 @@ re-reading routes to `$stage-refs-curator`.
   ephemeral, date in filename. Frontmatter `date:`, `scope:`; sections: `## Verdict` (keys
   checked / undefined; assertions supported / unsupported / unverifiable; missing-citation and
   hygiene counts), `## Keys` (undefined with locations; uncited entries), `## Assertions` —
-  `| Where | Assertion | Key | Note | Verdict |`, failures first, `## Missing citations`,
+  `| Where | Assertion | Key | Note | Verdict |` (the Note cell names the file and, for a seeded
+  note, its `depth:`), failures first, `## Missing citations`,
   `## Bib hygiene` (entries quoted), `## Tasks filed`.
 - `tasks/cites_followups.md` — one checkbox per failure under a dated heading: the durable
   outcome.
