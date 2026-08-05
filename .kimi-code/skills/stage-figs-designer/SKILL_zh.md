@@ -1,14 +1,11 @@
 ---
 name: stage-figs-designer
 description: >-
-  拥有手稿的图清单，并负责把图建出来：notes/outline.md 里的 Figures 表（一张图一行用途）、
-  manus/figs/ 里每个渲染出的 PDF 在 manus/figs/srcs/ 下都有一个可编辑源文件（tikz / python /
-  drawio），以及给 teaser 的一份专门检查清单。不许有孤儿 PDF：没有源文件的图必须能追溯到一条
-  mates/MANIFEST.md 条目（用于导入的美术素材）。数据图只画带指纹的 mates/ 证据所承载的数字，
-  每条数据系列一条 src: 注释；证据没有承载的东西在 caption 里变成 \todo，绝不变成一条看着合理的
-  曲线。不带参数时，对着磁盘上的文件审计这份清单并提出下一步动作；`plan` 修订 Figures 表；
-  给出某张图则建立或修订那一张图。只要用户运行 /skill:stage-figs-designer，或要求规划、草绘、渲染或
-  修复某张图、teaser、或整份图清单，都应使用本 skill。
+  拥有手稿的图清单，并负责把图建出来：notes/outline.md 里的 Figures 表（一张图一行用途）、 manus/figs/ 里每个渲染出的 PDF 在 manus/figs/srcs/
+  下都有一个可编辑源文件（tikz / python / drawio），以及给 teaser 的一份专门检查清单。不许有孤儿 PDF：没有源文件的图必须能追溯到一条 mates/MANIFEST.md
+  条目（用于导入的美术素材）。数据图只画带指纹的 mates/ 证据所承载的数字， 每条数据系列一条 src: 注释；证据没有承载的东西在 caption 里变成 \todo，绝不变成一条看着合理的
+  曲线。不带参数时，对着磁盘上的文件审计这份清单并提出下一步动作；`plan` 修订 Figures 表； 给出某张图则建立或修订那一张图。只要用户运行
+  /skill:stage-figs-designer、一次运行点名它是下一步动作，或要求规划、草绘、渲染或 修复某张图、teaser、或整份图清单，都应使用本 skill。
 ---
 
 # Figure Designer —— 有来源的图，没有孤儿 PDF

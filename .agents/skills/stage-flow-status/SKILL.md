@@ -2,12 +2,12 @@
 name: stage-flow-status
 description: >-
   Read-only map of the whole writing flow: per-section, per-figure, and per-table status from
-  notes/outline.md, claim coverage counts by ledger status, evidence freshness against upstream
-  stamps, reference counts, cycle state (venue confirmed, reviews in, response drafted, promises
-  open, frozen), the latest build and lint signal, and exactly one next action with its exact
-  $stage-* command. Reports in chat only and points every action at the sibling skill that owns
-  it. Use when the user invokes $stage-flow-status, or asks where the paper stands, what to work on
-  next, whether evidence or the build is fresh, or how far the current cycle has gotten. Never
+  notes/outline.md, claim coverage counts by ledger status, evidence freshness against upstream stamps,
+  reference counts, cycle state (venue confirmed, reviews in, response drafted, promises open, frozen),
+  the latest build and lint signal, and exactly one next action with its exact $stage-* command. Reports
+  in chat only and points every action at the sibling skill that owns it. Use when the user invokes
+  $stage-flow-status, when a run names it as the next action, or asks where the paper stands, what to
+  work on next, whether evidence or the build is fresh, or how far the current cycle has gotten. Never
   writes.
 ---
 
@@ -105,7 +105,9 @@ writes, and never present a guess as a state.
    $stage-clms-auditor; (8) all rows drafted but the newest `CITES_*` / `POLISH_*` report date
    trails the outline's `updated:` → $stage-cite-auditor, then $stage-copy-editor; (9) no
    simulated review this cycle → $stage-peer-reviewer; (10) all green → $stage-subm-packer.
-   Give the one-line reason with the exact command.
+   Give the one-line reason with the exact command. When that command names one of the ten the
+   agent may start (conventions §11.4) and its target is settled, it is picked up once this
+   report is done rather than left for the author to type — this skill starts nothing itself.
 
    **A red gate outranks the list.** When step 6 found `lint.sh` failing hard — the build broken, a `\todo{` that would ship, a page count over the limit, an identity leak under `ANON=true` — that is the next action whichever numbered rule matched, routed to the owner lint itself names: a marker to `$stage-sect-drafter` or `$stage-tabs-builder`, an over-limit paper to `$stage-copy-editor`, an undefined citation to `$stage-cite-auditor` or `$stage-refs-curator`. Nothing downstream of a red gate is worth recommending — `$stage-subm-packer` refuses it, and a simulated review of a manuscript that does not build reviews the wrong artifact. The list resumes once the gate is green.
 8. **Report and stop.** Render in the Output order, then stop: never writes, never commits — and

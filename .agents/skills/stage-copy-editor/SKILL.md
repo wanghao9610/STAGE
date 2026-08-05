@@ -1,13 +1,13 @@
 ---
 name: stage-copy-editor
 description: >-
-  Polish pass over one section or the whole manuscript: clarity, flow, terminology and
-  abbreviation consistency against notes/notation.md, length trimmed toward the outline's page
-  budgets. Edits prose in manus/ in place but never changes technical meaning, any number, any
-  citation or reference key, or any \todo marker; content-level cuts and systematic issues are
-  reported and routed, never silently applied. Writes wkdrs/reports/POLISH_<date>.md (ephemeral)
-  plus follow-up items in tasks/, and proves the manuscript still builds. Use when the user
-  invokes $stage-copy-editor, or asks to polish, tighten, proofread, or de-jargon the paper's prose.
+  Polish pass over one section or the whole manuscript: clarity, flow, terminology and abbreviation
+  consistency against notes/notation.md, length trimmed toward the outline's page budgets. Edits prose in
+  manus/ in place but never changes technical meaning, any number, any citation or reference key, or any
+  \todo marker; content-level cuts and systematic issues are reported and routed, never silently applied.
+  Writes wkdrs/reports/POLISH_<date>.md (ephemeral) plus follow-up items in tasks/, and proves the
+  manuscript still builds. Use when the user invokes $stage-copy-editor, when a run names it as the next
+  action, or asks to polish, tighten, proofread, or de-jargon the paper's prose.
 ---
 
 # Manuscript Copy Editor — prose polish that changes no fact

@@ -1,17 +1,17 @@
 ---
 name: stage-peer-reviewer
 description: >-
-  Simulated program committee for the manuscript: convenes a five-perspective review panel —
-  novelty & related work, technical soundness, experimental rigor & reproducibility, clarity &
-  presentation, devil's advocate — under a citation-integrity contract (whitelist or verified
-  references only, every search logged), scores by anchored rubric bands with hard caps and an
-  honest confidence (6-point conference scale or journal tiers per venue.yml scale:), and writes
-  one venue-shaped meta-review to cycls/<cycle>/reviews/SIM_REVIEW_<date>.md whose weaknesses
-  name the claim IDs they attack — so $stage-resp-writer treats simulated and real reviews
-  identically. quick mode runs a single-pass version. Builds first via execs/run.sh; a broken
-  build is finding #1. Never edits the manuscript or the claim ledger. Use when the user invokes
-  $stage-peer-reviewer, or asks for a mock review, a review panel, a pre-submission attack on
-  the draft, or for the paper to be read as reviewers would.
+  Simulated program committee for the manuscript: convenes a five-perspective review panel — novelty &
+  related work, technical soundness, experimental rigor & reproducibility, clarity & presentation,
+  devil's advocate — under a citation-integrity contract (whitelist or verified references only, every
+  search logged), scores by anchored rubric bands with hard caps and an honest confidence (6-point
+  conference scale or journal tiers per venue.yml scale:), and writes one venue-shaped meta-review to
+  cycls/<cycle>/reviews/SIM_REVIEW_<date>.md whose weaknesses name the claim IDs they attack — so
+  $stage-resp-writer treats simulated and real reviews identically. quick mode runs a single pass. Builds
+  first via execs/run.sh; a broken build is finding #1. Never edits the manuscript or the ledger. Use
+  when the user invokes $stage-peer-reviewer, when a run names it as the next action, or asks for a mock
+  review, a review panel, a pre-submission attack on the draft, or for the paper to be read as reviewers
+  would.
 ---
 
 # Peer Reviewer — a five-perspective panel with an anchored rubric

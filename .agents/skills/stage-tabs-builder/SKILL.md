@@ -1,14 +1,14 @@
 ---
 name: stage-tabs-builder
 description: >-
-  Generate or update one booktabs table under manus/tabs/ from fingerprinted mates/ evidence only —
-  never from memory, chat, or recalled papers. Every data row carries a % src: mates/<...>#<anchor>
-  comment so each number is traceable to its fingerprint; a missing number becomes a \todo{...} cell
-  that opens an unsourced claim in notes/claims.md — hand-typed numbers are the failure mode this
-  skill exists to kill. Re-reads every cited number before it ships, surfaces evidence staleness, and
-  updates the outline Tables row and the claim ledger. Use when the user invokes $stage-tabs-builder, or
-  asks to build, fill, extend, or fix a results, ablation, or comparison table, or to turn imported
-  results into LaTeX.
+  Generate or update one booktabs table under manus/tabs/ from fingerprinted mates/ evidence only — never
+  from memory, chat, or recalled papers. Every data row carries a % src: mates/<...>#<anchor> comment so
+  each number is traceable to its fingerprint; a missing number becomes a \todo{...} cell that opens an
+  unsourced claim in notes/claims.md — hand-typed numbers are the failure mode this skill exists to kill.
+  Re-reads every cited number before it ships, surfaces evidence staleness, and updates the outline
+  Tables row and the claim ledger. Use when the user invokes $stage-tabs-builder, when a run names it as
+  the next action, or asks to build, fill, extend, or fix a results, ablation, or comparison table, or to
+  turn imported results into LaTeX.
 ---
 
 # Table Builder — evidence-to-booktabs compiler

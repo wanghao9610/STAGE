@@ -1,12 +1,10 @@
 ---
 name: stage-flow-status
 description: >-
-  整条写作流程的只读地图：从 notes/outline.md 读出每节、每图、每表的状态，按台账状态统计主张覆盖，
-  对着上游时间戳检查证据新鲜度，参考文献计数，周期状态（venue 是否确认、评审是否到齐、回复是否起草、
-  承诺是否未清、是否已冻结），最近一次构建与 lint 信号，以及恰好一个下一步动作连同它确切的
-  $stage-* 命令。只在聊天里汇报，并把每个动作指向拥有它的那个兄弟 skill。只要用户运行
-  $stage-flow-status，或询问论文进展到哪、接下来该做什么、证据或构建是否新鲜、当前周期走到了哪一步，
-  都应使用本 skill。绝不写任何文件。
+  整条写作流程的只读地图：从 notes/outline.md 读出每节、每图、每表的状态，按台账状态统计主张覆盖， 对着上游时间戳检查证据新鲜度，参考文献计数，周期状态（venue
+  是否确认、评审是否到齐、回复是否起草、 承诺是否未清、是否已冻结），最近一次构建与 lint 信号，以及恰好一个下一步动作连同它确切的 $stage-*
+  命令。只在聊天里汇报，并把每个动作指向拥有它的那个兄弟 skill。只要用户运行
+  $stage-flow-status、一次运行点名它是下一步动作，或询问论文进展到哪、接下来该做什么、证据或构建是否新鲜、当前周期走到了哪一步， 都应使用本 skill。绝不写任何文件。
 ---
 
 # Writing Flow Status — 只读总览
@@ -41,7 +39,7 @@ description: >-
 4. **主张覆盖。** 台账按状态计数：proposed / drafted / verified / unsourced / weakened / dropped。`unsourced > 0` 永远是一条点名 $stage-clms-auditor 的缺口行。
 5. **证据与参考文献。** MANIFEST 条目数与最新的 `imported:`；`import.sh --diff` 的结论（clean / drifted / unknown）；bib key 对着 refs 索引行——被引用却没有阅读笔记的工作是 $stage-refs-curator 的活。
 6. **构建与 lint。** `wkdrs/builds/` 下最新的 PDF（或 `build: none`）；按原则 3 取 lint 把关信号。
-7. **下一步动作。** 首个命中者胜出：(1) 没有 `notes/adopt.md` → $stage-proj-adopt；(2) story 缺失或未定稿 → $stage-stry-coach；(3) 提纲缺失或未定稿 → $stage-outl-planner；(4) 证据漂移 → $stage-evid-curator；(5) 有未清承诺 → 第一个未勾选框所需改动对应的 skill（$stage-sect-drafter、$stage-tabs-builder、$stage-figs-designer）；(6) 提纲里仍是 planned / skeleton / sketch 的行 → 上述三者中它的归属者，并点名是哪一行；(7) 主张处于 `unsourced`，或 `drafted` 却从未验证 → $stage-clms-auditor；(8) 所有行都已 drafted，但最新的 `CITES_*` / `POLISH_*` 报告日期落后于提纲的 `updated:` → 先 $stage-cite-auditor，再 $stage-copy-editor；(9) 本周期还没有模拟评审 → $stage-peer-reviewer；(10) 全绿 → $stage-subm-packer。给出一行理由和确切命令。
+7. **下一步动作。** 首个命中者胜出：(1) 没有 `notes/adopt.md` → $stage-proj-adopt；(2) story 缺失或未定稿 → $stage-stry-coach；(3) 提纲缺失或未定稿 → $stage-outl-planner；(4) 证据漂移 → $stage-evid-curator；(5) 有未清承诺 → 第一个未勾选框所需改动对应的 skill（$stage-sect-drafter、$stage-tabs-builder、$stage-figs-designer）；(6) 提纲里仍是 planned / skeleton / sketch 的行 → 上述三者中它的归属者，并点名是哪一行；(7) 主张处于 `unsourced`，或 `drafted` 却从未验证 → $stage-clms-auditor；(8) 所有行都已 drafted，但最新的 `CITES_*` / `POLISH_*` 报告日期落后于提纲的 `updated:` → 先 $stage-cite-auditor，再 $stage-copy-editor；(9) 本周期还没有模拟评审 → $stage-peer-reviewer；(10) 全绿 → $stage-subm-packer。给出一行理由和确切命令。当这条命令落在那十个 agent 可以自己启动的 skill 上、且目标已经定死时，它会在这份报告写完之后被直接拾起来跑，而不是留给作者去敲——本 skill 自己不启动任何东西（规约 §11.4）。
 
    **红闸门压过这张表。** 当第 6 步发现 `lint.sh` 硬失败时——构建坏了、一个会被印进 PDF 的 `\todo{`、页数超限、`ANON=true` 下的身份泄漏——那就是下一步动作，无论上面哪条编号命中，并路由给 lint 自己点名的归属者：标记归 `$stage-sect-drafter` 或 `$stage-tabs-builder`，超页归 `$stage-copy-editor`，未定义引用归 `$stage-cite-auditor` 或 `$stage-refs-curator`。红闸门下游的任何事都不值得推荐——`$stage-subm-packer` 会拒绝它，而对一份编译不出来的手稿做模拟评审，评的是错的产物。闸门转绿后这张表继续生效。
 8. **汇报并停下。** 按 Output 的顺序渲染，然后停下：绝不写、绝不提交——同样地，绝不声称或暗示有任何东西被改动过。

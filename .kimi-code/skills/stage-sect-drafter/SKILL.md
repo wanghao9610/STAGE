@@ -5,10 +5,11 @@ description: >-
   fingerprinted evidence under mates/. Resolves the section by number, file slug, or title against
   notes/outline.md and writes manus/secs/<n>_<slug>.tex; every number either traces to a fingerprinted
   mates/ entry read this run or is written as \todo{...} — no third state. Updates the claim ledger
-  (Stated in, status drafted), appends new symbols and abbreviations to notes/notation.md, and flips
-  the section's outline row. Never edits mates/ and never re-scopes the outline. Use when
-  the user runs /skill:stage-sect-drafter, or asks to draft, write, expand, or revise a section —
-  abstract, intro, method, experiments, related work — or to turn an outline row into prose.
+  (Stated in, status drafted), appends new symbols and abbreviations to notes/notation.md, and flips the
+  section's outline row. Never edits mates/ and never re-scopes the outline. Use when the user runs
+  /skill:stage-sect-drafter, when a run names it as the next action, or asks to draft, write, expand, or
+  revise a section — abstract, intro, method, experiments, related work — or to turn an outline row into
+  prose.
 ---
 
 # Section Drafter — evidence-bound prose

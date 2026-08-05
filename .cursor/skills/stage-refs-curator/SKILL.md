@@ -1,17 +1,16 @@
 ---
 name: stage-refs-curator
 description: >-
-  Curates the paper's reference base: manus/bibs/reference.bib with every field transcribed from a
-  record fetched during the run (DBLP, Crossref, Semantic Scholar, arXiv — never from memory),
-  reading notes notes/refs/<ABBREV>.md whose Citable facts are precise enough for
-  /stage-cite-auditor to verify manuscript assertions against, and the index
-  notes/refs/refs_index.md. Seeds from imported STAR refs under mates/ when present, keeping
-  upstream bibkeys stable. No argument surveys the base and audits its hygiene; an arXiv id, DOI,
-  URL, or quoted title reads one paper in, `add` several; `seed` converts imported STAR refs;
-  `tidy` fixes bib hygiene offline; `position` clusters the bib for related work. A paper with no
-  fetchable record is listed for manual check, never guessed into the bib. Use when the user runs
-  /stage-refs-curator, or asks to add a reference or reading note, clean or deduplicate the
-  bibliography, or position the paper against related work.
+  Curates the paper's reference base: manus/bibs/reference.bib with every field transcribed from a record
+  fetched during the run (DBLP, Crossref, Semantic Scholar, arXiv — never from memory), reading notes
+  notes/refs/<ABBREV>.md whose Citable facts are precise enough for /stage-cite-auditor to verify
+  manuscript assertions against, and the index notes/refs/refs_index.md. Seeds from imported STAR refs
+  under mates/ when present, keeping upstream bibkeys stable. No argument surveys the base and audits its
+  hygiene; an arXiv id, DOI, URL, or quoted title reads one paper in, `add` several; `seed` converts
+  imported STAR refs; `tidy` fixes bib hygiene offline; `position` clusters the bib for related work. A
+  paper with no fetchable record is listed for manual check, never guessed into the bib. Use when the
+  user runs /stage-refs-curator, when a run names it as the next action, or asks to add a reference or
+  reading note, clean or deduplicate the bibliography, or position the paper against related work.
 ---
 
 # Refs Curator — verified bibliography & notes the auditor can check

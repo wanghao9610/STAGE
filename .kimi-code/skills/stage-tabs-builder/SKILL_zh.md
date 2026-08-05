@@ -1,13 +1,10 @@
 ---
 name: stage-tabs-builder
 description: >-
-  只从带指纹的 mates/ 证据出发，在 manus/tabs/ 下生成或更新一张 booktabs 表格——绝不来自记忆、
-  聊天或回想起来的论文。每个数据行都带一条 % src: mates/<...>#<anchor> 注释，好让每个数字都能
-  追溯到它的指纹；缺失的数字变成一个 \todo{...} 单元格，并在 notes/claims.md 里开出一条 unsourced
-  主张——手敲进去的数字正是本 skill 存在要杀掉的失败模式。每个被引用的数字在发出去之前都重读一遍，
-  把证据过期问题浮出来，并更新提纲的 Tables 行与主张台账。只要用户运行 /skill:stage-tabs-builder，
-  或要求建立、填充、扩展或修复一张结果表、消融表或对比表，或者把导入的结果变成 LaTeX，
-  都应使用本 skill。
+  只从带指纹的 mates/ 证据出发，在 manus/tabs/ 下生成或更新一张 booktabs 表格——绝不来自记忆、 聊天或回想起来的论文。每个数据行都带一条 % src:
+  mates/<...>#<anchor> 注释，好让每个数字都能 追溯到它的指纹；缺失的数字变成一个 \todo{...} 单元格，并在 notes/claims.md 里开出一条 unsourced
+  主张——手敲进去的数字正是本 skill 存在要杀掉的失败模式。每个被引用的数字在发出去之前都重读一遍， 把证据过期问题浮出来，并更新提纲的 Tables 行与主张台账。只要用户运行
+  /skill:stage-tabs-builder、一次运行点名它是下一步动作， 或要求建立、填充、扩展或修复一张结果表、消融表或对比表，或者把导入的结果变成 LaTeX， 都应使用本 skill。
 ---
 
 # Table Builder —— 从证据到 booktabs 的编译器

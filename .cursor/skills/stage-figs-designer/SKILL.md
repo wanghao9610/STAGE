@@ -1,16 +1,16 @@
 ---
 name: stage-figs-designer
 description: >-
-  Owns the manuscript's figure inventory and builds its figures: the Figures table in
-  notes/outline.md (one purpose row per figure), an editable source under manus/figs/srcs/ (tikz /
-  python / drawio) for every rendered PDF in manus/figs/, and a dedicated checklist for the teaser.
-  No orphan PDFs: a figure with no source file must trace to a mates/MANIFEST.md entry for imported
-  artwork. Data figures draw only numbers carried by fingerprinted mates/ evidence, one src:
-  comment per series; what evidence does not carry becomes a \todo in the caption, never a
-  plausible curve. No argument audits the inventory against the files on disk and proposes the
-  next action; `plan` revises the Figures table; a figure argument builds or revises that one
-  figure. Use when the user runs /stage-figs-designer, or asks to plan, sketch, render, or fix a
-  figure, the teaser, or the figure inventory.
+  Owns the manuscript's figure inventory and builds its figures: the Figures table in notes/outline.md
+  (one purpose row per figure), an editable source under manus/figs/srcs/ (tikz / python / drawio) for
+  every rendered PDF in manus/figs/, and a dedicated checklist for the teaser. No orphan PDFs: a figure
+  with no source file must trace to a mates/MANIFEST.md entry for imported artwork. Data figures draw
+  only numbers carried by fingerprinted mates/ evidence, one src: comment per series; what evidence does
+  not carry becomes a \todo in the caption, never a plausible curve. No argument audits the inventory
+  against the files on disk and proposes the next action; `plan` revises the Figures table; a figure
+  argument builds or revises that one figure. Use when the user runs /stage-figs-designer, when a run
+  names it as the next action, or asks to plan, sketch, render, or fix a figure, the teaser, or the
+  figure inventory.
 ---
 
 # Figure Designer — sourced figures, no orphan PDFs

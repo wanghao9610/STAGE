@@ -1,13 +1,10 @@
 ---
 name: stage-sect-drafter
 description: >-
-  每次调用起草或修订一节手稿，依据是该节的提纲简介、主张台账，以及 mates/ 下带指纹的证据。
-  按编号、文件 slug 或标题对着 notes/outline.md 解析章节，写 manus/secs/<n>_<slug>.tex；每个数字
-  要么追溯到本次运行读过的一条带指纹的 mates/ 条目，要么写成 \todo{...}——没有第三种状态。更新
-  主张台账（Stated in，状态置 drafted），把新符号与缩写追加进 notes/notation.md，并翻转该节的
-  提纲行。绝不编辑 mates/，绝不重新划定提纲范围。只要用户运行 /stage-sect-drafter，或要求起草、
-  撰写、扩写或修订某一节——摘要、intro、方法、实验、相关工作——或者把一行提纲变成散文，
-  都应使用本 skill。
+  每次调用起草或修订一节手稿，依据是该节的提纲简介、主张台账，以及 mates/ 下带指纹的证据。 按编号、文件 slug 或标题对着 notes/outline.md 解析章节，写
+  manus/secs/<n>_<slug>.tex；每个数字 要么追溯到本次运行读过的一条带指纹的 mates/ 条目，要么写成 \todo{...}——没有第三种状态。更新 主张台账（Stated
+  in，状态置 drafted），把新符号与缩写追加进 notes/notation.md，并翻转该节的 提纲行。绝不编辑 mates/，绝不重新划定提纲范围。只要用户运行
+  /stage-sect-drafter、一次运行点名它是下一步动作，或要求起草、 撰写、扩写或修订某一节——摘要、intro、方法、实验、相关工作——或者把一行提纲变成散文， 都应使用本 skill。
 ---
 
 # Section Drafter —— 与证据绑定的散文

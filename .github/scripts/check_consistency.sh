@@ -468,7 +468,7 @@ CONV_HEADINGS=(
     '11. The skill roster'
 )
 # section|numbered top-level items
-CONV_ITEMS=("1|6" "3|6" "4|4" "5|6" "6|9" "7|11" "10|5" "11|3")
+CONV_ITEMS=("1|6" "3|6" "4|4" "5|6" "6|9" "7|11" "10|5" "11|4")
 CONV_SUBHEADS=("8|10")    # ### 8.n subheadings
 CONV_LETTERS=("9|5")      # **(a) ... **(e) rules
 
