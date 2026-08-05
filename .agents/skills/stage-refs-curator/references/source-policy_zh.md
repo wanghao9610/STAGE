@@ -34,13 +34,13 @@ Google Scholar 不是这里的来源：它没有 API，用 CAPTCHA 挡自动请�
 **端点。** 是相关性检索，不是记录查询：
 
 - **Semantic Scholar 相关性检索**——`https://api.semanticscholar.org/graph/v1/paper/search?query=<q>&limit=20&fields=title,abstract,year,venue,authors,externalIds,citationCount`——主力。候选被收进来时，它的 `externalIds` 能直接往回跳到 DBLP 或 Crossref；它的 `citationCount` 不用第二次调用就给出了临时分数。
-- **引文图扩展**，手上已经有几条候选之后——`https://api.semanticscholar.org/graph/v1/paper/<id>/references` 与 `/citations?fields=title,year,venue,citationCount`——一篇近邻工作站在谁肩上、以及谁回应了它。这能够到任何关键词查询都翻不出来的工作，也是结果太薄时该做的事：再造同义词是在假装覆盖，走引文图才是真去找。
+- **引文图扩展**，手上已经有几条候选之后——`https://api.semanticscholar.org/graph/v1/paper/<id>/references` 与 `/citations?fields=title,year,venue,citationCount`——一篇近邻工作站在谁肩上、以及谁回应了它。这能够到任何关键词查询都翻不出来的工作，也是结果太薄时该做的事：再造同义词是在假装覆盖，走引文图才是真去找。**最多 3 篇种子、只走一跳，绝不两跳**——顶格 6 次请求。这是整个发现流程里唯一的递归结构：一页 `/references` 就带回上百个节点，每一个还能再展开，所以第二跳不是让检索更深的地方，而是让它不再终止的地方。3 篇种子按与画像的重合度挑，绝不按引用量挑。
 - **DBLP 文献检索**——`https://dblp.org/search/publ/api?q=<q>&format=json&h=20`——venue 型与作者型查询的召回更好。
 - **arXiv 全文查询**——`http://export.arxiv.org/api/query?search_query=all:<q>&max_results=20`——够得着新到别处还没收录的工作。
 
 **查询。** 每轮 5–8 条，由检索画像生成，差异要体现在种类上而不是措辞上：任务本身的词、机制的词、这个领域实际在用的同义说法（一条只讲你自己词汇的查询，只找得到和你共用词汇的论文）、benchmark 与数据集名字，以及论文给自己取标题时那种"X for Y"的形状。每条查询都记下它返回了多少条命中——命中为零的也记，因为"查了，什么都没有"和"根本没查"是两种状态，只有其中一种构成停下来的理由。
 
-**预算。** 每次 `discover` 运行最多 25 次远程请求，按下面的分主机速率串行；这是同一份礼貌预算里切出来的份额，不是额外配额。撞到上限就结束检索并如实报告是撞了上限，绝不悄悄拿记忆把剩下的补齐。
+**预算。** 每个机制自带上界，整轮不设总量天花板，因此没有哪一步需要把一个计数器递给下一步。检索是 5–8 条查询，加上 3 篇种子 × 一跳的引文图扩展——大约 14 次请求，而查询条数正是本来就已经在记的那个量。作者挑完之后的部分——抓权威记录、读论文、自查的重抓——由他们挑了几篇决定，那是作者的决定，不是本文件配给的额度。礼貌是速率而不是总量，由下面的分主机速率结清；上面这些上界买到的是终止性，因为引文图是这里唯一不会自己停下来的结构。某个机制走到它的上界就在那里结束，并如实报告它走到了上界，绝不悄悄拿记忆把剩下的补齐。
 
 **匿名。** 当前周期的 `venue.yml` 写了 `anonymized: true`，或 `.env` 设了 `ANON=true` 时，查询只带主题词：绝不带手稿标题，绝不带它里面的原句，也绝不猜作者。查询会离开这台机器，而一条用论文自己句子拼出来的查询，能让握有日志的人认出一篇匿名投稿。
 

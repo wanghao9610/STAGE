@@ -18,7 +18,9 @@ model_trail:                    # append-only: one entry per write session, neve
      topic。存放原始内容的运行缓存：wkdrs/refs_<date>/raw/。
      模式：survey | intake | add | discover | seed | tidy | position | score | verify。
      跑过的每一条检索式，各自带上返回了多少条命中——命中为零的也写：查了没有是一个结果，
-     只有这份记录能把它和"根本没查"分开。discover 那一轮还要写明请求预算与实际用掉多少。 -->
+     只有这份记录能把它和"根本没查"分开。discover 那一轮还要把两条上界连同实际做到多少一起
+     写明：查询跑了几条（上界 5–8），以及走引文图展开了几篇种子（上界 3 篇、一跳）。这两个数
+     都从这份记录里数出来，而不是在旁边另写一句。 -->
 
 ## 2. 有笔记的论文
 
