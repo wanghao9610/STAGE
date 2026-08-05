@@ -290,7 +290,9 @@ frontmatter：`updated:`。`## Symbols`：`| Symbol | Meaning | First defined |`
 
 ### 8.7 `notes/refs/<ABBREV>.md` 与 `refs_index.md`
 
-笔记 frontmatter：`title:`、`venue:`、`year:`、`bibkey:`、`added:`。小节：`## What it does`、`## Relation to ours`、`## Citable facts`（事实要精确到足以让 cite-auditor 拿它核对断言）。索引：`| Abbrev | Title | Venue | Year | Bibkey | Note |`。
+笔记 frontmatter：`title:`、`venue:`、`year:`、`bibkey:`、`added:`。小节：`## What it does`、`## Relation to ours`、`## Citable facts`（事实要精确到足以让 cite-auditor 拿它核对断言）。笔记的文件名用论文自己的 `ABBREV` 代号（`CLIP.md`）；`bibkey:` 记的是 bib 里的 citekey，形如 `<Year>_<Method>_<FirstAuthorSurname>`（`2021_CLIP_Radford`）——两者是两个不同的串，这是有意的；已经被 `manus/` 引用的 citekey，以及从 `mates/` 播种来的 citekey，都不会为了迁就方案而被改写。
+
+`refs_index.md` 是这份 bib 的审计线索，分八个小节：范围、有笔记的论文、类别、出处（每条 bib 条目一行，100% 覆盖，自拟代号标 †、只有预印本的标 ‡）、带子指标与抓取日期的影响力评分、待人工核对的细节、自查、下一步。没有出处行的条目不允许存在。确切形状放在 `stage-refs-curator` 的 `references/` 下：本文件见 `refs-index-template.md`，citekey、`% src:` 行、`%% Needs manual check` 块、规范化封闭清单与评分算式见 `source-policy.md`。
 
 ### 8.8 评审与回复
 

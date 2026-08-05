@@ -44,7 +44,7 @@ re-reading routes to `$stage-refs-curator`.
 
 1. **§9b is the charter.** An assertion about a cited work — what it does, shows, achieves, or
    fails at — is checkable only against a reading note: `notes/refs/<ABBREV>.md`, found via the
-   `refs_index.md` bibkey column, or an imported note under `mates/<slug>/metds/refs/`. No note →
+   citekey rows of `refs_index.md` (§2 for notes, §4 for entries), or an imported note under `mates/<slug>/metds/refs/`. No note →
    `unverifiable`; a note that does not carry the fact → `unsupported`. Never bridge the gap from
    memory: model recall of a paper is not a reading note (§9e). An empty or missing `notes/refs/`
    makes every assertion unverifiable — that is the finding, not an error.

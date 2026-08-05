@@ -288,7 +288,9 @@ Frontmatter: `updated:`. `## Symbols`: `| Symbol | Meaning | First defined |`;
 
 ### 8.7 `notes/refs/<ABBREV>.md` and `refs_index.md`
 
-Note frontmatter: `title:`, `venue:`, `year:`, `bibkey:`, `added:`. Sections: `## What it does`, `## Relation to ours`, `## Citable facts` (facts precise enough for cite-auditor to check assertions against). Index: `| Abbrev | Title | Venue | Year | Bibkey | Note |`.
+Note frontmatter: `title:`, `venue:`, `year:`, `bibkey:`, `added:`. Sections: `## What it does`, `## Relation to ours`, `## Citable facts` (facts precise enough for cite-auditor to check assertions against). The note's filename is the paper's `ABBREV` handle (`CLIP.md`); `bibkey:` carries the bib's citekey, `<Year>_<Method>_<FirstAuthorSurname>` (`2021_CLIP_Radford`) — the two are different strings on purpose, and a citekey already cited in `manus/`, or seeded from `mates/`, is never rewritten to fit the scheme.
+
+`refs_index.md` is the bib's audit trail, in eight sections: scope, papers with notes, categories, provenance (one row per bib entry, 100% coverage, coined handles marked †, preprint-only entries ‡), impact scores with their sub-signals and fetch dates, needs-manual-check detail, self-audit, next actions. An entry with no provenance row is not allowed to exist. `stage-refs-curator`'s `references/` holds the exact shapes: `refs-index-template.md` for this file, `source-policy.md` for the citekey, the `% src:` line, the `%% Needs manual check` block, the closed list of normalizations, and the score arithmetic.
 
 ### 8.8 Reviews and response
 
