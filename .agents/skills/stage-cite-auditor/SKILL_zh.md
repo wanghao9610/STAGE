@@ -1,10 +1,7 @@
 ---
 name: stage-cite-auditor
 description: >-
-  引用审计：每个 \cite key 都必须能在 manus/bibs/reference.bib 里解析，而关于被引工作的每条断言 都必须能对着一份阅读笔记核查（notes/refs/，或 mates/
-  下导入的 refs）——核查不了或没有支撑的 断言只被标出，绝不静默修改。同时扫描缺失的引用与 bib 字段卫生。对手稿、bib 与台账都是只读； 写
-  wkdrs/reports/CITES_<date>.md（临时）外加 tasks/ 后续条目，并把每一处修复路由给 $stage-refs-curator 或
-  $stage-sect-drafter。只要用户调用 $stage-cite-auditor、一次运行点名它是下一步动作，或询问引用与 相关工作的说法站不站得住，都应使用本 skill。
+  引用审计：每个 \cite key 都必须能在 manus/bibs/reference.bib 里解析，而关于被引工作的每条断言都必须能对着一份阅读笔记核查（notes/refs/，或 mates/ 下导入的 refs）——核查不了或没有支撑的断言只被标出，绝不静默修改。同时扫描缺失的引用与 bib 字段卫生。对手稿、bib 与台账都是只读；写 wkdrs/reports/CITES_<date>.md（临时）外加 tasks/ 后续条目，并把每一处修复路由给 $stage-refs-curator 或 $stage-sect-drafter。只要用户调用 $stage-cite-auditor、一次运行点名它是下一步动作，或询问引用与相关工作的说法站不站得住，都应使用本 skill。
 ---
 
 # Citation Auditor —— key 能解析、断言被核过、什么都不打补丁

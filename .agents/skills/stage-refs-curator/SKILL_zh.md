@@ -1,12 +1,7 @@
 ---
 name: stage-refs-curator
 description: >-
-  维护论文的参考文献底盘：manus/bibs/reference.bib，其中每个字段都是从本次运行抓取到的记录里 誊写下来的（DBLP、Crossref、Semantic
-  Scholar、arXiv——绝不凭记忆）；阅读笔记 notes/refs/<ABBREV>.md，其 Citable facts 精确到足以让 $stage-cite-auditor 拿它核对手稿断言；
-  以及索引 notes/refs/refs_index.md。存在导入的 STAR refs（在 mates/ 下）时以它们为种子， 并保持上游 bibkey
-  稳定。不带参数时普查底盘并审查它的卫生状况；给出一个 arXiv id、DOI、URL 或带引号的标题则收进一篇论文，`add` 收多篇；`seed` 转换导入的 STAR refs；`tidy` 离线修
-  bib 卫生问题；`position` 为相关工作把 bib 聚类。抓不到记录的论文只列进人工核查清单，绝不猜着写进 bib。只要用户调用
-  $stage-refs-curator、一次运行点名它是下一步动作，或要求添加一条引用或一份阅读笔记、清理或去重参考文献、 或者把论文对着相关工作定位，都应使用本 skill。
+  维护论文的参考文献底盘：manus/bibs/reference.bib，其中每个字段都是从本次运行抓取到的记录里誊写下来的（DBLP、Crossref、Semantic Scholar、arXiv——绝不凭记忆）；阅读笔记 notes/refs/<ABBREV>.md，其 Citable facts 精确到足以让 $stage-cite-auditor 拿它核对手稿断言；以及索引 notes/refs/refs_index.md。存在导入的 STAR refs（在 mates/ 下）时以它们为种子，并保持上游 bibkey 稳定。不带参数时普查底盘并审查它的卫生状况；给出一个 arXiv id、DOI、URL 或带引号的标题则收进一篇论文，`add` 收多篇；`seed` 转换导入的 STAR refs；`tidy` 离线修 bib 卫生问题；`position` 为相关工作把 bib 聚类。抓不到记录的论文只列进人工核查清单，绝不猜着写进 bib。只要用户调用 $stage-refs-curator、一次运行点名它是下一步动作，或要求添加一条引用或一份阅读笔记、清理或去重参考文献、或者把论文对着相关工作定位，都应使用本 skill。
 ---
 
 # Refs Curator —— 经核实的参考文献，与审计器查得动的笔记

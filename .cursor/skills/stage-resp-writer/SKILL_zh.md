@@ -2,13 +2,7 @@
 name: stage-resp-writer
 disable-model-invocation: true
 description: >-
-  把 cycls/<cycle>/reviews/ 里的每一份评审——用户投放的 received_<id>.md 文件，以及来自
-  /stage-peer-reviewer 的 SIM_REVIEW_* 文件——变成一本逐点台账，把每一次攻击映射到主张与证据，
-  然后在 venue 的 response_limit 之内起草回复。写 cycls/<cycle>/response/RESPONSE_<date>.md，
-  把每一条许下的改动同步成 tasks/<cycle>_promises.md 里的一个复选框，并把让步掉的主张在
-  notes/claims.md 里降级为 weakened。绝不编辑手稿，也绝不编辑评审文件本身。只要用户运行
-  /stage-resp-writer，或要求起草一份 rebuttal 或回复信、逐点回答评审人、或者决定让步什么，
-  都应使用本 skill。
+  把 cycls/<cycle>/reviews/ 里的每一份评审——用户投放的 received_<id>.md 文件，以及来自 /stage-peer-reviewer 的 SIM_REVIEW_* 文件——变成一本逐点台账，把每一次攻击映射到主张与证据，然后在 venue 的 response_limit 之内起草回复。写 cycls/<cycle>/response/RESPONSE_<date>.md，把每一条许下的改动同步成 tasks/<cycle>_promises.md 里的一个复选框，并把让步掉的主张在 notes/claims.md 里降级为 weakened。绝不编辑手稿，也绝不编辑评审文件本身。只要用户运行 /stage-resp-writer，或要求起草一份 rebuttal 或回复信、逐点回答评审人、或者决定让步什么，都应使用本 skill。
 ---
 
 # Response Writer —— 逐点辩护，承诺上账

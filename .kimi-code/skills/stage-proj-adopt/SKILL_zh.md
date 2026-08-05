@@ -2,15 +2,7 @@
 name: stage-proj-adopt
 disable-model-invocation: true
 description: >-
-  把一份已经动工的 LaTeX 手稿接进 STAGE，且不毁掉任何东西。先做一次只读盘点，把草稿摸清——主文件、
-  章节 input、图、表、参考文献、样式、venue 信号、git 形态，以及那些看起来是证据而非正文的文件——
-  然后映射方案与逐文件的搬迁计划各自先获确认，之后才动手；每一处 \input、\graphicspath、
-  \bibliography 的改动都在计划里先点名再施行，接好的树用一次构建验证。外部草稿是复制进来的，
-  它的源码树绝不被修改。正文里已有的每个数字都记为一条 unsourced 主张——这就是
-  /skill:stage-clms-auditor 逐条清掉的待办——候选证据文件被路由给 /skill:stage-evid-curator，
-  在这里绝不复制进 mates/。只要用户运行 /skill:stage-proj-adopt、想把一篇已有论文、学位论文章节或
-  Overleaf 导出接进 STAGE，或者询问不是从模板起步的草稿该怎么接入，都应使用本 skill。
-  Bilingual (en/zh)。
+  把一份已经动工的 LaTeX 手稿接进 STAGE，且不毁掉任何东西。先做一次只读盘点，把草稿摸清——主文件、章节 input、图、表、参考文献、样式、venue 信号、git 形态，以及那些看起来是证据而非正文的文件——然后映射方案与逐文件的搬迁计划各自先获确认，之后才动手；每一处 \input、\graphicspath、 \bibliography 的改动都在计划里先点名再施行，接好的树用一次构建验证。外部草稿是复制进来的，它的源码树绝不被修改。正文里已有的每个数字都记为一条 unsourced 主张——这就是 /skill:stage-clms-auditor 逐条清掉的待办——候选证据文件被路由给 /skill:stage-evid-curator，在这里绝不复制进 mates/。只要用户运行 /skill:stage-proj-adopt、想把一篇已有论文、学位论文章节或 Overleaf 导出接进 STAGE，或者询问不是从模板起步的草稿该怎么接入，都应使用本 skill。 Bilingual (en/zh)。
 ---
 
 # Project Adopt —— 把进行中的手稿接进 STAGE

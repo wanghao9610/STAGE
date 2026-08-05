@@ -2,11 +2,7 @@
 name: stage-stry-coach
 disable-model-invocation: true
 description: >-
-  以对话为先的辅导，塑形论文的故事：访谈用户——或者在 mates/ 下已导入 idea 文档与结果 digest 时
-  据它们起草——直到 pitch、问题、核心想法、贡献与目标 venue 都定下来。写 notes/story.md，
-  以每条贡献一条 proposed 主张为 notes/claims.md 播种，并且只用用户确认过的取值创建
-  cycls/<cycle>/venue.yml——绝不出现臆造的页数上限或截稿日期。只要用户运行 /skill:stage-stry-coach，
-  或要求塑形论文的故事或 pitch、打磨贡献、挑选目标 venue、开启一个投稿周期，都应使用本 skill。
+  以对话为先的辅导，塑形论文的故事：访谈用户——或者在 mates/ 下已导入 idea 文档与结果 digest 时据它们起草——直到 pitch、问题、核心想法、贡献与目标 venue 都定下来。写 notes/story.md，以每条贡献一条 proposed 主张为 notes/claims.md 播种，并且只用用户确认过的取值创建 cycls/<cycle>/venue.yml——绝不出现臆造的页数上限或截稿日期。只要用户运行 /skill:stage-stry-coach，或要求塑形论文的故事或 pitch、打磨贡献、挑选目标 venue、开启一个投稿周期，都应使用本 skill。
 ---
 
 # Story Coach —— 从结果到一个站得住的 pitch

@@ -604,6 +604,36 @@ for guide in docs/mds/stage-workflow/writing-workflow-skills.md \
 done
 (( doc_errors == 0 )) && note "guides and landing pages name every skill; workflow docs paired en/zh; links resolve"
 
+# 16. Chinese descriptions carry no space between two Chinese characters.
+#     A folded scalar turns every line break into a space, which is what English
+#     descriptions want and Chinese ones never do: wrapping 中文 across two lines
+#     puts a space inside a word, and the next rewrap bakes that space in and
+#     adds a new one at the new break. The value the harness reads drifts one
+#     space per edit while the file still looks wrapped and tidy.
+#     The invariant is therefore both halves: the description is one line, so a
+#     fold cannot introduce a space, and no such space is already in it. The
+#     scan is non-ASCII-space-non-ASCII, which also catches "——" carrying a
+#     space on one side only; a space between Chinese and Latin (`notes/` 里的)
+#     is correct style and has an ASCII character on one side, so it passes.
+section "Chinese description spacing (SKILL_zh.md)"
+zh_desc_errors=0
+while IFS= read -r manifest; do
+    verdict="$(perl -CSD -Mutf8 -0777 -ne '
+        my ($fm) = /\A---\n(.*?)\n---\n/s or exit 0;
+        my ($body) = $fm =~ /^description:[^\n]*\n((?:[ \t]+\S[^\n]*\n?)+)/m or exit 0;
+        my @lines = grep { /\S/ } split /\n/, $body;
+        print "multi-line description: a fold would put a space inside a word\n" if @lines > 1;
+        my $joined = join " ", map { my $l = $_; $l =~ s/^\s+|\s+$//g; $l } @lines;
+        print "space between two Chinese characters\n" if $joined =~ /[^\x00-\x7f] [^\x00-\x7f]/;
+    ' "${manifest}")"
+    while IFS= read -r line; do
+        [[ -n "${line}" ]] || continue
+        fail "${manifest}: ${line}"
+        zh_desc_errors=1
+    done <<< "${verdict}"
+done < <(find "${SKILL_ROOTS[@]}" -name 'SKILL_zh.md' | sort)
+(( zh_desc_errors == 0 )) && note "every Chinese description is one line with no space inside a word"
+
 printf '\n'
 if (( FAILURES > 0 )); then
     printf '%d check(s) failed.\n' "${FAILURES}"

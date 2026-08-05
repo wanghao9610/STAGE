@@ -1,11 +1,7 @@
 ---
 name: stage-clms-auditor
 description: >-
-  数字审计：从 manus/tabs/ 与 manus/secs/ 里抽出每一个数字，顺着 % src: 注释与主张台账的证据链接， 把每个数字追到带指纹的 mates/
-  条目，并逐个数字给出判定——matched、mismatched 或 unsourced。 翻转 notes/claims.md 的状态（drafted → verified / unsourced），经
-  import.sh --diff 检查证据过期， 写 wkdrs/reports/CLAIMS_<date>.md（临时）以及每个失败一条 tasks/ 条目。绝不编辑手稿或 mates/——
-  每一处修复都路由到拥有那个文件的 skill。只要用户调用 $stage-clms-auditor、一次运行点名它是下一步动作、询问论文的数字是否 有证据支撑，或者在任何投稿冻结之前，都应使用本
-  skill。
+  数字审计：从 manus/tabs/ 与 manus/secs/ 里抽出每一个数字，顺着 % src: 注释与主张台账的证据链接，把每个数字追到带指纹的 mates/ 条目，并逐个数字给出判定——matched、mismatched 或 unsourced。翻转 notes/claims.md 的状态（drafted → verified / unsourced），经 import.sh --diff 检查证据过期，写 wkdrs/reports/CLAIMS_<date>.md（临时）以及每个失败一条 tasks/ 条目。绝不编辑手稿或 mates/——每一处修复都路由到拥有那个文件的 skill。只要用户调用 $stage-clms-auditor、一次运行点名它是下一步动作、询问论文的数字是否有证据支撑，或者在任何投稿冻结之前，都应使用本 skill。
 ---
 
 # Claims Auditor —— 每个数字要么追到指纹，要么被逮住

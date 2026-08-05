@@ -2,15 +2,7 @@
 name: stage-subm-packer
 disable-model-invocation: true
 description: >-
-  为当前周期做投稿的预检与打包：execs/run.sh 构建与 execs/scpts/lint.sh 关口必须双双通过，
-  然后对着用户确认过的 venue.yml 事实走一遍清单、做一次图/表/参考文献的齐备性巡检、在
-  wkdrs/builds/ 下打出包（camera PDF、补充材料、arXiv 可用源码）、写下持久记录
-  cycls/<cycle>/SUBMISSION_<date>.md，并打上冻结 tag freeze/<cycle>_<date>——它是这个家族里
-  唯一被允许创建 git tag 的 skill。camera-ready 模式还会在 tasks/<cycle>_promises.md 仍有
-  未勾选的承诺框时拒绝打包；convert 模式把论文改排成用户提供的官方 venue 模板，产出 wkdrs/ 下
-  一份可重新生成的副本，绝不抓取或重建模板。它只打包与记录；绝不上传到投稿系统、绝不 push、
-  绝不编辑手稿。只要用户运行 /skill:stage-subm-packer，或要求打包、冻结、转成 venue 模板，或准备
-  投稿、camera-ready、arXiv 源码，都应使用本 skill。
+  为当前周期做投稿的预检与打包：execs/run.sh 构建与 execs/scpts/lint.sh 关口必须双双通过，然后对着用户确认过的 venue.yml 事实走一遍清单、做一次图/表/参考文献的齐备性巡检、在 wkdrs/builds/ 下打出包（camera PDF、补充材料、arXiv 可用源码）、写下持久记录 cycls/<cycle>/SUBMISSION_<date>.md，并打上冻结 tag freeze/<cycle>_<date>——它是这个家族里唯一被允许创建 git tag 的 skill。camera-ready 模式还会在 tasks/<cycle>_promises.md 仍有未勾选的承诺框时拒绝打包；convert 模式把论文改排成用户提供的官方 venue 模板，产出 wkdrs/ 下一份可重新生成的副本，绝不抓取或重建模板。它只打包与记录；绝不上传到投稿系统、绝不 push、绝不编辑手稿。只要用户运行 /skill:stage-subm-packer，或要求打包、冻结、转成 venue 模板，或准备投稿、camera-ready、arXiv 源码，都应使用本 skill。
 ---
 
 # Submission Packer —— 预检、打包、冻结

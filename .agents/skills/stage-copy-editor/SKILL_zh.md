@@ -1,9 +1,7 @@
 ---
 name: stage-copy-editor
 description: >-
-  对一节或整篇手稿做一遍打磨：清晰度、流畅度、对着 notes/notation.md 的术语与缩写一致性， 以及朝提纲页数预算裁短篇幅。就地编辑 manus/ 下的散文，但绝不改变技术含义、任何数字、
-  任何引用或参考文献 key、任何 \todo 标记；内容层面的删减与系统性问题只报告与路由， 绝不静默施行。写 wkdrs/reports/POLISH_<date>.md（临时）外加 tasks/
-  里的后续条目， 并证明手稿仍然构建得过。只要用户调用 $stage-copy-editor、一次运行点名它是下一步动作，或要求打磨、收紧、校对论文散文 或去掉行话，都应使用本 skill。
+  对一节或整篇手稿做一遍打磨：清晰度、流畅度、对着 notes/notation.md 的术语与缩写一致性，以及朝提纲页数预算裁短篇幅。就地编辑 manus/ 下的散文，但绝不改变技术含义、任何数字、任何引用或参考文献 key、任何 \todo 标记；内容层面的删减与系统性问题只报告与路由，绝不静默施行。写 wkdrs/reports/POLISH_<date>.md（临时）外加 tasks/ 里的后续条目，并证明手稿仍然构建得过。只要用户调用 $stage-copy-editor、一次运行点名它是下一步动作，或要求打磨、收紧、校对论文散文或去掉行话，都应使用本 skill。
 ---
 
 # Manuscript Copy Editor —— 不改变任何事实的散文打磨
