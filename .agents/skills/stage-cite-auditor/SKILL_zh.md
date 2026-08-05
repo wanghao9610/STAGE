@@ -47,3 +47,4 @@ description: >-
 - `wkdrs/reports/CITES_<date>.md`——登记表行：Audit reports，生产者 `stage-cite-auditor`，临时，日期在文件名里。frontmatter `date:`、`scope:`；小节：`## Verdict`（检查了多少 key / 多少未定义；断言 supported / unsupported / unverifiable；缺引用与卫生问题的计数）、`## Keys`（未定义的及其位置；未被引用的条目）、`## Assertions`——`| Where | Assertion | Key | Note | Verdict |`，失败在前、`## Missing citations`、`## Bib hygiene`（把条目引上）、`## Tasks filed`。
 - `tasks/cites_followups.md`——在带日期的标题下，每个失败一个复选框：那份持久成果。
 - 手稿、`manus/bibs/reference.bib`、`notes/refs/` 与台账在这里都是只读的——标出的问题与路由就是全部产物。
+- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

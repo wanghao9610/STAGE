@@ -129,3 +129,4 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
   failure in `tasks/claims_followups.md` — the durable outcomes.
 - Never edits `manus/`, `mates/`, or the bib: verdicts, flips, and tasks are the entire write
   surface.
+- Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

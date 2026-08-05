@@ -102,3 +102,4 @@ confirmed: 2026-08-02
 - `notes/claims.md`——在这里创建，播下的每一行都是 `proposed`；之后由 `/stage-sect-drafter`、`/stage-tabs-builder`、`/stage-clms-auditor` 与 `/stage-resp-writer` 更新。登记表状态：每条主张的 `Status`。
 - `cycls/<cycle>/venue.yml`——扁平的 `key: value`，只放用户确认过的取值；`confirmed:` 只由一次明确的用户确认填上。登记表行：Venue profile —— 在这里产出（或由 `/stage-proj-adopt` 产出）。
 - 在聊天里：那份 ≤300 词的汇报。本 skill 绝不写 `manus/` 或 `mates/` 下的任何东西。
+- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

@@ -5,6 +5,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stage_model_id.sh",
+            "statusMessage": "Recording session model id for STAGE provenance"
+          },
+          {
+            "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stage_memory.sh",
             "statusMessage": "Loading STAGE project memory"
           }

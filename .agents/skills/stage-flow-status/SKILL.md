@@ -76,7 +76,7 @@ writes, and never present a guess as a state.
 
 ## Workflow
 
-1. **Load.** Read the conventions in full, then scan the registry artifacts: frontmatter and
+1. **Load.** Read the conventions in full, then scan the registry artifacts: frontmatter — `model_id:` and `model_trail:` included (§8) — and
    status tables of `notes/story.md`, `notes/outline.md`, `notes/claims.md`, `notes/notation.md`;
    `mates/MANIFEST.md` entries; `notes/refs/refs_index.md` rows against `manus/bibs/reference.bib`
    keys; the active cycle's `venue.yml`, `reviews/`, `response/`, and `SUBMISSION_*`;
@@ -119,6 +119,11 @@ Registry row (conventions §8): Status — no artifact on disk; read-only, repor
 field.
 
 Report order: cycle state → outline board → claim coverage → evidence and refs → build and lint →
-gap lines (omitted when none fire) → the one next action with its exact $stage-* command and
+provenance → gap lines (omitted when none fire) → the one next action with its exact $stage-* command and
 reason. Compact tables and tallies, never prose per row; "unknown" where a field is missing; the
 whole reply under ~500 words.
+
+**Provenance** is one line (§8): the models this paper's artifacts name as their last writer,
+with a count each — `claude-opus-5[1m] ×7, gpt-5 ×2` — followed by how many registry artifacts
+carry no `model_trail` yet, named when there are three or fewer. It reports, never gates: a
+missing trail is a file written before the field existed, not a next action.

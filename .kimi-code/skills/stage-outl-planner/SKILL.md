@@ -101,3 +101,4 @@ Set outline `finalized:` (real date) only when all of: both plans user-confirmed
 - `manus/secs/<n>_<slug>.tex` — one skeleton per Sections row: brief comment block, `\section` line, one `\todo`; each matching `\input` line uncommented in `manus/main.tex`; the result compiles via `execs/run.sh`.
 - `notes/notation.md` — created here; `/skill:stage-sect-drafter` appends, `/skill:stage-copy-editor` enforces. Registry state: `updated:`.
 - In chat: the ≤300-word report. Never written here: section prose, `notes/claims.md`, `mates/`, `venue.yml`.
+- Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

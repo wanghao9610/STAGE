@@ -198,6 +198,19 @@ STAGE_LANG=
 
 **过期靠逐字比对判定，绝不看 mtime。** 编译或导入产物会把它来源的时间戳*按读取当时的样子*记下来——对证据而言就是 MANIFEST 条目里的 `source-stamp:`，取自上游文件第一行 `generated:`/`updated:`/`finalized:`。判定过期靠把当前上游取值与记录在案的那个逐字节比对；文件 mtime 会因无关原因变动，永不参考。`import.sh --diff` 为证据实现了这一点，`stage-clms-auditor` 在信任任何指纹之前先跑它。
 
+**每份工作流产物都记下写它的模型。** 每个生产者把 `model_id` 写进它在 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 下创建的文件的 frontmatter；还没有 frontmatter 块的文件——`notes/refs/refs_index.md`——为它加一个。取值是运行时为本次写入会话报出的模型 id，原样抄录；而运行时确实会报：STAGE 的 `stage_model_id.sh` 钩子把它写进会话上下文，Claude Code 还会在系统提示里写明。那行注入缺失，或带来的是一条恢复命令而不是 id 时，`model_id_spec.md` 给出各运行时的兜底——先跑它，再考虑写 `unrecorded`，那是留给"会话里任何地方都没写明模型"的取值。绝不凭行为推断，绝不去想"这大概是哪个模型"，也绝不把一份产物的取值抄到另一份上。
+
+**而 `model_trail` 记的是跨写入者的流水。** `model_id` 只说明一次写入；这些文件多半是跨很多次会话写成的——一本被五个 skill 改到论文完稿的台账、每个周期重排一次的提纲、一篇一篇长起来的参考文献库——单个字段在那里只描述最后一次。所以凡带 `model_id` 的产物，旁边都带一份只追加的 `model_trail`：每次写入会话一条，`{ date, model, skill, scope }`，其中 `scope` 用这份文件自己的词汇说清那次会话写了什么——claim ID、章节号、评审要点、表格行。只追加，绝不改写已有条目，并让 `model_id` 始终镜像最后一条，好让一次普通的 grep 仍然有效。一次写成的产物——每份带日期的报告、模拟评审、回复、投稿记录——只有一条；重新生成的产物另起一条新流水，而不是接着它所替换的那一代往下写。形状见 §8.1，这一对字段进入 §8.4–§8.10 每个 schema 的 frontmatter，不在每处重复列出。
+
+**有三处刻意都不带。** `manus/` 下的一切都不带：手稿是交给 venue 和 arXiv 的东西，一篇论文是否披露 AI 参与，是作者按其 venue 政策做的决定，而不是某个 skill 留在 `.tex` 里的一行注释。`mates/` 下的一切也不带：证据不可变（§9d），且它自带溯源——`source-type:`、`source:`、`source-commit:`、`source-stamp:`、`sha256:`、`imported:`——其中很大一部分由 `import.sh` 写入，那是个没有模型可报的 shell 脚本。`cycls/<cycle>/venue.yml` 同样不带：它的取值是用户确认过的事实，`confirmed:` 就是它的溯源（§9c）。不带它们，谁起草了某一节仍然可追：被它改成 `drafted` 的主张行、被它翻状态的提纲行、读过它的审计报告的流水。
+
+有两条限制要紧，因为这些字段会被用来跨模型比较工作：
+
+1. **它们是自报的，不是核验过的。** 记的是运行时在写入当刻的说法。会话中途换过模型的，可能仍被换之前那个字符串描述，于是取值会滞后于事实。把它当作关于溯源的证据，而不是溯源的证明。
+2. **流水数的是写入事件，而写入事件不等于贡献。** 流水更长不等于工作更好：它说的是谁在什么时候动过这份文件，完全不说这次动手有没有帮上忙。
+
+`stage-flow-status` 是唯一把它们汇到一起的读者——按产物报出最后写它的模型、它的流水有多长，并点名每一份缺流水的登记产物，那正是这些字段存在之前写成的文件的样子。没有任何东西由它们生成，所以也没有一份需要保持同步的台账文件。
+
 下表指向的文件 schema。写这些文件的 skill 就写成这个形状；读它们的 skill 可以依赖这个形状。
 
 ### 8.1 `notes/claims.md`
@@ -205,6 +218,9 @@ STAGE_LANG=
 ```markdown
 ---
 updated: YYYY-MM-DD
+model_id: <this session's model id, verbatim | unrecorded>
+model_trail:                    # append-only: one entry per write session, never rewritten
+  - { date: YYYY-MM-DD, model: <id | unrecorded>, skill: stage-…, scope: <what this session wrote> }
 ---
 # Claim ledger
 

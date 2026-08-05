@@ -143,3 +143,7 @@ sources: [reviews/received_R2.md, reviews/SIM_REVIEW_<date>.md]
 
 In chat: the Step 6 digest. Review files are read-only inputs and the manuscript is untouched —
 every promised change is a checkbox pointing at the skill that will make it.
+
+Provenance (conventions §8): every artifact above under `notes/`, `tasks/`, `cycls/`, or
+`wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended
+`model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

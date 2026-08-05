@@ -196,6 +196,19 @@ Real reviews from a venue are dropped by the user into `cycls/<cycle>/reviews/` 
 
 **Staleness is exact comparison, never mtime.** A compiled or imported artifact records its source's stamp *as it was when read* — for evidence, the `source-stamp:` in its MANIFEST entry, taken from the first `generated:`/`updated:`/`finalized:` line of the upstream file. Staleness is detected by comparing the current upstream value against the recorded one, byte-exact; file mtimes move for unrelated reasons and are never consulted. `import.sh --diff` implements this for evidence, and `stage-clms-auditor` runs it before trusting any fingerprint.
 
+**Every workflow artifact records the model that wrote it.** Each producer writes `model_id` into the frontmatter of what it creates under `notes/`, `tasks/`, `cycls/`, and `wkdrs/reports/`; a file that has no frontmatter block yet — `notes/refs/refs_index.md` — gains one for it. The value is the model id the runtime reports for the writing session, copied verbatim, and the runtime does report it: STAGE's `stage_model_id.sh` hook states it in the session context, and Claude Code names it in the system prompt besides. Where that line is missing, or carries a recovery command in place of an id, `model_id_spec.md` holds the per-runtime fallback — run it before writing `unrecorded`, which is the value for a session that names no model anywhere. Never infer it from behavior, never reason about which model this is "probably", and never copy one artifact's value into another.
+
+**And `model_trail` records the flow across writers.** `model_id` names one write; most of these files are written across many sessions — a ledger five skills edit for the life of the paper, an outline replanned each cycle, a reference base grown paper by paper — and there a single field describes only the last one. So every artifact carrying `model_id` carries an append-only `model_trail` beside it: one entry per write session, `{ date, model, skill, scope }`, where `scope` names what that session wrote in the file's own vocabulary — claim IDs, section numbers, review points, table rows. Append, never rewrite a past entry, and keep `model_id` mirroring the last entry so a plain grep still works. A write-once artifact — every dated report, simulated review, response, and submission record — has exactly one entry; a regenerated one starts a fresh trail rather than extending the trail of the generation it replaced. The shape is the one in §8.1, and the pair joins the frontmatter of every schema in §8.4–§8.10 without being repeated in each.
+
+**Three places deliberately carry neither.** Nothing under `manus/`: the manuscript is what the venue and arXiv receive, and whether a paper discloses AI assistance is the authors' decision under their venue's policy, not a comment a skill leaves in a `.tex` file. Nothing under `mates/`: evidence is immutable (§9d) and already carries its own provenance — `source-type:`, `source:`, `source-commit:`, `source-stamp:`, `sha256:`, `imported:` — and much of it is written by `import.sh`, a shell script with no model to report. And not `cycls/<cycle>/venue.yml`, whose values are the user's confirmed facts and whose `confirmed:` is their provenance (§9c). Who drafted a section stays traceable without them: the claim rows it moved to `drafted`, the outline row it flipped, the trail of the audit report that read it.
+
+Two limits matter, because these fields will be used to compare work across models:
+
+1. **They are self-reported, not verified.** They record what the runtime claimed at write time. A model switched mid-session may still be described by the pre-switch string, so a value can lag reality. Treat it as evidence about provenance, not proof of it.
+2. **A trail counts write events, and a write event is not a contribution.** A longer trail is not better work: it says who touched the file and when, and nothing about whether the touch helped.
+
+`stage-flow-status` is the only reader that puts them together — per artifact, the model that last wrote it and how long its trail is, plus every registry artifact whose trail is missing, which is what a file written before these fields existed looks like. Nothing is generated from them, so there is no ledger file to keep in step.
+
 The file schemas the table points at. A skill that writes one of these files writes exactly this shape; a skill that reads one may rely on it.
 
 ### 8.1 `notes/claims.md`
@@ -203,6 +216,9 @@ The file schemas the table points at. A skill that writes one of these files wri
 ```markdown
 ---
 updated: YYYY-MM-DD
+model_id: <this session's model id, verbatim | unrecorded>
+model_trail:                    # append-only: one entry per write session, never rewritten
+  - { date: YYYY-MM-DD, model: <id | unrecorded>, skill: stage-…, scope: <what this session wrote> }
 ---
 # Claim ledger
 

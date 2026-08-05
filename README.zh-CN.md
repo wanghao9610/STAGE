@@ -87,18 +87,18 @@ STAGE/
 ├── .stage/memory/          # 项目记忆：早先会话学到的东西（local/ 被 git 忽略）
 ├── .claude/
 │   ├── skills/             # Claude Code 使用的写作工作流 skill
-│   ├── hooks/              # 会话钩子：注入项目记忆索引
-│   └── settings.json       # 注册该钩子
+│   ├── hooks/              # 会话钩子：项目记忆索引、本次会话的模型 id
+│   └── settings.json       # 注册这两个钩子
 ├── .agents/skills/         # Codex 使用的写作工作流 skill（各带一份 agents/openai.yaml）
 ├── .codex/                 # Codex 的会话钩子与 hooks.json（skill 在 .agents/ 下）
 ├── .cursor/
 │   ├── skills/             # Cursor 使用的写作工作流 skill
 │   ├── rules/              # 常驻规则：AGENTS.md 正文 + skill 目录归属
-│   ├── hooks/              # 会话钩子，注册在 hooks.json 里
+│   ├── hooks/              # 两个会话钩子，注册在 hooks.json 里
 │   └── hooks.json
 ├── .kimi-code/
 │   ├── skills/             # Kimi Code 使用的写作工作流 skill
-│   ├── hooks/              # 会话钩子 + install.sh（Kimi 只认全局注册）
+│   ├── hooks/              # 两个会话钩子 + install.sh（Kimi 只认全局注册）
 │   └── hooks.example.toml  # install.sh 替你写进配置的那段注册片段
 ├── .cursorignore           # 把构建产物与 LaTeX 垃圾挡在 Cursor 索引之外
 ├── .env.example            # 本地配置示例
@@ -258,7 +258,7 @@ bash execs/scpts/lint.sh   # 未定义引用、\todo 计数、页数上限、匿
 
 `/stage-flow-status` 是最值得记住的一个：它读取盘上的提纲、台账、manifest 和周期状态，给出唯一的下一步行动及其准确命令，你永远不必回忆上次写到哪里。
 
-**一个钩子，每台机器装一次。** 一个会话钩子会在每次会话开头，把[项目记忆](#项目记忆)索引摆到 agent 面前。Claude、Codex、Cursor 出厂就分别在 `.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json` 里注册好了。Kimi 没有项目级钩子配置，所以跑一次 `bash .kimi-code/hooks/install.sh`——它把钩子写进你的全局 Kimi 配置，写之前先备份，重复跑不会有第二次改动，此后这台机器上的每篇 STAGE 论文都覆盖到。在 Codex 上，注册好还不等于在跑：项目钩子要先信任该项目、再批准该钩子才会触发，所以在 Codex CLI 里跑 `/hooks` 批准它，钩子变更后再批准一次。在此之前不会有任何记忆到达会话，也没有任何地方会提示这个缺口。在这个钩子出现之前就接入的论文仓库，保留的是它自己的注册文件——`execs/update.sh` 从不覆盖，只会点名其中缺了哪个钩子。
+**两个钩子，每台机器装一次。** 一个会话钩子会在每次会话开头，把[项目记忆](#项目记忆)索引摆到 agent 面前；另一个报出运行时给出的模型 id，好让 skill 写出的每份产物都记下是谁写的——`model_id` 加一条追加的 `model_trail` 条目（工作流规约 §8；各运行时的兜底见 `docs/mds/stage-workflow/model_id_spec.md`）。Claude、Codex、Cursor 出厂就把两个都分别在 `.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json` 里注册好了。Kimi 没有项目级钩子配置，所以跑一次 `bash .kimi-code/hooks/install.sh`——它把两个钩子都写进你的全局 Kimi 配置，写之前先备份，重复跑不会有第二次改动，此后这台机器上的每篇 STAGE 论文都覆盖到。在 Codex 上，注册好还不等于在跑：项目钩子要先信任该项目、再批准该钩子才会触发，所以在 Codex CLI 里跑 `/hooks` 批准它，钩子变更后再批准一次。在此之前不会有任何记忆到达会话，每份产物都只能记成 `unrecorded`，也没有任何地方会提示这个缺口。在某个钩子出现之前就接入的论文仓库，保留的是它自己的注册文件——`execs/update.sh` 从不覆盖，只会点名其中缺了哪个钩子。
 
 ## 写作工作流
 
@@ -364,8 +364,8 @@ bash execs/update.sh
 
 - `AGENTS.md` 与 `.cursor/rules/`——共享的 agent 指令，以及抄录其正文的 Cursor 规则；你对它们的改动会被替换，且两者成对移动——一份就是另一份的正文，不能各走各的
 - `.agents/skills/`、`.claude/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——同样的十五个 skill，每套 harness 一份
-- `.claude/hooks/`、`.codex/hooks/`、`.cursor/hooks/`、`.kimi-code/hooks/` 与 `.kimi-code/hooks.example.toml`——注入项目记忆索引的那个会话钩子，每套 harness 一份；`.stage/memory/` 下的记忆库属于论文自己，从不同步
-- `docs/mds/stage-workflow/`——工作流规约、skill 指南与记忆规范，中英两版
+- `.claude/hooks/`、`.codex/hooks/`、`.cursor/hooks/`、`.kimi-code/hooks/` 与 `.kimi-code/hooks.example.toml`——两个会话钩子：项目记忆索引与本次会话的模型 id，每套 harness 各一份；`.stage/memory/` 下的记忆库属于论文自己，从不同步
+- `docs/mds/stage-workflow/`——工作流规约、skill 指南、记忆规范与模型 id 规范，中英两版
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
 - `execs/update.sh`——更新脚本自己，为的是不让任何仓库卡在一个老到取不回后继版本的更新机制上。它用重命名装上：执行更新的那一次仍读旧文件跑完，下一次调用才用上新的
 

@@ -171,3 +171,7 @@ Registry row (§8): Simulated review — producer `stage-peer-reviewer`, durable
 date in filename. Exact shapes: `references/review-template.md`, schema summary in conventions
 §8.8. The manuscript and the claim ledger leave this run byte-identical to how they entered —
 reviewing never edits.
+
+Provenance (conventions §8): every artifact above under `notes/`, `tasks/`, `cycls/`, or
+`wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended
+`model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

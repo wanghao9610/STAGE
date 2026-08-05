@@ -6,6 +6,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": ".codex/hooks/stage_model_id.sh",
+            "statusMessage": "Recording session model id for STAGE provenance"
+          },
+          {
+            "type": "command",
             "command": ".codex/hooks/stage_memory.sh",
             "statusMessage": "Loading STAGE project memory"
           }

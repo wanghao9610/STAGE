@@ -105,6 +105,7 @@ Write `notes/adopt.md`: the confirmed mapping, every move executed (old → new)
 - Nothing is ever deleted: not build junk, not superseded copies, not the directories an overlay adoption empties — they are listed for the user, whose call it is.
 - Real dates only: the adoption date and every date in the record come from the system clock.
 - Git: history is read (dating the draft, finding the main file); confirmed moves inside a git tree run as `git mv` so the rename stays tracked; nothing is staged beyond what `git mv` itself stages, and this skill never commits — the commit is the user's.
+- Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.
 
 ## Dialogue Discipline
 

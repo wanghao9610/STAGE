@@ -42,6 +42,7 @@ type: env
 scope: machine:mbp-a
 language: zh
 verified: 2026-08-03
+model_id: claude-opus-5[1m]
 source: wkdrs/builds/main.log
 ---
 
@@ -57,10 +58,11 @@ source: wkdrs/builds/main.log
 | `scope` | `global`、`machine:<name>`、`cycle:<cycle>` 或 `manus:<path>`——事实在哪里成立，不是在哪里学到的 |
 | `language` | 正文语言（规约 §7.6，回复语言规则）；frontmatter 的键始终英文 |
 | `verified` | 最后一次确认它为真的日期，取自系统时钟（规约 §4，真实日期） |
+| `model_id` | 写它或最后复核它的模型，原样抄录（规约 §8，产物登记表；兜底见 `model_id_spec.md`） |
 | `source` | 这条事实是从哪个产物里出来的，或者 `conversation` |
 | `supersedes` | 可选：这条记忆取代了哪个 slug |
 
-正文第一句把事实说完，之后只写读者据此行动所需的那些。记忆自己不留历史：复核就地改写 `verified`，而不是往后追加；它从前说过什么，在 git 里。
+正文第一句把事实说完，之后只写读者据此行动所需的那些。记忆自己不留历史，也没有 `model_trail`：复核就地改写 `verified` 与 `model_id`，而不是往后追加；它从前说过什么，在 git 里。规约 §8 要求流水的场景，是多次会话各写一份产物的不同部分，而这么小的文件不会如此。
 
 **语言规则只管正文。** `STAGE_LANG` 管的是一次运行**写下**什么（规约 §7.6），所以中文会话记的是中文正文——而 frontmatter 的每个键、上表里的每个取值、索引行里的 `<类型>` token 都保持英文，因为钩子和这份规范都按字节匹配它们。
 
@@ -79,7 +81,7 @@ source: wkdrs/builds/main.log
 
 三条路，第一条最常走：
 
-- **复核通过**——事实仍然成立：把 `verified` 改成今天，再把新日期带进这条记忆的索引行——陈旧标记读的是那一行，不是 frontmatter。
+- **复核通过**——事实仍然成立：把 `verified` 改成今天、`model_id` 改成做这次核对的模型，再把新日期带进这条记忆的索引行——陈旧标记读的是那一行，不是 frontmatter。
 - **被取代**——事实变了：写新的那条并带上 `supersedes: <旧 slug>`，然后删掉旧文件和它的索引行。历史在 git 里，记忆库内部不做归档——正是这一点让索引短到每次会话都注入得起。
 - **本来就错**——直接删。从来不成立的记忆不是值得留的历史。
 

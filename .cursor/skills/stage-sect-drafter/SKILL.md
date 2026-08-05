@@ -91,3 +91,4 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 - `notes/notation.md` — appended Symbols and Abbreviations rows.
 - `notes/outline.md` — the section's row status and `updated:`.
 - Chat report: claims stated, the `\todo{}` inventory, evidence read with stamps, staleness warnings, and the recommended next `/stage-*` step. Writes nothing outside these files.
+- Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

@@ -82,3 +82,5 @@ sources: [reviews/received_R2.md, reviews/SIM_REVIEW_<date>.md]
 ```
 
 在聊天里：Step 6 的摘要。评审文件是只读输入，手稿保持不动——每一条许下的改动都是一个指向"将会做出它的那个 skill"的复选框。
+
+溯源（规约 §8）：上述位于 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

@@ -86,3 +86,4 @@ description: >-
 - `notes/claims.md`——被陈述的 performance 主张（`drafted`）；每个 `\todo{}` 单元格一行 `unsourced`。
 - `notes/outline.md`——Tables 行的状态与 `updated:`。
 - 聊天汇报：有来源/todo 的单元格计数、读到的时间戳、过期发现、台账增减，以及建议的下一个 `$stage-*` 步骤。除这些文件之外什么都不写。
+- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

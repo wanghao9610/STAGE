@@ -93,3 +93,4 @@ Fails become the figure's todo list; the teaser's row stays short of `final` whi
 - `manus/figs/<slug>.pdf` — the rendered figure, or an honest statement of the render step that remains.
 - `notes/outline.md` — Figures table rows (`ID, File, Purpose, Section, Source, Status`), the registry state field for figures (§8).
 - Chat digest per Step 6. Nothing under `mates/` (read-only), nothing in `manus/secs/`, no reports in `wkdrs/`.
+- Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

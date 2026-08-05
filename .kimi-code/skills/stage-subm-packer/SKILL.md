@@ -226,3 +226,7 @@ Chat digest, verdict first: **packed** — package path, tag name, what awaits t
 **converted** — copy path, page count against the limit with its confirmation state, what was
 mapped, what was dropped, what needs a human — or **blocked (n)** with each blocker and the
 /skill:stage-* skill that clears it.
+
+Provenance (conventions §8): every artifact above under `notes/`, `tasks/`, `cycls/`, or
+`wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended
+`model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

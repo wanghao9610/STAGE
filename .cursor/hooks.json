@@ -3,6 +3,9 @@
   "hooks": {
     "sessionStart": [
       {
+        "command": "./.cursor/hooks/stage_model_id.sh"
+      },
+      {
         "command": "./.cursor/hooks/stage_memory.sh"
       }
     ]

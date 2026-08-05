@@ -28,9 +28,11 @@ SKILL_ROOTS=(
 DOCS_TREE="docs/mds/stage-workflow"
 
 # STAGE-owned session-hook assets: the script that injects the project-memory
-# index (.stage/memory/) at the start of a session, one copy per harness because
-# each runtime spells the event and the output field differently. Overwritten on
-# update like the skills — the store itself is the paper's and is never synced.
+# index (.stage/memory/) at the start of a session, and the one that injects the
+# runtime's model id so an artifact records who wrote it (conventions §8) — one
+# copy of each per harness, because every runtime spells the event and the
+# output field differently. Overwritten on update like the skills — the memory
+# store itself is the paper's and is never synced.
 HOOK_TREES=(
     ".claude/hooks"
     ".codex/hooks"
@@ -76,7 +78,7 @@ AGENT_RULES_TREE=".cursor/rules"
 #
 # The last three register the session hooks. They are kept rather than
 # overwritten because a paper repo may have added its own settings to them — so
-# a repo adopted before the memory hook existed keeps a config that does not
+# a repo adopted before a hook existed keeps a config that does not
 # register it, which HOOK_CONFIGS below turns into a printed line instead of a
 # hook that silently never fires.
 HARNESS_FILES=(
@@ -112,21 +114,28 @@ harness_rels() {
     done
 }
 
-# A kept registration config that does not name the memory hook: the hook is
-# installed, nothing errors, and no memory ever reaches a session. Reported, not
-# repaired — merging into a file the project may have extended is the user's.
+# A kept registration config that does not name one of the hooks: the script is
+# installed, nothing errors, and either no memory reaches a session or every
+# artifact it writes records "unrecorded". Reported, not repaired — merging into
+# a file the project may have extended is the user's.
 report_unregistered_hooks() {
-    local cfg
+    local cfg missing hook label
     for cfg in "${HOOK_CONFIGS[@]}"; do
         [[ -e "${ROOT_DIR}/${cfg}" ]] || continue
-        if ! grep -q 'stage_memory\.sh' "${ROOT_DIR}/${cfg}" 2>/dev/null; then
-            log "NOTE: ${cfg} was kept and does not register the STAGE project-memory hook."
-            log "      Merge the hook entry from upstream ${cfg} to enable it."
+        missing=""
+        for hook in "stage_memory.sh|project-memory" "stage_model_id.sh|model-id provenance"; do
+            label="${hook#*|}"
+            grep -q "${hook%%|*}" "${ROOT_DIR}/${cfg}" 2>/dev/null || missing+="${missing:+, }${label}"
+        done
+        if [[ -n "${missing}" ]]; then
+            log "NOTE: ${cfg} was kept and registers no STAGE session hook for: ${missing}."
+            log "      Merge the hook entries from upstream ${cfg} to enable them."
         elif [[ "${cfg}" == ".codex/hooks.json" ]]; then
-            # Registering it is not enough on Codex: a project hook runs only
+            # Registering them is not enough on Codex: a project hook runs only
             # once the project is trusted and the hook itself approved, and a
             # changed hook needs approving again. Nothing reports the gap — the
-            # hook simply does not fire and no memory reaches the session.
+            # hooks simply do not fire, no memory reaches the session, and every
+            # artifact the session writes records "unrecorded".
             log "NOTE: ${cfg} is registered, but Codex runs a project hook only after you approve it."
             log "      Run /hooks in the Codex CLI and approve it — re-approve whenever it changes."
         fi
@@ -142,8 +151,9 @@ Usage: bash execs/update.sh [ref] [--skill NAME] [--force]
 Overwrite the STAGE-managed content — the shared agent instructions (AGENTS.md
 and the Cursor rule that copies its body), the four per-harness skill trees
 (.claude/skills/, .agents/skills/, .cursor/skills/, .kimi-code/skills/), the
-four session-hook trees that inject the project-memory index, docs/mds/stage-workflow/,
-and both execs/ entrypoints, run.sh and this script — with files from upstream.
+four session-hook trees that inject the project-memory index and the session's
+model id, docs/mds/stage-workflow/, and both execs/ entrypoints, run.sh and this
+script — with files from upstream.
 The default ref is main; a branch or tag may be supplied instead. Local edits to
 those paths are replaced, AGENTS.md included; the manuscript, evidence, notes,
 and the memory store under .stage/memory/ are never touched. Use --skill to
@@ -161,7 +171,7 @@ Harness configuration an instance may have edited — .cursorignore and the thre
 hook registrations (.claude/settings.json, .codex/hooks.json, .cursor/hooks.json)
 — is installed when it is absent and otherwise kept, however far it has drifted
 from upstream; only --force overwrites it. A kept registration that does not name
-the project-memory hook is reported, since the hook would otherwise never fire.
+a session hook is reported, since a hook nobody registers never fires.
 
 --diff previews an update without changing anything: it lists upstream files
 that are new or differ from the local copies, harness configuration that
@@ -621,4 +631,4 @@ fi
 report_unregistered_hooks
 
 log "Next: copy .env.example to .env, then run /stage-proj-adopt to wire the paper up."
-log "      Kimi Code only: 'bash .kimi-code/hooks/install.sh' registers the project-memory hook once per machine."
+log "      Kimi Code only: 'bash .kimi-code/hooks/install.sh' registers both session hooks once per machine."

@@ -86,3 +86,4 @@ description: >-
 - `notes/notation.md`——追加的 Symbols 与 Abbreviations 行。
 - `notes/outline.md`——该节的行状态与 `updated:`。
 - 聊天汇报：陈述了哪些主张、`\todo{}` 清单、读过的证据及其时间戳、过期警告，以及建议的下一个 `$stage-*` 步骤。除这些文件之外什么都不写。
+- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

@@ -92,3 +92,4 @@ Re-fetch 3 entries at random (all of them when fewer) and diff field by field ag
 - `notes/refs/<ABBREV>.md` — one note per read paper: frontmatter `title:`, `venue:`, `year:`, `bibkey:`, `added:`; `## What it does`, `## Relation to ours`, `## Citable facts` precise enough to audit against (§9b).
 - `notes/refs/refs_index.md` — `| Abbrev | Title | Venue | Year | Bibkey | Note |`, one row per note; index presence is this skill's registry state field (§8).
 - Chat digest per Step 7. Nothing in `manus/secs/`, nothing under `mates/`, no reports in `wkdrs/`.
+- Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

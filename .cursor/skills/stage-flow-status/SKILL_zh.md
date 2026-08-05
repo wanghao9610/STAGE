@@ -30,7 +30,7 @@ description: >-
 
 ## 工作流
 
-1. **装载。** 整份读完规约，然后扫描登记表里的产物：`notes/story.md`、`notes/outline.md`、`notes/claims.md`、`notes/notation.md` 的 frontmatter 与状态表；`mates/MANIFEST.md` 条目；`notes/refs/refs_index.md` 的行对着 `manus/bibs/reference.bib` 的 key；当前周期的 `venue.yml`、`reviews/`、`response/` 与 `SUBMISSION_*`；`tasks/<cycle>_promises.md`；`manus/secs|figs|tabs` 与 `wkdrs/builds|reports` 的目录清单；`git tag -l 'freeze/<cycle>_*'`（只读）。给了 SECTION 就解析它（§5）。
+1. **装载。** 整份读完规约，然后扫描登记表里的产物（frontmatter 一律连 `model_id:` 与 `model_trail:` 一起读，规约 §8）：`notes/story.md`、`notes/outline.md`、`notes/claims.md`、`notes/notation.md` 的 frontmatter 与状态表；`mates/MANIFEST.md` 条目；`notes/refs/refs_index.md` 的行对着 `manus/bibs/reference.bib` 的 key；当前周期的 `venue.yml`、`reviews/`、`response/` 与 `SUBMISSION_*`；`tasks/<cycle>_promises.md`；`manus/secs|figs|tabs` 与 `wkdrs/builds|reports` 的目录清单；`git tag -l 'freeze/<cycle>_*'`（只读）。给了 SECTION 就解析它（§5）。
 2. **周期状态。** 一行：周期名；`confirmed:` 是否已设；评审是否在位（`SIM_*` 与 `received_*` 计数）；回复是否存在；承诺未清/总数；是否已冻结（tag 或 SUBMISSION 文件）。没有 story 文件 → 流程还没开始；说出来，直接跳到第 7 步。
 3. **提纲面板。** Sections、Figures、Tables 按状态计数（planned / skeleton / drafted / polished / frozen；planned / sketch / draft / final），限定了 SECTION 时给出逐行明细。某行对应的文件在磁盘上不存在，或某个文件没有对应行，都是漂移——标出来，绝不修它。
 4. **主张覆盖。** 台账按状态计数：proposed / drafted / verified / unsourced / weakened / dropped。`unsourced > 0` 永远是一条点名 /stage-clms-auditor 的缺口行。
@@ -45,4 +45,6 @@ description: >-
 
 登记表行（规约 §8）：Status —— 磁盘上没有产物；只读，在聊天里汇报；没有状态字段。
 
-汇报顺序：周期状态 → 提纲面板 → 主张覆盖 → 证据与参考文献 → 构建与 lint → 缺口行（一条都没触发就省掉）→ 唯一的下一步动作，连同它确切的 /stage-* 命令与理由。用紧凑的表格与计数，绝不逐行写散文；字段缺失处写 "unknown"；整条回复控制在约 500 词以内。
+汇报顺序：周期状态 → 提纲面板 → 主张覆盖 → 证据与参考文献 → 构建与 lint → 溯源 → 缺口行（一条都没触发就省掉）→ 唯一的下一步动作，连同它确切的 /stage-* 命令与理由。用紧凑的表格与计数，绝不逐行写散文；字段缺失处写 "unknown"；整条回复控制在约 500 词以内。
+
+**溯源**占一行（规约 §8）：这篇论文的产物各自指名的最后一个写入者，各带计数——`claude-opus-5[1m] ×7，gpt-5 ×2`——后面接上还有多少份登记产物尚无 `model_trail`，不超过三份时逐一点名。它只汇报，不把关：缺流水的文件是在这个字段存在之前写成的，不是一条下一步动作。

@@ -662,6 +662,83 @@ done < <(find . -path ./.git -prune -o -path ./wkdrs -prune -o \
          sed 's|^\./||' | sort)
 (( zh_desc_errors == 0 )) && note "every Chinese description is one line; no space inside a word in any Chinese file"
 
+# 17. Session hooks exist, are executable, and are registered.
+#     Both hooks — the project-memory index and the model-id provenance line —
+#     ship one copy per harness, and each harness registers them in its own
+#     file. A script added without its registration entry is the silent failure
+#     this catches: the hook is present, nothing runs it, and no report says so.
+#     For the model-id hook that failure is invisible in a different way — the
+#     run still writes, and every artifact it writes records "unrecorded".
+section "Session hooks"
+hook_errors=0
+for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
+         .cursor/hooks/stage_model_id.sh .kimi-code/hooks/stage_model_id.sh \
+         .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
+         .cursor/hooks/stage_memory.sh .kimi-code/hooks/stage_memory.sh \
+         .kimi-code/hooks/install.sh; do
+    [[ -x "${f}" ]] || { fail "${f} is missing or not executable"; hook_errors=1; }
+    [[ -f "${f}" ]] && ! bash -n "${f}" 2>/dev/null && { fail "${f} does not parse"; hook_errors=1; }
+done
+for f in .claude/settings.json .codex/hooks.json .cursor/hooks.json .kimi-code/hooks.example.toml; do
+    if [[ ! -f "${f}" ]]; then
+        fail "${f} is missing"
+        hook_errors=1
+        continue
+    fi
+    for hook in stage_model_id.sh stage_memory.sh; do
+        grep -qF "${hook}" "${f}" || { fail "${f} does not register ${hook}"; hook_errors=1; }
+    done
+done
+for hook in stage_model_id.sh stage_memory.sh; do
+    grep -qF "${hook}" .kimi-code/hooks/install.sh || \
+        { fail ".kimi-code/hooks/install.sh does not install ${hook}"; hook_errors=1; }
+done
+#     The model-id hooks and the spec that documents their fallbacks name the
+#     same conventions section by prose, because a hook injects a sentence a
+#     model reads rather than a path a script resolves. Renumber §8 and the
+#     injected line points at the wrong rule while every other check stays green.
+for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
+         .cursor/hooks/stage_model_id.sh .kimi-code/hooks/stage_model_id.sh; do
+    grep -qF 'writing-workflow-conventions section 8' "${f}" 2>/dev/null || \
+        { fail "${f} no longer points at 'writing-workflow-conventions section 8'"; hook_errors=1; }
+done
+for f in docs/mds/stage-workflow/model_id_spec.md docs/mds/stage-workflow/model_id_spec.zh-CN.md; do
+    [[ -f "${f}" ]] || { fail "${f} is missing; the hooks' injected line points at it"; hook_errors=1; }
+done
+(( hook_errors == 0 )) && note "both hooks ship per harness, parse, are registered, and cite §8"
+
+# 18. The provenance line is stated in the same skills in all four trees.
+#     Conventions §8 makes model_id / model_trail every producer's job; each
+#     manifest repeats it once so a run following the skill alone still records
+#     it. Which skills carry it is a decision — flow-status writes nothing and
+#     evid-curator writes only the mates/ store, which carries neither — and a
+#     tree that drifts from that decision records provenance on one harness and
+#     not on the next.
+section "Provenance line parity"
+prov_errors=0
+prov_marker() { # $1 = tree root; prints the skills whose manifests state it
+    local root="$1" skill
+    while IFS= read -r skill; do
+        if grep -qF 'model_trail' "${root}/${skill}/SKILL.md" 2>/dev/null &&
+           grep -qF 'model_trail' "${root}/${skill}/SKILL_zh.md" 2>/dev/null; then
+            printf '%s\n' "${skill}"
+        fi
+    done < <(printf '%s\n' "${SKILLS}")
+}
+PROV_BASELINE="$(prov_marker .claude/skills)"
+if [[ -z "${PROV_BASELINE}" ]]; then
+    fail ".claude/skills states model_trail in no manifest; conventions §8 asks every producer to"
+    prov_errors=1
+fi
+for root in "${SKILL_ROOTS[@]:1}"; do
+    if [[ "$(prov_marker "${root}")" != "${PROV_BASELINE}" ]]; then
+        fail "${root} states the provenance line in a different set of skills than .claude/skills:"
+        diff <(printf '%s\n' "${PROV_BASELINE}") <(prov_marker "${root}") | sed 's/^/      /'
+        prov_errors=1
+    fi
+done
+(( prov_errors == 0 )) && note "$(printf '%s\n' "${PROV_BASELINE}" | wc -l | tr -d ' ') skills state the provenance line, the same set in all four trees"
+
 printf '\n'
 if (( FAILURES > 0 )); then
     printf '%d check(s) failed.\n' "${FAILURES}"

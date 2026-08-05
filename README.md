@@ -87,18 +87,18 @@ STAGE/
 ├── .stage/memory/          # Project memory: what earlier sessions learned (local/ is git-ignored)
 ├── .claude/
 │   ├── skills/             # Writing workflow skills for Claude Code
-│   ├── hooks/              # Session hook: injects the project-memory index
-│   └── settings.json       # Registers that hook
+│   ├── hooks/              # Session hooks: project-memory index, session model id
+│   └── settings.json       # Registers both hooks
 ├── .agents/skills/         # Writing workflow skills for Codex (+ agents/openai.yaml each)
-├── .codex/                 # Codex session hook + hooks.json (skills live in .agents/)
+├── .codex/                 # Codex session hooks + hooks.json (skills live in .agents/)
 ├── .cursor/
 │   ├── skills/             # Writing workflow skills for Cursor
 │   ├── rules/              # Always-on rules: AGENTS.md body + skill-root ownership
-│   ├── hooks/              # Session hook, registered in hooks.json
+│   ├── hooks/              # Session hooks, registered in hooks.json
 │   └── hooks.json
 ├── .kimi-code/
 │   ├── skills/             # Writing workflow skills for Kimi Code
-│   ├── hooks/              # Session hook + install.sh (Kimi registers globally)
+│   ├── hooks/              # Session hooks + install.sh (Kimi registers globally)
 │   └── hooks.example.toml  # The registration snippet install.sh writes for you
 ├── .cursorignore           # Keeps builds and LaTeX junk out of Cursor's index
 ├── .env.example            # Local configuration example
@@ -258,7 +258,7 @@ The skeleton stands on its own — the layout, `.env`, `run.sh`, and `import.sh`
 
 `/stage-flow-status` is the one to remember: it reads the outline, ledger, manifest, and cycle state on disk and names the single next action with its exact command, so you never have to recall where you left off.
 
-**One hook, once per machine.** A session hook puts the [project memory](#project-memory) index in front of the agent at the start of every session. Claude, Codex, and Cursor ship it already registered in `.claude/settings.json`, `.codex/hooks.json`, and `.cursor/hooks.json`. Kimi has no project-level hook config, so run `bash .kimi-code/hooks/install.sh` once — it registers the hook in your global Kimi config, backs that file up first, does nothing on a second run, and then covers every STAGE paper on the machine. On Codex, registered is not yet running: a project hook fires only once the project is trusted and the hook approved, so run `/hooks` in the Codex CLI to approve it, and again whenever it changes. Until you do, no memory reaches the session and nothing points out the gap. A paper adopted before this hook existed keeps its own registration file — `execs/update.sh` never overwrites one, and names the hook missing from it instead.
+**Two hooks, once per machine.** One session hook puts the [project memory](#project-memory) index in front of the agent at the start of every session; the other states the model id the runtime reports, so every artifact a skill writes records who wrote it — `model_id` and an appended `model_trail` entry (workflow conventions §8; the per-runtime fallbacks are in `docs/mds/stage-workflow/model_id_spec.md`). Claude, Codex, and Cursor ship both already registered in `.claude/settings.json`, `.codex/hooks.json`, and `.cursor/hooks.json`. Kimi has no project-level hook config, so run `bash .kimi-code/hooks/install.sh` once — it registers them in your global Kimi config, backs that file up first, does nothing on a second run, and then covers every STAGE paper on the machine. On Codex, registered is not yet running: a project hook fires only once the project is trusted and the hook approved, so run `/hooks` in the Codex CLI to approve it, and again whenever it changes. Until you do, no memory reaches the session, every artifact records `unrecorded`, and nothing points out the gap. A paper adopted before a hook existed keeps its own registration file — `execs/update.sh` never overwrites one, and names the hook missing from it instead.
 
 ## Writing workflow
 
@@ -375,8 +375,8 @@ By default, the command updates these paths from STAGE's `main` branch:
 
 - `AGENTS.md` and `.cursor/rules/` — the shared agent instructions and the Cursor rule that copies their body; your own edits to them are replaced, and the two move as a pair, since one is the other's body and they must not drift
 - `.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — the same fifteen skills once per harness
-- `.claude/hooks/`, `.codex/hooks/`, `.cursor/hooks/`, `.kimi-code/hooks/` and `.kimi-code/hooks.example.toml` — the session hook that injects the project-memory index, once per harness; the store under `.stage/memory/` is the paper's own and is never synced
-- `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, and the memory spec, in both editions
+- `.claude/hooks/`, `.codex/hooks/`, `.cursor/hooks/`, `.kimi-code/hooks/` and `.kimi-code/hooks.example.toml` — the two session hooks — the project-memory index and the session's model id — once per harness; the store under `.stage/memory/` is the paper's own and is never synced
+- `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, the memory spec, and the model-id spec, in both editions
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
 - `execs/update.sh` — the updater itself, so that no repository strands on an update mechanism too old to fetch its successor. It is installed by rename: the run doing the update finishes on the old file, and the next invocation uses the new one
 

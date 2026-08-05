@@ -47,3 +47,4 @@ description: >-
 - `wkdrs/reports/POLISH_<date>.md`——登记表行：Audit reports，生产者 `stage-copy-editor`，临时，日期在文件名里。frontmatter `date:`、`scope:`；小节 `## Edits`（每节按类别的计数）、`## Systematic issues`（编号；各自的位置与路由）、`## Canon`（修掉的违反；标出的未知术语）、`## Budget`（每节实际 vs 预算）、`## Tasks filed`。
 - `tasks/polish_followups.md`——每条本 skill 不得自行修复的发现一个复选框：那份持久的待办。
 - 不写台账、不写提纲、不写记号规范、不写 `mates/`、不写 bib——主张、结构与规范的归属留给持有它们的那些 skill。
+- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

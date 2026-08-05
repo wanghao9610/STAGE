@@ -70,3 +70,5 @@ panel：五个委派，每批最多三个，按视角互不重叠。每份简介
 ## 输出
 
 登记表行（§8）：Simulated review —— 生产者 `stage-peer-reviewer`，持久路径 `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md`（评审组的综合评审；各视角评审、`citation_audit.md` 与抓取缓存住在 `wkdrs/reports/peer_<cycle>_<date>/`），状态：文件名里的日期。确切形状见 `references/review-template.md`，schema 摘要见规约 §8.8。手稿与主张台账离开这次运行时，与进来时逐字节相同——评审从不编辑。
+
+溯源（规约 §8）：上述位于 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

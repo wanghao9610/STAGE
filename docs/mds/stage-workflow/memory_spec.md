@@ -42,6 +42,7 @@ type: env
 scope: machine:mbp-a
 language: en
 verified: 2026-08-03
+model_id: claude-opus-5[1m]
 source: wkdrs/builds/main.log
 ---
 
@@ -57,10 +58,11 @@ source: wkdrs/builds/main.log
 | `scope` | `global`, `machine:<name>`, `cycle:<cycle>`, or `manus:<path>` — where the fact is true, not where it was learned |
 | `language` | the body's language (conventions §7.6, the reply-language rule); frontmatter keys stay English |
 | `verified` | the date the fact was last confirmed true, from the system clock (conventions §4, real dates) |
+| `model_id` | the model that wrote or last re-verified it, verbatim (conventions §8, the artifact registry; fallbacks in `model_id_spec.md`) |
 | `source` | the artifact the fact came out of, or `conversation` |
 | `supersedes` | optional: the slug this memory replaces |
 
-The body opens with one sentence stating the fact, then carries only what a reader needs in order to act on it. A memory carries no history of its own: a re-verification rewrites `verified` rather than appending, and what the file used to say is in git.
+The body opens with one sentence stating the fact, then carries only what a reader needs in order to act on it. A memory carries no history of its own, and no `model_trail`: a re-verification rewrites `verified` and `model_id` rather than appending, and what the file used to say is in git. Conventions §8 asks for a trail where several sessions each write a different part of one artifact, which is not what happens to a file this small.
 
 **The language rule applies to the body only.** `STAGE_LANG` governs what a run writes (conventions §7.6), so a Chinese session records a Chinese body — and every frontmatter key, every value in the table above, and the `<type>` token in the index line stay English, because the hooks and this spec match them byte-exactly.
 
@@ -79,7 +81,7 @@ That one line is what a session judges relevance on, so it says what the fact *i
 
 Three ways out, and the first is the common one:
 
-- **Re-verified** — the fact still holds: set `verified` to today, and carry the new date into the memory's index line — the stale flag reads that line, not the frontmatter.
+- **Re-verified** — the fact still holds: set `verified` to today and `model_id` to the model that checked it, and carry the new date into the memory's index line — the stale flag reads that line, not the frontmatter.
 - **Superseded** — the fact changed: write the new memory with `supersedes: <old-slug>`, then delete the old file and its index line. Git holds the history, and nothing is archived inside the store — that is what keeps the index short enough to inject into every session.
 - **Wrong** — delete it. A memory that was never true is not history worth keeping.
 

@@ -91,3 +91,4 @@ The choice of which methods and metrics the table compares belongs to the outlin
 - `notes/claims.md` — performance claims stated (`drafted`); one `unsourced` row per `\todo{}` cell.
 - `notes/outline.md` — the Tables row status and `updated:`.
 - Chat report: sourced/todo cell counts, stamps read, staleness findings, ledger deltas, and the recommended next `/stage-*` step. Writes nothing outside these files.
+- Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

@@ -105,3 +105,4 @@ routed finding; it never happens here as an edit.
   durable backlog.
 - No writes to the ledger, the outline, the notation canon, `mates/`, or the bib — ownership of
   claims, structure, and canon stays with the skills that hold it.
+- Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

@@ -97,3 +97,4 @@ description: >-
 - `manus/secs/<n>_<slug>.tex`——每个 Sections 行一个骨架：简介注释块、`\section` 行、一个 `\todo`；`manus/main.tex` 里每个对应的 `\input` 行都取消注释；结果通过 `execs/run.sh` 编译得过。
 - `notes/notation.md`——在这里创建；`/stage-sect-drafter` 追加，`/stage-copy-editor` 执行。登记表状态：`updated:`。
 - 在聊天里：那份 ≤300 词的汇报。这里绝不写：章节正文、`notes/claims.md`、`mates/`、`venue.yml`。
+- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

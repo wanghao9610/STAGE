@@ -85,3 +85,4 @@ description: >-
 - `notes/refs/<ABBREV>.md`——每篇读过的论文一份笔记：frontmatter `title:`、`venue:`、`year:`、`bibkey:`、`added:`；`## What it does`、`## Relation to ours`、精确到足以被拿来审计的 `## Citable facts`（§9b）。
 - `notes/refs/refs_index.md`——`| Abbrev | Title | Venue | Year | Bibkey | Note |`，一份笔记一行；索引在不在册就是本 skill 的登记表状态字段（§8）。
 - 按 Step 7 给出的聊天摘要。`manus/secs/` 里什么都不写，`mates/` 下什么都不写，`wkdrs/` 里不留报告。
+- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

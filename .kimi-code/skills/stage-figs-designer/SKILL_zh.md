@@ -86,3 +86,4 @@ tikz 源用 `.env` 的引擎独立编译进 `wkdrs/builds/figs/`，PDF 复制到
 - `manus/figs/<slug>.pdf`——渲染出来的图，或者一份关于"还剩哪一步渲染"的诚实说明。
 - `notes/outline.md`——Figures 表的各行（`ID, File, Purpose, Section, Source, Status`），即图的登记表状态字段（§8）。
 - 按 Step 6 给出的聊天摘要。`mates/` 下什么都不写（只读），`manus/secs/` 里什么都不写，`wkdrs/` 里不留报告。
+- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

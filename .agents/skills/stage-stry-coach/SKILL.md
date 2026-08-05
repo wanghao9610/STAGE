@@ -105,3 +105,4 @@ Set `finalized:` (real date) only when all five sections are user-confirmed or e
 - `notes/claims.md` — created here, every seeded row at `proposed`; later updated by `$stage-sect-drafter`, `$stage-tabs-builder`, `$stage-clms-auditor`, and `$stage-resp-writer`. Registry state: per-claim `Status`.
 - `cycls/<cycle>/venue.yml` — flat `key: value`, user-confirmed values only; `confirmed:` filled only by an explicit user confirmation. Registry row: Venue profile — produced here (or by `$stage-proj-adopt`).
 - In chat: the ≤300-word report. Nothing under `manus/` or `mates/` is ever written by this skill.
+- Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.
