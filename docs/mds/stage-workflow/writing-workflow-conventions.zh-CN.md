@@ -4,7 +4,7 @@
 
 本文件是 `writing-workflow-conventions.md` 的中文对照版，随英文版同步维护，供人阅读；两版冲突时以英文版为准。
 
-STAGE 写作工作流中每个 skill 都遵守的规则。十五个 skill——`stage-proj-adopt`、`stage-evid-curator`、`stage-stry-coach`、`stage-outl-planner`、`stage-sect-drafter`、`stage-tabs-builder`、`stage-figs-designer`、`stage-refs-curator`、`stage-copy-editor`、`stage-clms-auditor`、`stage-cite-auditor`、`stage-peer-reviewer`、`stage-resp-writer`、`stage-subm-packer`、`stage-flow-status`——各有自己的工作流、自己的写入边界、自己的质检表。它们共用的部分只在这里存一份。不做分节选读：**每个 skill 每次运行开始时都整份读完本文件。**
+STAGE 写作工作流中每个 skill 都遵守的规则。十六个 skill——`stage-proj-adopt`、`stage-evid-curator`、`stage-stry-coach`、`stage-outl-planner`、`stage-sect-drafter`、`stage-tabs-builder`、`stage-figs-designer`、`stage-refs-curator`、`stage-copy-editor`、`stage-clms-auditor`、`stage-cite-auditor`、`stage-peer-reviewer`、`stage-resp-writer`、`stage-subm-packer`、`stage-pstr-builder`、`stage-flow-status`——各有自己的工作流、自己的写入边界、自己的质检表。它们共用的部分只在这里存一份。不做分节选读：**每个 skill 每次运行开始时都整份读完本文件。**
 
 **优先级。** 本文件是**基线**。某个 skill 的 `SKILL.md` 可以更**严**——更窄的写入边界、更低的阈值、额外的确认点、乃至"本 skill 永不提交"——更严者生效。skill 绝不放松本文件设下的规则。若 `SKILL.md` 里带有下述某条规则的一行摘要，那一行是有约束力的提醒，本文件是完整规则。各 skill 以"规约 §n"的形式引用这些节；编号是冻结的，永不重排。
 
@@ -191,6 +191,7 @@ STAGE_LANG=
 | 模拟评审 | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md`——评审组的综合评审；各视角的工作文件在 `wkdrs/reports/peer_<cycle>_<date>/` | 文件名里的日期 |
 | 回复 | `stage-resp-writer` | `cycls/<cycle>/response/RESPONSE_<date>.md`，承诺在 `tasks/<cycle>_promises.md` | 承诺复选框 |
 | 投稿 | `stage-subm-packer` | `cycls/<cycle>/SUBMISSION_<date>.md`、git tag `freeze/<cycle>_<date>`、`wkdrs/builds/` 下的包、注册在 `cycls/<cycle>/template/` 的 venue 模板包、`tasks/<cycle>_venue.md` 里的 venue 待办 | `frozen:`；venue 待办复选框 |
+| 海报 | `stage-pstr-builder` | `cycls/<cycle>/poster/POSTER_PLAN.md`、`poster.tex`、注册在 `cycls/<cycle>/poster/template/` 的官方海报模板包、`wkdrs/builds/poster/` 下的渲染产物 | `state:`；每个分区的 Status |
 | 状态 | `stage-flow-status` | ——（只读；在聊天里汇报） | —— |
 
 来自 venue 的真实评审由用户投放到 `cycls/<cycle>/reviews/`，命名为
@@ -381,7 +382,7 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 | venue 样式 | `manus/stys/`：只有 `arxiv.cls` 与 `stage.sty`，别无他物——`manus/` 会被 `lint.sh` 扫描，只放本工作流自己拥有的文件 |
 | 导入的证据（只读） | `mates/<source-slug>/**`，镜像上游路径；手工登记的投放在 `mates/manual/**`；台账 `mates/MANIFEST.md` |
 | 写作元数据 | `notes/` 下的固定文件：`story.md`、`claims.md`、`outline.md`、`notation.md`、`adopt.md`；阅读笔记在 `notes/refs/` |
-| 投稿周期 | `cycls/<venue>_<year>/`：`venue.yml`、`template/`（官方 venue 模板包，整份解包，逐字节，永不编辑）、`reviews/`、`response/`、`SUBMISSION_<date>.md` |
+| 投稿周期 | `cycls/<venue>_<year>/`：`venue.yml`、`template/`（官方 venue 模板包，整份解包，逐字节，永不编辑）、`reviews/`、`response/`、`SUBMISSION_<date>.md`、`poster/`（海报计划与源文件，官方海报模板包放在 `poster/template/`） |
 | 修订草稿、承诺清单 | `tasks/` |
 | 构建与临时报告 | `wkdrs/builds/`、`wkdrs/reports/`（gitignore，可重新生成） |
 | 早先会话学到、又没有别的文件认领的事实 | `.stage/memory/`；只对本机成立的放 `.stage/memory/local/`，git 忽略（[`memory_spec.zh-CN.md`](memory_spec.zh-CN.md)） |
@@ -400,14 +401,14 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
    计数和身份泄漏扫描。`venue.yml` 里的 `template:` 指名模板包中的那个 class；`stage-subm-packer convert` 读它，
    在 `wkdrs/` 下重新生成一份能在该 class 下编译的独立副本。`manus/main.tex` 始终保持
    `\documentclass{stys/arxiv}`：没有就地替换，也没有第二份事实来源。
-5. **四棵 harness 目录树是副本，不是备选项。** 同样的十五个 skill 每套 harness 各发一份——`.claude/skills/`、
+5. **四棵 harness 目录树是副本，不是备选项。** 同样的十六个 skill 每套 harness 各发一份——`.claude/skills/`、
    `.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——彼此只差调用前缀和工具名（`Bash` / `Shell`、
    `AskUserQuestion` / `AskQuestion` / `request_user_input`、`Read` / `ReadFile`）。装载你自己那棵树下的副本并遵循它；
    某次列目录列出了别的树里的副本，那只是告诉你文件在哪，不是告诉你哪一份约束你。
 
 ## 11. Skill 一览
 
-十五个 skill，调用方式：Claude Code 与 Cursor 里是 `/stage-<name>`，Codex 里是 `$stage-<name>`，Kimi Code 里是 `/skill:stage-<name>`。每个 skill 的完整说明见 [writing-workflow-skills.zh-CN.md](writing-workflow-skills.zh-CN.md)（英文：[writing-workflow-skills.md](writing-workflow-skills.md)）；每个 skill 写出什么见 §8。
+十六个 skill，调用方式：Claude Code 与 Cursor 里是 `/stage-<name>`，Codex 里是 `$stage-<name>`，Kimi Code 里是 `/skill:stage-<name>`。每个 skill 的完整说明见 [writing-workflow-skills.zh-CN.md](writing-workflow-skills.zh-CN.md)（英文：[writing-workflow-skills.md](writing-workflow-skills.md)）；每个 skill 写出什么见 §8。
 
 | Skill | 职责 |
 | --- | --- |
@@ -425,9 +426,10 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 | `stage-peer-reviewer` | 模拟的五视角评审小组 |
 | `stage-resp-writer` † | 评审意见 → 要点台账 → 回复 + 承诺 |
 | `stage-subm-packer` † | 预检、venue 版式转换、打包、冻结 |
+| `stage-pstr-builder` † | 选内容、渲染并检查本周期的海报 |
 | `stage-flow-status` | 只读的状态与唯一的下一步 |
 
-1. **标 † 的五个是 slash-only。** 只有用户点名时才跑：它们是决策点——接入、故事、提纲、回复、投稿——而一个由 agent 自作主张走到的决策点，等于没有人做过这个决策。这张表是事实来源；执行它的守卫是 Claude、Cursor、Kimi 清单里的 `disable-model-invocation: true`，以及 Codex 的 `.agents/skills/<name>/agents/openai.yaml` 里的 `allow_implicit_invocation: false`，CI 会拿这四处与这里的标记逐一比对，所以在这里标了却没在四处都加守卫会让构建失败。
+1. **标 † 的六个是 slash-only。** 只有用户点名时才跑：它们是决策点——接入、故事、提纲、回复、投稿、以及什么能上墙——而一个由 agent 自作主张走到的决策点，等于没有人做过这个决策。这张表是事实来源；执行它的守卫是 Claude、Cursor、Kimi 清单里的 `disable-model-invocation: true`，以及 Codex 的 `.agents/skills/<name>/agents/openai.yaml` 里的 `allow_implicit_invocation: false`，CI 会拿这四处与这里的标记逐一比对，所以在这里标了却没在四处都加守卫会让构建失败。
 2. **两个 skill 从不碰稿件。** `stage-peer-reviewer` 只写 `cycls/<cycle>/reviews/` 下的评审；`stage-flow-status` 什么都不写。只要不知道进展到哪了，先跑状态 skill——它读提纲、台账、清单与周期状态，给出唯一的下一步和它确切的命令。
 3. **一次调用一个 skill，一个 skill 一件事。** 一节、一张表、一张图、一份回复——一次运行悄悄扩大范围正是这条规则针对的失败；下一件事是下一次调用。
-4. **点名了下一步动作，若落在那十个上，就去跑，而不是打印出来。** skill 收尾时都会点名接下来该做什么——状态 skill 唯一的下一步、lint 红灯点名是谁的东西坏了、审计把一条没有出处的主张退回给承载它的那一节——今天这些一律是递给读者的一条命令。当被点名的命令属于那十个、且目标已经定死时，就把它跑起来，而不是打印它：读者就是 agent 自己，打印一条命令给自己，等于转交给了没有人。那五个仍旧打印命令，因为"由作者敲下去"本身就是它们存在的意义所在的那个决定。三条限制保证这件事是安全的。**拾起发生在点名的那次运行结束之后，绝不在运行内部**——一个不许碰稿件的 skill，不会因为点名了后继者就伸得更长，因此 `stage-flow-status` 仍旧只是那个汇报者，后继者要等报告写完才开始。**目标没定死就发问，而不是猜**——哪一节、哪张表、哪张图、哪个周期（§5 负责解析）。以及**第 3 条原样有效**，一次一个 skill、一件事，而没有人敲下的那次运行，开跑前先说明自己要启动什么。
+4. **点名了下一步动作，若落在那十个上，就去跑，而不是打印出来。** skill 收尾时都会点名接下来该做什么——状态 skill 唯一的下一步、lint 红灯点名是谁的东西坏了、审计把一条没有出处的主张退回给承载它的那一节——今天这些一律是递给读者的一条命令。当被点名的命令属于那十个、且目标已经定死时，就把它跑起来，而不是打印它：读者就是 agent 自己，打印一条命令给自己，等于转交给了没有人。那六个仍旧打印命令，因为"由作者敲下去"本身就是它们存在的意义所在的那个决定。三条限制保证这件事是安全的。**拾起发生在点名的那次运行结束之后，绝不在运行内部**——一个不许碰稿件的 skill，不会因为点名了后继者就伸得更长，因此 `stage-flow-status` 仍旧只是那个汇报者，后继者要等报告写完才开始。**目标没定死就发问，而不是猜**——哪一节、哪张表、哪张图、哪个周期（§5 负责解析）。以及**第 3 条原样有效**，一次一个 skill、一件事，而没有人敲下的那次运行，开跑前先说明自己要启动什么。

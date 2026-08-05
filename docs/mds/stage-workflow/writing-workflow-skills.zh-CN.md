@@ -4,7 +4,7 @@
 
 本文件是 `writing-workflow-skills.md` 的中文对照版，随英文版同步维护，供人阅读；两版冲突时以英文版为准。
 
-STAGE 提供十五个彼此衔接的写作工作流 skill，把导入的证据和一个故事，变成一篇带可审计主张链的、已投出的论文：一个与研究项目配对好的仓库、一份每个文件都有指纹的只读证据库、一个贡献即被跟踪主张的故事、一份带页数预算的提纲、对着证据起草的章节、由证据生成而非手敲的表格、带可编辑源文件的图、核实过的参考文献、不碰数字的散文打磨、每个数字与每条引用都被审计、一份按 venue 自身格式写的模拟评审、一份带跟踪承诺的回复，最后是一个冻结、打包好的投稿。
+STAGE 提供十六个彼此衔接的写作工作流 skill，把导入的证据和一个故事，变成一篇带可审计主张链的、已投出的论文：一个与研究项目配对好的仓库、一份每个文件都有指纹的只读证据库、一个贡献即被跟踪主张的故事、一份带页数预算的提纲、对着证据起草的章节、由证据生成而非手敲的表格、带可编辑源文件的图、核实过的参考文献、不碰数字的散文打磨、每个数字与每条引用都被审计、一份按 venue 自身格式写的模拟评审、一份带跟踪承诺的回复，一个冻结、打包好的投稿，以及把录用结果带进展厅的那张海报。
 
 本指南每个 skill 一段紧凑的话。所有 skill 共用的规则——git、红线、`.env` 与构建工具链、日期、解析、委派、对话、产物登记表、编造边界、布局——住在 [writing-workflow-conventions.zh-CN.md](writing-workflow-conventions.zh-CN.md)（英文：[writing-workflow-conventions.md](writing-workflow-conventions.md)）；各 skill 引用它的 § 编号。本目录由上游管理：只在 STAGE 模板仓库里改它，绝不在某个论文实例里改——`execs/update.sh` 会覆盖它。
 
@@ -39,6 +39,8 @@ STAGE 提供十五个彼此衔接的写作工作流 skill，把导入的证据�
   → stage-resp-writer: 评审 → 逐点台账 → 回复 + 承诺复选框
   → stage-subm-packer: 构建+lint 把关、清单、转成 venue 自己的模板、打包、
     SUBMISSION 记录、freeze/<cycle>_<date> tag
+  → stage-pstr-builder: 一句结论、verified 的主张、复用的图 →
+    cycls/<cycle>/poster/ + 一道按印刷尺寸量出来的可读性闸
 
   ⌾ stage-flow-status: 任何时刻读上面的一切 ——
     现在到哪了，以及唯一的下一步动作连同它的确切命令
@@ -46,7 +48,7 @@ STAGE 提供十五个彼此衔接的写作工作流 skill，把导入的证据�
 
 这份清单读起来像一趟直线，但工作流不是线性的。`stage-proj-adopt` 只跑一次，而且除了 `.env` 之外，只有在存在一份要吸收的旧草稿时才要紧。证据导入在上游结果移动时随时重来——指纹和 `import.sh --diff` 就是为此而设。起草循环按节重入，也按每条评审承诺重入；审计被设计成在每次触及数字或引用的改动之后重跑。周期类 skill 按每次 venue 尝试重复：一次被拒会针对同一本台账开出新的 `cycls/<venue>_<year>/`，其中 `weakened` 与 `unsourced` 的主张是最先要修的东西。离开一段时间之后，`stage-flow-status` 是回到论文里的路。
 
-![STAGE 写作工作流：十五个 skill 分成五条相位带——建仓、规划、写作、润色与审计、投稿周期——各自写出什么，以及起草循环与拒稿回流如何闭合](../../srcs/stage-writing-workflow.png)
+![STAGE 写作工作流：十六个 skill 分成五条相位带——建仓、规划、写作、润色与审计、投稿周期——各自写出什么，以及起草循环与拒稿回流如何闭合](../../srcs/stage-writing-workflow.png)
 
 ## 怎么调用
 
@@ -57,9 +59,9 @@ STAGE 提供十五个彼此衔接的写作工作流 skill，把导入的证据�
 | Cursor | `.cursor/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Kimi Code | `.kimi-code/skills/` | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
 
-四份目录装着同样的十五个 skill，只差调用前缀与工具名（`Bash` / `Shell`、`AskUserQuestion` / `AskQuestion` / `request_user_input`、`Read` / `ReadFile`）。跟着你自己那套 harness 目录下的副本走；列表里冒出另一套目录的副本，说明的是文件在哪，不是哪一份对你有约束力。
+四份目录装着同样的十六个 skill，只差调用前缀与工具名（`Bash` / `Shell`、`AskUserQuestion` / `AskQuestion` / `request_user_input`、`Read` / `ReadFile`）。跟着你自己那套 harness 目录下的副本走；列表里冒出另一套目录的副本，说明的是文件在哪，不是哪一份对你有约束力。
 
-五个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。这一条按 harness 各自强制，不靠自觉——Claude、Cursor、Kimi 三份 manifest 里的 `disable-model-invocation: true`，以及 Codex 的 `.agents/skills/<name>/agents/openai.yaml` 里的 `allow_implicit_invocation: false`。另外十个在任务明显匹配时也可以由 agent 自行拾起。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
+六个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`、`stage-pstr-builder`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。这一条按 harness 各自强制，不靠自觉——Claude、Cursor、Kimi 三份 manifest 里的 `disable-model-invocation: true`，以及 Codex 的 `.agents/skills/<name>/agents/openai.yaml` 里的 `allow_implicit_invocation: false`。另外十个在任务明显匹配时也可以由 agent 自行拾起。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
 
 ## 各个 skill
 
@@ -120,6 +122,12 @@ Slash-only。把评审解析成一本逐点台账——真实的 `received_*.md`
 Slash-only。预检与打包：`run.sh` 构建与 `lint.sh` 必须通过、venue 清单逐条走完、图表与 bib 检查齐备，然后把包——camera PDF、补充材料、可直接投稿的源码——落到 `wkdrs/builds/` 下。它写 `cycls/<cycle>/SUBMISSION_<date>.md` 记录什么投到了哪里，并创建 git tag `freeze/<cycle>_<date>`——冻结 tag 唯一的出处（规约 §1）。它同样拒绝一个 `notes/adopt.md` 的 `backfilled:` 仍为空的被接入仓库——那是唯一一种 `lint.sh` 会在一堆追不到任何东西的数字之上读出"干净"的状态，标记计数在那里能证明的比它看上去的少（规约 §9a）。camera-ready 模式还会在 `tasks/<cycle>_promises.md` 仍有未勾选的框时拒绝打包：对评审人的承诺要在任何东西发出去之前兑现。
 
 论文取得 venue 自己的形状也在这里发生。`convert` 模式读用户提供的官方模板包——解包进 `cycls/<cycle>/template/`，与该周期的 `venue.yml` 并列，而 `template:` 指名的是模板包里那个 class——并在 `wkdrs/` 下生成一份能在 venue 的 class 下编译的独立副本：标题、作者与 abstract 用模板包自己的宏，`stys/arxiv.cls` 提供过而 venue class 没有的那一小撮由一个精简的 `compat.sty` 补上，`stys/stage.sty` 则逐字带过去——那一层本来就是为跨模板存活而建的。`manus/` 永不被编辑，也不往里新增任何东西——模板包待在 `lint.sh` 会扫 `\todo` 与身份泄漏的那棵树之外——而副本每次运行都从头重新生成，所以没有第二份真值源，也没有漂移。模板绝不去抓、也绝不凭记忆重建——管数字的那条边界同样管版式（规约 §9）。`convert` 刻意跳过所有冻结关口：把论文塞进页数上限要转很多次，而每一次都发生在手稿里还有 `\todo` 的时候。`page_limit_main` 量的是转换出的副本的页数，不是预印本构建的页数。转换替你做不了的事——被丢掉的 `\keywords`、需要拍板的附录顺序——会变成 `tasks/<cycle>_venue.md` 里的一行 `- [ ]`，各自点名由哪个 skill 来修。那份清单是被更新而不是被重新生成的，所以拍板过的条目不会再冒出来；而且与 `tasks/<cycle>_promises.md` 不同，它里面未勾选的框不阻断任何东西：那些是发现，不是对评审人的承诺。
+
+### stage-pstr-builder
+
+Slash-only。海报不是把论文重新灌进一张更大的纸——它是取舍，而做这个取舍就是这个 skill 的全部。`plan` 从 `notes/story.md` 的 pitch 提炼出一句核心结论，走一遍 `notes/claims.md` 取到达 `verified` 的行，提议出承载贡献的那几条，并把其余的记为可见的排除项，好让后来的运行不再翻已定的案；写任何东西之前由用户确认。`render` 把这份计划变成 `cycls/<cycle>/poster/poster.tex`——一个计划分区一个块，主张的措辞取自台账那一行而不是重新论证一遍，图从 `manus/figs/` 原样引入——并编译进 `wkdrs/builds/poster/`。这里从不新画美术素材：一张在海报尺寸下失效的图，是给 `stage-figs-designer` 的发现。
+
+两条边界让它是一个 STAGE skill，而不是一个通用海报工具。数字带 `% src:` 注释指向带指纹的 `mates/` 证据，与表格行的做法完全一致；而手稿的第三种状态在这里不存在——`check` 遇到 `\todo` 就硬失败，因为标记是给没人印出来的草稿用的，而这张纸是要印的。可读性也是算术而不是观感：纸张尺寸是 `venue.yml` 里用户确认过的事实，所以有效字号按印刷尺寸折算，对着这个 skill 自带的 `references/poster-layout.md` 里的下限核对，并点名纸面上最小的那处文字连同其量出的字号。海报还是唯一不继承 `ANON` 的产物——它带作者名，因为你就站在它旁边；这也正是它放在 `cycls/` 而绝不放在 `manus/` 的原因，后者是 `lint.sh` 搜捕身份泄漏的那棵树。会议给了官方海报模板包就逐字节照抄且从不编辑；只给了尺寸，就用自带的 `tikzposter` 模板按该尺寸出图，而模板包绝不抓取、也绝不凭记忆重建（规约 §9）。
 
 ### stage-flow-status
 

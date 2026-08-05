@@ -1,0 +1,6 @@
+interface:
+  display_name: "Poster Builder"
+  short_description: "Select, render, and check the conference poster for the active cycle"
+  default_prompt: "Use $stage-pstr-builder to plan what reaches the poster, then render and check it; the size and any official poster kit come from the cycle's venue.yml."
+policy:
+  allow_implicit_invocation: false

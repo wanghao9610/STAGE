@@ -44,10 +44,10 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - **只读的证据层**：STAR 产物（或人工登记的文件）被快照进 `mates/`，每个文件带一枚指纹，记录在 `mates/MANIFEST.md`。证据单向流动——要改一个数字，去上游改好再重新导入；绝不直接编辑 `mates/`。
 - **作为枢纽的论断台账**：`notes/claims.md` 把每条论断的陈述位置 ⇄ 证据 ⇄ 状态连在一起。写作提出论断，审计验证论断，回复捍卫论断。
 - **统一的构建入口**：`execs/run.sh` 用 latexmk 把 `manus/main.tex` 编译到树外的 `wkdrs/builds/`，并打印 PDF 路径和页数。
-- **确定性检查放在脚本里，判断放在 skill 里**：`execs/scpts/lint.sh` 机械地抓未定义引用、`\todo` 标记、超页和匿名泄漏；十五个 skill 处理一切需要判断的事。
-- **完整的写作生命周期**：十五个相互配合的 skill，按运行顺序依次是——接线仓库、整理证据、打磨故事、规划提纲、逐节起草、由证据生成表格、设计图、维护参考文献、润色文字、审计每个数字、审计每条引用、模拟评审、撰写回复、打包投稿、汇报状态。
+- **确定性检查放在脚本里，判断放在 skill 里**：`execs/scpts/lint.sh` 机械地抓未定义引用、`\todo` 标记、超页和匿名泄漏；十六个 skill 处理一切需要判断的事。
+- **完整的写作生命周期**：十六个相互配合的 skill，按运行顺序依次是——接线仓库、整理证据、打磨故事、规划提纲、逐节起草、由证据生成表格、设计图、维护参考文献、润色文字、审计每个数字、审计每条引用、模拟评审、撰写回复、打包投稿、做海报、汇报状态。
 - **投稿周期即数据**：每次投稿尝试都住在 `cycls/<venue>_<year>/` 里：经用户确认的 `venue.yml` 档案、真实与模拟评审、回复，以及冻结的投稿记录。
-- **一套工作流，四份 agent 目录**：同样的十五个 skill 分别供 Claude Code（`.claude/skills/`）、Codex（`.agents/skills/`）、Cursor（`.cursor/skills/`）和 Kimi Code（`.kimi-code/skills/`）使用，彼此只差调用前缀与工具名；外加一份共享的 `AGENTS.md`，其正文被镜像进 `.cursor/rules/`，成为 Cursor 的常驻规则。
+- **一套工作流，四份 agent 目录**：同样的十六个 skill 分别供 Claude Code（`.claude/skills/`）、Codex（`.agents/skills/`）、Cursor（`.cursor/skills/`）和 Kimi Code（`.kimi-code/skills/`）使用，彼此只差调用前缀与工具名；外加一份共享的 `AGENTS.md`，其正文被镜像进 `.cursor/rules/`，成为 Cursor 的常驻规则。
 - **属于论文自己的记忆**：一次会话学到、而仓库里没有任何文件认领的东西——某个 TeX 工具链的坑、你的一项长期偏好、一个试过又被否掉的框架——记在 `.stage/memory/` 下，并由一个钩子在下一次会话开头摆到 agent 面前；不管你用哪个工具驱动 STAGE 都一样。
 - **供人阅读的中文镜像**：每个 `SKILL.md` 旁边一份 `SKILL_zh.md`、peer-reviewer 的 references 旁边一份 `*_zh.md`、规范与 skills 指南旁边一份 `*.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
 
@@ -262,7 +262,7 @@ bash execs/scpts/lint.sh   # 未定义引用、\todo 计数、页数上限、匿
 
 ## 写作工作流
 
-STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事变成一篇论断链可审计的投稿论文。
+STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事变成一篇论断链可审计的投稿论文。
 
 **如何调用。** 前缀因工具而异：
 
@@ -276,7 +276,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 五个 skill（下表以 † 标注）仅限显式调用（slash-only）：只有你点名它们才会运行，agent 绝不会自作主张启动它们。它们是对话密集的决策点——接入、故事、提纲、回复、投稿——不请自来的一次运行会替你做本该由你做的决定。每套 harness 各按自己的方式强制这一条——Claude、Cursor、Kimi 三份 manifest 里的 `disable-model-invocation: true`，Codex 的 `agents/openai.yaml` 里的 `allow_implicit_invocation: false`——CI 会拿这四处去对 [规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md) 的 skill 一览——† 标记是在那里定的——所以不会出现"三套挡住了、第四套敞着"的情况。下表就是那份一览，外加一列"它写出什么"；按产物来看的同一批 skill 是产物登记表（规约 §8）。
 
 <div align="center">
-  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE 写作工作流：十五个 skill 分成五条相位带——建仓、规划、写作、润色与审计、投稿周期——各自写出什么，以及起草循环与拒稿回流如何闭合" width="100%">
+  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE 写作工作流：十六个 skill 分成五条相位带——建仓、规划、写作、润色与审计、投稿周期——各自写出什么，以及起草循环与拒稿回流如何闭合" width="100%">
 </div>
 
 | Skill | 用途 | 主要产出 |
@@ -295,6 +295,7 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 | `stage-peer-reviewer` | 模拟程序委员会：五视角评审团（新颖性与相关工作、技术正确性、实验严谨性、清晰度、魔鬼代言人），引用只认 whitelist/verified，按锚定评分带 + 封顶规则打分；`quick` 为单遍精简模式；绝不修改稿件 | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
 | `stage-resp-writer` † | 把真实与模拟评审解析成逐点台账，把每个攻击映射到论断和证据，在 venue 限制内起草回复，把每个承诺的修改记为复选框 | `cycls/<cycle>/response/RESPONSE_<date>.md`、`tasks/<cycle>_promises.md`、`notes/claims.md` 里降级为 `weakened` 的行 |
 | `stage-subm-packer` † | 投稿前检查与打包：build + lint 必须通过、走查检查单、完整性扫描、依官方模板包转成 venue 自己的版式、打包、投稿记录、冻结标签——camera-ready 模式在承诺未清空前拒绝打包 | `cycls/<cycle>/SUBMISSION_<date>.md`、标签 `freeze/<cycle>_<date>`、`cycls/<cycle>/template/` 下的模板包、`tasks/<cycle>_venue.md` 里的 venue 待办 |
+| `stage-pstr-builder` † | 把录用的论文压成一张纸：一句核心结论、论断台账里状态为 `verified` 的论断、从 `manus/figs/` 原样复用的图——外加一道按印刷尺寸折算有效字号的可读性闸，且不许 `\todo` 上墙 | `cycls/<cycle>/poster/POSTER_PLAN.md` + `poster.tex`，渲染产物在 `wkdrs/builds/poster/` |
 | `stage-flow-status` | 全流程的只读地图：章节/图/表状态、按状态统计的论断覆盖、证据新鲜度、周期状态、最近一次构建——以及唯一的下一步行动和它的准确命令 | 聊天内报告；从不写文件 |
 
 **投给多个会议。** 一个 venue 就是一个 cycle。`cycls/<venue>_<year>/` 拥有这次尝试的 `venue.yml`、`template/` 下的官方模板包、评审、回复、`SUBMISSION_<date>.md` 和冻结 tag；稿件、证据和论断台账则由所有尝试共享。
@@ -319,6 +320,8 @@ STAGE 包含十五个相互配合的 skill，把导入的证据和一个故事�
 8. **审计** —— `/stage-clms-auditor` 把每个数字追溯到指纹；`/stage-cite-auditor` 核查每条引用和断言；每个失败都变成一条 `tasks/` 条目和一个台账状态，而不是埋在报告里的一行。
 9. **评审与回复** —— `/stage-peer-reviewer` 召集五视角模拟评审团（或用 `quick` 单遍模式），把 meta-review 写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点台账、一份不超 venue 限制的回复，以及 `tasks/` 里的承诺复选框。
 10. **打包冻结** —— `/stage-subm-packer`：build 和 lint 必须通过、走查检查单、依已注册的模板包把论文转成 venue 自己的版式、包放到 `wkdrs/builds/` 下、写出 `SUBMISSION_<date>.md`、打出标签 `freeze/<cycle>_<date>`。camera-ready 模式在 `tasks/<cycle>_promises.md` 还有未勾选项时拒绝打包。先跑 `/stage-subm-packer convert kit=<path>`，并按需要跑很多次——单独的转换跳过所有冻结关口，所以在论文还在压页数时照样能用。
+11. **做海报** —— `/stage-pstr-builder`，录用之后：`plan` 挑出那一句核心结论和挣到墙面的 `verified` 论断，并记下砍掉了什么；`render` 生成 `cycls/<cycle>/poster/poster.tex` 并编译；闸按纸张已确认的物理尺寸核对有效字号，并拒绝 `\todo`。图从 `manus/figs/` 原样取用——要新图就退回 `/stage-figs-designer`。
+
 
 ## 证据、指纹与论断台账
 
@@ -363,7 +366,7 @@ bash execs/update.sh
 该命令默认从 STAGE 的 `main` 分支更新以下路径：
 
 - `AGENTS.md` 与 `.cursor/rules/`——共享的 agent 指令，以及抄录其正文的 Cursor 规则；你对它们的改动会被替换，且两者成对移动——一份就是另一份的正文，不能各走各的
-- `.agents/skills/`、`.claude/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——同样的十五个 skill，每套 harness 一份
+- `.agents/skills/`、`.claude/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——同样的十六个 skill，每套 harness 一份
 - `.claude/hooks/`、`.codex/hooks/`、`.cursor/hooks/`、`.kimi-code/hooks/` 与 `.kimi-code/hooks.example.toml`——两个会话钩子：项目记忆索引与本次会话的模型 id，每套 harness 各一份；`.stage/memory/` 下的记忆库属于论文自己，从不同步
 - `docs/mds/stage-workflow/`——工作流规约、skill 指南、记忆规范与模型 id 规范，中英两版
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
@@ -414,7 +417,7 @@ curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update
 - venue 官方模板包整包解压到 `cycls/<cycle>/template/`，不要放进 `manus/`——那是 `lint.sh` 扫描的命名空间，模板包自带的示例 `.tex` 会污染 `\todo` 计数和身份扫描。
 - 更新 `LICENSE` 中的年份和版权所有者。
 - 替换 `docs/htmls/stage.html`、`docs/htmls/stage_zh.html` 与 `docs/srcs/`——它们是 STAGE 自己的落地页和图片，不属于你的论文。`docs/index.html` 和 `docs/index_zh.html` 是把这两个页面挂到站点根目录的软链接。两个页面之间的中英切换用的是绝对链接（`/STAGE/index_zh.html`），要把其中的 `/STAGE` 前缀改成你自己的仓库名，否则语言切换会失效。`docs/mds/stage-workflow/` 保持不动，`execs/update.sh` 会负责更新它。
-- 删掉用不到的工具目录。`.agents/`（Codex）、`.claude/`、`.cursor/`、`.kimi-code/` 各自是同一套十五个 skill 的完整副本，每套 40–55 个文件；留下你所用 agent 会读的那一套，其余 `rm -rf` 即可。
+- 删掉用不到的工具目录。`.agents/`（Codex）、`.claude/`、`.cursor/`、`.kimi-code/` 各自是同一套十六个 skill 的完整副本，每套 40–55 个文件；留下你所用 agent 会读的那一套，其余 `rm -rf` 即可。
 
 骨架本身可独立使用：目录布局、`.env`、`execs/run.sh` 与 `execs/scpts/lint.sh` 在完全不装任何 skill 的情况下也能工作，因此删掉全部工具目录同样是受支持的用法。一篇论文一个仓库——第二篇论文是模板的第二个实例，而不是这里的第二棵目录树。
 

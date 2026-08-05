@@ -2,7 +2,7 @@
 
 **Language:** English | [简体中文](writing-workflow-conventions.zh-CN.md). The zh-CN edition is kept in step for human readers only and is never loaded at runtime — this file stays authoritative.
 
-The rules every STAGE writing workflow skill follows. The fifteen skills — `stage-proj-adopt`, `stage-evid-curator`, `stage-stry-coach`, `stage-outl-planner`, `stage-sect-drafter`, `stage-tabs-builder`, `stage-figs-designer`, `stage-refs-curator`, `stage-copy-editor`, `stage-clms-auditor`, `stage-cite-auditor`, `stage-peer-reviewer`, `stage-resp-writer`, `stage-subm-packer`, `stage-flow-status` — each carry their own workflow, their own limit on what they may write, and their own rubric. What they share lives here, once. There is no section-selective loading: **every skill reads this whole file at the start of every run.**
+The rules every STAGE writing workflow skill follows. The sixteen skills — `stage-proj-adopt`, `stage-evid-curator`, `stage-stry-coach`, `stage-outl-planner`, `stage-sect-drafter`, `stage-tabs-builder`, `stage-figs-designer`, `stage-refs-curator`, `stage-copy-editor`, `stage-clms-auditor`, `stage-cite-auditor`, `stage-peer-reviewer`, `stage-resp-writer`, `stage-subm-packer`, `stage-pstr-builder`, `stage-flow-status` — each carry their own workflow, their own limit on what they may write, and their own rubric. What they share lives here, once. There is no section-selective loading: **every skill reads this whole file at the start of every run.**
 
 **Precedence.** This file is the **baseline**. A skill's `SKILL.md` may be **stricter** — a narrower write surface, a lower threshold, an extra confirmation point, a rule that it never commits at all — and the stricter rule wins. A skill never loosens what this file sets. Where a `SKILL.md` carries a one-line summary of a rule below, that line is the binding reminder and this file is the full rule. Skills cite these sections as "conventions §n"; the numbers are frozen and never renumbered.
 
@@ -189,6 +189,7 @@ Every skill's durable output, in one table. `stage-flow-status` reads this as th
 | Simulated review | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` — the panel meta-review; per-perspective working files in `wkdrs/reports/peer_<cycle>_<date>/` | date in filename |
 | Response | `stage-resp-writer` | `cycls/<cycle>/response/RESPONSE_<date>.md`, promises in `tasks/<cycle>_promises.md` | promise checkboxes |
 | Submission | `stage-subm-packer` | `cycls/<cycle>/SUBMISSION_<date>.md`, git tag `freeze/<cycle>_<date>`, package under `wkdrs/builds/`, the registered venue template kit at `cycls/<cycle>/template/`, venue follow-ups in `tasks/<cycle>_venue.md` | `frozen:`; venue follow-up checkboxes |
+| Poster | `stage-pstr-builder` | `cycls/<cycle>/poster/POSTER_PLAN.md`, `poster.tex`, the official poster kit at `cycls/<cycle>/poster/template/`, render under `wkdrs/builds/poster/` | `state:`; per-zone Status |
 | Status | `stage-flow-status` | — (read-only; reports in chat) | — |
 
 Real reviews from a venue are dropped by the user into `cycls/<cycle>/reviews/` as
@@ -379,7 +380,7 @@ Where a skill puts what it writes. Each destination is exclusive — a file belo
 | Venue styles | `manus/stys/`: `arxiv.cls` and `stage.sty`, and nothing else — `manus/` is scanned by `lint.sh` and holds only files this workflow owns |
 | Imported evidence (read-only) | `mates/<source-slug>/**` mirroring upstream paths; hand-registered drops in `mates/manual/**`; ledger `mates/MANIFEST.md` |
 | Writing metadata | `notes/` fixed files: `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`; reading notes in `notes/refs/` |
-| Submission cycles | `cycls/<venue>_<year>/`: `venue.yml`, `template/` (the official venue kit, unpacked whole, byte-for-byte, never edited), `reviews/`, `response/`, `SUBMISSION_<date>.md` |
+| Submission cycles | `cycls/<venue>_<year>/`: `venue.yml`, `template/` (the official venue kit, unpacked whole, byte-for-byte, never edited), `reviews/`, `response/`, `SUBMISSION_<date>.md`, `poster/` (the poster plan and its source, with an official poster kit under `poster/template/`) |
 | Revision scratch, promise lists | `tasks/` |
 | Builds and ephemeral reports | `wkdrs/builds/`, `wkdrs/reports/` (gitignored, regenerable) |
 | What earlier sessions learned, owned by no other file | `.stage/memory/`; machine-specific facts in `.stage/memory/local/`, which git ignores ([`memory_spec.md`](memory_spec.md)) |
@@ -403,7 +404,7 @@ Rules the table alone does not carry:
    `stage-subm-packer convert` reads it and regenerates a standalone copy under `wkdrs/` that
    compiles under that class. `manus/main.tex` keeps its `\documentclass{stys/arxiv}`: there is no
    in-place swap and no second source of truth.
-5. **The four harness trees are copies, not alternatives.** The same fifteen skills ship once per
+5. **The four harness trees are copies, not alternatives.** The same sixteen skills ship once per
    harness — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` —
    differing only in invocation prefix and tool names (`Bash` / `Shell`, `AskUserQuestion` /
    `AskQuestion` / `request_user_input`, `Read` / `ReadFile`). Load the copy under your own root and
@@ -412,7 +413,7 @@ Rules the table alone does not carry:
 
 ## 11. The skill roster
 
-Fifteen skills, invoked as `/stage-<name>` in Claude Code and Cursor, `$stage-<name>` in Codex, `/skill:stage-<name>` in Kimi Code. What each one does in full is [writing-workflow-skills.md](writing-workflow-skills.md); what each one writes is §8.
+Sixteen skills, invoked as `/stage-<name>` in Claude Code and Cursor, `$stage-<name>` in Codex, `/skill:stage-<name>` in Kimi Code. What each one does in full is [writing-workflow-skills.md](writing-workflow-skills.md); what each one writes is §8.
 
 | Skill | Role |
 | --- | --- |
@@ -430,9 +431,10 @@ Fifteen skills, invoked as `/stage-<name>` in Claude Code and Cursor, `$stage-<n
 | `stage-peer-reviewer` | simulated five-perspective review panel |
 | `stage-resp-writer` † | reviews → point ledger → response + promises |
 | `stage-subm-packer` † | preflight, venue conversion, package, freeze |
+| `stage-pstr-builder` † | select, render, and check the cycle's poster |
 | `stage-flow-status` | read-only status and the one next action |
 
-1. **The five marked † are slash-only.** Run them only when the user names them: they are the decision points — adoption, story, outline, response, submission — and a decision point reached on an agent's own initiative is a decision nobody made. This table is the source of truth; the guards enforcing it are `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests and `allow_implicit_invocation: false` in `.agents/skills/<name>/agents/openai.yaml` for Codex, and CI checks all four against these markers, so marking a skill here without guarding it everywhere fails the build.
+1. **The six marked † are slash-only.** Run them only when the user names them: they are the decision points — adoption, story, outline, response, submission, and what goes on the poster — and a decision point reached on an agent's own initiative is a decision nobody made. This table is the source of truth; the guards enforcing it are `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests and `allow_implicit_invocation: false` in `.agents/skills/<name>/agents/openai.yaml` for Codex, and CI checks all four against these markers, so marking a skill here without guarding it everywhere fails the build.
 2. **Two skills never touch the manuscript.** `stage-peer-reviewer` writes only its review under `cycls/<cycle>/reviews/`; `stage-flow-status` writes nothing at all. Run the status skill first whenever you do not know where things stand — it reads the outline, the ledger, the manifest, and the cycle state, and names the single next action with its exact command.
 3. **One skill per invocation, and one unit of work inside it.** A section, a table, a figure, a response — a run that quietly widens its scope is the failure this rule exists for; the next unit is the next invocation.
-4. **A named next action is taken, not printed, when it names one of the ten.** Skills end by naming what comes next — the status skill's single next action, a red lint gate naming the owner of what broke, an auditor routing an unsupported claim to the section that carries it — and each of those is a command handed to the reader. Where the named command is one of the ten and its target is settled, run it instead of printing it: the reader is the agent, and a command printed to itself is a handoff to nobody. The five keep the printed command, because typing it *is* the decision they exist to leave with the author. Three limits make that safe. **The pickup happens after the naming run has ended, never inside it** — a skill that may not touch the manuscript gains no reach by naming a successor, so `stage-flow-status` stays the reporter it is and its successor starts once the report is done. **An unsettled target is asked about rather than guessed** — which section, which table, which figure, which cycle (§5 resolves them). And **item 3 holds unchanged**, one skill and one unit of work, with a run nobody typed saying what it is starting before it begins.
+4. **A named next action is taken, not printed, when it names one of the ten.** Skills end by naming what comes next — the status skill's single next action, a red lint gate naming the owner of what broke, an auditor routing an unsupported claim to the section that carries it — and each of those is a command handed to the reader. Where the named command is one of the ten and its target is settled, run it instead of printing it: the reader is the agent, and a command printed to itself is a handoff to nobody. The six keep the printed command, because typing it *is* the decision they exist to leave with the author. Three limits make that safe. **The pickup happens after the naming run has ended, never inside it** — a skill that may not touch the manuscript gains no reach by naming a successor, so `stage-flow-status` stays the reporter it is and its successor starts once the report is done. **An unsettled target is asked about rather than guessed** — which section, which table, which figure, which cycle (§5 resolves them). And **item 3 holds unchanged**, one skill and one unit of work, with a run nobody typed saying what it is starting before it begins.

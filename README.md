@@ -44,10 +44,10 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - **A read-only evidence layer**: STAR artifacts (or hand-registered drops) are snapshotted into `mates/` with a fingerprint per file, recorded in `mates/MANIFEST.md`. Evidence flows one way — to fix a number, fix it upstream and re-import; `mates/` is never edited in place.
 - **A claim ledger as the hub**: `notes/claims.md` links every claim's statements ⇄ evidence ⇄ status. Writing states claims, audits verify them, responses defend them.
 - **One build entrypoint**: `execs/run.sh` compiles `manus/main.tex` with latexmk, out-of-tree into `wkdrs/builds/`, and prints the PDF path and page count.
-- **Deterministic checks in scripts, judgment in skills**: `execs/scpts/lint.sh` catches undefined references, `\todo` markers, page-limit overruns, and anonymity leaks mechanically; the fifteen skills handle everything that needs judgment.
-- **A complete writing lifecycle** through fifteen complementary skills, in the order they run: wire the repo, curate evidence, shape the story, outline the paper, draft each section, build tables from evidence, design figures, curate references, polish the prose, audit every number, audit every citation, simulate review, write the response, pack the submission, and report status.
+- **Deterministic checks in scripts, judgment in skills**: `execs/scpts/lint.sh` catches undefined references, `\todo` markers, page-limit overruns, and anonymity leaks mechanically; the sixteen skills handle everything that needs judgment.
+- **A complete writing lifecycle** through sixteen complementary skills, in the order they run: wire the repo, curate evidence, shape the story, outline the paper, draft each section, build tables from evidence, design figures, curate references, polish the prose, audit every number, audit every citation, simulate review, write the response, pack the submission, build the poster, and report status.
 - **Submission cycles as data**: each venue attempt lives in `cycls/<venue>_<year>/` with a user-confirmed `venue.yml` profile, received and simulated reviews, the response, and a frozen submission record.
-- **One workflow, four agent trees**: the same fifteen skills for Claude Code (`.claude/skills/`), Codex (`.agents/skills/`), Cursor (`.cursor/skills/`), and Kimi Code (`.kimi-code/skills/`), differing only in invocation prefix and tool names — plus one shared `AGENTS.md`, whose body is mirrored into `.cursor/rules/` as an always-on Cursor rule.
+- **One workflow, four agent trees**: the same sixteen skills for Claude Code (`.claude/skills/`), Codex (`.agents/skills/`), Cursor (`.cursor/skills/`), and Kimi Code (`.kimi-code/skills/`), differing only in invocation prefix and tool names — plus one shared `AGENTS.md`, whose body is mirrored into `.cursor/rules/` as an always-on Cursor rule.
 - **A memory the paper owns**: what a session learns that no file in the repository holds — a TeX toolchain quirk, a standing preference of yours, a framing already tried and rejected — is recorded under `.stage/memory/` and put in front of the next session by a hook, in whichever tool you drive STAGE with.
 - **zh-CN mirrors for human readers**: `SKILL_zh.md` beside every `SKILL.md`, `*_zh.md` beside the peer-reviewer references, and `*.zh-CN.md` beside the conventions and the skills guide — kept in step, never loaded at runtime, and the English files stay authoritative.
 
@@ -262,7 +262,7 @@ The skeleton stands on its own — the layout, `.env`, `run.sh`, and `import.sh`
 
 ## Writing workflow
 
-STAGE includes fifteen complementary skills that turn imported evidence and a story into a submitted paper with an auditable claim trail.
+STAGE includes sixteen complementary skills that turn imported evidence and a story into a submitted paper with an auditable claim trail.
 
 **How to invoke them.** The prefix is tool-specific:
 
@@ -276,7 +276,7 @@ STAGE includes fifteen complementary skills that turn imported evidence and a st
 Five skills (marked † below) are slash-only: they run only when you name them explicitly, and the agent never starts them on its own initiative. They are the dialogue-heavy decision points — adoption, story, outline, response, submission — where an unrequested run would make choices that are yours to make. Each harness enforces it in its own way — `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests, `allow_implicit_invocation: false` in Codex's `agents/openai.yaml` — and CI checks all four against the roster in [conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md), which is where the † markers are decided, so a skill cannot end up guarded on three harnesses and open on the fourth. The table below is that roster with a column for what each skill writes; the artifact registry (conventions §8) is the same set by output.
 
 <div align="center">
-  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE writing workflow: fifteen skills in five phase bands — set up, plan, write, polish and audit, submission cycle — what each one writes, and how the drafting loop and the rejection loop close" width="100%">
+  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE writing workflow: sixteen skills in five phase bands — set up, plan, write, polish and audit, submission cycle — what each one writes, and how the drafting loop and the rejection loop close" width="100%">
 </div>
 
 | Skill | Purpose | Main output |
@@ -295,6 +295,7 @@ Five skills (marked † below) are slash-only: they run only when you name them 
 | `stage-peer-reviewer` | Simulated program committee: a five-perspective panel (novelty & related work, soundness, experimental rigor, clarity, devil's advocate) under a whitelist-or-verified citation contract, scored by anchored rubric bands with hard caps; `quick` runs a single-pass version; never edits the manuscript | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
 | `stage-resp-writer` † | Parse real and simulated reviews into a point ledger, map each attack to claims and evidence, draft the response within the venue's limit, record every promised change as a checkbox | `cycls/<cycle>/response/RESPONSE_<date>.md`, `tasks/<cycle>_promises.md`, `weakened` downgrades in `notes/claims.md` |
 | `stage-subm-packer` † | Preflight and packaging: build + lint must pass, checklist walk, completeness sweep, conversion into the venue's own template from an official kit, package, submission record, freeze tag — camera-ready refuses to pack while promises sit unchecked | `cycls/<cycle>/SUBMISSION_<date>.md`, tag `freeze/<cycle>_<date>`, the kit at `cycls/<cycle>/template/`, venue follow-ups in `tasks/<cycle>_venue.md` |
+| `stage-pstr-builder` † | The accepted paper as one sheet: a takeaway sentence, the claims the ledger carries at `verified`, figures reused from `manus/figs/` unmodified — with a legibility gate computed at print scale and no `\todo` allowed onto a wall | `cycls/<cycle>/poster/POSTER_PLAN.md` + `poster.tex`, render under `wkdrs/builds/poster/` |
 | `stage-flow-status` | Read-only map of the whole flow: section/figure/table status, claim coverage by status, evidence freshness, cycle state, latest build — and the one next action with its exact command | Chat report; never writes |
 
 **Targeting more than one venue.** One venue is one cycle. `cycls/<venue>_<year>/` owns that attempt's `venue.yml`, its official kit under `template/`, its reviews, its response, its `SUBMISSION_<date>.md`, and its freeze tag; the manuscript, the evidence, and the claim ledger are shared across all attempts.
@@ -319,6 +320,8 @@ The skills chain into one path from evidence to a frozen submission. Steps 5–7
 8. **Audit** — `/stage-clms-auditor` traces every number to a fingerprint; `/stage-cite-auditor` checks every citation and assertion; each failure becomes a `tasks/` item and a ledger status, not a buried report line.
 9. **Review and respond** — `/stage-peer-reviewer` convenes a five-perspective simulated panel (or a `quick` single pass) and writes its meta-review into `cycls/<cycle>/reviews/`; real reviews are dropped there as `received_<id>.md`; `/stage-resp-writer` turns them all into a point ledger, a response within the venue's limit, and promise checkboxes in `tasks/`.
 10. **Pack and freeze** — `/stage-subm-packer`: build and lint must pass, checklist walked, the paper converted into the venue's own template from the registered kit, package under `wkdrs/builds/`, `SUBMISSION_<date>.md` written, tag `freeze/<cycle>_<date>` created. Camera-ready mode refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes. Run `/stage-subm-packer convert kit=<path>` first, and as often as you need — conversion alone skips every freeze gate, so it works while the paper is still being trimmed to the page limit.
+11. **Poster** — `/stage-pstr-builder`, after acceptance: `plan` picks the one takeaway and the `verified` claims that earn wall space and records what was cut; `render` emits `cycls/<cycle>/poster/poster.tex` and compiles it; the gate checks effective point size against the sheet's confirmed physical size and refuses a `\todo`. Figures come from `manus/figs/` unmodified — new artwork routes back to `/stage-figs-designer`.
+
 
 ## Evidence, fingerprints, and the claim ledger
 
@@ -374,7 +377,7 @@ bash execs/update.sh
 By default, the command updates these paths from STAGE's `main` branch:
 
 - `AGENTS.md` and `.cursor/rules/` — the shared agent instructions and the Cursor rule that copies their body; your own edits to them are replaced, and the two move as a pair, since one is the other's body and they must not drift
-- `.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — the same fifteen skills once per harness
+- `.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — the same sixteen skills once per harness
 - `.claude/hooks/`, `.codex/hooks/`, `.cursor/hooks/`, `.kimi-code/hooks/` and `.kimi-code/hooks.example.toml` — the two session hooks — the project-memory index and the session's model id — once per harness; the store under `.stage/memory/` is the paper's own and is never synced
 - `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, the memory spec, and the model-id spec, in both editions
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
@@ -425,7 +428,7 @@ When you start a paper from STAGE, these are the adjustments worth making:
 - Unpack the venue's official kit whole into `cycls/<cycle>/template/`, not into `manus/`: that tree is the namespace `lint.sh` scans, and a kit's example `.tex` would trip its `\todo` count and its identity scan.
 - Update the year and copyright holder in `LICENSE`.
 - Replace `docs/htmls/stage.html`, `docs/htmls/stage_zh.html`, and `docs/srcs/` — they are STAGE's own landing pages and images, not your paper's. `docs/index.html` and `docs/index_zh.html` are the symlinks that mount those pages at the site root. The language switch between them uses absolute links (`/STAGE/index_zh.html`), so change the `/STAGE` prefix to your own repository name or the switch breaks. Leave `docs/mds/stage-workflow/` alone — `execs/update.sh` keeps it current.
-- Delete the tool directories you do not use. `.agents/` (Codex), `.claude/`, `.cursor/`, and `.kimi-code/` are each a complete copy of the same fifteen skills, 40–55 files apiece; keep the one your agent reads and `rm -rf` the rest.
+- Delete the tool directories you do not use. `.agents/` (Codex), `.claude/`, `.cursor/`, and `.kimi-code/` are each a complete copy of the same sixteen skills, 40–55 files apiece; keep the one your agent reads and `rm -rf` the rest.
 
 The skeleton stands on its own: the directory layout, `.env`, `execs/run.sh`, and `execs/scpts/lint.sh` all work with no skills installed at all, so deleting every tool directory is a supported way to use it. One paper, one repository — a second paper is a second instance of the template, not a second tree here.
 
