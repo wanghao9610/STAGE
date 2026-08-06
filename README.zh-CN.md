@@ -78,7 +78,7 @@ STAGE/
 ├── execs/
 │   ├── run.sh              # 构建入口（latexmk，树外构建）
 │   ├── update.sh           # 同步上游 STAGE skill 与文档；--adopt 安装骨架
-│   └── scpts/              # import.sh（证据导入）、lint.sh（确定性检查）
+│   └── scpts/              # import.sh（证据导入）、lint.sh（确定性检查）、fmt.sh（一句一行）
 ├── docs/                   # 项目文档
 │   ├── index.html          # GitHub Pages 文档入口（→ htmls/stage.html）
 │   ├── htmls/              # 落地页：stage.html + stage_zh.html
@@ -241,9 +241,10 @@ bash execs/scpts/import.sh --diff   # 只读的过期检查报告；任何漂移
 ```bash
 bash execs/run.sh          # latexmk 树外构建 → wkdrs/builds/ + PDF 路径和页数
 bash execs/scpts/lint.sh   # 未定义引用、\todo 计数、页数上限、匿名泄漏
+bash execs/scpts/fmt.sh    # 一句一行；--check 只报告偏离，不写入
 ```
 
-新检出的仓库用普通 pdflatex 开箱即可编译，而且自带的稿件里故意留了一个 `\todo{}`——第一次运行 lint 就能直观看到这道闸门，日后它拦住的就是你真正缺失的数字。`lint.sh` 在以下情况硬性失败：未定义引用、超出页数上限、残留 `\todo` 标记、以及（`ANON=true` 时）身份泄漏；其余都是警告。
+新检出的仓库用普通 pdflatex 开箱即可编译，而且自带的稿件里故意留了一个 `\todo{}`——第一次运行 lint 就能直观看到这道闸门，日后它拦住的就是你真正缺失的数字。`lint.sh` 在以下情况硬性失败：未定义引用、超出页数上限、残留 `\todo` 标记、以及（`ANON=true` 时）身份泄漏；其余都是警告。其中一条警告来自 `fmt.sh --check`：LaTeX 把换行读成一个空格，所以稿件保持一句一行——diff 显示的是你改动的那一句而不是它所在的整段，`% src:` 注释也永远就在它所溯源的那句上面一行。
 
 ### 6. 启动写作工作流
 
@@ -370,9 +371,10 @@ bash execs/update.sh
 - `.claude/hooks/`、`.codex/hooks/`、`.cursor/hooks/`、`.kimi-code/hooks/` 与 `.kimi-code/hooks.example.toml`——两个会话钩子：项目记忆索引与本次会话的模型 id，每套 harness 各一份；`.stage/memory/` 下的记忆库属于论文自己，从不同步
 - `docs/mds/stage-workflow/`——工作流规约、skill 指南、记忆规范与模型 id 规范，中英两版
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
+- `execs/scpts/import.sh`、`execs/scpts/lint.sh`、`execs/scpts/fmt.sh`——三个工具脚本，理由同上：十六个 skill 调用 `import.sh --diff`，五个调用 `lint.sh --no-build`，而读退出码的调用方，认的是它自己那一版写明的那套码。比某个工具脚本更老的 ref 会打印一行跳过它
 - `execs/update.sh`——更新脚本自己，为的是不让任何仓库卡在一个老到取不回后继版本的更新机制上。它用重命名装上：执行更新的那一次仍读旧文件跑完，下一次调用才用上新的
 
-拉取来源由 `STAGE_REPOSITORY` 指定，取值顺序为：环境变量、`.env`、内置默认值 `https://github.com/wanghao9610/STAGE.git`。想长期跟随某个 fork，就写进 `.env`；只想临时改一次，在命令前加变量即可——`STAGE_REPOSITORY=… bash execs/update.sh`。`.env` 里的其余内容从不同步——这也正是两个入口脚本可以放心替换的原因：实例的配置不住在它们里面。
+拉取来源由 `STAGE_REPOSITORY` 指定，取值顺序为：环境变量、`.env`、内置默认值 `https://github.com/wanghao9610/STAGE.git`。想长期跟随某个 fork，就写进 `.env`；只想临时改一次，在命令前加变量即可——`STAGE_REPOSITORY=… bash execs/update.sh`。`.env` 里的其余内容从不同步——这也正是 `execs/` 下每个脚本都可以放心替换的原因：实例的配置不住在它们里面。
 
 harness 配置——`.cursorignore` 与三份钩子注册文件（`.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json`）——仅在缺失时安装，除非加 `--force`，否则绝不覆盖：论文仓库可能往这些文件里加过自己的设置。若保留下来的文件与上游有差异，命令会打印一条提示说明有几处；若保留下来的注册文件里没有那个记忆钩子，它会点名说出来——否则的结果是一个永远不触发、也永远不报错的钩子。如果论文仓库是在更新脚本学会自同步之前创建的，请先手动刷新它一次——旧版 `execs/update.sh` 不会覆盖自己：
 

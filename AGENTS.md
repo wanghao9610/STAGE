@@ -46,7 +46,7 @@ The test: every changed line traces to the user's request, and every number in i
 - Run `/stage-flow-status` first when you do not know where things stand — it reads the outline, the ledger, the manifest, and the cycle state, and names the single next action.
 - The rules every workflow skill follows are in `docs/mds/stage-workflow/writing-workflow-conventions.md`, read whole at the start of every run; the skill roster is its §11, and what each skill does is in `writing-workflow-skills.md`.
 - Commit once per skill run, at that skill's commit step, and not otherwise (conventions §1).
-- Do not hand-edit generated reports under `wkdrs/`, and do not edit `docs/mds/stage-workflow/`, the skill trees, or the `execs/` entrypoints — `execs/update.sh` overwrites them, this file included.
+- Do not hand-edit generated reports under `wkdrs/`, and do not edit `docs/mds/stage-workflow/`, the skill trees, or any script under `execs/` — the two entrypoints and the three utilities in `execs/scpts/` alike — `execs/update.sh` overwrites them, this file included.
 
 ## 6. Reply Language
 
@@ -76,7 +76,7 @@ The test: every changed line traces to the user's request, and every number in i
 - Writing metadata under `notes/`: `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`, and reading notes in `notes/refs/`.
 - Submission cycles under `cycls/<venue>_<year>/`. Revision scratch, promise lists, and venue follow-ups in `tasks/`: `<cycle>_promises.md` blocks a camera-ready until every box is kept; `<cycle>_venue.md` blocks nothing.
 - Builds and ephemeral reports under `wkdrs/` — gitignored and regenerable. Durable outcomes go to the ledger and `tasks/`, not to reports.
-- `execs/` root is closed: `run.sh` and `update.sh` only. Utilities (`import.sh`, `lint.sh`) live in `execs/scpts/`.
+- `execs/` root is closed: `run.sh` and `update.sh` only. Utilities (`import.sh`, `lint.sh`, `fmt.sh`) live in `execs/scpts/`.
 
 ## 9. Project Runtime
 
@@ -84,6 +84,7 @@ The test: every changed line traces to the user's request, and every number in i
 
 - `bash execs/run.sh` is the only build: latexmk, out-of-tree into `wkdrs/builds/`, engine from `.env` `LATEX_ENGINE`. It prints the PDF path and the page count.
 - `bash execs/scpts/lint.sh` is the deterministic gate: undefined references, `\todo` count, page count against the active cycle's `venue.yml`, identity leaks when `ANON=true`. Hard failures exit non-zero.
+- `bash execs/scpts/fmt.sh` holds `manus/` at one sentence per line. LaTeX reads a newline as a space, so writing each sentence on its own line costs the PDF nothing and makes a `% src:` comment and the sentence it heads a fixed two-line pair. Write new prose that way rather than wrapping at a column; `--check` reports drift and `lint.sh` warns on it. It never touches `manus/stys/` or a venue kit under `cycls/*/template/`, and it refuses any rewrite that would change the typeset text.
 - Runtime configuration lives in `.env`, created from `.env.example`: `STAR_HOME` (empty means standalone), `LATEX_ENGINE`, `ANON`, `STAGE_REPOSITORY`, `STAGE_LANG`. Do not hardcode machine-specific paths.
 - Real dates only: every date written into an artifact comes from the system clock, never from memory or invention (conventions §4).
 

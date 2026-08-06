@@ -1,0 +1,38 @@
+# .editorconfig — https://editorconfig.org
+# What every editor must agree on so that opening a file is not an edit to it.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# One sentence per line (conventions §3.7): a source line is exactly as long as
+# its sentence, so no editor may wrap it at a column. indent_size matches
+# defaultIndent in .latexindent.yaml — a disagreement there is a file that
+# reindents one way on save and the other way under execs/scpts/fmt.sh.
+[*.{tex,sty,cls,bib}]
+indent_style = space
+indent_size = 4
+max_line_length = off
+
+# Two trailing spaces are a line break in Markdown.
+[*.md]
+trim_trailing_whitespace = false
+
+# Bytes that are somebody else's: the style layer and any official venue or
+# poster kit (conventions §10.4). fmt.sh refuses to format these; an editor
+# must not silently retouch them either.
+[manus/stys/**]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+[cycls/*/template/**]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+[cycls/*/*/template/**]
+trim_trailing_whitespace = false
+insert_final_newline = false

@@ -29,7 +29,11 @@
     // extensions.latex
     "[latex]": {
         "editor.defaultFormatter": "James-Yu.latex-workshop",
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        // One sentence per line means source lines as long as their sentence
+        // (conventions §3.7). Wrapping is a view, never a line break in the
+        // file — the formatter would undo a hard wrap on the next save anyway.
+        "editor.wordWrap": "on"
     },
     // Root search: a **/ glob so detection also works when the window is not
     // opened at the repo root. A workspace-relative "manus/main.tex" matches
@@ -60,11 +64,23 @@
     // gitignored and absent in a fresh clone, and latexindent exits non-zero
     // when -g points into a directory that does not exist yet — which surfaces
     // as a "Formatting failed" popup on the first save, before any build.
+    // -m lets latexindent move line breaks, which is what one-sentence-per-line
+    // needs; the rule itself comes from .latexindent.yaml at the repo root, the
+    // same file execs/scpts/fmt.sh reads, so a save and a script run cannot
+    // disagree. %WORKSPACE_FOLDER% is workspaceFolders[0] — wrong in a
+    // multi-root window, empty with no folder open — and here that is harmless:
+    // a config latexindent cannot find leaves the file indented but unbroken,
+    // and fmt.sh finishes the job. defaultIndent is repeated literally rather
+    // than as %INDENT% for exactly that fallback: %INDENT% follows the editor's
+    // tab settings, and an editor that disagrees with the yaml would reindent
+    // the file on every save and have fmt.sh undo it on every run.
     "latex-workshop.formatting.latexindent.args": [
+        "-m",
+        "-l=%WORKSPACE_FOLDER%/.latexindent.yaml",
         "-g",
         "%TMPDIR%/indent.log",
         "%TMPFILE%",
-        "-y=defaultIndent: '%INDENT%'"
+        "-y=defaultIndent: '    '"
     ],
     "latex-workshop.latex.recipes": [
         {

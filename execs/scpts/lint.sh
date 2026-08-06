@@ -43,6 +43,8 @@ Build the manuscript (execs/run.sh), then run the deterministic checks:
   warnings and notes (reported, exit 0):
     - overfull hboxes
     - sources newer than a reused build (--no-build only)
+    - manuscript sources that no longer read one sentence per line
+      (execs/scpts/fmt.sh --check; where a line breaks cannot move a page)
     - per-file word counts (when texcount is installed)
 
 A todo marker inside a LaTeX comment is not a failure: each candidate line has
@@ -250,7 +252,32 @@ else
     log "note: ANON=false — identity-leak scan skipped."
 fi
 
-# ---- 6. word counts (informational) -----------------------------------------
+# ---- 6. one sentence per line (warning; §3.7) -------------------------------
+# Delegated to fmt.sh, which owns the rule and the tool. A warning on purpose:
+# where a line breaks cannot move a page, a reference, or a todo count, so it
+# never blocks a submission — but drift means the next diff is a paragraph
+# rather than a sentence, and that is worth a line here.
+FMT_SH="${ROOT_DIR}/execs/scpts/fmt.sh"
+if [[ ! -f "${FMT_SH}" ]]; then
+    log "note: sentence-per-line check skipped — execs/scpts/fmt.sh absent."
+else
+    FMT_OUT="$(bash "${FMT_SH}" --check 2>&1)" && FMT_RC=0 || FMT_RC=$?
+    case "${FMT_RC}" in
+        0)
+            log "ok: manuscript sources read one sentence per line."
+            ;;
+        3)
+            log "note: sentence-per-line check skipped — ${FMT_OUT#*ERROR: }"
+            ;;
+        *)
+            log "warn: manuscript sources are not one sentence per line:"
+            printf '%s\n' "${FMT_OUT}" | sed -e 's/^\[STAGE fmt\] //' -e 's/^/      /'
+            WARNS=$(( WARNS + 1 ))
+            ;;
+    esac
+fi
+
+# ---- 7. word counts (informational) -----------------------------------------
 if command -v texcount >/dev/null 2>&1; then
     TC_FILES=("manus/main.tex")
     for f in "${MANU_DIR}"/secs/*.tex; do

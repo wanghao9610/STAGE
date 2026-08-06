@@ -17,7 +17,11 @@ manus/out/
 .vscode/ltex*
 .texpadtmp/
 
-# LaTeX junk (belt and suspenders; run.sh builds out-of-tree)
+# LaTeX junk (belt and suspenders; run.sh builds out-of-tree). The backups and
+# log are latexindent's: fmt.sh keeps both in a temp directory, a bare
+# `latexindent -w` run by hand does not.
+*.bak[0-9]*
+indent.log
 *.aux
 *.bbl
 *.blg

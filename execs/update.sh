@@ -3,8 +3,9 @@ set -euo pipefail
 
 # execs/update.sh — sync STAGE-managed content from the upstream template (the
 # four per-harness skill trees, the four session-hook trees, docs/mds/stage-workflow/,
-# the shared agent instructions, and both execs/ entrypoints — this script
-# included), or install the STAGE skeleton into an existing paper repo with --adopt.
+# the shared agent instructions, and every script under execs/ — both entrypoints,
+# this one included, and the three utilities in execs/scpts/), or install the
+# STAGE skeleton into an existing paper repo with --adopt.
 
 STAGE_REF="main"
 SKILL_NAME=""
@@ -43,9 +44,14 @@ HOOK_TREES=(
 # Single STAGE-managed files an update overwrites alongside the trees above.
 # execs/run.sh is here because the skills call it by name and by flag — a paper
 # repo that syncs a skill using `run.sh --main` while keeping a run.sh that
-# predates the flag gets a run that fails at its build step. Neither entrypoint
-# carries project configuration: everything an instance sets lives in .env,
-# which is git-ignored and never synced (conventions §3.1).
+# predates the flag gets a run that fails at its build step. The three utilities
+# under execs/scpts/ are here for the same reason and it is not weaker: sixteen
+# skills call `import.sh --diff` and five call `lint.sh --no-build` by name and
+# by flag, `lint.sh` calls `fmt.sh --check` the same way, and a caller reading an
+# exit code means the one its own version documents. No script here carries
+# project configuration: everything an instance sets lives in .env, which is
+# git-ignored and never synced (conventions §3.1) — so all five are safe to
+# replace wholesale.
 #
 # execs/update.sh syncs itself, so a repo never strands on an update mechanism
 # too old to fetch its successor. A running shell script must not be rewritten
@@ -56,11 +62,27 @@ HOOK_TREES=(
 SELF_PATH="execs/update.sh"
 SYNC_FILES=(
     "execs/run.sh"
+    "execs/scpts/import.sh"
+    "execs/scpts/lint.sh"
+    "execs/scpts/fmt.sh"
     # Kimi has no project-level hook config, so its registration snippet ships
     # as documentation beside the hook rather than as a config an update keeps.
     ".kimi-code/hooks.example.toml"
     "${SELF_PATH}"
 )
+
+# Synced paths a ref is allowed not to have. Each arrived later than the tree it
+# sits in, so pinning an older ref is a legitimate reason for it to be missing,
+# and that is a skipped line rather than a stopped update: the session hooks,
+# which arrived after the skills, and fmt.sh, which arrived after the other two
+# utilities. Anything else missing is a broken ref and still fatal.
+is_optional_path() {
+    case "$1" in
+        .*/hooks*)            return 0 ;;
+        "execs/scpts/fmt.sh") return 0 ;;
+    esac
+    return 1
+}
 
 # The shared agent instructions and the Cursor rule that copies their body:
 # upstream-managed like the skills, and overwritten by an update. They are the
@@ -152,20 +174,24 @@ Overwrite the STAGE-managed content — the shared agent instructions (AGENTS.md
 and the Cursor rule that copies its body), the four per-harness skill trees
 (.claude/skills/, .agents/skills/, .cursor/skills/, .kimi-code/skills/), the
 four session-hook trees that inject the project-memory index and the session's
-model id, docs/mds/stage-workflow/, and both execs/ entrypoints, run.sh and this
-script — with files from upstream.
+model id, docs/mds/stage-workflow/, and every script under execs/ — the two
+entrypoints, run.sh and this one, and the three utilities in execs/scpts/:
+import.sh, lint.sh, fmt.sh — with files from upstream.
 The default ref is main; a branch or tag may be supplied instead. Local edits to
 those paths are replaced, AGENTS.md included; the manuscript, evidence, notes,
 and the memory store under .stage/memory/ are never touched. Use --skill to
 update only the named skill across all four skill trees (it leaves everything
 else, entrypoints and docs included, alone).
 
-Neither entrypoint holds project configuration — everything an instance sets
-lives in .env, which is git-ignored and never synced — so both are safe to
-replace. execs/run.sh is synced because the skills call it by name and by flag.
-execs/update.sh syncs itself, so no repo strands on an update mechanism too old
-to fetch its successor: it is installed by rename, which leaves this running
-process on the old file and gives the next invocation the new one.
+No script under execs/ holds project configuration — everything an instance sets
+lives in .env, which is git-ignored and never synced — so all five are safe to
+replace. They are synced because they are called by name and by
+flag: run.sh --main, lint.sh --no-build and import.sh --diff from the skills,
+fmt.sh --check from lint.sh. A repo that syncs a skill while keeping a script
+that predates the flag it passes gets a run that fails at that step. execs/update.sh syncs itself, so no repo strands on an
+update mechanism too old to fetch its successor: it is installed by rename,
+which leaves this running process on the old file and gives the next invocation
+the new one.
 
 Harness configuration an instance may have edited — .cursorignore and the three
 hook registrations (.claude/settings.json, .codex/hooks.json, .cursor/hooks.json)
@@ -277,10 +303,16 @@ if [[ "${ADOPT}" == true ]]; then
         ".stage/memory/MEMORY.md"
         ".env.example"
         ".gitignore"
+        # The line-break rule fmt.sh applies and .vscode/settings.json points
+        # at, plus the editor-side half of the same convention; a paper that
+        # already has either keeps its own, like every file here.
+        ".latexindent.yaml"
+        ".editorconfig"
         "execs/run.sh"
         "execs/update.sh"
         "execs/scpts/import.sh"
         "execs/scpts/lint.sh"
+        "execs/scpts/fmt.sh"
         "manus/main.tex"
         "manus/stys/stage.sty"
         "mates/MANIFEST.md"
@@ -396,16 +428,14 @@ if [[ "${ADOPT}" == false ]]; then
     git -C "${SOURCE_DIR}" sparse-checkout set "${SPARSE_PATHS[@]}"
 
     # SYNCED is SYNC_PATHS minus what the fetched ref does not carry, and it is
-    # what everything below diffs, dirty-checks, and extracts. Only the session
-    # hooks may be absent: they arrived later than the skills, so pinning an
-    # older ref is a legitimate reason for the ref not to have them, and that is
-    # a skipped line rather than a stopped update. Anything else missing is a
-    # broken ref and still fatal.
+    # what everything below diffs, dirty-checks, and extracts. What may be
+    # absent is is_optional_path()'s list and nothing else; anything else
+    # missing is a broken ref and still fatal.
     SYNCED=()
     for path in "${SYNC_PATHS[@]}"; do
         if [[ -e "${SOURCE_DIR}/${path}" ]]; then
             SYNCED+=("${path}")
-        elif [[ "${path}" == .*/hooks* ]]; then
+        elif is_optional_path "${path}"; then
             log "Skipping ${path}: not present in ref '${STAGE_REF}'."
         else
             fail "Upstream ref is missing ${path}."

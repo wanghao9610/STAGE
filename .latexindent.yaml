@@ -1,0 +1,37 @@
+# .latexindent.yaml — the manuscript's line-break rule, in one file.
+#
+# One sentence per line: LaTeX reads a single newline as a space, so where a
+# sentence breaks costs the PDF nothing and buys the repository a per-sentence
+# diff, a per-sentence blame, and — the reason this workflow cares — a fixed
+# two-line shape for `% src:` and the sentence it heads (conventions §9a).
+#
+# Read by `bash execs/scpts/fmt.sh`, which passes it with -l and refuses any
+# rewrite that would change the typeset text; the editor points at this same
+# file (.vscode/settings.json) so a save and a script run cannot disagree.
+# Never applied to manus/stys/ or to a venue kit under cycls/*/template/ —
+# those are byte-for-byte copies (conventions §10.4).
+
+# Spaces, not tabs, and the same width the editor inserts — a mismatch here is a
+# file that reformats one way on save and the other way in the script, forever.
+defaultIndent: "    "
+
+modifyLineBreaks:
+  oneSentencePerLine:
+    manipulateSentences: 1
+    # Joins an existing 80-column paragraph back into whole sentences before
+    # splitting it, so the convention applies to old prose and new alike.
+    removeSentenceLineBreaks: 1
+    multipleSpacesToSingle: 1
+    sentencesBeginWith:
+      A-Z: 1
+      a-z: 0
+      other: 0
+    sentencesEndWith:
+      # basicFullStop breaks at every period, `0.5` and `Fig.` included.
+      # betterFullStop knows e.g. / i.e. / etc. / w.r.t. and leaves a period
+      # inside math, a citation, or `~\ref{}` alone.
+      basicFullStop: 0
+      betterFullStop: 1
+      exclamationMark: 1
+      questionMark: 1
+      other: 0

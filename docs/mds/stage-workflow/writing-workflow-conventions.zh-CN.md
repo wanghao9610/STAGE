@@ -112,6 +112,7 @@ STAGE_LANG=
 4. **`ANON=true` 表示仓库处于投稿匿名模式。** `lint.sh` 会额外搜捕身份泄漏——`\author` 内容、致谢、`github.com/<user>`、`\thanks`——泄漏即硬失败。venue 档案里的 `anonymized:` 记录的是 venue 的要求；`ANON` 是操作开关，由用户来拨。发现两者不一致的 skill 要说出来并提问（§7），而不是静默改掉其中任何一个。
 5. **没有任何 skill 安装东西。** 缺失的工具——latexmk、pdfinfo、texcount、bib 解析器——意味着一次**降级检查**：能跑的照跑，在报告里点名缺口，并把安装命令交给用户（§2 禁止代跑）。
 6. **shell 是无状态的。** `run.sh` 从自身路径定位仓库根，在任何位置都能工作；skill 用绝对路径解析，绝不依赖此前的 `cd`。
+7. **手稿一句一行。** LaTeX 把一个换行折成一个空格，所以句子在哪里断开对 PDF 毫无代价，换来的却是逐句的 diff、逐句的 blame，以及——这套工作流真正在意的那一点——`% src:` 注释与它领起的那一句固定成两行（§9a）。往 `manus/` 里写东西的 skill 让每句另起一行，绝不按列宽折行。`bash execs/scpts/fmt.sh` 把已有文件改成这个样子，`--check` 只报告偏离；`lint.sh` 把它记为**警告，绝不是硬失败**——一行在哪里断开，动不了页数、动不了引用、动不了 todo 计数，所以它不该拦住投稿。规则本身写在仓库根的 `.latexindent.yaml` 里，脚本与编辑器读的是同一份；两棵树被豁免，因为那些字节是别人的：`manus/stys/`，以及 `cycls/*/template/` 下的任何官方包（§10.4）。**会改变排版结果的重写一律拒绝，文件原样留着。** 工具的断句并不完美——大写字母前的小写缩写（`std.`、`et al.`）会被读成句末——所以每次重写都与原文比对一次，比对前把每段连续空白折成一个空格，这正是 TeX 自己的做法；没通过比对的文件只被报出来，绝不写入。修法在正文里（`et al.\ `、`Fig.~\ref{...}`），绝不是放松规则。
 
 ## 4. 真实日期
 
@@ -388,7 +389,7 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 | 修订草稿、承诺清单 | `tasks/` |
 | 构建与临时报告 | `wkdrs/builds/`、`wkdrs/reports/`（gitignore，可重新生成） |
 | 早先会话学到、又没有别的文件认领的事实 | `.stage/memory/`；只对本机成立的放 `.stage/memory/local/`，git 忽略（[`memory_spec.zh-CN.md`](memory_spec.zh-CN.md)） |
-| 入口脚本 | `execs/run.sh`、`execs/update.sh`——**execs/ 根目录是封闭的**；工具脚本放 `execs/scpts/`。`run.sh` 由上游管理，`execs/update.sh` 会覆盖它；每个项目自己的设置住在 `.env` 里 |
+| 入口脚本 | `execs/run.sh`、`execs/update.sh`——**execs/ 根目录是封闭的**；工具脚本放 `execs/scpts/`（`import.sh`、`lint.sh`、`fmt.sh`）。`execs/` 下的每个脚本都由上游管理，`execs/update.sh` 会把这五个一起覆盖；每个项目自己的设置住在 `.env` 里，绝不住在某个被改过的脚本副本里 |
 | 工作流文档（上游管理） | `docs/mds/stage-workflow/` |
 
 光有表格带不出来的规则：

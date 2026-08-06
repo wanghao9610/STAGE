@@ -78,7 +78,7 @@ STAGE/
 ├── execs/
 │   ├── run.sh              # Build entrypoint (latexmk, out-of-tree)
 │   ├── update.sh           # Sync upstream STAGE skills and docs; --adopt installs the skeleton
-│   └── scpts/              # import.sh (evidence import), lint.sh (deterministic checks)
+│   └── scpts/              # import.sh (evidence import), lint.sh (deterministic checks), fmt.sh (one sentence per line)
 ├── docs/                   # Project documentation
 │   ├── index.html          # Documentation entrypoint for GitHub Pages (→ htmls/stage.html)
 │   ├── htmls/              # The landing pages: stage.html + stage_zh.html
@@ -241,9 +241,10 @@ Leave `STAR_HOME` empty. Drop evidence files — results exports, a collaborator
 ```bash
 bash execs/run.sh          # latexmk, out-of-tree → wkdrs/builds/ + PDF path and page count
 bash execs/scpts/lint.sh   # undefined refs, \todo count, page limit, anonymity leaks
+bash execs/scpts/fmt.sh    # one sentence per line; --check reports drift and writes nothing
 ```
 
-A fresh checkout compiles out of the box with plain pdflatex, and the stock manuscript carries one deliberate `\todo{}` — so the first lint run visibly demonstrates the gate that will later hold your real missing numbers. `lint.sh` fails hard on undefined references, page-limit overruns, remaining `\todo` markers, and (when `ANON=true`) identity leaks; everything else is a warning.
+A fresh checkout compiles out of the box with plain pdflatex, and the stock manuscript carries one deliberate `\todo{}` — so the first lint run visibly demonstrates the gate that will later hold your real missing numbers. `lint.sh` fails hard on undefined references, page-limit overruns, remaining `\todo` markers, and (when `ANON=true`) identity leaks; everything else is a warning. One of those warnings is `fmt.sh --check`: LaTeX reads a newline as a space, so the manuscript is kept at one sentence per line — a diff that shows the sentence you changed rather than the paragraph it sits in, and a `% src:` comment always one line above the sentence it sources.
 
 ### 6. Start the writing workflow
 
@@ -381,9 +382,10 @@ By default, the command updates these paths from STAGE's `main` branch:
 - `.claude/hooks/`, `.codex/hooks/`, `.cursor/hooks/`, `.kimi-code/hooks/` and `.kimi-code/hooks.example.toml` — the two session hooks — the project-memory index and the session's model id — once per harness; the store under `.stage/memory/` is the paper's own and is never synced
 - `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, the memory spec, and the model-id spec, in both editions
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
+- `execs/scpts/import.sh`, `execs/scpts/lint.sh`, `execs/scpts/fmt.sh` — the utilities, for the same reason: sixteen skills call `import.sh --diff` and five call `lint.sh --no-build`, and a caller reading an exit code means the one its own version documents. A ref older than a utility simply skips it with a printed line
 - `execs/update.sh` — the updater itself, so that no repository strands on an update mechanism too old to fetch its successor. It is installed by rename: the run doing the update finishes on the old file, and the next invocation uses the new one
 
-The repository it pulls from is `STAGE_REPOSITORY`, resolved in that order: the environment, then `.env`, then the default `https://github.com/wanghao9610/STAGE.git`. Set it in `.env` to track a fork permanently, or prefix a single command — `STAGE_REPOSITORY=… bash execs/update.sh` — to override it once. Nothing else in `.env` is ever synced, which is why both entrypoints are safe to replace: an instance's configuration does not live in them.
+The repository it pulls from is `STAGE_REPOSITORY`, resolved in that order: the environment, then `.env`, then the default `https://github.com/wanghao9610/STAGE.git`. Set it in `.env` to track a fork permanently, or prefix a single command — `STAGE_REPOSITORY=… bash execs/update.sh` — to override it once. Nothing else in `.env` is ever synced, which is why every script under `execs/` is safe to replace: an instance's configuration does not live in them.
 
 Harness configuration — `.cursorignore` and the three hook registrations (`.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`) — is installed only when missing, and never overwritten unless you pass `--force`, since a paper may have added its own settings to those files. When a kept file differs from upstream, the command prints a note naming how many; when a kept registration does not name the memory hook, it says so, because the alternative is a hook that silently never fires. Papers created before the updater learned to sync itself should refresh it once by hand, since an older `execs/update.sh` never overwrites itself:
 
