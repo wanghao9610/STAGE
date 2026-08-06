@@ -160,6 +160,22 @@ AI 会议的模板（NeurIPS / CVPR / ICML / ICLR / ACL）会渲染 author、tit
 - HTTP 429 / 503 → 指数退避（2s、4s、8s），最多重试 3 次，然后放过并记下失败。限速永远不是凭记忆补缺口的理由。
 - 某个来源什么都没返回，记成"not found in `<source>`"——那是一次抓取的结果，不是这篇论文不存在的证据。
 
+## 阅读收集者合同
+
+阅读那一步扇出时，一个只读委派者返回什么（`SKILL_zh.md` 原则 9）。一篇论文一个，而且它只对着主 agent 已经抓好、缓存在 `wkdrs/refs_<date>/raw/` 下的那份论文页面干活——它不打开任何 URL，不写任何文件，只返回下面这些字段：
+
+- `abbrev_suggestion`——论文给自己取的代号（`CLIP`、`DETR`），或者 `none`。文件名仍由主 agent 定：它必须在 `notes/refs/` 里唯一。
+- `what_it_does`——3–6 句，用你自己的话写。这是 `## What it does` 的素材，不是写好的那一节。
+- `facts`——`[{fact, where, quote}]`，`## Citable facts` 的候选。`fact` 是一个自足的要点，数字要带着它的数据集、指标与设置一起走；`where` 是它出自哪一节、哪张表、哪个公式；`quote` 是从缓存页面里逐字符抄下来的至多 25 个词。主 agent 拿这条引文去缓存里搜，所以这里写成转述，就等于这条事实注定被丢掉。
+- `floor_evidence`——`{sections_reached: [...], results_table: <表题加一行，逐字>}`，或者 `not reached`。底线是摘要、intro、方法与主结果表；确实没有结果表的论文在这里说明，并点名什么顶了它的位置。
+- `repo_named`——这篇论文自己的页面挂出来的仓库，或者 `none found`。你不去抓它；那一次 GitHub 调用是主 agent 的。
+- `relation_material`——`[{claim, where}]`：`## Relation to ours` 的原始素材，绝不是那一节本身——那一节要对着手稿的故事与主张台账写，而这两样都没有交给你。
+- `failures`——`[{what, why}]`：缓存页面里没有的那一节、解析不出来的表、抽不出文字的扫描件。
+
+此外什么都不返回：不给 frontmatter，不给 `bibkey:` 或 `added:`，不给索引行，不给影响力分，也不给起草好的 `## Relation to ours`。这些属于写文件的那个会话，以及一份委派者根本看不到的 `reference.bib`。
+
+**主 agent 拿这份返回做什么。** 写笔记之前，每条 `quote` 都要在缓存页面里搜到：搜不到的那条事实丢掉，并在摘要与 index 的 §7 里点名。`floor_evidence: not reached` 与正文压根抓不到是同一个结果——bib 条目保留，不写笔记。返回里的任何东西都绝不进 `reference.bib`：那里的字段来自书目记录，不来自论文自己的页面。
+
 ## 收尾前的自查
 
 1. `reference.bib` 里每个 citekey 都在运行缓存里有对应的原始内容**且**在 `refs_index.md` 里有一行出处**且**条目上方那行 `% src:` 与该行的 URL 和日期一致。播种来的条目那一行写 `mates/<...>`；用户手工添加的写明是手工添加。
