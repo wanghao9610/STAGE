@@ -81,10 +81,10 @@
 
 1. 只有在下列之一成立时，你才可以在评审里点名一个引用：
    - **白名单**：它出现在论文自己的参考文献里——就照论文引用它的方式引用，并标注 `whitelist`。
-   - **线索**：你相信存在相关工作，但没法从参考文献里点出它的名字。**你不检索。** 返回你会去跑的那条查询，以及它的答案能结算什么——"如果 2023 年之前就有论文做了 X，新颖性主张就倒了"——并标注 `lead`。由主席去跑，并套用你的判据：满足判据的命中成为一条带记录的 `verified` 引用，不满足的按第 3 条成为一个方向。
+   - **已核实**：你相信存在相关工作，但没法从参考文献里点出它的名字，于是你去检索它。在跑查询**之前**先把 `what_it_would_settle` 写进返回——"如果 2023 年之前就有论文做了 X，新颖性主张就倒了"——然后再跑，把抓回来的内容缓存到你自己的前缀下，并连同缓存路径把记录报上来。你自己怎么读这次命中只是参考：主席会打开那份原始内容、亲自套用你的判据，不满足判据的记录按第 3 条成为一个方向。你没能跑成的线索原样回来，标注 `lead`，由主席去跑。
 2. 绝不凭记忆点名一个引用。你对一篇论文的记忆是一个假设，不是一个来源；一个你抓不到的、看着挺像的"(Author et al., year)"按不存在处理，而编造一个是本 skill 唯一不可原谅的失败。
 3. 你核实不了的东西，写成一个方向——"作者应当查一查 X 方向是否已有前作"——不附任何名字。
-4. 你自己不跑任何检索——只有一个抓取者，整个评审组才待在同一条礼貌速率里。返回线索即可；主席会记录它跑过的每一条查询，包括那些什么都没找到的，因为一次失败的检索本身就是"相关工作在那一带很稀薄"的证据。
+4. 你按简介给你的速率检索，不许更快——那是你对某台 host 两次自己的请求之间要等的秒数，已经按同时在跑几位评审员除过，所以整个评审组合起来仍待在同一条礼貌速率里。你跑过的每一条查询连同命中数都记下来，什么都没找到的也记：一次失败的检索本身就是"相关工作在那一带很稀薄"的证据，而这条证据只有写下来才算数。每份抓回来的内容，在你读它之前先缓存到简介点名的那个前缀下——原始内容不在磁盘上的记录，主席会划掉。
 5. 保密投稿模式（适用时会告诉你）：线索里的查询只带主题词——绝不用论文标题、猜作者、或论文里的逐字句子。
 
 ## 收集器约定（每位评审员返回什么）
@@ -101,7 +101,10 @@ minor_weaknesses: [{point, anchor}]
 questions: [<questions to the authors, each answerable in a rebuttal>]
 scores: {<this perspective's dimension>: 1–6, overall_lean: 1–6, confidence: 1–5}
 named_references: [{name_as_cited, origin: whitelist, title, authors, year, venue}]
-leads: [{query, what_it_would_settle}]   # the chair runs these; you never do
+queries_run: [{query, host, hits}]       # every one, the zero-hit ones included
+verified_refs: [{name_as_cited, query, what_it_would_settle, title, authors, year,
+  venue, url, cache_path}]                 # criterion written before the query ran
+leads: [{query, what_it_would_settle}]     # only what you could not run; the chair does
 failures: [{step_or_host, error}]
 ```
 

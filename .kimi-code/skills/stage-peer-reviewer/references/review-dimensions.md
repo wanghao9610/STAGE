@@ -82,10 +82,10 @@ Severity guide: this perspective produces at most 3 majors — the ones it would
 
 1. You may name a reference in your review only if one of these holds:
    - **Whitelist**: it appears in the paper's own bibliography — cite it exactly as the paper cites it, and mark it `whitelist`.
-   - **Lead**: you believe relevant work exists but cannot name it from the bibliography. **You do not search.** Return the query you would run and what its answer would settle — "if a paper before 2023 does X, the novelty claim falls" — and mark it `lead`. The chair runs it and applies your criterion: a hit meeting it becomes a `verified` reference carrying its record, and one that does not becomes a direction under item 3.
+   - **Verified**: you believe relevant work exists but cannot name it from the bibliography, so you search for it. Write `what_it_would_settle` into your return **before** you run the query — "if a paper before 2023 does X, the novelty claim falls" — then run it, cache the payload under your own prefix, and report the record with its cache path. Your own reading of the hit is advisory: the chair opens that payload and applies your criterion itself, and a record that does not meet it becomes a direction under item 3. A lead you could not run comes back unsettled, marked `lead`, and the chair runs it.
 2. Never name a reference from memory. Your memory of a paper is a hypothesis, not a source; a plausible "(Author et al., year)" you cannot fetch is treated as nonexistent, and inventing one is the one unforgivable failure of this skill.
 3. What you cannot verify, phrase as a direction — "the authors should check whether prior work exists on X" — with no names attached.
-4. You run no searches yourself — one fetching agent keeps the whole panel inside one polite rate. Return leads instead; the chair logs every query it runs, including the ones that find nothing, because a failed search is evidence that the related-work landscape is thin there.
+4. You search at the rate your brief gives you and no faster — a number of seconds between your own requests to a host, already divided by how many panelists are running, so the panel together stays inside one polite rate. Log every query you run with its hit count, the ones that find nothing included: a failed search is evidence that the related-work landscape is thin there, and it only counts as evidence if it is written down. Cache every payload under the prefix your brief names, before you read it — a record whose payload is not on disk is one the chair will strike.
 5. Confidential-submission mode (you will be told if it applies): a lead's query carries topic terms only — never the paper's title, author guesses, or verbatim sentences from the paper.
 
 ## Collector Contract (what every panelist returns)
@@ -102,7 +102,10 @@ minor_weaknesses: [{point, anchor}]
 questions: [<questions to the authors, each answerable in a rebuttal>]
 scores: {<this perspective's dimension>: 1–6, overall_lean: 1–6, confidence: 1–5}
 named_references: [{name_as_cited, origin: whitelist, title, authors, year, venue}]
-leads: [{query, what_it_would_settle}]   # the chair runs these; you never do
+queries_run: [{query, host, hits}]       # every one, the zero-hit ones included
+verified_refs: [{name_as_cited, query, what_it_would_settle, title, authors, year,
+  venue, url, cache_path}]                 # criterion written before the query ran
+leads: [{query, what_it_would_settle}]     # only what you could not run; the chair does
 failures: [{step_or_host, error}]
 ```
 

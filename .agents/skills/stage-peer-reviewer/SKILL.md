@@ -26,7 +26,7 @@ before the mode is read (§7.7).
 every STAGE skill shares — read the whole file at the start of every run; there is no
 section-selective loading. The sections that bind this skill hardest: §2 the STOP line, §5
 cycle resolution, §6 delegation (the panel is this workflow's largest sanctioned fan-out, and
-§6.9 is why the panelists do not fetch), §8 the artifact registry, §9 the fabrication
+§6.9 is what lets a panelist run its own searches, and what that costs), §8 the artifact registry, §9 the fabrication
 boundary — §9b's review-side extension is this skill's charter.
 This file states what is specific to this skill and wins wherever it is stricter.
 
@@ -56,8 +56,8 @@ flip a ledger status, never soften a finding to be kind.
 1. **Five perspectives, one chair.** The panel is the five briefs of
    `references/review-dimensions.md` — novelty & related work, technical soundness, experimental
    rigor & reproducibility, clarity & presentation, devil's advocate — each dispatched as a
-   read-only, non-fetching delegate (§6.4) carrying its brief and the two contracts verbatim
-   plus the built paper. Exactly five, in batches of at most three (§6.2). `quick` is the
+   read-only delegate (§6.4) that fetches nothing but its own leads (§6.9), carrying its
+   brief and the two contracts verbatim plus the built paper. Exactly five, in batches of at most three (§6.2). `quick` is the
    no-fan-out path: the chair walks all five perspectives itself in one sequential pass, and
    the meta-review says so (`mode: quick` — cheaper, and not independent).
 2. **The rubric is anchored; caps bind.** The score is the band whose description the paper
@@ -71,15 +71,20 @@ flip a ledger status, never soften a finding to be kind.
    citation-integrity contract: a named reference is either in `manus/bibs/reference.bib`
    (whitelist) or backed by a record fetched this run with its query logged (verified); what
    cannot be verified is phrased as a direction, and every search — empty ones included — is
-   logged. **Panelists do not fetch (§6.9).** One fetching agent keeps the whole panel inside
-   one polite rate, which splitting a quota five ways never did. A panelist wanting a record
-   returns the query and what its answer would settle — "if work before 2023 does X, the
-   novelty claim falls" — and the chair runs it, one request at a time, caching payloads under
-   the run directory's `fetch/` prefix. Nothing is rationed: the leads are fixed before the
-   first request and the searching ends when the last one is settled. The criterion arriving
-   before the result is also stricter than a panelist grading its own hit. Confidential mode is
+   logged. **A panelist runs its own leads (§6.9).** The rate divides rather than the
+   quota: each brief states, in seconds, the wait between that panelist's own requests to a
+   host — the host's interval times the three running at once — so the panel as a whole asks
+   each host no faster than one agent would have. Every payload is cached under that
+   panelist's own prefix in the run directory. What does not move is the discipline the leads
+   were built on: a panelist writes `what_it_would_settle` into its return **before** it runs
+   the query — "if work before 2023 does X, the novelty claim falls" — and its own verdict on
+   the hit is advisory. The chair opens the cached record and applies that criterion itself
+   (Principle 5), which is what keeps a reference from being talked into existence by whoever
+   wanted it. Nothing is rationed: the leads are fixed before the first request and the
+   searching ends when the last one is settled. Confidential mode is
    ON when `venue.yml` has `anonymized: true` or `.env` sets `ANON=true`: topic-term searches
-   only — never the title, author guesses, or verbatim sentences.
+   only — never the title, author guesses, or verbatim sentences — and it now binds each
+   panelist directly, because each one is the thing making the request.
 4. **Weaknesses attack claims by ID.** Panelists receive the ledger and fill `attacked_claims`
    per major weakness; the chair carries the IDs into the meta-review. Claims sitting at
    `unsourced` or `proposed` are exactly the soft spots a sharp reviewer finds first: attack
@@ -87,8 +92,12 @@ flip a ledger status, never soften a finding to be kind.
 5. **The chair confirms before it publishes (§6.5).** Every major weakness's anchor is opened
    and read by the chair before it enters the meta-review; an unanchored item is dropped and the
    drop recorded in Synthesis Notes. A panelist's own coverage claim is audited like any other
-   return (§6.3). Verified references need no spot check any more: the chair fetched them itself
-   (Principle 3), so no delegate claim about them is left to confirm.
+   return (§6.3). A `verified` reference is confirmed twice over, and this is the cost of
+   Principle 3's fan-out rather than a formality: the chair opens the payload at the cache path
+   the panelist returned, and re-applies the criterion that panelist wrote before its query.
+   No path, no payload, or a record the criterion does not actually settle → the reference is
+   demoted to a direction with no name attached, and the demotion is recorded in the citation
+   audit.
 6. **One durable artifact, real-review shaped.** The meta-review
    `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` follows `references/review-template.md` exactly —
    `$stage-resp-writer` parses everything in `reviews/` through one pipeline and must not be
@@ -130,18 +139,20 @@ panelist reads the paper itself, in full.
 Panel: five delegates, batches of at most three, disjoint by perspective. Each brief contains
 its perspective section from `references/review-dimensions.md` verbatim, both contracts
 verbatim, the digest, and the scope line "ONLY this perspective; return the collector
-contract's fields and nothing else". No brief carries a fetch budget or a cache prefix —
-panelists do not fetch (Principle 3). At involve `high`, announce the partition before
-dispatch (§6.8). Quick: the chair reads the
+contract's fields and nothing else". Each brief also carries the seconds that panelist waits
+between its own requests to a host and its own cache prefix under the run directory
+(Principle 3) — never a request quota, which is not what politeness is made of. At involve
+`high`, announce the partition before dispatch (§6.8). Quick: the chair reads the
 paper once and fills all five collector returns itself, in perspective order, devil's advocate
 last.
 
 ### Step 5: Confirm and synthesize
 
-The chair's own searching first: run every lead the panel returned, one request at a time, and
-settle each by the criterion its panelist wrote before the result was known — a hit meeting it
-becomes a `verified` reference with its record, one that does not becomes a direction with no
-name attached. Then Principle 5 — anchors opened, unanchored items dropped and logged. Then
+The chair's own confirming first: for every reference a panelist returned as `verified`, open
+the payload at the cache path it gave and settle the hit by the criterion that panelist wrote
+before running the query — a record meeting it keeps `verified` and carries its record, one
+that does not becomes a direction with no name attached. A lead nobody could run comes back
+unsettled; the chair runs it here, one request at a time. Then Principle 5 — anchors opened, unanchored items dropped and logged. Then
 write the per-perspective files (`review_<perspective>.md`, or `review_quick.md`) into the run
 directory, consolidate the concern matrix (which perspectives raised what), dedupe the
 questions, and record panel disagreements for Synthesis Notes.
@@ -156,7 +167,8 @@ each item anchored and carrying its satisfaction condition. Map to the venue's f
 ### Step 7: Write the artifacts
 
 Run directory: the perspective reviews and `citation_audit.md` — every named reference with its
-origin and query, every lead with the criterion it was settled by, searches with no result;
+origin, query, and cache path, every lead with the criterion it was settled by and who ran it,
+every reference the chair demoted and why, searches with no result;
 OFFLINE degradation noted when the host had no network (§3.5). Durable:
 `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` — the meta-review per the template, `mode:`
 honest, the 中文要点摘要 section appended when the dialogue is Chinese. Real date (§4); a
