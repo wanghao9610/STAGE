@@ -258,10 +258,16 @@ for root in "${FRONTMATTER_ROOTS[@]}"; do
     check_foreign "${root}" 'update_plan' 'plan mode'
 done
 # The delegation ban is stated once per skill that has one, and it has to be
-# stated in the tree's own words or it names nothing the agent can refuse.
-stale_generic="$(grep -RnE --include='*.md' 'no subagents|不派子代理' .agents/skills .cursor/skills || true)"
+# stated in the tree's own words or it names nothing the agent can refuse. This
+# holds in all four trees, and the direction it fails in is not symmetric: a
+# nameless ban still stops a dispatch, while the nameless *permission* it used
+# to sit beside stopped one too — a host told "do not call the Agent tool unless
+# asked" cannot match an abstract "delegate" against the tool it was told to
+# leave alone, so the fan-out never fired and nothing said so. Both sides name
+# the tool now: Agent for Claude and Kimi, Task for Cursor, spawn_agent here.
+stale_generic="$(grep -RnE --include='*.md' 'no subagents|不派子代理' "${SKILL_ROOTS[@]}" || true)"
 if [[ -n "${stale_generic}" ]]; then
-    fail ".agents/.cursor state the delegation ban generically; each must name its own dispatch tool:"
+    fail "a delegation ban is stated generically; each tree must name its own dispatch tool:"
     printf '%s\n' "${stale_generic}" | sed 's/^/      /'
     vocab_errors=1
 fi

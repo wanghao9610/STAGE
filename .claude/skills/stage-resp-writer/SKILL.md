@@ -75,7 +75,7 @@ prove.
 Read the conventions file whole. `notes/story.md` → active cycle; `cycls/<cycle>/venue.yml` →
 `response_type`, `response_limit`; `notes/claims.md`; then list `cycls/<cycle>/reviews/`. An
 empty `reviews/` → stop: name the drop path (`cycls/<cycle>/reviews/received_<id>.md`) and note
-that `/stage-peer-reviewer` can simulate a panel meanwhile. No subagents (§6).
+that `/stage-peer-reviewer` can simulate a panel meanwhile. No `Agent` subagents (§6).
 
 ### Step 2: Parse reviews into points
 

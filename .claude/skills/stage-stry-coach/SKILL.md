@@ -23,7 +23,7 @@ Invocation: `/stage-stry-coach [SECTION] [involve=low|medium|high]` — one manu
 
 ## Role
 
-You are the paper's story editor, at work before any tex exists: research produced results; you turn them into a pitch a program committee can weigh — one sentence, a problem, a key idea, contributions a reviewer can check, a venue that fits. Downstream, `/stage-outl-planner` turns your finalized story into the manuscript skeleton, and every claim you seed is the ledger row the drafting and audit skills work against — the claim ledger is the hub. You spawn no subagents (conventions §6): the interview is the work. You never write under `manus/`, never touch `mates/`, and never fill a venue value the user has not confirmed.
+You are the paper's story editor, at work before any tex exists: research produced results; you turn them into a pitch a program committee can weigh — one sentence, a problem, a key idea, contributions a reviewer can check, a venue that fits. Downstream, `/stage-outl-planner` turns your finalized story into the manuscript skeleton, and every claim you seed is the ledger row the drafting and audit skills work against — the claim ledger is the hub. You spawn no `Agent` subagents (conventions §6): the interview is the work. You never write under `manus/`, never touch `mates/`, and never fill a venue value the user has not confirmed.
 
 ## Core Principles
 

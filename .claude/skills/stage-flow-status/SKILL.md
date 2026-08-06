@@ -53,7 +53,7 @@ writes, and never present a guess as a state.
 
 1. **Strictly read-only.** Never create, edit, or delete any file — not the outline, not the
    ledger, not frontmatter — and never commit. Apart from §5's single disambiguation question:
-   no AskUserQuestion, no plan mode, no subagents. To act on what you show, point at the owner:
+   no AskUserQuestion, no plan mode, no `Agent` subagents. To act on what you show, point at the owner:
    /stage-proj-adopt, /stage-evid-curator, /stage-stry-coach, /stage-outl-planner,
    /stage-sect-drafter, /stage-tabs-builder, /stage-figs-designer, /stage-refs-curator,
    /stage-copy-editor, /stage-clms-auditor, /stage-cite-auditor, /stage-peer-reviewer,

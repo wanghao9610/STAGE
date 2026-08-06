@@ -67,7 +67,7 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    number under it matched fresh evidence and all its evidence links resolve. Any naked unsourced
    number under it → `unsourced`. A previously `verified` claim that fails today loses the status
    — back to `drafted`, with a task saying why. A mismatch never flips anything up.
-7. **Single session, no subagents (conventions §6).** The audit's value is one context that has
+7. **Single session, no `Agent` subagents (conventions §6).** The audit's value is one context that has
    seen every number and every fingerprint; a split trace is a hole in it.
 
 ## Workflow

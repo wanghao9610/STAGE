@@ -35,7 +35,7 @@ description: >-
 
 ### Step 1：装载
 
-整份读完规约文件。`notes/story.md` → 当前周期；`cycls/<cycle>/venue.yml` → `response_type`、`response_limit`；`notes/claims.md`；然后列出 `cycls/<cycle>/reviews/`。`reviews/` 为空 → 停下：点名投放路径（`cycls/<cycle>/reviews/received_<id>.md`），并说明这期间 `/skill:stage-peer-reviewer` 可以先模拟一个评审组。不派子代理（§6）。
+整份读完规约文件。`notes/story.md` → 当前周期；`cycls/<cycle>/venue.yml` → `response_type`、`response_limit`；`notes/claims.md`；然后列出 `cycls/<cycle>/reviews/`。`reviews/` 为空 → 停下：点名投放路径（`cycls/<cycle>/reviews/received_<id>.md`），并说明这期间 `/skill:stage-peer-reviewer` 可以先模拟一个评审组。不派 `Agent` 子代理（§6）。
 
 ### Step 2：把评审解析成意见点
 

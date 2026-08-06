@@ -68,7 +68,7 @@ re-reading routes to `/skill:stage-refs-curator`.
 5. **Hygiene is reported with the entries quoted.** Duplicates (same title or DOI under two
    keys), missing required fields, inconsistent venue naming, arXiv entries where the note
    records a published version. The fix is `/skill:stage-refs-curator`'s.
-6. **Single session, no subagents (conventions §6).** The audit's worth is one context that saw
+6. **Single session, no `Agent` subagents (conventions §6).** The audit's worth is one context that saw
    every key, every note, and every citing sentence.
 
 ## Workflow
