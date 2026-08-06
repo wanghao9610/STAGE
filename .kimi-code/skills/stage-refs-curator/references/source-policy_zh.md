@@ -157,12 +157,13 @@ AI 会议的模板（NeurIPS / CVPR / ICML / ICLR / ACL）会渲染 author、tit
 
 - 按主机串行：DBLP 与 Semantic Scholar 约每秒 1 次，Crossref 约每秒 3 次（加 `mailto` 走它的礼貌池，写进 `% src:` 行之前再把它去掉）。这份预算属于整个会话对每台主机，不是每个 agent 一份。
 - 论文页面——arXiv abs/HTML、ACL Anthology、CVF open access、项目页——用同样的礼貌默认：约每秒 1 次，对 arXiv 约每 3 秒 1 次，那是它要求的。
+- **阅读扇出拆的是速率，不是额度**（规约 §6.9）。每份任务书都用秒数写明：这个委派者对某台 host 两次自己的请求之间等多久——上面那个间隔乘以在跑的委派者数。三个读 arXiv 页面的委派者各等 9 秒，于是整轮运行对 arXiv 仍然是每 3 秒一页。上限是三，而这一页上除了委派者自己那篇论文的页面之外，每一次抓取都是主 agent 的。
 - HTTP 429 / 503 → 指数退避（2s、4s、8s），最多重试 3 次，然后放过并记下失败。限速永远不是凭记忆补缺口的理由。
 - 某个来源什么都没返回，记成"not found in `<source>`"——那是一次抓取的结果，不是这篇论文不存在的证据。
 
 ## 阅读收集者合同
 
-阅读那一步扇出时，一个只读委派者返回什么（`SKILL_zh.md` 原则 9）。一篇论文一个，而且它只对着主 agent 已经抓好、缓存在 `wkdrs/refs_<date>/raw/` 下的那份论文页面干活——它不打开任何 URL，不写任何文件，只返回下面这些字段：
+阅读那一步扇出时，一个只读委派者返回什么（`SKILL_zh.md` 原则 9）。一篇论文一个。委派者自己去抓那篇论文自己的页面——规约 §6.9 那个唯一的口子——两次自己的请求之间按任务书写明的秒数等待，每份原始内容都先缓存到任务书点名的前缀下再读。别的 URL 一概不开：不抓书目记录，不打检索端点，不调 GitHub API，这些都留在主 agent 手里。除了那份缓存它什么都不写，只返回下面这些字段：
 
 - `abbrev_suggestion`——论文给自己取的代号（`CLIP`、`DETR`），或者 `none`。文件名仍由主 agent 定：它必须在 `notes/refs/` 里唯一。
 - `what_it_does`——3–6 句，用你自己的话写。这是 `## What it does` 的素材，不是写好的那一节。
@@ -170,11 +171,12 @@ AI 会议的模板（NeurIPS / CVPR / ICML / ICLR / ACL）会渲染 author、tit
 - `floor_evidence`——`{sections_reached: [...], results_table: <表题加一行，逐字>}`，或者 `not reached`。底线是摘要、intro、方法与主结果表；确实没有结果表的论文在这里说明，并点名什么顶了它的位置。
 - `repo_named`——这篇论文自己的页面挂出来的仓库，或者 `none found`。你不去抓它；那一次 GitHub 调用是主 agent 的。
 - `relation_material`——`[{claim, where}]`：`## Relation to ours` 的原始素材，绝不是那一节本身——那一节要对着手稿的故事与主张台账写，而这两样都没有交给你。
-- `failures`——`[{what, why}]`：缓存页面里没有的那一节、解析不出来的表、抽不出文字的扫描件。
+- `pages_fetched`——`[{url, cache_path, status}]`，你发过的每个请求一行，按发出的顺序。主 agent 在读你返回的任何别的东西之前，先打开这些路径。
+- `failures`——`[{what, why, host, retries}]`：加载不出来的页面、抓回的页面里没有的那一节、解析不出来的表、抽不出文字的扫描件。
 
 此外什么都不返回：不给 frontmatter，不给 `bibkey:` 或 `added:`，不给索引行，不给影响力分，也不给起草好的 `## Relation to ours`。这些属于写文件的那个会话，以及一份委派者根本看不到的 `reference.bib`。
 
-**主 agent 拿这份返回做什么。** 写笔记之前，每条 `quote` 都要在缓存页面里搜到：搜不到的那条事实丢掉，并在摘要与 index 的 §7 里点名。`floor_evidence: not reached` 与正文压根抓不到是同一个结果——bib 条目保留，不写笔记。返回里的任何东西都绝不进 `reference.bib`：那里的字段来自书目记录，不来自论文自己的页面。
+**主 agent 拿这份返回做什么。** 先打开缓存前缀：`pages_fetched` 点的路径在磁盘上一条都不存在的返回，等于什么都没证明，那篇论文回到家里重读，而不是被采信（规约 §6.3）。然后，写笔记之前，每条 `quote` 都要在缓存页面里搜到：搜不到的那条事实丢掉，并在摘要与 index 的 §7 里点名。`floor_evidence: not reached` 与正文压根抓不到是同一个结果——bib 条目保留，不写笔记。返回里的任何东西都绝不进 `reference.bib`：那里的字段来自书目记录，不来自论文自己的页面。
 
 ## 收尾前的自查
 

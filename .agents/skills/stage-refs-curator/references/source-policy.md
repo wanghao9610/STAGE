@@ -157,12 +157,13 @@ The bins and weights are calibrated for CS/AI literature and live here precisely
 
 - Serialize per host: ~1 request/second to DBLP and Semantic Scholar, ~3/second to Crossref (add a `mailto` for its polite pool, and strip it again before the URL is written into a `% src:` line). The budget belongs to the whole session against each host.
 - Paper pages — arXiv abs/HTML, ACL Anthology, CVF open access, project pages — follow the same polite default: ~1 request/second, and ~1 per 3 seconds to arXiv, which asks for that.
+- **A reading fan-out divides the rate, not the quota** (conventions §6.9). Each delegate's brief states, as a number of seconds, how long it waits between its own requests to a host: the interval above multiplied by how many delegates are running. Three readers of arXiv pages each wait 9 seconds, so the run as a whole still asks arXiv for one page every 3. Three is the cap, and every fetch on this page other than a delegate's own paper pages is the main agent's.
 - HTTP 429 / 503 → exponential backoff (2s, 4s, 8s), at most 3 retries, then move on and record the failure. A rate limit is never a reason to fill the gap from memory.
 - A source returning nothing is logged as "not found in `<source>`" — that is a fetch outcome, not evidence the paper does not exist.
 
 ## Reading collector contract
 
-What a read-only delegate returns when the reading step fans out (SKILL.md Principle 9). One paper each, and the delegate works from the paper page the main agent has already fetched and cached under `wkdrs/refs_<date>/raw/` — it opens no URL, writes no file, and returns exactly these fields:
+What a read-only delegate returns when the reading step fans out (SKILL.md Principle 9). One paper each. The delegate fetches that paper's own pages itself — conventions §6.9's one carve-out — waiting between its own requests the seconds its brief states, and caching every payload under the prefix its brief names before reading it. It opens no other URL: not a bibliographic record, not a search endpoint, not the GitHub API, all of which stay with the main agent. It writes nothing but that cache, and returns exactly these fields:
 
 - `abbrev_suggestion` — the handle the paper gives itself (`CLIP`, `DETR`), or `none`. The filename stays the main agent's call: it has to be unique across `notes/refs/`.
 - `what_it_does` — 3–6 sentences in your own words. Material for `## What it does`, not that section written.
@@ -170,11 +171,12 @@ What a read-only delegate returns when the reading step fans out (SKILL.md Princ
 - `floor_evidence` — `{sections_reached: [...], results_table: <the caption plus one row, verbatim>}`, or `not reached`. The floor is abstract, intro, method, and main results table; a paper that genuinely has no results table says so here and names what stands in its place.
 - `repo_named` — the repository this paper's own page names, or `none found`. You do not fetch it; the one GitHub call is the main agent's.
 - `relation_material` — `[{claim, where}]`: raw material for `## Relation to ours`, never that section itself, which is written against the manuscript's story and claim ledger — neither of which you were given.
-- `failures` — `[{what, why}]`: a section the cached page did not contain, a table that would not parse, a scan with no extractable text.
+- `pages_fetched` — `[{url, cache_path, status}]`, one row per request you made, in the order you made them. The main agent opens these paths before it reads anything else you returned.
+- `failures` — `[{what, why, host, retries}]`: a page that would not load, a section the fetched page did not contain, a table that would not parse, a scan with no extractable text.
 
 and nothing else: no frontmatter, no `bibkey:` or `added:`, no index row, no impact score, no drafted `## Relation to ours`. Those belong to the session that writes the file, and to a `reference.bib` the delegate cannot see.
 
-**What the main agent does with the return.** Search the cached page for every `quote` before the note is written: a quote that is not there drops its fact, and the drop is named in the digest and in the index's §7. `floor_evidence: not reached` is the same outcome as a text that could not be fetched at all — the bib entry stands and no note is written. Nothing in the return ever reaches `reference.bib`, whose fields came from the bibliographic record and not from the paper's own page.
+**What the main agent does with the return.** Open the cache prefix first: a return whose `pages_fetched` names no path that exists on disk has evidenced nothing, and its paper is read again at home rather than believed (conventions §6.3). Then search the cached page for every `quote` before the note is written: a quote that is not there drops its fact, and the drop is named in the digest and in the index's §7. `floor_evidence: not reached` is the same outcome as a text that could not be fetched at all — the bib entry stands and no note is written. Nothing in the return ever reaches `reference.bib`, whose fields came from the bibliographic record and not from the paper's own page.
 
 ## Self-audit before finishing
 
