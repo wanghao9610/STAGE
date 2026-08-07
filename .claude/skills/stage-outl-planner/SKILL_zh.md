@@ -5,7 +5,7 @@ description: >-
   把定稿的故事变成一副能编译的手稿骨架：写 notes/outline.md——一张章节表，其页数预算之和落在 venue 页数上限之内，外加图计划、表计划，以及主张到章节的分配——创建 manus/secs/<n>_<slug>.tex 骨架，其开头的注释块就是该节的简介，在 manus/main.tex 里把对应的 \input 行取消注释以保持构建为绿，并给 notes/notation.md 播下种子。只要用户运行 /stage-outl-planner，或要求给论文列提纲、按页数上限分配各节预算、建好章节文件、或者把故事变成骨架，都应使用本 skill。
 argument-hint: "[involve=low|medium|high]"
 allowed-tools: >-
-  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*), Agent,
   Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 

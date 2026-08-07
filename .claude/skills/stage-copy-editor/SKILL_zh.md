@@ -4,7 +4,7 @@ description: >-
   对一节或整篇手稿做一遍打磨：清晰度、流畅度、对着 notes/notation.md 的术语与缩写一致性，以及朝提纲页数预算裁短篇幅。就地编辑 manus/ 下的散文，但绝不改变技术含义、任何数字、任何引用或参考文献 key、任何 \todo 标记；内容层面的删减与系统性问题只报告与路由，绝不静默施行。写 wkdrs/reports/POLISH_<date>.md（临时）外加 tasks/ 里的后续条目，并证明手稿仍然构建得过。style 那一遍则改为把作者的行文偏好记成可量的档位写进 notes/style.md，一个字的散文都不改。只要用户运行 /stage-copy-editor、一次运行点名它是下一步动作，或要求打磨、收紧、校对论文散文、去掉行话，或要求设定、更改、推导这篇论文的文风，都应使用本 skill。
 argument-hint: "[SECTION | style]"
 allowed-tools: >-
-  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*), Agent,
   Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 

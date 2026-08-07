@@ -1,5 +1,8 @@
 ---
 name: stage-flow-status
+model: sonnet
+context: fork
+background: false
 description: >-
   Read-only map of the whole writing flow: per-section, per-figure, and per-table status from
   notes/outline.md, claim coverage counts by ledger status, evidence freshness against upstream stamps,

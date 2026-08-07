@@ -6,7 +6,8 @@ argument-hint: "[SECTION | CLAIM_ID]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),
   Bash(execs/scpts/import.sh:*), Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
-  Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
+  Agent, Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*),
+  Bash(git commit:*)
 ---
 
 # Claims Auditor —— 每个数字要么追到指纹，要么被逮住

@@ -6,7 +6,7 @@ argument-hint: "[FIGURE | plan | teaser]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),
   Bash(execs/scpts/import.sh:*), Bash(python3 manus/figs/srcs/:*),
-  Bash(python manus/figs/srcs/:*), Bash(latexmk:*), Bash(git status:*), Bash(git diff:*),
+  Bash(python manus/figs/srcs/:*), Bash(latexmk:*), Agent, Bash(git status:*), Bash(git diff:*),
   Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 

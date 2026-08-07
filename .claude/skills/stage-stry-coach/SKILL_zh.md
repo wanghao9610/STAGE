@@ -6,7 +6,7 @@ description: >-
 argument-hint: "[SECTION] [involve=low|medium|high]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),
-  Bash(execs/scpts/import.sh:*), Bash(git status:*), Bash(git diff:*), Bash(git log:*),
+  Bash(execs/scpts/import.sh:*), Agent, Bash(git status:*), Bash(git diff:*), Bash(git log:*),
   Bash(git add:*), Bash(git commit:*)
 ---
 

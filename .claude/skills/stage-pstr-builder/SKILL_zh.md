@@ -7,7 +7,7 @@ argument-hint: "[plan | render | check] [kit=<path>]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
   Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
-  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Bash(git status:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Agent, Bash(git status:*),
   Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
