@@ -9,6 +9,12 @@ description: >-
   section's outline row. Never edits mates/ and never re-scopes the outline. Use when the user runs
   /stage-sect-drafter, when a run names it as the next action, or asks to draft, write, expand, or revise
   a section — abstract, intro, method, experiments, related work — or to turn an outline row into prose.
+argument-hint: "SECTION"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Agent, Bash(git status:*),
+  Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Section Drafter — evidence-bound prose
@@ -38,6 +44,8 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 5. **Registry updates are part of the draft (§8).** Writing states claims, and `notes/claims.md` is where that fact lives (core principle B): a run that does not flip its ledger rows, notation appends, and outline row is unfinished, whatever the prose looks like.
 6. **Evidence is read-only and freshness-checked.** To fix a wrong number, fix it upstream and re-import — never edit `mates/`, never "correct" it in prose. Staleness is exact stamp comparison via `execs/scpts/import.sh --diff`, never mtime (§8).
 7. **Write in the author's voice where one is on file.** `notes/style.md` (§8.11) is the style profile — sentence length, voice, hedging, enumeration form, and the words this paper does not use — and a draft follows it. It outranks nothing: §9 first, then the notation canon (Principle 4), then the venue's format, then the profile. So no dial licenses a number (Principle 1) or a claim the evidence cannot carry (Principle 3), and `hedging: minimal` tightens wording without ever removing a qualifier the evidence requires — a claim's strength is the ledger's, not a preference's. No profile means draft as this skill always has; never invent one, and never write the file — it belongs to `/stage-copy-editor style`.
+
+8. **Fan out the evidence read, never the section (§6).** One section per invocation is the roster's rule (§11.3) and it does not bend — but Step 2 opens every `mates/` entry the brief names, and more than 6 of them → one delegate per entry, each returning the values its own file carries at their anchors, the anchor text quoted, and nothing else. The prose is written here from those returns: a section is one argument, and an argument split across contexts reads like one. Every number those returns carry still enters under Principle 1 — the `% src:` anchor of the entry that was opened, or a `\todo{}` — whoever opened it (§6.4). Step 6's build and lint are the gate and run here (§6.3).
 
 ## Workflow
 

@@ -12,6 +12,11 @@ description: >-
   user runs /stage-evid-curator, when a run names it as the next action, wants STAR results imported or
   refreshed, has a result file to put behind a claim, or asks whether the paper's evidence is current.
   Bilingual (en/zh).
+argument-hint: "[import | register <path> | check]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),
+  Bash(execs/scpts/import.sh:*), Agent, Bash(git status:*), Bash(git diff:*), Bash(git log:*),
+  Bash(git add:*), Bash(git commit:*)
 ---
 
 # Evidence Curator — the manifest and the files behind the numbers
@@ -38,6 +43,8 @@ You are the gatekeeper of `mates/` — the store of result files this paper's cl
 4. **Provenance is pinned, not remembered.** A star entry carries the upstream path and the commit `import.sh` pinned; a manual entry carries the origin the user named, the date, the checksum. An entry that cannot say where its file came from is not written.
 5. **The curator makes no numbers.** Nothing here computes, aggregates, or fills in a metric. A request to register a number with no file behind it is declined: the file comes first — and when the number lives in the paired STAR repo, the answer is `import`, not a hand copy that loses the stamp.
 6. **A refresh is a change to the paper.** Re-import can move a number the draft already quotes. Rewrites of registered entries are therefore confirmed before they run, and refreshed entries always route to `/stage-tabs-builder` (its tables just went stale) and `/stage-clms-auditor` (claims citing them need re-checking). Evidence drifting under finished sentences is how drafts become fiction.
+
+7. **Fan out the `check` reconciliation (§6).** More than 3 slugs under `mates/` → one delegate per `mates/<slug>` tree, each grading its own files `ok | unregistered | missing | tampered` against their manifest entries and returning that table and nothing else. Nothing it touches is written: `mates/` is read-only to every agent in this run, delegates included (§6.4, §10). What stays here is what a split would break — the staleness diff is one `import.sh --diff` call against one upstream, and registration is a confirmation point, the file read in full and its provenance asked before an entry exists (§6.5).
 
 ## Workflow
 

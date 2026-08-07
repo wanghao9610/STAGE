@@ -67,6 +67,13 @@ prove.
    invented. `response_type: none` → build the point ledger and promises for the revision, skip
    the draft, and say why.
 
+7. **Fan out the parse (§6).** More than two files in `cycls/<cycle>/reviews/` → one delegate per
+   review file, each returning that review's points as ledger rows — point ID, the verbatim quote,
+   severity, and the claim IDs it attacks — and nothing else. What does not split is everything
+   after it: a disposition is decided against the whole point set, the costly ones are the user's
+   call and stay at a confirmation point (§6.5), and the response is one document written to one
+   limit. Every number quoted to a reviewer enters under Principle 4 whoever writes it (§6.4).
+
 ## Workflow
 
 ### Step 1: Load
@@ -74,7 +81,8 @@ prove.
 Read the conventions file whole. `notes/story.md` → active cycle; `cycls/<cycle>/venue.yml` →
 `response_type`, `response_limit`; `notes/claims.md`; then list `cycls/<cycle>/reviews/`. An
 empty `reviews/` → stop: name the drop path (`cycls/<cycle>/reviews/received_<id>.md`) and note
-that `$stage-peer-reviewer` can simulate a panel meanwhile. No `spawn_agent` (§6).
+that `$stage-peer-reviewer` can simulate a panel meanwhile. The parse that follows fans out per
+review file (Principle 7).
 
 ### Step 2: Parse reviews into points
 

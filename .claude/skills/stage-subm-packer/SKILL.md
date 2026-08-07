@@ -13,6 +13,12 @@ description: >-
   and records; it never uploads to a portal, never pushes, never edits the manuscript. Use when
   the user runs /stage-subm-packer, or asks to package, freeze, convert to a venue template, or
   prepare the submission, the camera-ready, or the arXiv source.
+argument-hint: "[camera | convert] [kit=<path>]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Agent, Bash(git status:*),
+  Bash(git diff:*), Bash(git log:*), Bash(git tag:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Submission Packer — preflight, package, freeze
@@ -112,6 +118,15 @@ third-party file nobody here is allowed to edit.
    change in `manus/` through the skill that owns the file. And the copy's page count, not the
    preprint build's, is what `page_limit_main` means: `lint.sh` measures a different document in
    a different class, which is a drafting proxy and not the answer.
+
+9. **Fan out the sweeps, never the gates (§6).** Step 5's completeness sweep splits by registry
+   artifact — one delegate for the outline's three tables, one for the claim ledger, one for notes
+   and bib, one for the promises file — each returning its own shortfalls as findings and nothing
+   else; Step 6's checklist walk is one delegate per checklist item once the family carries more
+   than 6. The hard gates never split and never delegate: `execs/run.sh`, `execs/scpts/lint.sh`,
+   and the tree check are single script calls whose exit codes the main agent reads itself (§6.3).
+   Neither does anything from Step 8 on — the package, the record, the commit, and the freeze tag
+   are on the STOP line and belong to the session the user is in (§2, §6.5).
 
 ## Workflow
 

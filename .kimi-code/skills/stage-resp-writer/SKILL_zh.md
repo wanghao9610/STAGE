@@ -31,11 +31,13 @@ description: >-
 5. **承诺是一笔债。** 草稿里每一句"我们将……"都在 `tasks/<cycle>_promises.md` 里有一条对应的 `- [ ]`，点名它对应的意见与目标；只要还有框没勾，`/skill:stage-subm-packer` 就拒绝打包 camera-ready。凡是用户没有确认团队真会去做的，一律不承诺。
 6. **venue 的回复规则是用户确认过的事实（§9c）。** `response_type` 与 `response_limit` 来自 `cycls/<cycle>/venue.yml`；缺失或未确认的取值要问，绝不臆造。`response_type: none` → 为修订版建好逐点台账与承诺，跳过起草，并说明为什么。
 
+7. **解析并行分派（§6）。** `cycls/<cycle>/reviews/` 下的文件超过两份 → 一份评审一个委派者，各自把那份评审的意见按台账行返回——意见 ID、逐字引文、严重程度、以及它攻击的主张 ID——别的什么都不返回。不切开的是它之后的一切：处置方式是对着全部意见一起定的，代价高的那几种是用户的决定、停在确认点上（§6.5），而回复是一份文档、写到一个限额里。给评审人引用的每个数字，不管由谁写下，都按原则 4 进入（§6.4）。
+
 ## 工作流
 
 ### Step 1：装载
 
-整份读完规约文件。`notes/story.md` → 当前周期；`cycls/<cycle>/venue.yml` → `response_type`、`response_limit`；`notes/claims.md`；然后列出 `cycls/<cycle>/reviews/`。`reviews/` 为空 → 停下：点名投放路径（`cycls/<cycle>/reviews/received_<id>.md`），并说明这期间 `/skill:stage-peer-reviewer` 可以先模拟一个评审组。不派 `Agent` 子代理（§6）。
+整份读完规约文件。`notes/story.md` → 当前周期；`cycls/<cycle>/venue.yml` → `response_type`、`response_limit`；`notes/claims.md`；然后列出 `cycls/<cycle>/reviews/`。`reviews/` 为空 → 停下：点名投放路径（`cycls/<cycle>/reviews/received_<id>.md`），并说明这期间 `/skill:stage-peer-reviewer` 可以先模拟一个评审组。紧接着的解析按评审文件并行分派（原则 7）。
 
 ### Step 2：把评审解析成意见点
 

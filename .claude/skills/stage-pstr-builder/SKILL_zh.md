@@ -3,6 +3,12 @@ name: stage-pstr-builder
 disable-model-invocation: true
 description: >-
   拥有当前投稿轮次的会议海报：cycls/<cycle>/poster/POSTER_PLAN.md 里的内容计划（一句核心结论、挣到墙面的那几条主张、从 manus/figs/ 复用的图）、据此生成的 poster.tex，以及 wkdrs/builds/poster/ 下的渲染产物。海报是取舍，不是把论文重新排一遍：只陈述结果汇总表里状态为 verified 的主张，每个数字都追溯到带指纹的 mates/ 证据，并且从不新画美术素材——那要路由到 /stage-figs-designer。海报尺寸与官方海报模板包都是 venue.yml 里用户确认过的事实，逐字节照抄，绝不凭空生成。可读性闸按印刷尺寸折算有效字号，并拒绝让 \todo 上墙。不带参数时对着计划审计这张海报；plan 选内容；render 生成 poster.tex 并编译成品；check 跑闸。只要用户运行 /stage-pstr-builder，或要求规划、渲染、检查投某个会议的海报，都应使用本 skill。
+argument-hint: "[plan | render | check] [kit=<path>]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Bash(git status:*),
+  Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Poster Builder —— 一句结论，有来源，隔着大厅也看得清
@@ -36,6 +42,8 @@ description: >-
 5. **可读性是量出来的，不是看出来的。** 物理尺寸是已知的，所以有效字号就是算术：按印刷尺寸折算，守住 `references/poster-layout.md` 里的下限——核心结论四米可读，正文一米半可读。灰度打印后语义不丢，符号与术语对齐 `notes/notation.md`，任何东西都不许溢出所声明的纸张。"在屏幕上看着还行"不是结论，一个数字才是。
 6. **尺寸是会议事实；模板包由用户提供，绝不凭空生成。** 纸张尺寸与朝向来自 `cycls/<cycle>/venue.yml`，且只有在其 `confirmed:` 已设时才生效（§9c）——未确认或缺失的尺寸会让运行停下并发问，绝不按海报"一般多大"去假定。会议给了官方海报模板包，就逐字节照抄进 `cycls/<cycle>/poster/template/` 且从不编辑；只给了尺寸，就用自带模板按该尺寸出图。绝不去抓取模板包，也绝不凭"某会议的海报长什么样"的记忆重建一个（§9）。二维码背后的 URL 或 DOI 是同一类事实：由用户提供，绝不凭记忆写。
 7. **海报是署名的；论文可以是匿名的。** `ANON` 管的是 `manus/`，在这里不继承——海报带作者名、单位和联系方式，因为你就站在它旁边。这也正是海报放在 `cycls/` 下而绝不放进 `manus/` 的原因：那棵树被 `lint.sh` 扫描，它数遍每个 `.tex` 里的 `\todo{` 并搜捕身份泄漏，而一张署名的海报待在被扫描的命名空间里，会让一个本身正确的文件硬性失败。
+
+8. **check 关卡里互不依赖的几路并行分派（§6）。** Step 5 的各项检查彼此不依赖，所以 Sourced、Backed、Fresh 各派一个委派者——第一个把 `poster.tex` 里每个 `% src:` 锚点回到它那个 `mates/` 文件重读一遍，第二个把每条写出来的主张对上它在 `notes/claims.md` 里那一行，第三个拿每个记录在案的 `source-stamp:` 去比 `import.sh --diff` 的输出——各自只返回自己那几行通过/不通过，别的什么都不返回。Legible、Grayscale 与 Fits 是对渲染出来的 PDF 做的测量，等它出来之后跑。Step 2 那次取舍既不委派也不挪位（§6.5）：什么上墙是作者的决定，而原则 1 之所以存在，是因为绕过它拼出来的海报正是本 skill 要挡掉的那面字墙。
 
 ## 工作流
 

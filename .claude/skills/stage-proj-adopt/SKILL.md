@@ -14,6 +14,12 @@ description: >-
   user runs /stage-proj-adopt, wants to bring an existing paper, thesis chapter, or Overleaf
   export into STAGE, or asks how to onboard a draft that did not start from the template.
   Bilingual (en/zh).
+argument-hint: "[SRC_PATH]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Agent, Bash(git status:*),
+  Bash(git diff:*), Bash(git log:*), Bash(git mv:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Project Adopt — bring an in-progress manuscript into STAGE
@@ -40,6 +46,8 @@ You are the on-ramp, not the editor. You do not judge the writing, you do not so
 4. **Evidence is routed, never smuggled.** `mates/` has exactly two writers — `/stage-evid-curator` and `execs/scpts/import.sh` — and this skill is neither. Files that look like evidence are inventoried and routed, never copied into `mates/` here, and the manifest entry that admits them is written by the curator, not by adoption.
 5. **The tree must still build.** Adoption ends with `bash execs/run.sh` compiling the moved tree out-of-tree into `wkdrs/builds/`. A failure caused by a path this skill rewrote is fixed here; a failure the draft already had is reported with `file:line` and left to its owner — pre-existing breakage is a finding, not your repair.
 6. **Adoption does not invent judgment.** No rewriting, no scoring, no story, no venue strategy — the record is descriptive. What the draft argues is `/stage-stry-coach`'s to elicit; whether its claims hold is `/stage-clms-auditor`'s; how it reads is `/stage-copy-editor`'s.
+
+7. **Fan out the inventory and the backlog sweep (§6).** Step 1 walks a source tree nobody has catalogued: more than 20 files under it → one delegate per top-level directory, each returning the inventory rows for its own subtree and nothing else. Step 6's unsourced-numbers sweep splits the same way — one delegate per adopted `.tex` file once more than 6 carry prose — each returning its numbers verbatim with `file:line`, which is what the backlog records. The two confirmation points between them do not delegate and do not move (§6.5): a mapping and a move plan are what the user approves, and nothing is copied or renamed until they have.
 
 ## Workflow
 

@@ -56,8 +56,10 @@ flip a ledger status, never soften a finding to be kind.
 1. **Five perspectives, one chair.** The panel is the five briefs of
    `references/review-dimensions.md` — novelty & related work, technical soundness, experimental
    rigor & reproducibility, clarity & presentation, devil's advocate — each dispatched as a
-   read-only delegate (§6.4) that fetches nothing but its own leads (§6.9), carrying its
-   brief and the two contracts verbatim plus the built paper. Exactly five, in batches of at most three (§6.2). `quick` is the
+   delegate that fetches nothing but its own leads (§6.9) and writes exactly one file, its own
+   `review_<perspective>.md` in the run directory (§6.2, §6.4), carrying its brief and the two
+   contracts verbatim plus the built paper. It writes nothing under `manus/`, `notes/`, or
+   `cycls/`: the meta-review is the chair's synthesis, not five reviews concatenated. Exactly five, all dispatched in one message so the panel is genuinely concurrent (§6.2). `quick` is the
    no-fan-out path: the chair walks all five perspectives itself in one sequential pass, and
    the meta-review says so (`mode: quick` — cheaper, and not independent).
 2. **The rubric is anchored; caps bind.** The score is the band whose description the paper
@@ -73,7 +75,7 @@ flip a ledger status, never soften a finding to be kind.
    cannot be verified is phrased as a direction, and every search — empty ones included — is
    logged. **A panelist runs its own leads (§6.9).** The rate divides rather than the
    quota: each brief states, in seconds, the wait between that panelist's own requests to a
-   host — the host's interval times the three running at once — so the panel as a whole asks
+   host — the host's interval times the five running at once — so the panel as a whole asks
    each host no faster than one agent would have. Every payload is cached under that
    panelist's own prefix in the run directory. What does not move is the discipline the leads
    were built on: a panelist writes `what_it_would_settle` into its return **before** it runs
@@ -89,8 +91,10 @@ flip a ledger status, never soften a finding to be kind.
    per major weakness; the chair carries the IDs into the meta-review. Claims sitting at
    `unsourced` or `proposed` are exactly the soft spots a sharp reviewer finds first: attack
    them. A weakness that maps to no claim still carries its anchor.
-5. **The chair confirms before it publishes (§6.5).** Every major weakness's anchor is opened
-   and read by the chair before it enters the meta-review; an unanchored item is dropped and the
+5. **The chair confirms before it publishes (§6.6).** A panel is the one fan-out whose reading
+   the chair repeats rather than replaces — the second opinion is the entire product, and a
+   verdict nobody checked is one reviewer's opinion wearing five hats. So every major
+   weakness's anchor is opened and read by the chair before it enters the meta-review; an unanchored item is dropped and the
    drop recorded in Synthesis Notes. A panelist's own coverage claim is audited like any other
    return (§6.3). A `verified` reference is confirmed twice over, and this is the cost of
    Principle 3's fan-out rather than a formality: the chair opens the payload at the cache path
@@ -136,7 +140,7 @@ panelist reads the paper itself, in full.
 
 ### Step 4: Dispatch the panel (or walk it in quick mode)
 
-Panel: five delegates, batches of at most three, disjoint by perspective — `Agent` subagents of type `coder`, each batch dispatched in a single message so its panelists run concurrently. The permission is asked for, not assumed (§6.1): one question before the first batch, whether the panel runs as five delegates or the chair walks all five itself. No dispatch tool, or a no at that question, takes the `quick` path and the meta-review says `mode: quick`, which is the honest name for a panel that was never independent. Each brief contains
+Panel: five delegates, disjoint by perspective — `Agent` subagents of type `coder`, all five dispatched in a single message so the panelists run concurrently. No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
 its perspective section from `references/review-dimensions.md` verbatim, both contracts
 verbatim, the digest, and the scope line "ONLY this perspective; return the collector
 contract's fields and nothing else". Each brief also carries the seconds that panelist waits
@@ -152,9 +156,9 @@ The chair's own confirming first: for every reference a panelist returned as `ve
 the payload at the cache path it gave and settle the hit by the criterion that panelist wrote
 before running the query — a record meeting it keeps `verified` and carries its record, one
 that does not becomes a direction with no name attached. A lead nobody could run comes back
-unsettled; the chair runs it here, one request at a time. Then Principle 5 — anchors opened, unanchored items dropped and logged. Then
-write the per-perspective files (`review_<perspective>.md`, or `review_quick.md`) into the run
-directory, consolidate the concern matrix (which perspectives raised what), dedupe the
+unsettled; the chair runs it here, one request at a time. Then Principle 5 — anchors opened, unanchored items dropped and logged. The
+per-perspective files are already in the run directory, one written by each panelist; a `quick`
+run writes its own `review_quick.md` here. Consolidate the concern matrix (which perspectives raised what), dedupe the
 questions, and record panel disagreements for Synthesis Notes.
 
 ### Step 6: Score

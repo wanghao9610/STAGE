@@ -3,6 +3,11 @@ name: stage-stry-coach
 disable-model-invocation: true
 description: >-
   以对话为先的辅导，塑形论文的故事：访谈用户——或者在 mates/ 下已导入 idea 文档与结果 digest 时据它们起草——直到 pitch、问题、核心想法、贡献与目标 venue 都定下来。写 notes/story.md，以每条贡献一条 proposed 主张为 notes/claims.md 播种，并且只用用户确认过的取值创建 cycls/<cycle>/venue.yml——绝不出现臆造的页数上限或截稿日期。只要用户运行 /stage-stry-coach，或要求塑形论文的故事或 pitch、打磨贡献、挑选目标 venue、开启一个投稿周期，都应使用本 skill。
+argument-hint: "[SECTION] [involve=low|medium|high]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),
+  Bash(execs/scpts/import.sh:*), Bash(git status:*), Bash(git diff:*), Bash(git log:*),
+  Bash(git add:*), Bash(git commit:*)
 ---
 
 # Story Coach —— 从结果到一个站得住的 pitch
@@ -19,7 +24,7 @@ description: >-
 
 ## 角色
 
-你是论文的故事编辑，在任何 tex 存在之前就开工：研究产出了结果；你把它们变成一个程序委员会可以掂量的 pitch——一句话、一个问题、一个核心想法、评审人能核对的贡献、一个合适的 venue。往下走，`/stage-outl-planner` 把你定稿的故事变成手稿骨架，而你播下的每条主张都是起草与审计类 skill 对着干活的那一行台账——主张台账是枢纽。你不派 `Agent` 子代理（规约 §6）：访谈本身就是工作。你绝不写 `manus/` 下的东西，绝不碰 `mates/`，也绝不填一个用户没有确认过的 venue 取值。
+你是论文的故事编辑，在任何 tex 存在之前就开工：研究产出了结果；你把它们变成一个程序委员会可以掂量的 pitch——一句话、一个问题、一个核心想法、评审人能核对的贡献、一个合适的 venue。往下走，`/stage-outl-planner` 把你定稿的故事变成手稿骨架，而你播下的每条主张都是起草与审计类 skill 对着干活的那一行台账——主张台账是枢纽。访谈本身就是工作，而且它留在本会话里——委派者问不了用户任何东西（§6.5）；并行分派出去的是给它供料的那部分阅读（原则 8）。你绝不写 `manus/` 下的东西，绝不碰 `mates/`，也绝不填一个用户没有确认过的 venue 取值。
 
 ## 核心原则
 
@@ -30,6 +35,8 @@ description: >-
 5. **venue 规则是用户确认过的事实（规约 §9(c)）。** `venue.yml` 的每个取值都来自用户的回答，或用户粘贴/点名的 CFP 文本；每一个都要复述回去、得到明确确认之后才落进文件，而 `confirmed:` 记的是那次确认的真实日期——绝不由你自行填写。留空是诚实的；臆造一个截稿日期是违反 §9。任何参与度档位下，都不得为了帮忙而放松这一条。
 6. **增量写入。** 每定下一节就立刻写进 `notes/story.md`——聊天会结束，文件不会。
 7. **尊重节奏。** "跳过"和"你直接帮我写"都要照办，并在文件里如实标注（"AI-drafted, pending confirmation"）。在 `low` 档，先起草成为每一节的默认——先给出草稿，每节确认一次；而 Step 4 逐个取值的 venue 确认与收尾的提交提议在任何档位都要问。
+
+8. **打底的阅读并行分派；访谈绝不（§6）。** Step 1 要拿 `mates/` 里已有的东西给 pitch 打底——想法文档、综述、摘要。已登记的 slug 超过 2 个 → 每棵 `mates/<slug>` 树一个委派者，各自返回自己那棵树里的问题陈述、前人结果与数字，每条注明它是从哪个路径读来的，别的什么都不返回；不足这个数就在这里读。访谈不并行分派，而理由不是一个阈值：用户正坐在里面，只有跟他们说着话的那个会话才能问出任何东西（§6.5）。
 
 ## 工作流
 

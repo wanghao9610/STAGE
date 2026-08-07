@@ -2,6 +2,12 @@
 name: stage-tabs-builder
 description: >-
   只从带指纹的 mates/ 证据出发，在 manus/tabs/ 下生成或更新一张 booktabs 表格——绝不来自记忆、聊天或回想起来的论文。每个数据行都带一条 % src: mates/<...>#<anchor> 注释，好让每个数字都能追溯到它的指纹；缺失的数字变成一个 \todo{...} 单元格，并在 notes/claims.md 里开出一条 unsourced 主张——手敲进去的数字正是本 skill 存在要杀掉的失败模式。每个被引用的数字在发出去之前都重读一遍，把证据过期问题浮出来，并更新提纲的 Tables 行与主张台账。只要用户运行 /stage-tabs-builder、一次运行点名它是下一步动作，或要求建立、填充、扩展或修复一张结果表、消融表或对比表，或者把导入的结果变成 LaTeX，都应使用本 skill。
+argument-hint: "[TABLE]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Bash(git status:*),
+  Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Table Builder —— 从证据到 booktabs 的编译器
@@ -32,6 +38,8 @@ description: >-
 4. **加粗是一种主张。** 把最好的数字高亮出来，就是在陈述一条性能主张：只有在被引用的证据支撑这个对比时才加粗或加下划线，并确保有一条台账行以 `tabs/<slug>` 出现在 Stated in 里覆盖它。在一列 `\todo{}` 之上标最优，是用排版做的编造。
 5. **排版之前先查过期（§8）。** 通过 `execs/scpts/import.sh --diff` 把被引用条目的 `source-stamp:` 与上游比对——逐字比对，绝不看 mtime。过期的证据要报出来、并在它的数字发出去之前（经用户批准）重新导入；要修一个错的数字，就到上游修好再重新导入——不在 `mates/` 里修，也不只在表格里修。
 6. **booktabs，可 grep。** `\toprule`/`\midrule`/`\bottomrule`，不要竖线；一个源码行一个数据行，好让每条 `% src:` 注释正好挨着一行；caption 与列头陈述设置类事实——数据集、划分、指标——只按证据所述来写，并用 `notes/notation.md` 的术语。
+
+7. **证据采集并行分派（§6）。** Step 2 要从留了指纹的 `mates/` 文件里给每个单元格取一个数：一张表背后不同的文件超过 6 个 → 一个文件一个委派者，各自返回自己那些锚点处的值与锚点原文的引文，别的什么都不返回。表在这里生成，因为一个 `.tex` 文件只有一个写入者（§6.2），而一行的 `% src:` 注释与它那个数字是由写这一行的人一起写下的（§6.4）。过期比对是一次 `import.sh --diff` 调用，Step 5 出货前那次重读是关卡——两样都在这里跑（§6.3）。
 
 ## 工作流
 

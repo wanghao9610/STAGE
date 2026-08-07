@@ -67,8 +67,14 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    number under it matched fresh evidence and all its evidence links resolve. Any naked unsourced
    number under it → `unsourced`. A previously `verified` claim that fails today loses the status
    — back to `drafted`, with a task saying why. A mismatch never flips anything up.
-7. **Single session, no `Agent` subagents (conventions §6).** The audit's value is one context that has
-   seen every number and every fingerprint; a split trace is a hole in it.
+7. **Fan out the trace (§6).** More than one `.tex` file in scope → one delegate per in-scope
+   `manus/secs/` and `manus/tabs/` file, each following Principle 3's order for its own numbers,
+   opening the cited `mates/` file at its anchor, and returning one row per number — the value in
+   the tex, the value at the anchor, the verdict — and nothing else. `notes/claims.md` has one
+   writer and it is the main agent: Step 7 reads across every delegate's rows at once, a claim is
+   stated in more than one file, and a ledger row two delegates edit is a row one of them loses
+   (§6.2). The staleness gate runs first and runs here — it decides whether any verdict this run
+   produces can flip anything up at all.
 
 ## Workflow
 

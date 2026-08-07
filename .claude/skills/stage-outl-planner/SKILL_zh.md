@@ -3,6 +3,10 @@ name: stage-outl-planner
 disable-model-invocation: true
 description: >-
   把定稿的故事变成一副能编译的手稿骨架：写 notes/outline.md——一张章节表，其页数预算之和落在 venue 页数上限之内，外加图计划、表计划，以及主张到章节的分配——创建 manus/secs/<n>_<slug>.tex 骨架，其开头的注释块就是该节的简介，在 manus/main.tex 里把对应的 \input 行取消注释以保持构建为绿，并给 notes/notation.md 播下种子。只要用户运行 /stage-outl-planner，或要求给论文列提纲、按页数上限分配各节预算、建好章节文件、或者把故事变成骨架，都应使用本 skill。
+argument-hint: "[involve=low|medium|high]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Plan Outliner —— 从故事到可编译的骨架
@@ -30,6 +34,8 @@ description: >-
 5. **骨架承载简介，不承载散文。** 开头的注释块就是该节简介——起草者的长期指令；正文只有一行 `\section` 和一个 `\todo{...}`。没有事实、没有数字：按规约 §9(a)，一个数字只有在起草者把它追溯到一条带指纹的 `mates/` 条目时才进入 `manus/`，所以骨架一个都不带。
 6. **骨架必须编译得过。** 接好线之后跑 `execs/run.sh`（一次 Bash 调用）——确定性检查住在脚本里，判断住在这里。这次运行以一个绿色构建、或一份"什么坏了、为什么"的诚实说明收尾。
 7. **增量写入。** 先提纲再骨架，每个骨架写完再写下一个，记号表最后——聊天会结束，文件不会。
+
+8. **先并行分派预读，再并行分派骨架（§6）。** Step 0 在创建任何东西之前，必须把 `manus/secs/` 下每一个"不止是骨架"的文件读完——接入进来的仓库正是满满一堆这种文件——所以这种文件超过 6 个 → 一个文件一个委派者，各自只返回那个文件挣到的状态与它那一行提纲，别的什么都不返回。Step 4 随后并行地写：一个骨架一个委派者，各自恰好独占自己那个 `manus/secs/<n>_<slug>.tex`，把简介注释块与 `\section` 那一行写进去，遵原则 5——只写简介，不写事实，一个数字都不写（§9a 约束会写入的委派者，与约束本会话完全一样）。有三个文件各只有一个写入者，而且都是主 agent，因为每个委派者都会去改同一个：`notes/outline.md`、`main.tex` 与 `notes/notation.md`（§6.2）。收尾那次构建是关卡，在这里跑（§6.3）。
 
 ## 工作流
 

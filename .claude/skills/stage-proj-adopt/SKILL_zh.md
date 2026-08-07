@@ -3,6 +3,12 @@ name: stage-proj-adopt
 disable-model-invocation: true
 description: >-
   把一份已经动工的 LaTeX 手稿接进 STAGE，且不毁掉任何东西。先做一次只读盘点，把草稿摸清——主文件、章节 input、图、表、参考文献、样式、venue 信号、git 形态，以及那些看起来是证据而非正文的文件——然后映射方案与逐文件的搬迁计划各自先获确认，之后才动手；每一处 \input、\graphicspath、 \bibliography 的改动都在计划里先点名再施行，接好的树用一次构建验证。外部草稿是复制进来的，它的源码树绝不被修改。正文里已有的每个数字都记为一条 unsourced 主张——这就是 /stage-clms-auditor 逐条清掉的待办——候选证据文件被路由给 /stage-evid-curator，在这里绝不复制进 mates/。只要用户运行 /stage-proj-adopt、想把一篇已有论文、学位论文章节或 Overleaf 导出接进 STAGE，或者询问不是从模板起步的草稿该怎么接入，都应使用本 skill。 Bilingual (en/zh)。
+argument-hint: "[SRC_PATH]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Bash(git status:*),
+  Bash(git diff:*), Bash(git log:*), Bash(git mv:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Project Adopt —— 把进行中的手稿接进 STAGE
@@ -31,6 +37,8 @@ description: >-
 4. **证据是路由过去的，不是夹带进去的。** `mates/` 恰好有两个写入者——`/stage-evid-curator` 与 `execs/scpts/import.sh`——本 skill 两者都不是。看起来像证据的文件只被盘点与路由，在这里绝不复制进 `mates/`；接纳它们的那条 manifest 条目由 curator 写，不由接入写。
 5. **树必须仍然构建得出来。** 接入以 `bash execs/run.sh` 收尾，把搬好的树树外编译进 `wkdrs/builds/`。由本 skill 改写过的路径导致的失败在这里修好；草稿本来就有的失败带着 `file:line` 报出来、留给它的主人——既有的破损是一项发现，不是你的修理活。
 6. **接入不发明判断。** 不重写、不打分、不讲故事、不做 venue 策略——记录是描述性的。草稿在论证什么是 `/stage-stry-coach` 要问出来的；它的主张站不站得住是 `/stage-clms-auditor` 的事；它读起来怎么样是 `/stage-copy-editor` 的事。
+
+7. **清点与欠账扫描并行分派（§6）。** Step 1 要走一棵没人编过目的源码树：树下超过 20 个文件 → 每个顶层目录一个委派者，各自只返回自己那棵子树的清点行，别的什么都不返回。Step 6 那次"没有出处的数字"扫描按同样的方式切开——被接入的 `.tex` 文件超过 6 个带正文时，一个文件一个委派者——各自把自己的数字连同 `file:line` 逐字返回，欠账清单记的就是它。夹在两者之间的那两个确认点既不委派也不挪位（§6.5）：映射与搬动方案是用户要批的东西，没批下来之前不复制、不改名。
 
 ## 工作流
 

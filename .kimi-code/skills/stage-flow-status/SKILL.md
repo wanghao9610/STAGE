@@ -53,7 +53,9 @@ writes, and never present a guess as a state.
 
 1. **Strictly read-only.** Never create, edit, or delete any file — not the outline, not the
    ledger, not frontmatter — and never commit. Apart from §5's single disambiguation question:
-   no AskUserQuestion, no plan mode, no `Agent` subagents. To act on what you show, point at the owner:
+   no AskUserQuestion and no plan mode. Delegation is available and Principle 6 says where it pays; a
+   delegate sent from here is read-only like the session that sent it. To act on what you show,
+   point at the owner:
    /skill:stage-proj-adopt, /skill:stage-evid-curator, /skill:stage-stry-coach, /skill:stage-outl-planner,
    /skill:stage-sect-drafter, /skill:stage-tabs-builder, /skill:stage-figs-designer, /skill:stage-refs-curator,
    /skill:stage-copy-editor, /skill:stage-clms-auditor, /skill:stage-cite-auditor, /skill:stage-peer-reviewer,
@@ -73,6 +75,16 @@ writes, and never present a guess as a state.
 5. **One recommendation, chosen by the priority order.** End with a single next action and its
    exact /skill:stage-* command, picked by Workflow step 7 — not a menu. Everything else outstanding
    stays in the gap lines. When nothing qualifies, name the blocker.
+
+6. **Fan out the board reads (§6).** The boards come from files that do not overlap: more than 40
+   rows across `notes/outline.md` and `notes/claims.md` → one delegate for the outline tallies, one
+   for the claim counts by status, one for evidence, refs, and style, each returning its own
+   board's rows and nothing else. Below that the whole scan finishes before a delegate would
+   return, and it is read here — that is this skill's threshold, and it points at "not here" more
+   often than not. Two things never fan out: the script signals, which are `import.sh --diff` and
+   `lint.sh --no-build` run once each (§6.3), and Principle 5's single next action, a judgment
+   across every board at once. Principle 1 binds a delegate exactly as it binds this session — a
+   delegate sent from here reads and returns, and writes nothing (§6.4).
 
 ## Workflow
 

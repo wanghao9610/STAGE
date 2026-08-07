@@ -67,8 +67,13 @@ re-reading routes to `/stage-refs-curator`.
 5. **Hygiene is reported with the entries quoted.** Duplicates (same title or DOI under two
    keys), missing required fields, inconsistent venue naming, arXiv entries where the note
    records a published version. The fix is `/stage-refs-curator`'s.
-6. **Single session, no `Task` subagents (conventions §6).** The audit's worth is one context that saw
-   every key, every note, and every citing sentence.
+6. **Fan out the assertion audit (§6).** More than 20 in-scope citing sentences → split them one
+   delegate per cited key, so every sentence about a given paper reaches the same reader with the
+   same note in front of it, each returning one verdict per sentence — supported, unsupported, or
+   unverifiable, with the note line it turned on — and nothing else. Two checks stay whole because
+   splitting them would blind them: key resolution greps the whole manuscript against the whole
+   bib, and Principle 5's hygiene needs the entire bib in one view to see a duplicate at all.
+   Nothing a delegate returns is fixed anywhere — Principle 2 binds it too (§6.4).
 
 ## Workflow
 

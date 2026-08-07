@@ -2,6 +2,11 @@
 name: stage-evid-curator
 description: >-
   mates/ 的管理员——这是撑起论文数字的只读证据库，它的写入者只有：本 skill 与 execs/scpts/import.sh。`import` 通过跑该脚本，从配对的 STAR 仓库拉取或刷新结果，脚本把每个文件的上游 commit 钉进 mates/MANIFEST.md 并整体重写它的 source-type: star 条目；`register <path>` 把手工投放的证据收进 mates/manual/，登记为一条 source-type: manual 条目——整份读完、问明出处、算好校验和、写上日期；`check`（默认）把磁盘与 manifest 对账，给每个文件评级 ok、unregistered、 missing、tampered 或 stale，每一级都附上修复它的命令。证据是只读的——错数在它的来源处修好再重新导入，绝不原地编辑——而没有 manifest 条目的文件，对写作类 skill 来说并不存在。只要用户运行 /stage-evid-curator、一次运行点名它是下一步动作、想导入或刷新 STAR 结果、手上有一份结果文件要放到某条主张背后、或者询问论文的证据是否还是当前的，都应使用本 skill。Bilingual (en/zh)。
+argument-hint: "[import | register <path> | check]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),
+  Bash(execs/scpts/import.sh:*), Bash(git status:*), Bash(git diff:*), Bash(git log:*),
+  Bash(git add:*), Bash(git commit:*)
 ---
 
 # Evidence Curator —— manifest，以及数字背后的那些文件
@@ -30,6 +35,8 @@ description: >-
 4. **出处是钉住的，不是记住的。** star 条目带着上游路径和 `import.sh` 钉住的 commit；manual 条目带着用户说明的来源、日期、校验和。一条说不出自己的文件哪来的条目，就不写。
 5. **管理员不制造数字。** 这里不计算、不聚合、不补任何指标。要求登记一个背后没有文件的数字，一律拒绝：文件先来——而当这个数字住在配对的 STAR 仓库里时，答案是 `import`，不是一次会丢掉时间戳的手工誊抄。
 6. **一次刷新就是对论文的一次改动。** 重新导入可能移动草稿已经引用过的数字。因此重写已登记条目的动作在执行前先确认，而被刷新的条目永远路由到 `/stage-tabs-builder`（它的表格刚刚过期）与 `/stage-clms-auditor`（引用它们的主张需要重新核）。证据在写好的句子底下悄悄漂移，正是草稿变成小说的方式。
+
+7. **`check` 的对账并行分派（§6）。** `mates/` 下的 slug 超过 3 个 → 每棵 `mates/<slug>` 树一个委派者，各自对着自己那些文件的 manifest 条目判 `ok | unregistered | missing | tampered`，只返回这张表，别的什么都不返回。它碰到的东西一律不写：`mates/` 对本次运行的每个 agent 都只读，委派者也一样（§6.4、§10）。留在这里的是切开就会坏掉的那些——过期比对是对着一个上游的一次 `import.sh --diff` 调用，而登记是一个确认点，文件整份读完、出处问清楚，才会有一条条目（§6.5）。
 
 ## 工作流
 

@@ -41,6 +41,8 @@ You are the on-ramp, not the editor. You do not judge the writing, you do not so
 5. **The tree must still build.** Adoption ends with `bash execs/run.sh` compiling the moved tree out-of-tree into `wkdrs/builds/`. A failure caused by a path this skill rewrote is fixed here; a failure the draft already had is reported with `file:line` and left to its owner — pre-existing breakage is a finding, not your repair.
 6. **Adoption does not invent judgment.** No rewriting, no scoring, no story, no venue strategy — the record is descriptive. What the draft argues is `/skill:stage-stry-coach`'s to elicit; whether its claims hold is `/skill:stage-clms-auditor`'s; how it reads is `/skill:stage-copy-editor`'s.
 
+7. **Fan out the inventory and the backlog sweep (§6).** Step 1 walks a source tree nobody has catalogued: more than 20 files under it → one delegate per top-level directory, each returning the inventory rows for its own subtree and nothing else. Step 6's unsourced-numbers sweep splits the same way — one delegate per adopted `.tex` file once more than 6 carry prose — each returning its numbers verbatim with `file:line`, which is what the backlog records. The two confirmation points between them do not delegate and do not move (§6.5): a mapping and a move plan are what the user approves, and nothing is copied or renamed until they have.
+
 ## Workflow
 
 ### Step 0: Resolve the source

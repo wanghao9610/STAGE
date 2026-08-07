@@ -11,6 +11,12 @@ description: >-
   effective point size at print scale and refuses a \todo on a wall. No argument audits the poster against
   its plan; plan selects the content; render emits poster.tex and compiles the sheet; check runs the gate.
   Use when the user runs /stage-pstr-builder, or asks to plan, render, or check the poster for a venue.
+argument-hint: "[plan | render | check] [kit=<path>]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Agent, Bash(git status:*),
+  Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Poster Builder — one takeaway, sourced, legible across a hall
@@ -42,6 +48,8 @@ You write only under `cycls/<cycle>/poster/` and render into `wkdrs/builds/poste
 5. **Legibility is measured, not eyeballed.** The physical size is known, so the effective point size is arithmetic: compute it at print scale and hold the floors in `references/poster-layout.md` — the takeaway readable at four metres, body text at one and a half. Meaning survives grayscale, symbols and terms match `notes/notation.md`, and nothing overflows the declared sheet. "Looks fine on screen" is not a verdict; a number is.
 6. **The size is a venue fact; the kit is supplied, never synthesized.** Sheet size and orientation come from `cycls/<cycle>/venue.yml` and bind only when its `confirmed:` is set (§9c) — an unconfirmed or absent size stops the run and is asked about, never assumed from what posters "usually" are. Where the venue supplies an official poster kit it is copied byte-for-byte into `cycls/<cycle>/poster/template/` and never edited; where it supplies only a size, the house template is used at that size. Never fetch a kit and never reconstruct one from memory of what a venue's poster looks like (§9). A URL or DOI behind a QR code is the same kind of fact: supplied by the user, never recalled.
 7. **The poster is signed; the paper may be anonymous.** `ANON` governs `manus/` and is not inherited here — a poster carries author names, affiliations, and contact, because you are standing next to it. This is also why the poster lives under `cycls/` and never under `manus/`: that tree is scanned by `lint.sh`, which counts `\todo{` and hunts identity leaks across every `.tex` in it, and a signed poster inside a scanned namespace is a hard lint failure on a file that is correct.
+
+8. **Fan out the check gate's independent lanes (§6).** Step 5's checks do not depend on each other, so dispatch Sourced, Backed, and Fresh as one delegate each — the first re-reading every `% src:` anchor in `poster.tex` from its `mates/` file, the second matching every stated claim against its `notes/claims.md` row, the third comparing each recorded `source-stamp:` against `import.sh --diff` output — each returning its own pass/fail rows and nothing else. Legible, Grayscale, and Fits are measurements on the rendered PDF and run once it exists. The cut in Step 2 does not delegate and does not move (§6.5): what goes on a wall is the author's call, and Principle 1 exists because a poster assembled without it is the wall of text this skill prevents.
 
 ## Workflow
 

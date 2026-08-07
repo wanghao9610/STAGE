@@ -11,6 +11,12 @@ description: >-
   argument builds or revises that one figure. Use when the user runs /stage-figs-designer, when a run
   names it as the next action, or asks to plan, sketch, render, or fix a figure, the teaser, or the
   figure inventory.
+argument-hint: "[FIGURE | plan | teaser]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),
+  Bash(execs/scpts/import.sh:*), Bash(python3 manus/figs/srcs/:*),
+  Bash(python manus/figs/srcs/:*), Bash(latexmk:*), Agent, Bash(git status:*), Bash(git diff:*),
+  Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Figure Designer — sourced figures, no orphan PDFs
@@ -37,6 +43,8 @@ You never hand-type data into artwork, never write section prose, never place `\
 4. **Captions are claims (§9a).** A caption stating a number or a comparative follows prose rules: trace it to `mates/` or write `\todo{}`. Keep captions checkable by `/stage-clms-auditor`, and keep any claim a caption states in step with `notes/claims.md`.
 5. **The teaser answers for the whole paper.** It gets the dedicated checklist in Step 5, and its row never reaches `final` while an item fails.
 6. **Legible before beautiful.** Text readable at final print width, meaning survives grayscale, symbols and terms match `notes/notation.md`; when `ANON=true` (§3), no author names, lab marks, or repo URLs inside artwork.
+
+7. **Fan out per figure (§6).** The no-argument audit walks every Figures row against `manus/figs/` and `manus/figs/srcs/`: more than 6 figures → one delegate per figure, each returning its row's origin verdict — editable source, `mates/` entry, or orphan — and nothing else. A run that builds several sources splits the same way, one delegate per figure, each owning its own `manus/figs/srcs/<slug>.*` and no other file (§6.2), and each `% src:` comment on a data series is written by whoever draws it (Principle 3, §6.4). What does not split: rendering, which is one call per source; the Figures table, which has one writer; and the teaser checklist, which is a judgment about the whole paper made in one place.
 
 ## Workflow
 

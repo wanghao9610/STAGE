@@ -2,6 +2,12 @@
 name: stage-sect-drafter
 description: >-
   每次调用起草或修订一节手稿，依据是该节的提纲简介、主张台账，以及 mates/ 下带指纹的证据。按编号、文件 slug 或标题对着 notes/outline.md 解析章节，写 manus/secs/<n>_<slug>.tex；每个数字要么追溯到本次运行读过的一条带指纹的 mates/ 条目，要么写成 \todo{...}——没有第三种状态。更新主张台账（Stated in，状态置 drafted），把新符号与缩写追加进 notes/notation.md，并翻转该节的提纲行。绝不编辑 mates/，绝不重新划定提纲范围。只要用户运行 /stage-sect-drafter、一次运行点名它是下一步动作，或要求起草、撰写、扩写或修订某一节——摘要、intro、方法、实验、相关工作——或者把一行提纲变成散文，都应使用本 skill。
+argument-hint: "SECTION"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Bash(git status:*),
+  Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Section Drafter —— 与证据绑定的散文
@@ -33,6 +39,8 @@ description: >-
 5. **更新登记表是起草的一部分（§8）。** 写作即陈述主张，而这个事实住在 `notes/claims.md` 里（核心原则 B）：一次没有翻转台账行、没有追加记号、没有更新提纲行的运行，无论散文看着多好，都是没做完的。
 6. **证据只读，且要查新鲜度。** 要修一个错的数字，就到上游修好再重新导入——绝不编辑 `mates/`，也绝不在散文里"更正"它。过期是通过 `execs/scpts/import.sh --diff` 做的逐字时间戳比对，绝不看 mtime（§8）。
 7. **盘上有作者的行文档案，就照它写。** `notes/style.md`（§8.11）是文风档案——句长、语态、限定语的分量、罗列的形式，以及这篇论文不用的那些词——一份草稿照着它来。它压不过任何东西：§9 最先，其次是记号规范（原则 4），再次是 venue 的格式，最后才是这份档案。所以没有任何档位能授权一个数字（原则 1），也不能授权一条证据扛不住的主张（原则 3），而 `hedging: minimal` 收紧的是措辞，绝不撤掉证据所要求的限定语——主张的强度归台账，不归偏好。没有档案就照本 skill 一贯的样子起草；绝不发明一份，也绝不去写那个文件——它归 `/stage-copy-editor style`。
+
+8. **证据阅读并行分派，章节绝不（§6）。** 一次调用只写一节，这是花名册定下的（§11.3），不打弯——但 Step 2 要打开简介点名的每一条 `mates/` 记录，这种记录超过 6 条 → 一条记录一个委派者，各自返回自己那个文件在各锚点处承载的值、锚点原文的引文，别的什么都不返回。散文是在这里、拿这些返回写出来的：一节就是一个论证，而被切到几个上下文里的论证，读起来就是那个样子。这些返回里的每个数字仍按原则 1 进入——被打开的那条记录的 `% src:` 锚点，或者一个 `\todo{}`——不管打开它的是谁（§6.4）。Step 6 的构建与 lint 是关卡，在这里跑（§6.3）。
 
 ## 工作流
 

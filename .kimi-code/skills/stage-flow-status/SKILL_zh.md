@@ -22,11 +22,13 @@ description: >-
 
 ## 核心原则
 
-1. **严格只读。** 绝不创建、编辑或删除任何文件——不动提纲、不动台账、不动 frontmatter——也绝不提交。除了 §5 那唯一一个消歧问题之外：不用 AskUserQuestion、不进 plan 模式、不派 `Agent` 子代理。用户想据此行动，就把他们指向对应的 skill：/skill:stage-proj-adopt、/skill:stage-evid-curator、/skill:stage-stry-coach、/skill:stage-outl-planner、/skill:stage-sect-drafter、/skill:stage-tabs-builder、/skill:stage-figs-designer、/skill:stage-refs-curator、/skill:stage-copy-editor、/skill:stage-clms-auditor、/skill:stage-cite-auditor、/skill:stage-peer-reviewer、/skill:stage-resp-writer、/skill:stage-subm-packer。
+1. **严格只读。** 绝不创建、编辑或删除任何文件——不动提纲、不动台账、不动 frontmatter——也绝不提交。除了 §5 那唯一一个消歧问题之外：不用 AskUserQuestion、不进 plan 模式。委派是可用的，哪里划算见原则 6；从这里派出去的委派者与派出它的会话一样只读。用户想据此行动，就把他们指向对应的 skill：/skill:stage-proj-adopt、/skill:stage-evid-curator、/skill:stage-stry-coach、/skill:stage-outl-planner、/skill:stage-sect-drafter、/skill:stage-tabs-builder、/skill:stage-figs-designer、/skill:stage-refs-curator、/skill:stage-copy-editor、/skill:stage-clms-auditor、/skill:stage-cite-auditor、/skill:stage-peer-reviewer、/skill:stage-resp-writer、/skill:stage-subm-packer。
 2. **文件是唯一依据。** 汇报的一切都来自登记表（§8）里的产物：`notes/`、`mates/MANIFEST.md`、`manus/`、`cycls/<cycle>/`、`tasks/`，以及 `wkdrs/builds/` 与 `wkdrs/reports/` 的目录清单。绝不凭对话记忆推断进度；字段缺失就报"unknown"，不要猜。
 3. **确定性信号来自脚本，且只用它们的只读模式。** 证据新鲜度：`STAR_HOME` 有设置时跑 `execs/scpts/import.sh --diff`（按约定只读），否则报 unknown——过期是时间戳比对，绝不看 mtime（§8）。构建与 lint：点名 `wkdrs/builds/` 下最新的产物，存在时跑 `execs/scpts/lint.sh --no-build` 取当前把关信号——它什么都不写；绝不触发一次新的构建。
 4. **要计数，不要长篇；沉默是默认。** 面板就是一行行和一串串计数。缺口行只在它的触发条件成立时才出现——进行中的工作现在还不需要什么，而一个连健康状态也要报的检查，只会教会读者跳过它。
 5. **只给一条建议，由优先级顺序选出。** 以单一的下一步动作及其确切的 /skill:stage-* 命令收尾，由 Workflow 第 7 步选出——不是一份菜单。其余尚未了结的事情留在缺口行里。没有任何一条够格时，点名那个卡点。
+
+6. **各块看板的读取并行分派（§6）。** 这些看板来自互不重叠的文件：`notes/outline.md` 与 `notes/claims.md` 加起来超过 40 行 → 提纲统计一个委派者、按状态分的主张计数一个、证据与参考文献与文风一个，各自只返回自己那块看板的行，别的什么都不返回。不足这个数，整趟扫描还没等委派者返回就已经读完了，那就在这里读——这就是本 skill 的阈值，而它多半指向"这里不派"。有两样绝不并行分派：脚本信号，它们是各跑一次的 `import.sh --diff` 与 `lint.sh --no-build`（§6.3）；以及原则 5 那唯一一条下一步动作，那是把每块看板同时摆在眼前才做得出的判断。原则 1 约束委派者与约束本会话完全一样——从这里派出去的委派者只读、只返回，什么都不写（§6.4）。
 
 ## 工作流
 

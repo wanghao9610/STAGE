@@ -39,6 +39,8 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 6. **Evidence is read-only and freshness-checked.** To fix a wrong number, fix it upstream and re-import — never edit `mates/`, never "correct" it in prose. Staleness is exact stamp comparison via `execs/scpts/import.sh --diff`, never mtime (§8).
 7. **Write in the author's voice where one is on file.** `notes/style.md` (§8.11) is the style profile — sentence length, voice, hedging, enumeration form, and the words this paper does not use — and a draft follows it. It outranks nothing: §9 first, then the notation canon (Principle 4), then the venue's format, then the profile. So no dial licenses a number (Principle 1) or a claim the evidence cannot carry (Principle 3), and `hedging: minimal` tightens wording without ever removing a qualifier the evidence requires — a claim's strength is the ledger's, not a preference's. No profile means draft as this skill always has; never invent one, and never write the file — it belongs to `/stage-copy-editor style`.
 
+8. **Fan out the evidence read, never the section (§6).** One section per invocation is the roster's rule (§11.3) and it does not bend — but Step 2 opens every `mates/` entry the brief names, and more than 6 of them → one delegate per entry, each returning the values its own file carries at their anchors, the anchor text quoted, and nothing else. The prose is written here from those returns: a section is one argument, and an argument split across contexts reads like one. Every number those returns carry still enters under Principle 1 — the `% src:` anchor of the entry that was opened, or a `\todo{}` — whoever opened it (§6.4). Step 6's build and lint are the gate and run here (§6.3).
+
 ## Workflow
 
 ### Step 0: Load

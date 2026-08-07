@@ -35,6 +35,8 @@ You give the finalized story its load-bearing frame: which sections exist, what 
 6. **The skeleton must compile.** After wiring, run `execs/run.sh` (one Shell call) — deterministic checks live in scripts, judgment lives here. The run ends with a green build or an honest statement of what is broken and why.
 7. **Incremental writes.** Outline before skeletons, each skeleton written before the next, notation last — chats end, files do not.
 
+8. **Fan out the pre-read, then the skeletons (§6).** Step 0 must read every `manus/secs/` file that is more than a skeleton before anything is created — an adopted repository arrives full of them — so more than 6 such files → one delegate per file, each returning that file's earned status and its outline row and nothing else. Step 4 then writes in parallel: one delegate per skeleton, each owning exactly its own `manus/secs/<n>_<slug>.tex` and writing the brief comment block and the `\section` line into it, under Principle 5 — briefs, never facts, and never a number (§9a binds a delegate that writes exactly as it binds this session). Three files have one writer each and it is the main agent, because every delegate would be editing the same one: `notes/outline.md`, `main.tex`, and `notes/notation.md` (§6.2). The build at the end is the gate, run here (§6.3).
+
 ## Workflow
 
 ### Step 0: Load and gate

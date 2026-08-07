@@ -38,6 +38,8 @@ The choice of which methods and metrics the table compares belongs to the outlin
 5. **Staleness before typesetting (§8).** Compare the cited entries' `source-stamp:` values upstream via `execs/scpts/import.sh --diff` — exact comparison, never mtime. Stale evidence is reported and re-imported (user-approved) before its numbers ship; to fix a wrong number, fix it upstream and re-import — never in `mates/`, never only in the table.
 6. **Booktabs, greppable.** `\toprule`/`\midrule`/`\bottomrule`, no vertical rules; one data row per source line so each `% src:` comment sits beside exactly one row; captions and column heads state setup facts — dataset, split, metric — only as the evidence states them, in `notes/notation.md`'s terms.
 
+7. **Fan out the evidence gather (§6).** Step 2 collects one number per cell from fingerprinted `mates/` files: more than 6 distinct files behind one table → one delegate per file, each returning the values at their anchors with the anchor text quoted and nothing else. The table is emitted here, because one `.tex` file has one writer (§6.2) and a row's `% src:` comment and its number are written together by whoever writes the row (§6.4). The staleness diff is one `import.sh --diff` call and Step 5's re-read before it ships is the gate — both run here (§6.3).
+
 ## Workflow
 
 ### Step 0: Load

@@ -3,6 +3,12 @@ name: stage-subm-packer
 disable-model-invocation: true
 description: >-
   为当前周期做投稿的预检与打包：execs/run.sh 构建与 execs/scpts/lint.sh 关口必须双双通过，然后对着用户确认过的 venue.yml 事实走一遍清单、做一次图/表/参考文献的齐备性巡检、在 wkdrs/builds/ 下打出包（camera PDF、补充材料、arXiv 可用源码）、写下持久记录 cycls/<cycle>/SUBMISSION_<date>.md，并打上冻结 tag freeze/<cycle>_<date>——它是这个家族里唯一被允许创建 git tag 的 skill。camera-ready 模式还会在 tasks/<cycle>_promises.md 仍有未勾选的承诺框时拒绝打包；convert 模式把论文改排成用户提供的官方 venue 模板，产出 wkdrs/ 下一份可重新生成的副本，绝不抓取或重建模板。它只打包与记录；绝不上传到投稿系统、绝不 push、绝不编辑手稿。只要用户运行 /stage-subm-packer，或要求打包、冻结、转成 venue 模板，或准备投稿、camera-ready、arXiv 源码，都应使用本 skill。
+argument-hint: "[camera | convert] [kit=<path>]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
+  Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
+  Bash(bash execs/scpts/import.sh:*), Bash(execs/scpts/import.sh:*), Bash(git status:*),
+  Bash(git diff:*), Bash(git log:*), Bash(git tag:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Submission Packer —— 预检、打包、冻结
@@ -35,6 +41,8 @@ venue 的版式也归你管，而这一点丝毫不改变上面那条线。改�
 6. **包里不泄漏任何东西。** 这个包只装编译这篇论文所需的东西——源文件、图、样式、参考文献——此外什么都没有：不装 `mates/`、不装 `notes/`、不装 `tasks/`、不装 `.env`；在匿名周期下，lint 的 anon 家族会标出的东西一样都不装。`wkdrs/` 永不提交（§1）；持久记录是 SUBMISSION 文件与那个 tag。可编辑的图源也留在家里：`manus/figs/srcs/` 从不随包发出，因为一个绘图脚本或 `.drawio` 文件会带上渲染出的 PDF 不带的路径、用户名与机器名。
 7. **venue 模板是被提供的，不是被合成的。** venue 的 class、style 与 `.bst` 文件来自用户交过来的官方模板包，逐字节拷贝，且永不被编辑——不为修一个编译错误改，也不为压一点页边距改。绝不去抓一份模板包，绝不凭"某个 venue 的 class 大概长这样"的记忆重建一份：§9 的边界管版式跟管数字是一模一样的，而一份凭记忆写出来的 class，错的地方要到投稿系统那一刻才浮出来。副本编译不过时，修改落在生成的 `compat.sty` 或生成的 `main.tex` 里，否则就是报告里的一行。
 8. **venue 版式是生成的，不是写出来的。** 每一次转换都从 `manus/` 从头重建副本——没有增量同步，也没有第二份真值源。在副本内部手工打的补丁会被下一次运行抹掉，所以那从来不是答案；答案是经由拥有那个文件的 skill 去改 `manus/`。还有，`page_limit_main` 说的是副本的页数，不是预印本构建的页数：`lint.sh` 量的是另一个 class 下的另一份文档，那是写作期的代理指标，不是答案。
+
+9. **扫描并行分派，关卡绝不（§6）。** Step 5 的完备性扫描按登记产物切开——提纲那三张表一个委派者、主张台账一个、笔记与 bib 一个、承诺文件一个——各自把自己这边的缺口作为发现返回，别的什么都不返回；Step 6 的清单走查在某个清单族条目超过 6 条时，一条一个委派者。硬关卡既不切开也不委派：`execs/run.sh`、`execs/scpts/lint.sh` 与工作树检查都是单次脚本调用，退出码由主 agent 自己读（§6.3）。Step 8 往后的一切也一样——打包、留档、提交与冻结 tag 都在 STOP 线上，属于用户所在的那个会话（§2、§6.5）。
 
 ## 工作流
 

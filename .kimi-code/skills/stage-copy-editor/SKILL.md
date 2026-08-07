@@ -82,6 +82,15 @@ from the same ones instead of each session inventing a voice.
    profile on disk means write exactly as this skill always has; never invent one mid-polish, and
    never widen one because a sentence would read better outside it.
 
+8. **Fan out per section file (§6).** A whole-manuscript run polishes files that do not touch each
+   other: one delegate per in-scope `manus/secs/<n>_<slug>.tex`, each owning that file alone for
+   the length of the fan-out (§6.2) and editing it in place under Principles 1–4 — no number
+   changed, no citation key touched, no `\todo` moved, the canon in `notes/notation.md` enforced,
+   and every meaning-adjacent edit returned as a question rather than applied. One section in scope
+   is one file, so it is done here. What never splits: the budget arithmetic, which compares
+   sections against each other; Principle 6's systematic patterns, which are only visible across
+   the whole return set; and Step 6's build, the gate the main agent runs itself (§6.3).
+
 ## Workflow
 
 1. **Load.** Read the conventions file whole; then `notes/notation.md`, `notes/outline.md`

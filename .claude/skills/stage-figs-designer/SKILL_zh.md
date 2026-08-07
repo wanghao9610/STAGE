@@ -2,6 +2,12 @@
 name: stage-figs-designer
 description: >-
   拥有手稿的图清单，并负责把图建出来：notes/outline.md 里的 Figures 表（一张图一行用途）、 manus/figs/ 里每个渲染出的 PDF 在 manus/figs/srcs/ 下都有一个可编辑源文件（tikz / python / drawio），以及给 teaser 的一份专门检查清单。不许有孤儿 PDF：没有源文件的图必须能追溯到一条 mates/MANIFEST.md 条目（用于导入的美术素材）。数据图只画带指纹的 mates/ 证据所承载的数字，每条数据系列一条 src: 注释；证据没有承载的东西在 caption 里变成 \todo，绝不变成一条看着合理的曲线。不带参数时，对着磁盘上的文件审计这份清单并提出下一步动作；`plan` 修订 Figures 表；给出某张图则建立或修订那一张图。只要用户运行 /stage-figs-designer、一次运行点名它是下一步动作，或要求规划、草绘、渲染或修复某张图、teaser、或整份图清单，都应使用本 skill。
+argument-hint: "[FIGURE | plan | teaser]"
+allowed-tools: >-
+  Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),
+  Bash(execs/scpts/import.sh:*), Bash(python3 manus/figs/srcs/:*),
+  Bash(python manus/figs/srcs/:*), Bash(latexmk:*), Bash(git status:*), Bash(git diff:*),
+  Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Figure Designer —— 有来源的图，没有孤儿 PDF
@@ -30,6 +36,8 @@ description: >-
 4. **caption 也是主张（§9a）。** 陈述了一个数字或一句比较的 caption 遵循散文的规则：追溯到 `mates/`，或者写 `\todo{}`。让 caption 对 `/stage-clms-auditor` 保持可核查，并让 caption 陈述的任何主张与 `notes/claims.md` 保持同步。
 5. **teaser 要为整篇论文负责。** 它有 Step 5 的专门检查清单，只要还有一项不过，它那一行就绝不到 `final`。
 6. **先看得清，再好看。** 文字在最终印刷宽度下可读、含义在灰度下仍然成立、符号与术语与 `notes/notation.md` 一致；`ANON=true` 时（§3），美术素材内部不出现作者名、实验室标识或仓库 URL。
+
+7. **按图并行分派（§6）。** 不带参数那次审计要拿 Figures 表的每一行去对 `manus/figs/` 与 `manus/figs/srcs/`：图超过 6 张 → 一张图一个委派者，各自只返回自己那一行的来源判定——可编辑源文件、`mates/` 条目、还是孤儿——别的什么都不返回。一次要生成好几个源文件的运行按同样方式切开，一张图一个委派者，各自独占自己那个 `manus/figs/srcs/<slug>.*`，不碰别的文件（§6.2），而数据序列上的每条 `% src:` 注释由画它的那个人写下（原则 3、§6.4）。不切开的是：渲染，它是一个源文件一次调用；Figures 表，它只有一个写入者；以及 teaser 清单，它是对整篇论文的判断，要在一个地方做。
 
 ## 工作流
 
