@@ -27,6 +27,8 @@ Per paper, stop at the first source that yields a matching record:
 
 Cache every fetched payload under `wkdrs/refs_<date>/raw/<citekey>.<source>.<ext>` **before** using it. `wkdrs/` is regenerable and never committed (conventions §1.2), so the cache is what makes the run's own self-audit and a same-day re-run cheap; what outlives it is the `% src:` line in the bib and the entry's row in `notes/refs/refs_index.md`, which are tracked.
 
+**A batch of three or more resolves its ids first.** One Semantic Scholar batch call — `POST https://api.semanticscholar.org/graph/v1/paper/batch?fields=externalIds,title,year,venue,authors`, up to 500 ids in the body, the same endpoint the score refresh uses — over every input that already carries an arXiv id or a DOI, and the `externalIds` it returns take each paper straight to its DBLP key or DOI at sources 1–2. Nothing about where a field comes from changes: the entry is still transcribed from the DBLP or Crossref record and still matched on all three fields. What goes away is the per-paper title search that produced most of the requests, and with them most of the backoff — a ten-paper `add` of arXiv ids costs one batch call and ten keyed lookups instead of ten searches. An input that is a title has no id to batch and resolves exactly as before.
+
 ## Discovery — finding candidates by topic
 
 Everything above answers "what is the authoritative record for *this* paper". This section answers the question before it — which papers are worth looking at at all, when nobody has named one — and it is the only place in this skill where a query describes a topic instead of identifying a paper. The record rules do not loosen for it: a candidate becomes an entry only by going back through the search order above.

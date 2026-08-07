@@ -27,6 +27,8 @@ Google Scholar 不是这里的来源：它没有 API，用 CAPTCHA 挡自动请�
 
 每份抓回的原始内容，**先**缓存到 `wkdrs/refs_<date>/raw/<citekey>.<source>.<ext>` 再使用。`wkdrs/` 可再生、永不提交（规约 §1.2），所以这份缓存服务的是本次运行的自查和当天的重跑；能活下来的是 bib 里那行 `% src:` 与该条目在 `notes/refs/refs_index.md` 里的行——那两处是被跟踪的。
 
+**三篇以上的一批，先把 id 解析出来。** 对每个本来就带 arXiv id 或 DOI 的输入，走一次 Semantic Scholar 批量调用——`POST https://api.semanticscholar.org/graph/v1/paper/batch?fields=externalIds,title,year,venue,authors`，请求体里最多 500 个 id，和刷新影响力分用的是同一个端点——它返回的 `externalIds` 直接把每篇论文送到来源 1–2 的 DBLP key 或 DOI 上。字段来自哪里一点没变：条目仍然照着 DBLP 或 Crossref 的记录誊写，仍然三项全部匹配才算命中。省掉的是"每篇一次标题检索"——请求大头就在那里，退避的大头也在那里。十篇 arXiv id 的 `add`，从十次检索变成一次批量调用加十次按 key 的查询。输入是标题的那些没有 id 可批，照旧解析。
+
 ## 主题发现——按主题找候选
 
 上面每一节回答的都是"**这一篇**论文的权威记录是什么"。这一节回答的是它之前那个问题——没人点过任何一篇的时候，到底哪些论文值得看——这也是本 skill 里唯一一处让查询去描述一个主题、而不是指认一篇论文的地方。记录规则不为它松半分：一条候选要成为条目，仍然得回头走一遍上面那套抓取优先顺序。

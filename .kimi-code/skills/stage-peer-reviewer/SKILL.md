@@ -136,7 +136,7 @@ panelist reads the paper itself, in full.
 
 ### Step 4: Dispatch the panel (or walk it in quick mode)
 
-Panel: five delegates, batches of at most three, disjoint by perspective — `Agent` subagents of type `coder`, each batch dispatched in a single message so its panelists run concurrently. Invoking this skill is what asks for them; a host offering no dispatch tool takes the `quick` path and the meta-review says `mode: quick`, which is the honest name for a panel that was never independent. Each brief contains
+Panel: five delegates, batches of at most three, disjoint by perspective — `Agent` subagents of type `coder`, each batch dispatched in a single message so its panelists run concurrently. The permission is asked for, not assumed (§6.1): one question before the first batch, whether the panel runs as five delegates or the chair walks all five itself. No dispatch tool, or a no at that question, takes the `quick` path and the meta-review says `mode: quick`, which is the honest name for a panel that was never independent. Each brief contains
 its perspective section from `references/review-dimensions.md` verbatim, both contracts
 verbatim, the digest, and the scope line "ONLY this perspective; return the collector
 contract's fields and nothing else". Each brief also carries the seconds that panelist waits
