@@ -22,6 +22,7 @@ STAGE 写作工作流中每个 skill 都遵守的规则。十六个 skill——`
 | 指纹 fingerprint | `mates/MANIFEST.md` 里钉住某个证据文件的条目：来源、commit、来源时间戳、导入日期 | §8 |
 | 主张 claim | 台账里的一行：论文断言的一句话，连同它写在哪、证据是什么、状态如何 | §8、§9 |
 | 台账 ledger | `notes/claims.md`，把每条主张的陈述处 ⇄ 证据 ⇄ 状态连起来的枢纽 | §8 |
+| 文风档案 style profile | `notes/style.md`：作者的行文偏好，写成一次运行能套用、一份报告能量出来的档位；只约束 `manus/` 正文 | §8 |
 | 投稿周期 cycle | 面向一个 venue 的一次投稿尝试：`cycls/<venue>_<year>/` 及其中的一切 | §5、§8 |
 | 当前周期 | skill 作用的那个周期：`notes/story.md` frontmatter 里的 `cycle:` | §5 |
 | venue 档案 | `cycls/<cycle>/venue.yml`：该 venue 的规则，只以用户确认过的事实录入 | §8、§9 |
@@ -47,7 +48,7 @@ STAGE 写作工作流中每个 skill 都遵守的规则。十六个 skill——`
 | `stage-tabs-builder` | 会话结束时提供一次 | 写出的表格，加上它们的提纲与台账更新 |
 | `stage-figs-designer` | 会话结束时提供一次 | `manus/figs/` 渲染产物、`manus/figs/srcs/` 源文件、提纲更新 |
 | `stage-refs-curator` | 会话结束时提供一次 | `manus/bibs/reference.bib`、`notes/refs/` 下的笔记与索引 |
-| `stage-copy-editor` | 完成一遍打磨后提供一次 | 只有这一遍改过的 `.tex` 文件——打磨报告留在 `wkdrs/` |
+| `stage-copy-editor` | 完成一遍打磨后提供一次 | 只有这一遍改过的 `.tex` 文件，外加 `style` 那一遍写出的 `notes/style.md`——打磨报告留在 `wkdrs/` |
 | `stage-clms-auditor` | 完成审计后提供一次 | `notes/claims.md` 的状态翻转与新增的 `tasks/` 条目——审计报告留在 `wkdrs/` |
 | `stage-cite-auditor` | 仅当本次运行修过 bib 字段时提供 | `manus/bibs/reference.bib`——发现的问题留在 `wkdrs/` 报告里 |
 | `stage-peer-reviewer` | 每份评审提供一次 | 它写出的那一个 `SIM_REVIEW_*` 文件 |
@@ -184,6 +185,7 @@ STAGE_LANG=
 | 主张台账 | `stage-stry-coach` 创建；`stage-sect-drafter`、`stage-tabs-builder`、`stage-clms-auditor`、`stage-resp-writer` 更新 | `notes/claims.md` | 每条主张的 `Status` 列 |
 | 提纲 | `stage-outl-planner` 创建；起草 / 图 / 表 skill 更新各自的行 | `notes/outline.md` + `manus/secs/*.tex` 骨架 | `finalized:`；每行的 `Status` |
 | 记号表 | `stage-outl-planner` 创建；`stage-sect-drafter` 追加；`stage-copy-editor` 执行 | `notes/notation.md` | `updated:` |
+| 文风档案 | `stage-copy-editor` 创建与修订；`stage-sect-drafter` 读取 | `notes/style.md` | `updated:`、`source:` |
 | 章节草稿 | `stage-sect-drafter` | `manus/secs/<n>_<slug>.tex` | 提纲 Sections 行的状态 |
 | 表格 | `stage-tabs-builder` | `manus/tabs/<slug>.tex` | 每个数据行的 `% src:` 注释；提纲 Tables 行 |
 | 图 | `stage-figs-designer` | `manus/figs/<slug>.pdf`、`manus/figs/srcs/<slug>.*` | 提纲 Figures 行 |
@@ -202,7 +204,7 @@ STAGE_LANG=
 
 **每份工作流产物都记下写它的模型。** 每个生产者把 `model_id` 写进它在 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 下创建的文件的 frontmatter；还没有 frontmatter 块的文件——`notes/refs/refs_index.md`——为它加一个。取值是运行时为本次写入会话报出的模型 id，原样抄录；而运行时确实会报：STAGE 的 `stage_model_id.sh` 钩子把它写进会话上下文，Claude Code 还会在系统提示里写明。那行注入缺失，或带来的是一条恢复命令而不是 id 时，`model_id_spec.md` 给出各运行时的兜底——先跑它，再考虑写 `unrecorded`，那是留给"会话里任何地方都没写明模型"的取值。绝不凭行为推断，绝不去想"这大概是哪个模型"，也绝不把一份产物的取值抄到另一份上。
 
-**而 `model_trail` 记的是跨写入者的流水。** `model_id` 只说明一次写入；这些文件多半是跨很多次会话写成的——一本被五个 skill 改到论文完稿的台账、每个周期重排一次的提纲、一篇一篇长起来的参考文献库——单个字段在那里只描述最后一次。所以凡带 `model_id` 的产物，旁边都带一份只追加的 `model_trail`：每次写入会话一条，`{ date, model, skill, scope }`，其中 `scope` 用这份文件自己的词汇说清那次会话写了什么——claim ID、章节号、评审要点、表格行。只追加，绝不改写已有条目，并让 `model_id` 始终镜像最后一条，好让一次普通的 grep 仍然有效。一次写成的产物——每份带日期的报告、模拟评审、回复、投稿记录——只有一条；重新生成的产物另起一条新流水，而不是接着它所替换的那一代往下写。形状见 §8.1，这一对字段进入 §8.4–§8.10 每个 schema 的 frontmatter，不在每处重复列出。
+**而 `model_trail` 记的是跨写入者的流水。** `model_id` 只说明一次写入；这些文件多半是跨很多次会话写成的——一本被五个 skill 改到论文完稿的台账、每个周期重排一次的提纲、一篇一篇长起来的参考文献库——单个字段在那里只描述最后一次。所以凡带 `model_id` 的产物，旁边都带一份只追加的 `model_trail`：每次写入会话一条，`{ date, model, skill, scope }`，其中 `scope` 用这份文件自己的词汇说清那次会话写了什么——claim ID、章节号、评审要点、表格行。只追加，绝不改写已有条目，并让 `model_id` 始终镜像最后一条，好让一次普通的 grep 仍然有效。一次写成的产物——每份带日期的报告、模拟评审、回复、投稿记录——只有一条；重新生成的产物另起一条新流水，而不是接着它所替换的那一代往下写。形状见 §8.1，这一对字段进入 §8.4–§8.11 每个 schema 的 frontmatter，不在每处重复列出。
 
 **有三处刻意都不带。** `manus/` 下的一切都不带：手稿是交给 venue 和 arXiv 的东西，一篇论文是否披露 AI 参与，是作者按其 venue 政策做的决定，而不是某个 skill 留在 `.tex` 里的一行注释。`mates/` 下的一切也不带：证据不可变（§9d），且它自带溯源——`source-type:`、`source:`、`source-commit:`、`source-stamp:`、`sha256:`、`imported:`——其中很大一部分由 `import.sh` 写入，那是个没有模型可报的 shell 脚本。`cycls/<cycle>/venue.yml` 同样不带：它的取值是用户确认过的事实，`confirmed:` 就是它的溯源（§9c）。不带它们，谁起草了某一节仍然可追：被它改成 `drafted` 的主张行、被它翻状态的提纲行、读过它的审计报告的流水。
 
@@ -315,6 +317,34 @@ frontmatter：`cycle:`、`date:`、`frozen:`（tag 名）、`package:`（`wkdrs/
 
 同一个产出者的另一份持久产物是 `tasks/<cycle>_venue.md`，由 `convert` 运行维护的 venue 待办清单。frontmatter：`cycle:`、`template:`、`updated:`。正文：一条发现一行 `- [ ]`，各带一个稳定的 `V<n>` 编号和拥有这个修法的 skill。它是被更新的，不是被重新生成的——已勾选的条目保持勾选、永不被重新提出，新发现以下一个空闲编号追加，不再适用的条目连同理由勾掉而不是删除。它们是发现，不是承诺：一个未勾选的框永不阻断打包，这正是它与 `tasks/<cycle>_promises.md` 的分界。
 
+### 8.11 `notes/style.md`
+
+作者的行文偏好，写下来一次，好让每一次动到句子的运行读的是同一套，而不是每次会话自己发明一种腔调。它唯一的写入者是 `stage-copy-editor`（它的 `style` 模式）；`stage-sect-drafter` 起草时读它，打磨那一遍编辑时读它。由 `stage-tabs-builder` 与 `stage-figs-designer` 写下的 caption 散文在下一次打磨时才获得这个腔调，而不在写下的当时——这两个 skill 刻意不读档案，好让建表、作图的一次运行保持今天这样轻。frontmatter：`updated:`，以及 `source:`——`interview` | `sample` | `preset:<name>`——记录这些档位是怎么定下来的。四个小节：
+
+```markdown
+## Dials
+| Dial | Setting | Notes |
+| sentence length | short — median ≤ 22 words | |
+| voice | active, first-person plural | ANON=true 时自指仍用第三人称（§3.4） |
+| paragraph opener | claim-first | |
+| hedging | minimal | 绝不低于证据所要求的——见"优先级" |
+| enumeration | \parahead runs, not itemize | |
+| tense | present for method, past for experiments | |
+
+## Prefer / Avoid          | Prefer | Avoid | Why |          —— 管句式，不管单个词
+## Never                   | Never | Use instead |          —— 这篇论文不用的词和口头禅
+## Samples                 作者写过或认可的段落，各自注明出处，
+                           并用一行说清一次运行该从中取走什么
+```
+
+每个 `Setting` 单元格和每个 `Never` 单元格都是简短的英文字面量，因为打磨报告要对着它们量，而量就要 grep；`Notes` 与 `Why` 两列是自由文本，用这次运行的语言写（§7.6）。
+
+**优先级，也正是这份文件做成 schema 而不是一段品味自述的理由。** §9 压过它，其次是 `notes/notation.md`，再次是 venue 的格式规则，最后才是这份档案。具体地说：没有任何档位能授权一个数字、一个引用键、或者拿掉一个 `\todo{}`（§9a）；没有任何档位能盖过规范术语或某个缩写的首次展开（§8.6）；并且**没有任何档位能改变一句话断言了什么。** `hedging: minimal` 收紧的是措辞，绝不撤掉证据所要求的限定语——主张的强度住在台账行里（§8.1），不住在偏好里，而一份非得压过上面某一条才成立的档案，本身就是错的。那一刻运行要把这件事说出来，并且不动那句话。
+
+**样例提供的是档位，不是句子。** 从 `## Samples` 段落跨进 `manus/` 的，是一次运行从中推出的档位；跨进去的若是措辞，那就是复用，不论样例出自谁手。取自作者本人早先论文的样例同样适用这条，因为查重不问源文是谁写的。
+
+**它只约束 `manus/` 正文，别的都不管。** 不管一次运行写进 `notes/`、`tasks/`、`wkdrs/` 的 Markdown——那些是有自己 schema 的记录——也不管 `cycls/<cycle>/response/`，后者的语域由 venue 的 `response_type` 与 `response_limit` 定死。这份文件是可选的：不存在就意味着每个 skill 照今天的样子写，并且没有任何 skill 会在办别的事时顺手创建一份。
+
 ## 9. 编造边界
 
 一篇论文是一条由可核查陈述串成的链，而写作 agent 最廉价的失败方式，就是拿看着像样的材料把链条补全。这套工作流唯一保证的性质是：**`manus/` 里没有任何东西是编出来的。** 数字不是，被引论文说了什么不是，venue 要求什么也不是。五条规则承载这个性质；审计类 skill 的存在就是为了机械地执行它们，而截稿压力——前一晚、缺的那个格子、大家都"记得"的那个数——正是它们校准过的场景。
@@ -384,7 +414,7 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 | 参考文献 | `manus/bibs/reference.bib` |
 | venue 样式 | `manus/stys/`：只有 `arxiv.cls` 与 `stage.sty`，别无他物——`manus/` 会被 `lint.sh` 扫描，只放本工作流自己拥有的文件 |
 | 导入的证据（只读） | `mates/<source-slug>/**`，镜像上游路径；手工登记的投放在 `mates/manual/**`；台账 `mates/MANIFEST.md` |
-| 写作元数据 | `notes/` 下的固定文件：`story.md`、`claims.md`、`outline.md`、`notation.md`、`adopt.md`；阅读笔记在 `notes/refs/` |
+| 写作元数据 | `notes/` 下的固定文件：`story.md`、`claims.md`、`outline.md`、`notation.md`、`style.md`、`adopt.md`；阅读笔记在 `notes/refs/` |
 | 投稿周期 | `cycls/<venue>_<year>/`：`venue.yml`、`template/`（官方 venue 模板包，整份解包，逐字节，永不编辑）、`reviews/`、`response/`、`SUBMISSION_<date>.md`、`poster/`（海报计划与源文件，官方海报模板包放在 `poster/template/`） |
 | 修订草稿、承诺清单 | `tasks/` |
 | 构建与临时报告 | `wkdrs/builds/`、`wkdrs/reports/`（gitignore，可重新生成） |

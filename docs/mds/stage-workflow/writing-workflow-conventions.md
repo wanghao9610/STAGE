@@ -20,6 +20,7 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 | fingerprint | the `mates/MANIFEST.md` entry pinning an evidence file: source, commit, source-stamp, import date | §8 |
 | claim | one ledger row: one sentence the paper asserts, with where it is stated, its evidence, and its status | §8, §9 |
 | ledger | `notes/claims.md`, the hub linking every claim's statements ⇄ evidence ⇄ status | §8 |
+| style profile | `notes/style.md`: the author's prose preferences as dials a run applies and a report measures; binds `manus/` prose only | §8 |
 | cycle | one submission attempt at one venue: `cycls/<venue>_<year>/` and everything in it | §5, §8 |
 | active cycle | the cycle skills act on: `cycle:` in `notes/story.md` frontmatter | §5 |
 | venue profile | `cycls/<cycle>/venue.yml`: the venue's rules, entered only as user-confirmed facts | §8, §9 |
@@ -45,7 +46,7 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 | `stage-tabs-builder` | offered once when the session ends | the tables written, plus their outline and ledger updates |
 | `stage-figs-designer` | offered once when the session ends | `manus/figs/` renders, `manus/figs/srcs/` sources, outline updates |
 | `stage-refs-curator` | offered once when the session ends | `manus/bibs/reference.bib`, `notes/refs/` notes and index |
-| `stage-copy-editor` | offered once after the pass | only the `.tex` files the pass edited — the polish report stays in `wkdrs/` |
+| `stage-copy-editor` | offered once after the pass | only the `.tex` files the pass edited, plus `notes/style.md` when a `style` run wrote it — the polish report stays in `wkdrs/` |
 | `stage-clms-auditor` | offered once after the audit | `notes/claims.md` status flips and the new `tasks/` items — the audit report stays in `wkdrs/` |
 | `stage-cite-auditor` | offered only when the run fixed bib fields | `manus/bibs/reference.bib` — findings stay in the `wkdrs/` report |
 | `stage-peer-reviewer` | offered once per review | the one `SIM_REVIEW_*` file it wrote |
@@ -182,6 +183,7 @@ Every skill's durable output, in one table. `stage-flow-status` reads this as th
 | Claim ledger | `stage-stry-coach` creates; `stage-sect-drafter`, `stage-tabs-builder`, `stage-clms-auditor`, `stage-resp-writer` update | `notes/claims.md` | per-claim `Status` column |
 | Outline | `stage-outl-planner` creates; drafter / figs / tabs skills update their rows | `notes/outline.md` + `manus/secs/*.tex` skeletons | `finalized:`; per-row `Status` |
 | Notation | `stage-outl-planner` creates; `stage-sect-drafter` appends; `stage-copy-editor` enforces | `notes/notation.md` | `updated:` |
+| Style profile | `stage-copy-editor` creates and revises; `stage-sect-drafter` reads | `notes/style.md` | `updated:`, `source:` |
 | Section drafts | `stage-sect-drafter` | `manus/secs/<n>_<slug>.tex` | Sections row status in outline |
 | Tables | `stage-tabs-builder` | `manus/tabs/<slug>.tex` | per-data-row `% src:` comment; Tables row in outline |
 | Figures | `stage-figs-designer` | `manus/figs/<slug>.pdf`, `manus/figs/srcs/<slug>.*` | Figures row in outline |
@@ -200,7 +202,7 @@ Real reviews from a venue are dropped by the user into `cycls/<cycle>/reviews/` 
 
 **Every workflow artifact records the model that wrote it.** Each producer writes `model_id` into the frontmatter of what it creates under `notes/`, `tasks/`, `cycls/`, and `wkdrs/reports/`; a file that has no frontmatter block yet — `notes/refs/refs_index.md` — gains one for it. The value is the model id the runtime reports for the writing session, copied verbatim, and the runtime does report it: STAGE's `stage_model_id.sh` hook states it in the session context, and Claude Code names it in the system prompt besides. Where that line is missing, or carries a recovery command in place of an id, `model_id_spec.md` holds the per-runtime fallback — run it before writing `unrecorded`, which is the value for a session that names no model anywhere. Never infer it from behavior, never reason about which model this is "probably", and never copy one artifact's value into another.
 
-**And `model_trail` records the flow across writers.** `model_id` names one write; most of these files are written across many sessions — a ledger five skills edit for the life of the paper, an outline replanned each cycle, a reference base grown paper by paper — and there a single field describes only the last one. So every artifact carrying `model_id` carries an append-only `model_trail` beside it: one entry per write session, `{ date, model, skill, scope }`, where `scope` names what that session wrote in the file's own vocabulary — claim IDs, section numbers, review points, table rows. Append, never rewrite a past entry, and keep `model_id` mirroring the last entry so a plain grep still works. A write-once artifact — every dated report, simulated review, response, and submission record — has exactly one entry; a regenerated one starts a fresh trail rather than extending the trail of the generation it replaced. The shape is the one in §8.1, and the pair joins the frontmatter of every schema in §8.4–§8.10 without being repeated in each.
+**And `model_trail` records the flow across writers.** `model_id` names one write; most of these files are written across many sessions — a ledger five skills edit for the life of the paper, an outline replanned each cycle, a reference base grown paper by paper — and there a single field describes only the last one. So every artifact carrying `model_id` carries an append-only `model_trail` beside it: one entry per write session, `{ date, model, skill, scope }`, where `scope` names what that session wrote in the file's own vocabulary — claim IDs, section numbers, review points, table rows. Append, never rewrite a past entry, and keep `model_id` mirroring the last entry so a plain grep still works. A write-once artifact — every dated report, simulated review, response, and submission record — has exactly one entry; a regenerated one starts a fresh trail rather than extending the trail of the generation it replaced. The shape is the one in §8.1, and the pair joins the frontmatter of every schema in §8.4–§8.11 without being repeated in each.
 
 **Three places deliberately carry neither.** Nothing under `manus/`: the manuscript is what the venue and arXiv receive, and whether a paper discloses AI assistance is the authors' decision under their venue's policy, not a comment a skill leaves in a `.tex` file. Nothing under `mates/`: evidence is immutable (§9d) and already carries its own provenance — `source-type:`, `source:`, `source-commit:`, `source-stamp:`, `sha256:`, `imported:` — and much of it is written by `import.sh`, a shell script with no model to report. And not `cycls/<cycle>/venue.yml`, whose values are the user's confirmed facts and whose `confirmed:` is their provenance (§9c). Who drafted a section stays traceable without them: the claim rows it moved to `drafted`, the outline row it flipped, the trail of the audit report that read it.
 
@@ -313,6 +315,34 @@ Frontmatter: `cycle:`, `date:`, `frozen:` (tag name), `package:` (path under `wk
 
 The same producer's other durable artifact is `tasks/<cycle>_venue.md`, the venue follow-up list a `convert` run maintains. Frontmatter: `cycle:`, `template:`, `updated:`. Body: one `- [ ]` line per finding, each carrying a stable `V<n>` id and the skill that owns the fix. It is updated, never regenerated — a checked item stays checked and is never re-raised, new findings append with the next free id, and an item that no longer applies is checked with its reason rather than deleted. These are findings, not promises: an open box never blocks a pack, which is what separates this list from `tasks/<cycle>_promises.md`.
 
+### 8.11 `notes/style.md`
+
+The author's prose preferences, written down once so every run that touches a sentence reads the same ones instead of inventing a voice per session. `stage-copy-editor` is its only writer (its `style` mode); `stage-sect-drafter` reads it while drafting and the polish pass reads it while editing. Caption prose written by `stage-tabs-builder` and `stage-figs-designer` acquires the voice at the next polish pass, not at authoring time — neither skill reads the profile, deliberately, so a table or figure run stays as lean as it is today. Frontmatter: `updated:`, and `source:` — `interview` | `sample` | `preset:<name>` — recording how the dials were arrived at. Four sections:
+
+```markdown
+## Dials
+| Dial | Setting | Notes |
+| sentence length | short — median ≤ 22 words | |
+| voice | active, first-person plural | ANON=true keeps self-reference third-person (§3.4) |
+| paragraph opener | claim-first | |
+| hedging | minimal | never below what the evidence requires — see Precedence |
+| enumeration | \parahead runs, not itemize | |
+| tense | present for method, past for experiments | |
+
+## Prefer / Avoid          | Prefer | Avoid | Why |          — constructions, not single words
+## Never                   | Never | Use instead |          — the words and tics this paper does not use
+## Samples                 paragraphs the author wrote or approved, each with its attribution
+                           and one line naming what a run should take from it
+```
+
+Every `Setting` and every `Never` cell is a short English literal, because a polish report measures against them and a measurement greps; the `Notes` and `Why` columns are free text in the run's language (§7.6).
+
+**Precedence, and it is why this file is a schema rather than a paragraph of taste.** §9 outranks it, then `notes/notation.md`, then the venue's format rules, then this profile. Concretely: no dial licenses a number, a citation key, or the removal of a `\todo{}` (§9a); no dial overrides a canon term or an abbreviation's first use (§8.6); and **no dial changes what a sentence asserts.** `hedging: minimal` tightens wording and never strips a qualifier the evidence requires — claim strength lives in the ledger row (§8.1), not in a preference, and a profile that would have to override one of these is a profile that is wrong. The run says so and leaves the sentence alone.
+
+**A sample supplies dials, never sentences.** What crosses from a `## Samples` paragraph into `manus/` is the setting a run derived from it; wording that crosses is reuse, whatever the sample's origin. A sample from the author's own earlier paper carries the same rule, because a similarity check does not ask who wrote the source.
+
+**It binds `manus/` prose and nothing else.** Not the Markdown a run writes under `notes/`, `tasks/`, or `wkdrs/` — those are records with schemas of their own — and not `cycls/<cycle>/response/`, whose register is fixed by the venue's `response_type` and `response_limit`. The file is optional: absent means every skill writes exactly as it does today, and no skill creates one as a side effect of another job.
+
 ## 9. The fabrication boundary
 
 A paper is a chain of checkable statements, and a writing agent's cheapest failure is to complete the chain with plausible material. The one property this workflow guarantees is: **nothing in `manus/` is made up.** Not numbers, not what cited papers say, not what the venue demands. Five rules carry that property; the auditors exist to enforce them mechanically, and deadline pressure — the night before, the missing cell, the number everyone "remembers" — is exactly what they are calibrated for.
@@ -382,7 +412,7 @@ Where a skill puts what it writes. Each destination is exclusive — a file belo
 | Bibliography | `manus/bibs/reference.bib` |
 | Venue styles | `manus/stys/`: `arxiv.cls` and `stage.sty`, and nothing else — `manus/` is scanned by `lint.sh` and holds only files this workflow owns |
 | Imported evidence (read-only) | `mates/<source-slug>/**` mirroring upstream paths; hand-registered drops in `mates/manual/**`; ledger `mates/MANIFEST.md` |
-| Writing metadata | `notes/` fixed files: `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`; reading notes in `notes/refs/` |
+| Writing metadata | `notes/` fixed files: `story.md`, `claims.md`, `outline.md`, `notation.md`, `style.md`, `adopt.md`; reading notes in `notes/refs/` |
 | Submission cycles | `cycls/<venue>_<year>/`: `venue.yml`, `template/` (the official venue kit, unpacked whole, byte-for-byte, never edited), `reviews/`, `response/`, `SUBMISSION_<date>.md`, `poster/` (the poster plan and its source, with an official poster kit under `poster/template/`) |
 | Revision scratch, promise lists | `tasks/` |
 | Builds and ephemeral reports | `wkdrs/builds/`, `wkdrs/reports/` (gitignored, regenerable) |

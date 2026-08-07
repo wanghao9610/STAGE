@@ -30,11 +30,11 @@ description: >-
 
 ## 工作流
 
-1. **装载。** 整份读完规约，然后扫描登记表里的产物（frontmatter 一律连 `model_id:` 与 `model_trail:` 一起读，规约 §8）：`notes/story.md`、`notes/outline.md`、`notes/claims.md`、`notes/notation.md` 的 frontmatter 与状态表；`mates/MANIFEST.md` 条目；`notes/refs/refs_index.md` 的行对着 `manus/bibs/reference.bib` 的 key；当前周期的 `venue.yml`、`reviews/`、`response/` 与 `SUBMISSION_*`；`tasks/<cycle>_promises.md`；`manus/secs|figs|tabs` 与 `wkdrs/builds|reports` 的目录清单；`git tag -l 'freeze/<cycle>_*'`（只读）。给了 SECTION 就解析它（§5）。
+1. **装载。** 整份读完规约，然后扫描登记表里的产物（frontmatter 一律连 `model_id:` 与 `model_trail:` 一起读，规约 §8）：`notes/story.md`、`notes/outline.md`、`notes/claims.md`、`notes/notation.md`、以及存在时的 `notes/style.md` 的 frontmatter 与状态表；`mates/MANIFEST.md` 条目；`notes/refs/refs_index.md` 的行对着 `manus/bibs/reference.bib` 的 key；当前周期的 `venue.yml`、`reviews/`、`response/` 与 `SUBMISSION_*`；`tasks/<cycle>_promises.md`；`manus/secs|figs|tabs` 与 `wkdrs/builds|reports` 的目录清单；`git tag -l 'freeze/<cycle>_*'`（只读）。给了 SECTION 就解析它（§5）。
 2. **周期状态。** 一行：周期名；`confirmed:` 是否已设；评审是否在位（`SIM_*` 与 `received_*` 计数）；回复是否存在；承诺未清/总数；是否已冻结（tag 或 SUBMISSION 文件）。没有 story 文件 → 流程还没开始；说出来，直接跳到第 7 步。
 3. **提纲面板。** Sections、Figures、Tables 按状态计数（planned / skeleton / drafted / polished / frozen；planned / sketch / draft / final），限定了 SECTION 时给出逐行明细。某行对应的文件在磁盘上不存在，或某个文件没有对应行，都是漂移——标出来，绝不修它。
 4. **主张覆盖。** 台账按状态计数：proposed / drafted / verified / unsourced / weakened / dropped。`unsourced > 0` 永远是一条点名 /stage-clms-auditor 的缺口行。
-5. **证据与参考文献。** MANIFEST 条目数与最新的 `imported:`；`import.sh --diff` 的结论（clean / drifted / unknown）；bib key 对着 refs 索引行——被引用却没有阅读笔记的工作是 /stage-refs-curator 的活。
+5. **证据、参考文献与文风。** MANIFEST 条目数与最新的 `imported:`；`import.sh --diff` 的结论（clean / drifted / unknown）；bib key 对着 refs 索引行——被引用却没有阅读笔记的工作是 /stage-refs-curator 的活。然后给文风档案（§8.11）一行：存在就报它的 `source:` 与 `updated:`，不存在就说不存在——不存在是一个仓库的默认状态，不是缺口，也永远不会成为下一步动作。
 6. **构建与 lint。** `wkdrs/builds/` 下最新的 PDF（或 `build: none`）；按原则 3 取 lint 把关信号。
 7. **下一步动作。** 首个命中者胜出：(1) 没有 `notes/adopt.md` → /stage-proj-adopt；(2) story 缺失或未定稿 → /stage-stry-coach；(3) 提纲缺失或未定稿 → /stage-outl-planner；(4) 证据漂移 → /stage-evid-curator；(5) 有未清承诺 → 第一个未勾选框所需改动对应的 skill（/stage-sect-drafter、/stage-tabs-builder、/stage-figs-designer）；(6) 提纲里仍是 planned / skeleton / sketch 的行 → 上述三者中它的归属者，并点名是哪一行；(7) 主张处于 `unsourced`，或 `drafted` 却从未验证 → /stage-clms-auditor；(8) 所有行都已 drafted，但最新的 `CITES_*` / `POLISH_*` 报告日期落后于提纲的 `updated:` → 先 /stage-cite-auditor，再 /stage-copy-editor；(9) 本周期还没有模拟评审 → /stage-peer-reviewer；(10) 全绿 → /stage-subm-packer。给出一行理由和确切命令。当这条命令落在那十个 agent 可以自己启动的 skill 上、且目标已经定死时，它会在这份报告写完之后被直接拾起来跑，而不是留给作者去敲——本 skill 自己不启动任何东西（规约 §11.4）。
 
@@ -45,6 +45,6 @@ description: >-
 
 登记表行（规约 §8）：Status —— 磁盘上没有产物；只读，在聊天里汇报；没有状态字段。
 
-汇报顺序：周期状态 → 提纲面板 → 主张覆盖 → 证据与参考文献 → 构建与 lint → 溯源 → 缺口行（一条都没触发就省掉）→ 唯一的下一步动作，连同它确切的 /stage-* 命令与理由。用紧凑的表格与计数，绝不逐行写散文；字段缺失处写 "unknown"；整条回复控制在约 500 词以内。
+汇报顺序：周期状态 → 提纲面板 → 主张覆盖 → 证据、参考文献与文风 → 构建与 lint → 溯源 → 缺口行（一条都没触发就省掉）→ 唯一的下一步动作，连同它确切的 /stage-* 命令与理由。用紧凑的表格与计数，绝不逐行写散文；字段缺失处写 "unknown"；整条回复控制在约 500 词以内。
 
 **溯源**占一行（规约 §8）：这篇论文的产物各自指名的最后一个写入者，各带计数——`claude-opus-5[1m] ×7，gpt-5 ×2`——后面接上还有多少份登记产物尚无 `model_trail`，不超过三份时逐一点名。它只汇报，不把关：缺流水的文件是在这个字段存在之前写成的，不是一条下一步动作。

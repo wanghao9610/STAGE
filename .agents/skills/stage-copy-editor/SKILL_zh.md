@@ -1,7 +1,7 @@
 ---
 name: stage-copy-editor
 description: >-
-  对一节或整篇手稿做一遍打磨：清晰度、流畅度、对着 notes/notation.md 的术语与缩写一致性，以及朝提纲页数预算裁短篇幅。就地编辑 manus/ 下的散文，但绝不改变技术含义、任何数字、任何引用或参考文献 key、任何 \todo 标记；内容层面的删减与系统性问题只报告与路由，绝不静默施行。写 wkdrs/reports/POLISH_<date>.md（临时）外加 tasks/ 里的后续条目，并证明手稿仍然构建得过。只要用户调用 $stage-copy-editor、一次运行点名它是下一步动作，或要求打磨、收紧、校对论文散文或去掉行话，都应使用本 skill。
+  对一节或整篇手稿做一遍打磨：清晰度、流畅度、对着 notes/notation.md 的术语与缩写一致性，以及朝提纲页数预算裁短篇幅。就地编辑 manus/ 下的散文，但绝不改变技术含义、任何数字、任何引用或参考文献 key、任何 \todo 标记；内容层面的删减与系统性问题只报告与路由，绝不静默施行。写 wkdrs/reports/POLISH_<date>.md（临时）外加 tasks/ 里的后续条目，并证明手稿仍然构建得过。style 那一遍则改为把作者的行文偏好记成可量的档位写进 notes/style.md，一个字的散文都不改。只要用户调用 $stage-copy-editor、一次运行点名它是下一步动作，或要求打磨、收紧、校对论文散文、去掉行话，或要求设定、更改、推导这篇论文的文风，都应使用本 skill。
 ---
 
 # Manuscript Copy Editor —— 不改变任何事实的散文打磨
@@ -10,7 +10,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`$stage-copy-editor [SECTION]`——章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5；有歧义 → 提问）；不带参数则按提纲顺序，打磨提纲里状态为 `drafted` 或更靠后的每一节。
+调用方式：`$stage-copy-editor [SECTION | style]`——章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5；有歧义 → 提问）；不带参数则按提纲顺序，打磨提纲里状态为 `drafted` 或更靠后的每一节。字面量 `style` 改走档案分支：它写 `notes/style.md`，一个字的散文都不碰；`style preset:<name>` 从该预设起手，`style sample=<path>`（可重复）量那些文件，未识别的 token 一律问、绝不猜。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完（不做分节选读）。对本 skill 约束最紧的几节：§5 章节解析、§9 编造边界（数字不是散文）、§1 git、§7 对话。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
@@ -20,6 +20,8 @@ description: >-
 
 你是这个家族的文字编辑：唯一一个整份工作就是"散文读起来如何"的 skill，也是评审人看到句子之前最后一双手。`stage-sect-drafter` 决定一节说什么；你让它说的话清楚、一致、且足够短。你就地编辑散文；你绝不改变技术含义、绝不碰任何数字、绝不去了结一个 `\todo`。内容外科手术——砍掉实质、重排论证、改写主张——作为一条被路由的发现送到 `$stage-sect-drafter`；它绝不在这里以编辑的形式发生。
 
+正因为"散文读起来如何"就是你的题目，`notes/style.md` 归你写（规约 §8.11）：作者的档位，记下来一次，好让这一遍以及此后每一次起草都照着同一套来，而不是每次会话自己发明一种腔调。
+
 ## 核心原则
 
 1. **数字不是散文（规约 §9a）。** 绝不修改、四舍五入、重排格式、删除或移动任何数字——正文里、表格里、caption 里，哪里都不行。绝不编辑数学式、`\cite`/`\ref`/`\label` key、`% src:` 注释，以及 `\todo{}` 标记的内容与位置：一个 `\todo` 是证据机制的一部分，去了结它是证据的活，不是打磨。引用形式属于语法——为了句子通顺把 `\citep` 换成 `\citet` 是允许的；里面的 key 不是散文，保持不动。可疑的数字是交给 `$stage-clms-auditor` 的一条发现，绝不是这里的一次修改。
@@ -28,23 +30,27 @@ description: >-
 4. **预算来自提纲。** 朝 `notes/outline.md` 里每节的 Budget 列裁短。收紧归你；一节如果不丢掉实质就到不了预算，那就变成一条点名"什么必须删掉"的被路由发现——删减归 `$stage-sect-drafter`。
 5. **构建必须挺过这遍打磨。** 每次编辑都要保持是合法的 LaTeX；这一遍以一次 `run.sh` 构建收尾，弄坏构建的编辑在任何汇报之前先回退。
 6. **报模式，不只报个例。** 十处被动句是一个系统性问题，带十个位置。持久的成果是打磨过的正文与 `tasks/` 待办；那份带日期的报告是临时的（规约 §10：`wkdrs/` 永不提交）。
+7. **文风档案是作者的，而它压不过任何东西。** `notes/style.md`（规约 §8.11）定下语态、句长、限定语的分量、罗列的形式，以及这篇论文不用的那些词；你做的每一次编辑都照它来。它的优先级是钉死的，而本 skill 正是它生效的地方：§9 最先，其次是记号规范，再次是 venue 的格式，最后才是这份档案。所以没有任何档位能授权一个数字、一个引用键、或一个 `\todo`（原则 1），没有任何档位能盖过规范（原则 2），并且**没有任何档位能改变一句话断言了什么**（原则 3）——`hedging: minimal` 收紧的是措辞，绝不撤掉证据所要求的限定语。盘上没有档案，就照本 skill 一贯的样子写；绝不在打磨途中发明一份，也绝不因为某句话跳出档案会更好读就把档案放宽。
 
 ## 工作流
 
-1. **装载。** 整份读完规约文件；然后读 `notes/notation.md`、`notes/outline.md`（章节行与预算）、`notes/claims.md`（知道哪些句子承载着主张）。真实日期取自系统时钟（规约 §4）。
-2. **解析范围（规约 §5）。** 有参数 → 一节；没有 → 按提纲顺序，取状态为 `drafted` 或更靠后的每一节。`planned`/`skeleton` 的节没有可打磨的东西——跳过并说明。
+1. **装载。** 整份读完规约文件；然后读 `notes/notation.md`、`notes/outline.md`（章节行与预算）、`notes/claims.md`（知道哪些句子承载着主张），以及存在时的 `notes/style.md`（原则 7）。真实日期取自系统时钟（规约 §4）。
+2. **解析范围（规约 §5）。** 字面量 `style` → 下面的档案分支，本次运行别的都不做。否则：有章节参数 → 一节；没有 → 按提纲顺序，取状态为 `drafted` 或更靠后的每一节。`planned`/`skeleton` 的节没有可打磨的东西——跳过并说明。
+
+   **档案分支（`style`）。** 照 `references/style-profile.md` 走，那里有档位词表、三条入口（访谈、用户指定的样例、命名预设）、以及每个档位的量法。调用时带的入口 token（`preset:<name>`、`sample=<path>`）直接定入口；裸 `style` 才问。把表建好，在提问的那条回复里整份摆出来（规约 §7.12：选项陈述后果，草稿本身引在选项之上），用户确认之后才按规约 §8.11 的 schema 写 `notes/style.md`——这个确认在每个 involve 级别都问（规约 §7.9）：档位是作者的。盘上已有档案的一次运行从现状出发：摆出当前各表，只改用户要求改的行，追加一条 trail 条目——绝不擅自整份重推。然后停：档案那一遍不编辑散文、不跑构建、不写报告，收尾一句是 `$stage-copy-editor <section>`——把这些档位真正用起来的那一次运行。
 3. **先整读。** 编辑之前，把每个在范围内的 `manus/secs/<n>_<slug>.tex` 从头读到尾：记下断流处、违反规范处、超预算迹象，以及任何闻起来像含义问题的东西（路由它；别修它）。
-4. **就地编辑。** 逐句走完这一节，然后是它的表与图的 caption（只碰 `manus/tabs/` 里的 caption 散文——数据单元格与 `% src:` 行不可触碰）。施行原则 1–3；按类别记下每节的编辑计数。
+4. **就地编辑。** 逐句走完这一节，然后是它的表与图的 caption（只碰 `manus/tabs/` 里的 caption 散文——数据单元格与 `% src:` 行不可触碰）。施行原则 1–3 与 7；按类别记下每节的编辑计数。
 5. **裁到预算。** 把每节与它的提纲预算比对——有构建产物时页数估计取自 `wkdrs/builds/` 里最近一次构建，否则用字数当代理量。散文本身能补上的差距就收紧；剩下的记成一条被路由的发现（原则 4）。
 6. **验证构建。** 跑 `execs/run.sh`（shell）。失败时二分本次会话的编辑、回退那个肇事者、重新构建——只有编译得过的手稿才离开本 skill。
 7. **汇报。** 按 Output 写 `wkdrs/reports/POLISH_<date>.md`（先 `mkdir -p`）。为每条系统性或被路由的发现，在 `tasks/polish_followups.md` 的 `## <date>` 标题下追加一条 `- [ ]`——位置、问题、路由；重跑时把新一遍显示已解决的条目勾掉。
 8. **在聊天里给摘要。** ≤300 词：打磨了哪些节、按类别的编辑计数、修掉的规范违反、每节的预算状态、路由出去的发现、报告路径。
-9. **提交（规约 §1）。** 一个会话一次提交——编辑过的 `manus/` 文件与 `tasks/polish_followups.md`——标题点名本 skill。`wkdrs/` 永不提交。
+9. **提交（规约 §1）。** 一个会话一次提交——编辑过的 `manus/` 文件与 `tasks/polish_followups.md`，或者档案那一遍之后单独的 `notes/style.md`——标题点名本 skill。`wkdrs/` 永不提交。
 
 ## 输出
 
 - `manus/secs/*.tex` 里打磨过的散文，以及 `manus/tabs/*.tex` 里的 caption 文字——在每个数字、每个 key、每个 label、每条 `% src:` 注释、每个 `\todo` 上逐字节相同。
-- `wkdrs/reports/POLISH_<date>.md`——登记表行：Audit reports，生产者 `stage-copy-editor`，临时，日期在文件名里。frontmatter `date:`、`scope:`；小节 `## Edits`（每节按类别的计数）、`## Systematic issues`（编号；各自的位置与路由）、`## Canon`（修掉的违反；标出的未知术语）、`## Budget`（每节实际 vs 预算）、`## Tasks filed`。
+- `wkdrs/reports/POLISH_<date>.md`——登记表行：Audit reports，生产者 `stage-copy-editor`，临时，日期在文件名里。frontmatter `date:`、`scope:`；小节 `## Edits`（每节按类别的计数）、`## Systematic issues`（编号；各自的位置与路由）、`## Canon`（修掉的违反；标出的未知术语）、`## Style`（`notes/style.md` 里每个档位一行：打磨后的正文对着它量出来是多少，以及这一遍够不到的每个档位，直说——档位只被量出来、被报告，绝不变成一道闸）、`## Budget`（每节实际 vs 预算）、`## Tasks filed`。没有档案时省去 Style 一节。
 - `tasks/polish_followups.md`——每条本 skill 不得自行修复的发现一个复选框：那份持久的待办。
+- `notes/style.md`，只在 `style` 那一遍写，别的时候都不写——档位表、Prefer / Avoid 与 Never 两份清单、以及样例，按规约 §8.11 的 schema（登记表行：Style profile）。打磨那一遍只读它、绝不写它，而 `style` 那一遍不写任何别的持久产物——`wkdrs/` 下的测量暂存（git 忽略、可再生）除外。
 - 不写台账、不写提纲、不写记号规范、不写 `mates/`、不写 bib——主张、结构与规范的归属留给持有它们的那些 skill。
 - 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

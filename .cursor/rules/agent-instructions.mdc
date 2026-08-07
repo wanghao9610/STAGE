@@ -76,7 +76,7 @@ The test: every changed line traces to the user's request, and every number in i
 - Manuscript under `manus/`: entry `main.tex`; sections `secs/<n>_<slug>.tex`; figures `figs/` with sources in `figs/srcs/`; tables `tabs/`; bibliography `bibs/reference.bib`; template layers `stys/`.
 - The manuscript always compiles as the preprint, and a venue's format is a generated copy: the official kit unpacks whole into `cycls/<cycle>/template/`, never under `manus/`, which `lint.sh` scans (conventions §10.4).
 - Evidence under `mates/` — read-only. `execs/scpts/import.sh` and `/stage-evid-curator` are its only writers, and they only add or replace whole files with fingerprints.
-- Writing metadata under `notes/`: `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`, and reading notes in `notes/refs/`.
+- Writing metadata under `notes/`: `story.md`, `claims.md`, `outline.md`, `notation.md`, `style.md`, `adopt.md`, and reading notes in `notes/refs/`.
 - Submission cycles under `cycls/<venue>_<year>/`. Revision scratch, promise lists, and venue follow-ups in `tasks/`: `<cycle>_promises.md` blocks a camera-ready until every box is kept; `<cycle>_venue.md` blocks nothing.
 - Builds and ephemeral reports under `wkdrs/` — gitignored and regenerable. Durable outcomes go to the ledger and `tasks/`, not to reports.
 - `execs/` root is closed: `run.sh` and `update.sh` only. Utilities (`import.sh`, `lint.sh`, `fmt.sh`) live in `execs/scpts/`.

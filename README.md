@@ -69,7 +69,7 @@ STAGE/
 │   ├── manual/             # Hand-registered evidence drops
 │   └── MANIFEST.md         # The fingerprint ledger: one entry per evidence file
 ├── notes/                  # Writing metadata
-│   ├── story.md            # Also: claims.md, outline.md, notation.md, adopt.md
+│   ├── story.md            # Also: claims.md, outline.md, notation.md, style.md, adopt.md
 │   └── refs/               # Reading notes per paper + refs_index.md
 ├── cycls/                  # Submission cycles
 │   └── <venue>_<year>/     # venue.yml, template/ (the venue kit), reviews/, response/, SUBMISSION_<date>.md
@@ -290,7 +290,7 @@ Five skills (marked † below) are slash-only: they run only when you name them 
 | `stage-tabs-builder` | Generate tables from `mates/` evidence only — booktabs style, one `% src:` fingerprint comment per data row, `\todo` cells for missing data. Hand-typed numbers are the failure mode this skill exists to kill | `manus/tabs/<slug>.tex` |
 | `stage-figs-designer` | Own the figure inventory and each figure end to end: purpose, editable source under `figs/srcs/`, rendered PDF; the teaser figure gets its own checklist | `manus/figs/<slug>.pdf` + sources |
 | `stage-refs-curator` | Bibliography hygiene, reading-note intake for newly read papers, and related-work positioning; seeds from imported STAR refs when present, and `discover` searches by topic and proposes candidates when there are none | `manus/bibs/reference.bib`, `notes/refs/<ABBREV>.md`, `notes/refs/refs_index.md` |
-| `stage-copy-editor` | Polish a section or the whole manuscript: clarity, flow, notation consistency, length trim — never changes technical meaning or any number | edited prose in `manus/`, `wkdrs/reports/POLISH_<date>.md` |
+| `stage-copy-editor` | Polish a section or the whole manuscript: clarity, flow, notation consistency, length trim — never changes technical meaning or any number; `style` mode instead records the author's prose dials | edited prose in `manus/`, `wkdrs/reports/POLISH_<date>.md`, `notes/style.md` |
 | `stage-clms-auditor` | The mechanical heart: extract every number from the manuscript, trace each to a fingerprinted evidence entry, verdict matched / mismatched / unsourced, flip ledger statuses, check evidence staleness | `notes/claims.md` status flips, `wkdrs/reports/CLAIMS_<date>.md`, `tasks/` items |
 | `stage-cite-auditor` | Every `\cite` key resolves; every assertion about a cited work is checkable against a reading note — unverifiable assertions get flagged, never silently fixed | `wkdrs/reports/CITES_<date>.md`, `tasks/` items |
 | `stage-peer-reviewer` | Simulated program committee: a five-perspective panel (novelty & related work, soundness, experimental rigor, clarity, devil's advocate) under a whitelist-or-verified citation contract, scored by anchored rubric bands with hard caps; `quick` runs a single-pass version; never edits the manuscript | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
@@ -317,7 +317,7 @@ The skills chain into one path from evidence to a frozen submission. Steps 5–7
 4. **Skeleton the paper** — `/stage-outl-planner`: section table with page budgets, figure and table plans, claim→section assignment in `notes/outline.md`; skeleton `.tex` files appear under `manus/secs/` and their `\input` lines are uncommented in `main.tex`; `notes/notation.md` is seeded.
 5. **Build the reference base** — `/stage-refs-curator`: reading notes with citable facts in `notes/refs/`, a clean `reference.bib`, related-work positioning.
 6. **Draft** — `/stage-sect-drafter`, one section per run, from the brief, evidence, and claims; `/stage-tabs-builder` generates the tables from evidence; `/stage-figs-designer` takes each figure from source to rendered PDF. Ledger statuses flip to `drafted`.
-7. **Polish** — `/stage-copy-editor`: clarity, flow, and notation consistency, with meaning and numbers untouchable.
+7. **Polish** — `/stage-copy-editor`: clarity, flow, and notation consistency, with meaning and numbers untouchable. `/stage-copy-editor style` records the paper's writing style as measurable dials in `notes/style.md` first, if you want one.
 8. **Audit** — `/stage-clms-auditor` traces every number to a fingerprint; `/stage-cite-auditor` checks every citation and assertion; each failure becomes a `tasks/` item and a ledger status, not a buried report line.
 9. **Review and respond** — `/stage-peer-reviewer` convenes a five-perspective simulated panel (or a `quick` single pass) and writes its meta-review into `cycls/<cycle>/reviews/`; real reviews are dropped there as `received_<id>.md`; `/stage-resp-writer` turns them all into a point ledger, a response within the venue's limit, and promise checkboxes in `tasks/`.
 10. **Pack and freeze** — `/stage-subm-packer`: build and lint must pass, checklist walked, the paper converted into the venue's own template from the registered kit, package under `wkdrs/builds/`, `SUBMISSION_<date>.md` written, tag `freeze/<cycle>_<date>` created. Camera-ready mode refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes. Run `/stage-subm-packer convert kit=<path>` first, and as often as you need — conversion alone skips every freeze gate, so it works while the paper is still being trimmed to the page limit.
@@ -411,7 +411,7 @@ Working on STAGE itself rather than on a paper? `bash .github/scripts/check_cons
 
 1. The manuscript lives under `manus/`: `main.tex` is the entry point, sections are `secs/<n>_<slug>.tex`, figures go in `figs/` with editable sources in `figs/srcs/`, tables in `tabs/`, the bibliography is `bibs/reference.bib`, and the template layers are in `stys/`.
 2. Evidence lives under `mates/` and is read-only — `execs/scpts/import.sh` and `/stage-evid-curator` are its only writers. A wrong number is fixed at its source and re-imported, never edited in place.
-3. Writing metadata lives under `notes/`: the fixed files `story.md`, `claims.md`, `outline.md`, `notation.md`, `adopt.md`, and reading notes in `notes/refs/`.
+3. Writing metadata lives under `notes/`: the fixed files `story.md`, `claims.md`, `outline.md`, `notation.md`, `style.md`, `adopt.md`, and reading notes in `notes/refs/`.
 4. Submission cycles live under `cycls/<venue>_<year>/`, with the venue's official kit unpacked whole into that cycle's `template/`; revision scratch, promise lists, and venue follow-ups go in `tasks/`.
 5. Builds and ephemeral reports live under `wkdrs/` and are never committed; durable outcomes land as status flips in `notes/claims.md` and entries in `tasks/`, not as report files.
 6. Use `execs/run.sh` as the single build entrypoint and keep utilities in `execs/scpts/`; read runtime paths from `.env` rather than hardcoding machine-specific ones.

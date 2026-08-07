@@ -77,7 +77,8 @@ writes, and never present a guess as a state.
 ## Workflow
 
 1. **Load.** Read the conventions in full, then scan the registry artifacts: frontmatter — `model_id:` and `model_trail:` included (§8) — and
-   status tables of `notes/story.md`, `notes/outline.md`, `notes/claims.md`, `notes/notation.md`;
+   status tables of `notes/story.md`, `notes/outline.md`, `notes/claims.md`, `notes/notation.md`,
+   and `notes/style.md` where it exists;
    `mates/MANIFEST.md` entries; `notes/refs/refs_index.md` rows against `manus/bibs/reference.bib`
    keys; the active cycle's `venue.yml`, `reviews/`, `response/`, and `SUBMISSION_*`;
    `tasks/<cycle>_promises.md`; listings of `manus/secs|figs|tabs` and `wkdrs/builds|reports`;
@@ -91,9 +92,11 @@ writes, and never present a guess as a state.
    it, never fix it.
 4. **Claim coverage.** Ledger counts by status: proposed / drafted / verified / unsourced /
    weakened / dropped. `unsourced > 0` is always a gap line naming /stage-clms-auditor.
-5. **Evidence and refs.** MANIFEST entry count and newest `imported:`; `import.sh --diff` verdict
-   (clean / drifted / unknown); bib keys against refs-index rows — a cited work with no reading
-   note is /stage-refs-curator's.
+5. **Evidence, refs, and style.** MANIFEST entry count and newest `imported:`; `import.sh --diff`
+   verdict (clean / drifted / unknown); bib keys against refs-index rows — a cited work with no
+   reading note is /stage-refs-curator's. Then one line for the style profile (§8.11): present
+   with its `source:` and `updated:`, or absent — absent is the default state of a repository, not
+   a gap, and it never becomes the next action.
 6. **Build and lint.** Newest PDF under `wkdrs/builds/` (or `build: none`); the lint gate signal
    per Principle 3.
 7. **Next action.** First match wins: (1) no `notes/adopt.md` → /stage-proj-adopt; (2) story
@@ -118,7 +121,7 @@ writes, and never present a guess as a state.
 Registry row (conventions §8): Status — no artifact on disk; read-only, reports in chat; no state
 field.
 
-Report order: cycle state → outline board → claim coverage → evidence and refs → build and lint →
+Report order: cycle state → outline board → claim coverage → evidence, refs, and style → build and lint →
 provenance → gap lines (omitted when none fire) → the one next action with its exact /stage-* command and
 reason. Compact tables and tallies, never prose per row; "unknown" where a field is missing; the
 whole reply under ~500 words.

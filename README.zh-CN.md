@@ -69,7 +69,7 @@ STAGE/
 │   ├── manual/             # 人工登记的证据文件
 │   └── MANIFEST.md         # 指纹台账：每个证据文件一条记录
 ├── notes/                  # 写作元数据
-│   ├── story.md            # 另有：claims.md、outline.md、notation.md、adopt.md
+│   ├── story.md            # 另有：claims.md、outline.md、notation.md、style.md、adopt.md
 │   └── refs/               # 逐篇阅读笔记 + refs_index.md
 ├── cycls/                  # 投稿周期
 │   └── <venue>_<year>/     # venue.yml、template/（venue 模板包）、reviews/、response/、SUBMISSION_<date>.md
@@ -290,7 +290,7 @@ STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事�
 | `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<slug>.tex` |
 | `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<slug>.pdf` + 源文件 |
 | `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子，没有时用 `discover` 按主题检索并提议候选 | `manus/bibs/reference.bib`、`notes/refs/<ABBREV>.md`、`notes/refs/refs_index.md` |
-| `stage-copy-editor` | 对一个章节或全稿做润色：清晰、流畅、记号一致、按预算删减——绝不改技术含义和任何数字 | `manus/` 下被润色的正文、`wkdrs/reports/POLISH_<date>.md` |
+| `stage-copy-editor` | 对一个章节或全稿做润色：清晰、流畅、记号一致、按预算删减——绝不改技术含义和任何数字；`style` 模式改为把作者的行文档位记下来 | `manus/` 下被润色的正文、`wkdrs/reports/POLISH_<date>.md`、`notes/style.md` |
 | `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转台账状态，检查证据过期 | `notes/claims.md` 的状态翻转、`wkdrs/reports/CLAIMS_<date>.md`、`tasks/` 条目 |
 | `stage-cite-auditor` | 每个 `\cite` key 都能解析；关于被引论文的每个断言都能对上一份阅读笔记——对不上的断言被标记，绝不悄悄改掉 | `wkdrs/reports/CITES_<date>.md`、`tasks/` 条目 |
 | `stage-peer-reviewer` | 模拟程序委员会：五视角评审团（新颖性与相关工作、技术正确性、实验严谨性、清晰度、魔鬼代言人），引用只认 whitelist/verified，按锚定评分带 + 封顶规则打分；`quick` 为单遍精简模式；绝不修改稿件 | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
@@ -317,7 +317,7 @@ STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事�
 4. **搭论文骨架** —— `/stage-outl-planner`：带页数预算的章节表、图表计划、论断→章节分配写进 `notes/outline.md`；骨架 `.tex` 文件出现在 `manus/secs/` 下，`main.tex` 中对应的 `\input` 行被取消注释；`notes/notation.md` 被播种。
 5. **建参考文献基座** —— `/stage-refs-curator`：`notes/refs/` 里带可引用事实的阅读笔记、干净的 `reference.bib`、相关工作定位。
 6. **起草** —— `/stage-sect-drafter` 每次一个章节，依据简报、证据和论断；`/stage-tabs-builder` 从证据生成表格；`/stage-figs-designer` 把每张图从源文件做到渲染 PDF。台账状态翻到 `drafted`。
-7. **润色** —— `/stage-copy-editor`：清晰、流畅、记号一致；含义和数字碰不得。
+7. **润色** —— `/stage-copy-editor`：清晰、流畅、记号一致；含义和数字碰不得。想先定文风的话，`/stage-copy-editor style` 把它记成 `notes/style.md` 里可量的档位。
 8. **审计** —— `/stage-clms-auditor` 把每个数字追溯到指纹；`/stage-cite-auditor` 核查每条引用和断言；每个失败都变成一条 `tasks/` 条目和一个台账状态，而不是埋在报告里的一行。
 9. **评审与回复** —— `/stage-peer-reviewer` 召集五视角模拟评审团（或用 `quick` 单遍模式），把 meta-review 写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点台账、一份不超 venue 限制的回复，以及 `tasks/` 里的承诺复选框。
 10. **打包冻结** —— `/stage-subm-packer`：build 和 lint 必须通过、走查检查单、依已注册的模板包把论文转成 venue 自己的版式、包放到 `wkdrs/builds/` 下、写出 `SUBMISSION_<date>.md`、打出标签 `freeze/<cycle>_<date>`。camera-ready 模式在 `tasks/<cycle>_promises.md` 还有未勾选项时拒绝打包。先跑 `/stage-subm-packer convert kit=<path>`，并按需要跑很多次——单独的转换跳过所有冻结关口，所以在论文还在压页数时照样能用。
@@ -400,7 +400,7 @@ curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update
 
 1. 稿件放在 `manus/`：入口是 `main.tex`，章节是 `secs/<n>_<slug>.tex`，图放 `figs/`（可编辑源在 `figs/srcs/`），表放 `tabs/`，参考文献是 `bibs/reference.bib`，模板层在 `stys/`。
 2. 证据放在 `mates/`，且只读——`execs/scpts/import.sh` 与 `/stage-evid-curator` 是仅有的两个写入者。数字错了，去它的源头改再重新导入，绝不就地编辑证据文件。
-3. 写作元数据放在 `notes/`：固定文件 `story.md`、`claims.md`、`outline.md`、`notation.md`、`adopt.md`，阅读笔记放 `notes/refs/`。
+3. 写作元数据放在 `notes/`：固定文件 `story.md`、`claims.md`、`outline.md`、`notation.md`、`style.md`、`adopt.md`，阅读笔记放 `notes/refs/`。
 4. 投稿周期放在 `cycls/<venue>_<year>/`，venue 官方模板包整包解压进该周期的 `template/`；修订便签、承诺清单与 venue 跟进项放 `tasks/`。
 5. 构建产物与临时报告放在 `wkdrs/`，永不提交；可留存的结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目落盘，而不是报告文件。
 6. 用 `execs/run.sh` 作为唯一构建入口，工具脚本放 `execs/scpts/`；运行环境路径从 `.env` 读取，不要在脚本里硬编码本机路径。

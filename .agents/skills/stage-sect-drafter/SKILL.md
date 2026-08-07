@@ -37,12 +37,13 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 4. **Notation is law.** Use the symbols, terminology canon, and abbreviations of `notes/notation.md`; expand each abbreviation at its first use. A new symbol or abbreviation is appended to `notation.md` in the same run; a collision — same symbol, new meaning — is asked about, never silently forked.
 5. **Registry updates are part of the draft (§8).** Writing states claims, and `notes/claims.md` is where that fact lives (core principle B): a run that does not flip its ledger rows, notation appends, and outline row is unfinished, whatever the prose looks like.
 6. **Evidence is read-only and freshness-checked.** To fix a wrong number, fix it upstream and re-import — never edit `mates/`, never "correct" it in prose. Staleness is exact stamp comparison via `execs/scpts/import.sh --diff`, never mtime (§8).
+7. **Write in the author's voice where one is on file.** `notes/style.md` (§8.11) is the style profile — sentence length, voice, hedging, enumeration form, and the words this paper does not use — and a draft follows it. It outranks nothing: §9 first, then the notation canon (Principle 4), then the venue's format, then the profile. So no dial licenses a number (Principle 1) or a claim the evidence cannot carry (Principle 3), and `hedging: minimal` tightens wording without ever removing a qualifier the evidence requires — a claim's strength is the ledger's, not a preference's. No profile means draft as this skill always has; never invent one, and never write the file — it belongs to `$stage-copy-editor style`.
 
 ## Workflow
 
 ### Step 0: Load
 
-1. Read the conventions file (whole file, own file read call), then `notes/story.md` (pitch, active `cycle:`), `notes/outline.md`, `notes/claims.md`, and `notes/notation.md`.
+1. Read the conventions file (whole file, own file read call), then `notes/story.md` (pitch, active `cycle:`), `notes/outline.md`, `notes/claims.md`, `notes/notation.md`, and `notes/style.md` when it exists (Principle 7).
 2. Missing story or outline means the pipeline is not ready for drafting: stop and route to `$stage-stry-coach` or `$stage-outl-planner` rather than improvising a structure.
 
 ### Step 1: Resolve the section
