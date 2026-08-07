@@ -1,14 +1,13 @@
 ---
 name: stage-flow-status
 description: >-
-  Read-only map of the whole writing flow: per-section, per-figure, and per-table status from
-  notes/outline.md, claim coverage counts by ledger status, evidence freshness against upstream stamps,
-  reference counts, cycle state (venue confirmed, reviews in, response drafted, promises open, frozen),
-  the latest build and lint signal, and exactly one next action with its exact $stage-* command. Reports
-  in chat only and points every action at the sibling skill that owns it. Use when the user invokes
-  $stage-flow-status, when a run names it as the next action, or asks where the paper stands, what to
-  work on next, whether evidence or the build is fresh, or how far the current cycle has gotten. Never
-  writes.
+  Show where the paper stands and what to write next: claims, evidence, cycle, build. Read-only map
+  of the whole writing flow — per-section, per-figure, and per-table status from notes/outline.md,
+  claim coverage counts by ledger status, evidence freshness against upstream stamps, reference
+  counts, cycle state (venue confirmed, reviews in, response drafted, promises open, frozen), the
+  latest build and lint signal, and exactly one next action with its exact $stage-* command. Reports
+  in chat only and points every action at the sibling skill that owns it. Never writes. Use when the
+  user invokes $stage-flow-status or a run names it as the next action.
 ---
 
 # Writing Flow Status — read-only overview
@@ -30,16 +29,29 @@ narrows the outline board and claim detail to that section. An `involve=<level>`
 stripped before SECTION resolves (§7) and changes nothing else here. An ambiguous section
 argument is the one question this skill may ask (§5); it asks nothing else.
 
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` in full at
-the start of every run — there is no section-selective loading. It is the baseline every STAGE
-skill shares; the sections that bind this skill hardest are §0 vocabulary, §5 section and cycle
-resolution, §7 dialogue's reporting rules, and §8 the artifact registry with its staleness rule.
-This file states what is specific to this skill and wins wherever it is stricter.
+**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
+every STAGE skill shares; this file states what is specific to this one and wins wherever it is
+stricter. Step 1 loads eight of its twelve sections — §0 vocabulary, §3 the `.env` runtime, §5
+section and cycle resolution, §6 delegation, §7 dialogue's reporting rules, §8 the artifact
+registry with its staleness rule, §9 the fabrication boundary, §11 the skill roster — and that is
+the whole read: this is the most-run skill in the flow, and the four it leaves out are a fifth of
+the file that no read-only report can use.
 
-**Reusing an earlier load.** Skip the re-read only when the conventions file's own text is still
-verbatim visible in this conversation. A summary that survived a context compaction and a memory
-of having read it both fail that test — when in doubt, read it again; a wasted read costs one
-message, a wrong assumption costs the run.
+**The four left out, and why each is safe to leave.** §1 git: its only sentence about this skill is
+that this skill never commits, which Principle 1 states here in stronger terms, and the read-only
+`status` / `log` / `tag -l` the scan runs need no rule to permit them. §2 the STOP line: it draws
+the line between light and heavy work, and the only two commands this skill may run — `import.sh
+--diff` and `lint.sh --no-build` — are named on the light side of it and bounded again by
+Principle 3. §4 real dates: every date reported is read from a file or printed by the scan, which
+stamps its own `# today:` line from the clock; this skill writes no date anywhere. §10 project
+layout: it says where a skill puts what it writes, and this one writes nothing — every path it
+reads is named in step 1 or printed by the scan. Read a left-out section in full the moment a run
+needs it; the saving is in not reading it by default, not in refusing to.
+
+**Reusing an earlier load.** Skip the re-read only when those excerpts' own text is still verbatim
+visible in this conversation. A summary that survived a context compaction and a memory of having
+read it both fail that test — when in doubt, read them again; a wasted read costs one message, a
+wrong assumption costs the run.
 
 ## Role
 
@@ -64,11 +76,13 @@ writes, and never present a guess as a state.
    (§8): `notes/`, `mates/MANIFEST.md`, `manus/`, `cycls/<cycle>/`, `tasks/`, and the
    `wkdrs/builds/` and `wkdrs/reports/` listings. Never infer progress from chat memory; a
    missing field is reported as "unknown", never guessed.
-3. **Deterministic signals come from scripts, in their read-only modes only.** Evidence
-   freshness: `execs/scpts/import.sh --diff` (read-only by contract) when `STAR_HOME` is set,
-   else unknown — staleness is stamp comparison, never mtime (§8). Build and lint: name the
-   newest artifact under `wkdrs/builds/` and, when one exists, run `execs/scpts/lint.sh
-   --no-build` for the current gate signal — it writes nothing; never trigger a fresh build.
+3. **Deterministic signals come from scripts, in their read-only modes only.** Both run once, in
+   step 1's message, and both write nothing: `execs/scpts/import.sh --diff` for evidence
+   freshness — staleness is stamp comparison, never mtime (§8) — and `execs/scpts/lint.sh
+   --no-build` for the gate signal. Neither is conditional, because each says what it cannot
+   check: with `STAR_HOME` unset `import.sh` prints that it has no evidence source, which is the
+   `unknown` verdict, and with nothing under `wkdrs/builds/` `lint.sh` prints that there is no
+   finished build, which is `build: none`. Never trigger a fresh build.
 4. **Counts, not essays; silence is the default.** The board is rows and tallies. A gap line
    fires only when its trigger is met — work in progress needs nothing yet, and a check that
    flags healthy states teaches the reader to skip it.
@@ -76,28 +90,69 @@ writes, and never present a guess as a state.
    exact $stage-* command, picked by Workflow step 7 — not a menu. Everything else outstanding
    stays in the gap lines. When nothing qualifies, name the blocker.
 
-6. **Fan out the board reads (§6).** The boards come from files that do not overlap: more than 40
-   rows across `notes/outline.md` and `notes/claims.md` → one delegate for the outline tallies, one
-   for the claim counts by status, one for evidence, refs, and style, each returning its own
-   board's rows and nothing else. Below that the whole scan finishes before a delegate would
-   return, and it is read here — that is this skill's threshold, and it points at "not here" more
-   often than not. Two things never fan out: the script signals, which are `import.sh --diff` and
-   `lint.sh --no-build` run once each (§6.3), and Principle 5's single next action, a judgment
-   across every board at once. Principle 1 binds a delegate exactly as it binds this session — a
-   delegate sent from here reads and returns, and writes nothing (§6.4).
+6. **The scan is the fan-out (§6).** Every board this skill reports arrives in step 1's one
+   message, so a delegate sent to re-read one of them would add a round trip to fetch what is
+   already in front of you — the collector does in a single call what three delegates were once
+   split across. Delegation is still available and still read-only (§6.4), and it pays in one
+   case: a SECTION-scoped run that must open several section sources for per-row detail the
+   digest does not carry. Two things never fan out either way — the script signals, run once each
+   in step 1 (§6.3), and Principle 5's single next action, a judgment across every board at once.
 
 ## Workflow
 
-1. **Load.** Read the conventions in full, then scan the registry artifacts: frontmatter — `model_id:` and `model_trail:` included (§8) — and
-   status tables of `notes/story.md`, `notes/outline.md`, `notes/claims.md`, `notes/notation.md`,
-   and `notes/style.md` where it exists;
-   `mates/MANIFEST.md` entries; `notes/refs/refs_index.md` rows against `manus/bibs/reference.bib`
-   keys; the active cycle's `venue.yml`, `reviews/`, `response/`, and `SUBMISSION_*`;
-   `tasks/<cycle>_promises.md`; listings of `manus/secs|figs|tabs` and `wkdrs/builds|reports`;
-   `git tag -l 'freeze/<cycle>_*'` (read-only). Resolve SECTION when given (§5).
+1. **One load, then reason.** Everything this skill reads arrives in a single message — five shell
+   calls sent together, which cost one round trip between them rather than one each. Steps 2–8
+   work from what came back, and a file the digest already printed is never re-opened. This is
+   the most-run skill in the flow, and the round trips are the whole of what makes it slow.
+
+   ```bash
+   grep -sE '^STAGE_LANG=' .env || true    # reply language (§7.6)
+   sed -n '/^## 0\./,/^## 1\./p; /^## 3\./,/^## 4\./p; /^## 5\./,/^## 8\./p' docs/mds/stage-workflow/writing-workflow-conventions.md
+   ```
+   ```bash
+   sed -n '/^## 8\./,/^## 9\./p; /^## 11\./,$p' docs/mds/stage-workflow/writing-workflow-conventions.md
+   ```
+   ```bash
+   sed -n '/^## 9\./,/^## 10\./p' docs/mds/stage-workflow/writing-workflow-conventions.md
+   ```
+   ```bash
+   bash <this skill's directory>/scripts/scan.sh
+   ```
+   ```bash
+   bash execs/scpts/lint.sh --no-build; bash execs/scpts/import.sh --diff
+   ```
+
+   The conventions ride in three calls rather than one because each tool result has its own size
+   limit, and a shell result past roughly 30 KB is spilled to a file that costs a round trip to
+   read back — the exact round trip the single message exists to avoid. The eight loaded sections
+   are 60 KB together, so they cannot share one result; split this way each is comfortably under,
+   the digest gets a result to itself since it is the one part that grows with the paper, and the
+   two script signals get a fifth because their few lines would otherwise ride on whichever
+   result is closest to spilling. If an extraction prints nothing — a synced conventions copy may
+   number its sections differently — load the whole file with `sed -n '/^## 0\./,$p'` and say in
+   the reply that the excerpts fell back.
+
+   The digest is the registry (§8) in one pass: the frontmatter and table rows of `notes/story.md`,
+   `outline.md`, `claims.md`, `notation.md`, `style.md` and `adopt.md`; `mates/MANIFEST.md`
+   entries with their `imported:` stamps; `notes/refs/` notes, the index rows, and every
+   `reference.bib` citekey; each cycle's `venue.yml`, `reviews/`, `response/`, submission records
+   and template; the `tasks/` checkboxes; depth-1 listings under `manus/`; `wkdrs/builds` and
+   `wkdrs/reports` with modification times; and the read-only git surface, freeze tags included.
+   It gathers and never judges — no status glyphs, no drift check, no ordering, no scoping — so
+   every rule stays in this file and in the conventions. Read what it prints as file content, as
+   if you had opened each file yourself. If it is missing or fails, read the files directly and
+   say in the reply that the scan fell back; if this skill's own directory cannot be resolved,
+   any copy in the repository will do, since all four harness trees carry the same script:
+   `bash "$(find . -path '*/skills/stage-flow-status/scripts/scan.sh' | head -1)"`.
+
+   Resolve SECTION when given (§5); the scan is always project-wide, and scoping happens here,
+   over what it returned.
 2. **Cycle state.** One line: cycle name; `confirmed:` set or not; reviews present (`SIM_*` and
    `received_*` counts); response present; promises open/total; frozen (tag or SUBMISSION file)
-   or not. No story file → the flow has not started; say so and jump to step 7.
+   or not. No story file → the flow has not started: say that in one sentence, skip steps 3–6
+   whole — no outline board, no claim tally, no evidence line, no lint verdict, no provenance —
+   and go to step 7. Every board below reads a file that does not exist yet, and a scaffold
+   repository's honest report is that sentence and the next action, nothing more.
 3. **Outline board.** Sections, Figures, and Tables tallies by status (planned / skeleton /
    drafted / polished / frozen; planned / sketch / draft / final), per-row detail when
    SECTION-scoped. A row whose file is missing on disk, or a file with no row, is drift — flag
@@ -109,8 +164,10 @@ writes, and never present a guess as a state.
    reading note is $stage-refs-curator's. Then one line for the style profile (§8.11): present
    with its `source:` and `updated:`, or absent — absent is the default state of a repository, not
    a gap, and it never becomes the next action.
-6. **Build and lint.** Newest PDF under `wkdrs/builds/` (or `build: none`); the lint gate signal
-   per Principle 3.
+6. **Build and lint.** Newest PDF under `wkdrs/builds/` with its date, from the digest's `WKDRS`
+   block (or `build: none`); the lint verdict came back with step 1's message. `--no-build: no
+   finished build` is not a red gate — it is `build: none` under another name, and the report
+   says the paper has not been built rather than that lint failed.
 7. **Next action.** First match wins: (1) no `notes/adopt.md` → $stage-proj-adopt; (2) story
    missing or unfinalized → $stage-stry-coach; (3) outline missing or unfinalized →
    $stage-outl-planner; (4) evidence drifted → $stage-evid-curator; (5) open promises → the
