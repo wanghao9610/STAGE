@@ -1,6 +1,11 @@
 {
   "version": 1,
   "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "./.cursor/hooks/stage_commit_guard.sh"
+      }
+    ],
     "sessionStart": [
       {
         "command": "./.cursor/hooks/stage_model_id.sh"

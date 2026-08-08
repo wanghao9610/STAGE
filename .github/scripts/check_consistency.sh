@@ -669,19 +669,24 @@ done < <(find . -path ./.git -prune -o -path ./wkdrs -prune -o \
          sed 's|^\./||' | sort)
 (( zh_desc_errors == 0 )) && note "every Chinese description is one line; no space inside a word in any Chinese file"
 
-# 17. Session hooks exist, are executable, and are registered.
-#     Both hooks — the project-memory index and the model-id provenance line —
-#     ship one copy per harness, and each harness registers them in its own
-#     file. A script added without its registration entry is the silent failure
-#     this catches: the hook is present, nothing runs it, and no report says so.
-#     For the model-id hook that failure is invisible in a different way — the
-#     run still writes, and every artifact it writes records "unrecorded".
-section "Session hooks"
+# 17. Hooks exist, are executable, and are registered.
+#     Two hooks inject at the start of a session — the project-memory index and
+#     the model-id provenance line — and one decides at every level, the commit
+#     guard; all three ship one copy per harness, and each harness registers them
+#     in its own file. A script added without its registration entry is the
+#     silent failure this catches: the hook is present, nothing runs it, and no
+#     report says so. For the model-id hook that failure is invisible in a
+#     different way — the run still writes, and every artifact it writes records
+#     "unrecorded"; for the guard, a git command §1 forbids simply meets no floor.
+section "Hooks"
 hook_errors=0
 for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
          .cursor/hooks/stage_model_id.sh .kimi-code/hooks/stage_model_id.sh \
          .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
          .cursor/hooks/stage_memory.sh .kimi-code/hooks/stage_memory.sh \
+         .claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh \
+         .cursor/hooks/stage_commit_guard.sh .kimi-code/hooks/stage_commit_guard.sh \
+         .claude/hooks/stage_involve_gate.sh .codex/hooks/stage_involve_gate.sh \
          .kimi-code/hooks/install.sh; do
     [[ -x "${f}" ]] || { fail "${f} is missing or not executable"; hook_errors=1; }
     [[ -f "${f}" ]] && ! bash -n "${f}" 2>/dev/null && { fail "${f} does not parse"; hook_errors=1; }
@@ -692,13 +697,43 @@ for f in .claude/settings.json .codex/hooks.json .cursor/hooks.json .kimi-code/h
         hook_errors=1
         continue
     fi
-    for hook in stage_model_id.sh stage_memory.sh; do
+    for hook in stage_model_id.sh stage_memory.sh stage_commit_guard.sh; do
         grep -qF "${hook}" "${f}" || { fail "${f} does not register ${hook}"; hook_errors=1; }
     done
 done
-for hook in stage_model_id.sh stage_memory.sh; do
+#     The involve gate answers a permission prompt, so it ships and registers
+#     only where a hook can decide one: Cursor has no event that fires before a
+#     file edit, and Kimi's PreToolUse documents a deny and no allow.
+for f in .claude/settings.json .codex/hooks.json; do
+    grep -qF stage_involve_gate.sh "${f}" || \
+        { fail "${f} does not register stage_involve_gate.sh"; hook_errors=1; }
+done
+#     Kimi loads no project-level config, so its registration snippet is only a
+#     snippet: the installer is what actually writes it, and a hook it does not
+#     write reaches no Kimi user however correct the snippet beside it is.
+for hook in stage_model_id.sh stage_memory.sh stage_commit_guard.sh; do
     grep -qF "${hook}" .kimi-code/hooks/install.sh || \
         { fail ".kimi-code/hooks/install.sh does not install ${hook}"; hook_errors=1; }
+done
+#     The guard is the hook that decides rather than reports, and each harness
+#     spells the decision its own way — a copy carrying another harness's spelling
+#     parses, runs, and silently never blocks anything. Claude and Codex answer
+#     PreToolUse with permissionDecision, Kimi the same without the event name its
+#     documented shape omits, and Cursor blocks on permission plus exit 2.
+for f in .claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh; do
+    grep -qF '"hookEventName":"PreToolUse","permissionDecision":"deny"' "${f}" || \
+        { fail "${f} no longer emits a PreToolUse deny decision"; hook_errors=1; }
+done
+grep -qF '"hookSpecificOutput":{"permissionDecision":"deny"' .kimi-code/hooks/stage_commit_guard.sh || \
+    { fail ".kimi-code/hooks/stage_commit_guard.sh no longer emits Kimi's deny shape"; hook_errors=1; }
+{ grep -qF '"permission":"deny"' .cursor/hooks/stage_commit_guard.sh && \
+  grep -qF 'exit 2' .cursor/hooks/stage_commit_guard.sh; } || \
+    { fail ".cursor/hooks/stage_commit_guard.sh lost its deny permission or its exit 2"; hook_errors=1; }
+#     Both gates read the same one-line INVOLVE lookup and answer only at low;
+#     a copy that lost the test would answer every level's prompt.
+for f in .claude/hooks/stage_involve_gate.sh .codex/hooks/stage_involve_gate.sh; do
+    grep -qF '"${involve}" == "low"' "${f}" || \
+        { fail "${f} no longer gates on INVOLVE=low"; hook_errors=1; }
 done
 #     The model-id hooks and the spec that documents their fallbacks name the
 #     same conventions section by prose, because a hook injects a sentence a
@@ -712,7 +747,7 @@ done
 for f in docs/mds/stage-workflow/model_id_spec.md docs/mds/stage-workflow/model_id_spec.zh-CN.md; do
     [[ -f "${f}" ]] || { fail "${f} is missing; the hooks' injected line points at it"; hook_errors=1; }
 done
-(( hook_errors == 0 )) && note "both hooks ship per harness, parse, are registered, and cite §8"
+(( hook_errors == 0 )) && note "session hooks, commit guard, and involve gate ship, parse, are registered, and cite §8"
 
 # 18. The provenance line is stated in the same skills in all four trees.
 #     Conventions §8 makes model_id / model_trail every producer's job; each

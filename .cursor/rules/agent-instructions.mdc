@@ -88,7 +88,7 @@ The test: every changed line traces to the user's request, and every number in i
 - `bash execs/run.sh` is the only build: latexmk, out-of-tree into `wkdrs/builds/`, engine from `.env` `LATEX_ENGINE`. It prints the PDF path and the page count.
 - `bash execs/scpts/lint.sh` is the deterministic gate: undefined references, `\todo` count, page count against the active cycle's `venue.yml`, identity leaks when `ANON=true`. Hard failures exit non-zero.
 - `bash execs/scpts/fmt.sh` holds `manus/` at one sentence per line. LaTeX reads a newline as a space, so writing each sentence on its own line costs the PDF nothing and makes a `% src:` comment and the sentence it heads a fixed two-line pair. Write new prose that way rather than wrapping at a column; `--check` reports drift and `lint.sh` warns on it. It never touches `manus/stys/` or a venue kit under `cycls/*/template/`, and it refuses any rewrite that would change the typeset text.
-- Runtime configuration lives in `.env`, created from `.env.example`: `STAR_HOME` (empty means standalone), `LATEX_ENGINE`, `ANON`, `STAGE_REPOSITORY`, `STAGE_LANG`. Do not hardcode machine-specific paths.
+- Runtime configuration lives in `.env`, created from `.env.example`: `STAR_HOME` (empty means standalone), `LATEX_ENGINE`, `ANON`, `STAGE_REPOSITORY`, `INVOLVE`, `STAGE_LANG`. Do not hardcode machine-specific paths.
 - Real dates only: every date written into an artifact comes from the system clock, never from memory or invention (conventions §4).
 
 ## 10. Project Memory

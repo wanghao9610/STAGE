@@ -87,18 +87,18 @@ STAGE/
 ├── .stage/memory/          # 项目记忆：早先会话学到的东西（local/ 被 git 忽略）
 ├── .claude/
 │   ├── skills/             # Claude Code 使用的写作工作流 skill
-│   ├── hooks/              # 会话钩子：项目记忆索引、本次会话的模型 id
-│   └── settings.json       # 注册这两个钩子
+│   ├── hooks/              # 钩子：项目记忆索引、本次会话的模型 id、参与度放行、提交守卫
+│   └── settings.json       # 注册这四个钩子
 ├── .agents/skills/         # Codex 使用的写作工作流 skill（各带一份 agents/openai.yaml）
-├── .codex/                 # Codex 的会话钩子与 hooks.json（skill 在 .agents/ 下）
+├── .codex/                 # Codex 的钩子与 hooks.json（skill 在 .agents/ 下）
 ├── .cursor/
 │   ├── skills/             # Cursor 使用的写作工作流 skill
 │   ├── rules/              # 常驻规则：AGENTS.md 正文 + skill 目录归属
-│   ├── hooks/              # 两个会话钩子，注册在 hooks.json 里
+│   ├── hooks/              # 钩子，注册在 hooks.json 里
 │   └── hooks.json
 ├── .kimi-code/
 │   ├── skills/             # Kimi Code 使用的写作工作流 skill
-│   ├── hooks/              # 两个会话钩子 + install.sh（Kimi 只认全局注册）
+│   ├── hooks/              # 钩子 + install.sh（Kimi 只认全局注册）
 │   └── hooks.example.toml  # install.sh 替你写进配置的那段注册片段
 ├── .cursorignore           # 把构建产物与 LaTeX 垃圾挡在 Cursor 索引之外
 ├── .env.example            # 本地配置示例
@@ -208,11 +208,15 @@ LATEX_ENGINE=pdflatex
 ANON=false
 # execs/update.sh 使用的上游 STAGE 仓库
 STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
+# 可选。skill 决定之前问多少：low | medium | high
+INVOLVE=medium
 # 可选。回复与文档语言：en | zh；留空 = 跟随对话
 STAGE_LANG=
 ```
 
 `STAR_HOME` 决定你走哪条快速开始路径。本地 `.env` 已被 Git 忽略。
+
+`INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code 与 Codex 里，文件编辑前的权限提示也会被跳过。`medium`（默认）按文档所写发问，`high` 逐条确认。硬门槛任何档位都要问：红线、删除与覆盖、以及每一个以"已确认"身份进入 `venue.yml` 的取值。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 3_method involve=low`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)。
 
 `STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)。
 
@@ -259,7 +263,9 @@ bash execs/scpts/fmt.sh    # 一句一行；--check 只报告偏离，不写入
 
 `/stage-flow-status` 是最值得记住的一个：它读取盘上的提纲、台账、manifest 和周期状态，给出唯一的下一步行动及其准确命令，你永远不必回忆上次写到哪里。
 
-**两个钩子，每台机器装一次。** 一个会话钩子会在每次会话开头，把[项目记忆](#项目记忆)索引摆到 agent 面前；另一个报出运行时给出的模型 id，好让 skill 写出的每份产物都记下是谁写的——`model_id` 加一条追加的 `model_trail` 条目（工作流规约 §8；各运行时的兜底见 `docs/mds/stage-workflow/model_id_spec.md`）。Claude、Codex、Cursor 出厂就把两个都分别在 `.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json` 里注册好了。Kimi 没有项目级钩子配置，所以跑一次 `bash .kimi-code/hooks/install.sh`——它把两个钩子都写进你的全局 Kimi 配置，写之前先备份，重复跑不会有第二次改动，此后这台机器上的每篇 STAGE 论文都覆盖到。在 Codex 上，注册好还不等于在跑：项目钩子要先信任该项目、再批准该钩子才会触发，所以在 Codex CLI 里跑 `/hooks` 批准它，钩子变更后再批准一次。在此之前不会有任何记忆到达会话，每份产物都只能记成 `unrecorded`，也没有任何地方会提示这个缺口。在某个钩子出现之前就接入的论文仓库，保留的是它自己的注册文件——`execs/update.sh` 从不覆盖，只会点名其中缺了哪个钩子。
+**两个会话钩子，每台机器装一次。** 一个会在每次会话开头，把[项目记忆](#项目记忆)索引摆到 agent 面前；另一个报出运行时给出的模型 id，好让 skill 写出的每份产物都记下是谁写的——`model_id` 加一条追加的 `model_trail` 条目（工作流规约 §8；各运行时的兜底见 `docs/mds/stage-workflow/model_id_spec.md`）。Claude、Codex、Cursor 出厂就把两个都分别在 `.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json` 里注册好了。Kimi 没有项目级钩子配置，所以跑一次 `bash .kimi-code/hooks/install.sh`——它把这两个钩子连同下面那个提交守卫一起写进你的全局 Kimi 配置，写之前先备份，重复跑不会有第二次改动，此后这台机器上的每篇 STAGE 论文都覆盖到。在 Codex 上，注册好还不等于在跑：项目钩子要先信任该项目、再批准该钩子才会触发，所以在 Codex CLI 里跑 `/hooks` 批准它，钩子变更后再批准一次。在此之前不会有任何记忆到达会话，每份产物都只能记成 `unrecorded`，也没有任何地方会提示这个缺口。在某个钩子出现之前就接入的论文仓库，保留的是它自己的注册文件——`execs/update.sh` 从不覆盖，只会点名其中缺了哪个钩子。
+
+**另外两个钩子，做的是决定而不是注入。** Claude 与 Codex 带一个参与度放行钩子：只要 `.env` 写着 `INVOLVE=low`，它就替文件编辑前的权限提示作答；其他任何档位它什么都不做。Cursor 与 Kimi Code 不带它——Cursor 根本没有在文件编辑前触发的钩子事件，Kimi 自己的 `PreToolUse` 只写了 deny、没有 allow。四套树都带 `stage_commit_guard.sh`，而这一个在任何档位都跑：它拒掉[规约](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md) §1 明令禁止的 git 命令——一把梭或强制暂存、历史改写、删除或移动冻结 tag，以及暂存文件超过 10 MB 的提交。Claude、Codex 与 Kimi Code 把它挂在匹配 `Bash` 的 `PreToolUse` 上，Cursor 挂在 `beforeShellExecution` 上——那里才是它决定一条 shell 命令的地方。它是 `INVOLVE=low` 自行回答提交征询之下的那层地板：它拒掉的命令，归你自己去跑。
 
 ## 写作工作流
 
@@ -368,7 +374,7 @@ bash execs/update.sh
 
 - `AGENTS.md` 与 `.cursor/rules/`——共享的 agent 指令，以及抄录其正文的 Cursor 规则；你对它们的改动会被替换，且两者成对移动——一份就是另一份的正文，不能各走各的
 - `.agents/skills/`、`.claude/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——同样的十六个 skill，每套 harness 一份
-- `.claude/hooks/`、`.codex/hooks/`、`.cursor/hooks/`、`.kimi-code/hooks/` 与 `.kimi-code/hooks.example.toml`——两个会话钩子：项目记忆索引与本次会话的模型 id，每套 harness 各一份；`.stage/memory/` 下的记忆库属于论文自己，从不同步
+- `.claude/hooks/`、`.codex/hooks/`、`.cursor/hooks/`、`.kimi-code/hooks/` 与 `.kimi-code/hooks.example.toml`——两个会话钩子（项目记忆索引与本次会话的模型 id）、提交守卫，以及 harness 支持时的参与度放行钩子，每套 harness 各一份；`.stage/memory/` 下的记忆库属于论文自己，从不同步
 - `docs/mds/stage-workflow/`——工作流规约、skill 指南、记忆规范与模型 id 规范，中英两版
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
 - `execs/scpts/import.sh`、`execs/scpts/lint.sh`、`execs/scpts/fmt.sh`——三个工具脚本，理由同上：十六个 skill 调用 `import.sh --diff`，五个调用 `lint.sh --no-build`，而读退出码的调用方，认的是它自己那一版写明的那套码。比某个工具脚本更老的 ref 会打印一行跳过它
@@ -414,7 +420,7 @@ curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update
 基于 STAGE 开始写一篇新论文时，建议完成以下调整：
 
 - 把 `manus/main.tex` 里的标题、作者、机构换成真实信息。双盲周期内保持匿名占位——`.env` 里 `ANON=true` 会让 `lint.sh` 在 `manus/` 下搜身份泄漏，注释也算。
-- 复制 `.env.example` 为 `.env`，设好 `STAR_HOME`（不与 STAR 配对就留空）、`LATEX_ENGINE`、`ANON` 与可选的 `STAGE_LANG`。
+- 复制 `.env.example` 为 `.env`，设好 `STAR_HOME`（不与 STAR 配对就留空）、`LATEX_ENGINE`、`ANON` 与可选的 `INVOLVE`、`STAGE_LANG`。
 - 用 `/stage-stry-coach` 建立第一个投稿周期和它的 `venue.yml`；页数上限、截止日期与检查单只以你确认的事实录入，绝不臆造。
 - venue 官方模板包整包解压到 `cycls/<cycle>/template/`，不要放进 `manus/`——那是 `lint.sh` 扫描的命名空间，模板包自带的示例 `.tex` 会污染 `\todo` 计数和身份扫描。
 - 更新 `LICENSE` 中的年份和版权所有者。

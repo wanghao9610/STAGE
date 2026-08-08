@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # execs/update.sh — sync STAGE-managed content from the upstream template (the
-# four per-harness skill trees, the four session-hook trees, docs/mds/stage-workflow/,
+# four per-harness skill trees, the four hook trees, docs/mds/stage-workflow/,
 # the shared agent instructions, and every script under execs/ — both entrypoints,
 # this one included, and the three utilities in execs/scpts/), or install the
 # STAGE skeleton into an existing paper repo with --adopt.
@@ -28,12 +28,16 @@ SKILL_ROOTS=(
 )
 DOCS_TREE="docs/mds/stage-workflow"
 
-# STAGE-owned session-hook assets: the script that injects the project-memory
-# index (.stage/memory/) at the start of a session, and the one that injects the
-# runtime's model id so an artifact records who wrote it (conventions §8) — one
-# copy of each per harness, because every runtime spells the event and the
-# output field differently. Overwritten on update like the skills — the memory
-# store itself is the paper's and is never synced.
+# STAGE-owned hook assets. Two inject at the start of a session: the script that
+# puts the project-memory index (.stage/memory/) in front of the agent, and the
+# one that states the runtime's model id so an artifact records who wrote it
+# (conventions §8). Two decide instead: the commit guard that declines the git
+# commands conventions §1 forbids, in every tree, and the involve gate that
+# answers a file-edit permission prompt at INVOLVE=low (§7.7), in the two trees
+# whose harness lets a hook decide one. One copy of each per harness, because
+# every runtime spells the event and the output field differently. Overwritten
+# on update like the skills — the memory store itself is the paper's and is
+# never synced.
 HOOK_TREES=(
     ".claude/hooks"
     ".codex/hooks"
@@ -98,11 +102,11 @@ AGENT_RULES_TREE=".cursor/rules"
 # variable under `set -u` on bash 3.2, so a tree joins this only with the
 # guarded expansion that needs.
 #
-# The last three register the session hooks. They are kept rather than
-# overwritten because a paper repo may have added its own settings to them — so
-# a repo adopted before a hook existed keeps a config that does not
-# register it, which HOOK_CONFIGS below turns into a printed line instead of a
-# hook that silently never fires.
+# The last three register the hooks. They are kept rather than overwritten
+# because a paper repo may have added its own settings to them — so a repo
+# adopted before a hook existed keeps a config that does not register it, which
+# HOOK_CONFIGS below turns into a printed line instead of a hook that silently
+# never fires.
 HARNESS_FILES=(
     ".cursorignore"
     ".claude/settings.json"
@@ -137,20 +141,32 @@ harness_rels() {
 }
 
 # A kept registration config that does not name one of the hooks: the script is
-# installed, nothing errors, and either no memory reaches a session or every
-# artifact it writes records "unrecorded". Reported, not repaired — merging into
-# a file the project may have extended is the user's.
+# installed, nothing errors, and either no memory reaches a session, or every
+# artifact it writes records "unrecorded", or a git command §1 forbids meets no
+# floor. Reported, not repaired — merging into a file the project may have
+# extended is the user's.
 report_unregistered_hooks() {
-    local cfg missing hook label
+    local cfg missing hook label hooks
     for cfg in "${HOOK_CONFIGS[@]}"; do
         [[ -e "${ROOT_DIR}/${cfg}" ]] || continue
         missing=""
-        for hook in "stage_memory.sh|project-memory" "stage_model_id.sh|model-id provenance"; do
+        # The commit guard declines a shell command before it runs, which every
+        # harness can express — Claude and Codex on PreToolUse, Cursor on
+        # beforeShellExecution — so every config carries it. The involve gate
+        # answers a permission prompt, so it applies only where a hook can
+        # decide one: Cursor has no event that gates a file edit.
+        hooks=("stage_memory.sh|project-memory" "stage_model_id.sh|model-id provenance"
+               "stage_commit_guard.sh|commit guard")
+        case "${cfg}" in
+            .claude/settings.json|.codex/hooks.json)
+                hooks+=("stage_involve_gate.sh|involve gate") ;;
+        esac
+        for hook in "${hooks[@]}"; do
             label="${hook#*|}"
             grep -q "${hook%%|*}" "${ROOT_DIR}/${cfg}" 2>/dev/null || missing+="${missing:+, }${label}"
         done
         if [[ -n "${missing}" ]]; then
-            log "NOTE: ${cfg} was kept and registers no STAGE session hook for: ${missing}."
+            log "NOTE: ${cfg} was kept and registers no STAGE hook for: ${missing}."
             log "      Merge the hook entries from upstream ${cfg} to enable them."
         elif [[ "${cfg}" == ".codex/hooks.json" ]]; then
             # Registering them is not enough on Codex: a project hook runs only
@@ -197,7 +213,7 @@ Harness configuration an instance may have edited — .cursorignore and the thre
 hook registrations (.claude/settings.json, .codex/hooks.json, .cursor/hooks.json)
 — is installed when it is absent and otherwise kept, however far it has drifted
 from upstream; only --force overwrites it. A kept registration that does not name
-a session hook is reported, since a hook nobody registers never fires.
+a hook is reported, since a hook nobody registers never fires.
 
 --diff previews an update without changing anything: it lists upstream files
 that are new or differ from the local copies, harness configuration that
@@ -661,4 +677,4 @@ fi
 report_unregistered_hooks
 
 log "Next: copy .env.example to .env, then run /stage-proj-adopt to wire the paper up."
-log "      Kimi Code only: 'bash .kimi-code/hooks/install.sh' registers both session hooks once per machine."
+log "      Kimi Code only: 'bash .kimi-code/hooks/install.sh' registers all three Kimi hooks once per machine."

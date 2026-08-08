@@ -87,18 +87,18 @@ STAGE/
 ├── .stage/memory/          # Project memory: what earlier sessions learned (local/ is git-ignored)
 ├── .claude/
 │   ├── skills/             # Writing workflow skills for Claude Code
-│   ├── hooks/              # Session hooks: project-memory index, session model id
-│   └── settings.json       # Registers both hooks
+│   ├── hooks/              # Hooks: project-memory index, session model id, involve gate, commit guard
+│   └── settings.json       # Registers all four hooks
 ├── .agents/skills/         # Writing workflow skills for Codex (+ agents/openai.yaml each)
-├── .codex/                 # Codex session hooks + hooks.json (skills live in .agents/)
+├── .codex/                 # Codex hooks + hooks.json (skills live in .agents/)
 ├── .cursor/
 │   ├── skills/             # Writing workflow skills for Cursor
 │   ├── rules/              # Always-on rules: AGENTS.md body + skill-root ownership
-│   ├── hooks/              # Session hooks, registered in hooks.json
+│   ├── hooks/              # Hooks, registered in hooks.json
 │   └── hooks.json
 ├── .kimi-code/
 │   ├── skills/             # Writing workflow skills for Kimi Code
-│   ├── hooks/              # Session hooks + install.sh (Kimi registers globally)
+│   ├── hooks/              # Hooks + install.sh (Kimi registers globally)
 │   └── hooks.example.toml  # The registration snippet install.sh writes for you
 ├── .cursorignore           # Keeps builds and LaTeX junk out of Cursor's index
 ├── .env.example            # Local configuration example
@@ -208,11 +208,15 @@ LATEX_ENGINE=pdflatex
 ANON=false
 # Upstream STAGE repo used by execs/update.sh
 STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
+# Optional. How much the skills ask before deciding: low | medium | high
+INVOLVE=medium
 # Optional. Reply and document language: en | zh; empty = follow the conversation
 STAGE_LANG=
 ```
 
 `STAR_HOME` decides which quick-start path you are on. The local `.env` is ignored by Git.
+
+`INVOLVE` (optional, `low` | `medium` | `high`) sets how much the skills ask before they decide. At `low` a skill takes the recommended option on judgment calls and logs that it did, commits what its run wrote without asking and names each commit in its reply, and — in Claude Code and Codex — the permission prompt before each file edit is skipped; `medium` (the default) asks as documented; `high` confirms item by item. Hard gates are asked at every level: the STOP line, deletions and overwrites, and every `venue.yml` value entering as confirmed. To change the level for one run, add the same token when you call a skill: `/stage-sect-drafter 3_method involve=low`. Full rule: [conventions §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 `STAGE_LANG` (optional, `en` | `zh`) sets the language of chat replies and of the Markdown the workflow writes — `notes/`, `tasks/`, simulated reviews, `wkdrs/` reports. Left empty, everything follows the conversation's own language. Two things stay English whatever it says, because people outside the repository read them: the manuscript under `manus/`, and the response to reviewers. So do structural literals in any document — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names — which is what keeps a Chinese note machine-readable. Full rule: [conventions §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
@@ -259,7 +263,9 @@ The skeleton stands on its own — the layout, `.env`, `run.sh`, and `import.sh`
 
 `/stage-flow-status` is the one to remember: it reads the outline, ledger, manifest, and cycle state on disk and names the single next action with its exact command, so you never have to recall where you left off.
 
-**Two hooks, once per machine.** One session hook puts the [project memory](#project-memory) index in front of the agent at the start of every session; the other states the model id the runtime reports, so every artifact a skill writes records who wrote it — `model_id` and an appended `model_trail` entry (workflow conventions §8; the per-runtime fallbacks are in `docs/mds/stage-workflow/model_id_spec.md`). Claude, Codex, and Cursor ship both already registered in `.claude/settings.json`, `.codex/hooks.json`, and `.cursor/hooks.json`. Kimi has no project-level hook config, so run `bash .kimi-code/hooks/install.sh` once — it registers them in your global Kimi config, backs that file up first, does nothing on a second run, and then covers every STAGE paper on the machine. On Codex, registered is not yet running: a project hook fires only once the project is trusted and the hook approved, so run `/hooks` in the Codex CLI to approve it, and again whenever it changes. Until you do, no memory reaches the session, every artifact records `unrecorded`, and nothing points out the gap. A paper adopted before a hook existed keeps its own registration file — `execs/update.sh` never overwrites one, and names the hook missing from it instead.
+**Two session hooks, once per machine.** One puts the [project memory](#project-memory) index in front of the agent at the start of every session; the other states the model id the runtime reports, so every artifact a skill writes records who wrote it — `model_id` and an appended `model_trail` entry (workflow conventions §8; the per-runtime fallbacks are in `docs/mds/stage-workflow/model_id_spec.md`). Claude, Codex, and Cursor ship both already registered in `.claude/settings.json`, `.codex/hooks.json`, and `.cursor/hooks.json`. Kimi has no project-level hook config, so run `bash .kimi-code/hooks/install.sh` once — it registers these two and the commit guard below in your global Kimi config, backs that file up first, does nothing on a second run, and then covers every STAGE paper on the machine. On Codex, registered is not yet running: a project hook fires only once the project is trusted and the hook approved, so run `/hooks` in the Codex CLI to approve it, and again whenever it changes. Until you do, no memory reaches the session, every artifact records `unrecorded`, and nothing points out the gap. A paper adopted before a hook existed keeps its own registration file — `execs/update.sh` never overwrites one, and names the hook missing from it instead.
+
+**Two more hooks that decide rather than inject.** Claude and Codex carry an involve gate: while `.env` reads `INVOLVE=low` it answers the permission prompt before a file edit, and at every other level it does nothing. Cursor and Kimi Code do not carry it — Cursor has no hook that fires before a file edit, and Kimi's own `PreToolUse` documents a deny and no allow. All four carry `stage_commit_guard.sh`, and that one runs at every level: it declines the git commands the [conventions](docs/mds/stage-workflow/writing-workflow-conventions.md) §1 forbid — blanket or forced staging, the history rewrites, deleting or moving a freeze tag, and a commit whose staged files exceed 10 MB. Claude, Codex and Kimi Code run it on `PreToolUse` matching `Bash`; Cursor on `beforeShellExecution`, which is where a shell command is decided there. It is the floor under `INVOLVE=low` answering the commit offer itself: what it declines is yours to run.
 
 ## Writing workflow
 
@@ -379,7 +385,7 @@ By default, the command updates these paths from STAGE's `main` branch:
 
 - `AGENTS.md` and `.cursor/rules/` — the shared agent instructions and the Cursor rule that copies their body; your own edits to them are replaced, and the two move as a pair, since one is the other's body and they must not drift
 - `.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — the same sixteen skills once per harness
-- `.claude/hooks/`, `.codex/hooks/`, `.cursor/hooks/`, `.kimi-code/hooks/` and `.kimi-code/hooks.example.toml` — the two session hooks — the project-memory index and the session's model id — once per harness; the store under `.stage/memory/` is the paper's own and is never synced
+- `.claude/hooks/`, `.codex/hooks/`, `.cursor/hooks/`, `.kimi-code/hooks/` and `.kimi-code/hooks.example.toml` — the two session hooks (the project-memory index and the session's model id), the commit guard, and the involve gate where the harness supports one, once per harness; the store under `.stage/memory/` is the paper's own and is never synced
 - `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, the memory spec, and the model-id spec, in both editions
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
 - `execs/scpts/import.sh`, `execs/scpts/lint.sh`, `execs/scpts/fmt.sh` — the utilities, for the same reason: sixteen skills call `import.sh --diff` and five call `lint.sh --no-build`, and a caller reading an exit code means the one its own version documents. A ref older than a utility simply skips it with a printed line
@@ -425,7 +431,7 @@ The full collaboration and writing conventions are in [`AGENTS.md`](AGENTS.md) a
 When you start a paper from STAGE, these are the adjustments worth making:
 
 - Replace the title, authors, and affiliations in `manus/main.tex` with the real ones. Keep the anonymous placeholders during a double-blind cycle — `ANON=true` in `.env` makes `lint.sh` hunt identity leaks anywhere under `manus/`, comments included.
-- Copy `.env.example` to `.env` and set `STAR_HOME` (empty when you are not pairing with a STAR repository), `LATEX_ENGINE`, `ANON`, and the optional `STAGE_LANG`.
+- Copy `.env.example` to `.env` and set `STAR_HOME` (empty when you are not pairing with a STAR repository), `LATEX_ENGINE`, `ANON`, and the optional `INVOLVE` and `STAGE_LANG`.
 - Create the first submission cycle and its `venue.yml` with `/stage-stry-coach`. Page limits, deadlines, and checklist requirements are entered only as facts you confirmed — never invented.
 - Unpack the venue's official kit whole into `cycls/<cycle>/template/`, not into `manus/`: that tree is the namespace `lint.sh` scans, and a kit's example `.tex` would trip its `\todo` count and its identity scan.
 - Update the year and copyright holder in `LICENSE`.

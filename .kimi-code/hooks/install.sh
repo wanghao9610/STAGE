@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # Register STAGE's Kimi hooks in Kimi's GLOBAL config, idempotently.
 #
-# Two hooks: model_id provenance, and the project-memory index injected from
-# .stage/memory/.
+# Three hooks: model_id provenance, the project-memory index injected from
+# .stage/memory/, and the commit guard that declines the git commands the writing
+# workflow conventions §1 forbid. The first two inject context on
+# UserPromptSubmit; the guard decides instead, so it registers on PreToolUse
+# matching Bash.
 #
 # Kimi has no project-level hook config, so the [[hooks]] entries must live in
 # the global config at $KIMI_CODE_HOME/config.toml (default ~/.kimi-code/config.toml).
@@ -11,14 +14,16 @@
 # paper repository with no per-project editing.
 #
 # Safe to re-run: each hook is registered only when it is not there already, so a
-# machine set up before the memory hook existed gains just that one. It backs the
-# config up before its first modification, and appends new [[hooks]] table arrays
-# (valid TOML) rather than rewriting anything.
+# machine set up before the commit guard existed gains just that one. It backs
+# the config up before its first modification, and appends new [[hooks]] table
+# arrays (valid TOML) rather than rewriting anything.
 set -euo pipefail
 
 cfg="${KIMI_CODE_HOME:-$HOME/.kimi-code}/config.toml"
-hooks=("stage_model_id.sh|STAGE model_id provenance hook"
-       "stage_memory.sh|STAGE project-memory hook")
+# script | label | event | matcher (empty matcher = every occurrence)
+hooks=("stage_model_id.sh|STAGE model_id provenance hook|UserPromptSubmit|"
+       "stage_memory.sh|STAGE project-memory hook|UserPromptSubmit|"
+       "stage_commit_guard.sh|STAGE commit guard|PreToolUse|Bash")
 
 # Make sure this repo's hook scripts are executable.
 here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
@@ -33,8 +38,7 @@ mkdir -p "$(dirname "$cfg")"
 backed_up=false
 added=0
 for row in "${hooks[@]}"; do
-  script="${row%%|*}"
-  label="${row#*|}"
+  IFS='|' read -r script label event matcher <<< "$row"
 
   if grep -qF "${script}" "$cfg" 2>/dev/null; then
     echo "${label} already registered in $cfg — skipped."
@@ -49,7 +53,8 @@ for row in "${hooks[@]}"; do
   {
     printf '\n# --- %s (added by .kimi-code/hooks/install.sh) ---\n' "${label}"
     printf '[[hooks]]\n'
-    printf 'event = "UserPromptSubmit"\n'
+    printf 'event = "%s"\n' "${event}"
+    if [ -n "${matcher}" ]; then printf 'matcher = "%s"\n' "${matcher}"; fi
     printf 'command = ".kimi-code/hooks/%s"\n' "${script}"
     printf 'timeout = 10\n'
   } >> "$cfg"
@@ -59,7 +64,7 @@ for row in "${hooks[@]}"; do
 done
 
 if (( added == 0 )); then
-  echo "Nothing to do — both STAGE hooks were already registered."
+  echo "Nothing to do — all three STAGE hooks were already registered."
   exit 0
 fi
 
