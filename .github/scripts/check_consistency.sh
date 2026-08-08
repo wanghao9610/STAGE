@@ -4,9 +4,10 @@
 # Guards the invariants the four per-harness skill trees (.agents / .claude /
 # .cursor / .kimi-code), the shared agent instructions, and the workflow docs
 # are supposed to keep while being maintained by hand. The trees hold the same
-# fifteen skills and differ only in invocation prefix and tool names, so every
-# drift between them is a bug rather than a variant — and nothing but this
-# script looks for it.
+# sixteen skills and share their workflow shape. Explicit harness-local
+# capabilities are exceptions only when a dedicated check below pins both the
+# enhanced harness and the absence of that contract elsewhere; unguarded drift
+# remains a bug, and nothing but this script looks for it.
 #
 # Run from anywhere inside the repo:  bash .github/scripts/check_consistency.sh
 # Exits non-zero if any check fails. Upstream-maintainer tooling only — this
@@ -744,6 +745,66 @@ for root in "${SKILL_ROOTS[@]:1}"; do
     fi
 done
 (( prov_errors == 0 )) && note "$(printf '%s\n' "${PROV_BASELINE}" | wc -l | tr -d ' ') skills state the provenance line, the same set in all four trees"
+
+# 19. Codex alone has the image_gen -> editable PPTX -> rendered PDF figure
+#     pipeline. This is a deliberate harness-local capability, not a partial
+#     port: the English and Chinese Codex manifests must carry the complete
+#     source/evidence/render/QA contract, the Codex UI prompt must advertise it,
+#     and the other three harnesses must not acquire fragments of it by a broad
+#     sync. Literal markers are used because each one protects a distinct link
+#     in the chain a future edit could otherwise drop silently.
+section "Codex figure PPTX pipeline"
+codex_fig_errors=0
+CODEX_FIG_EN=".agents/skills/stage-figs-designer/SKILL.md"
+CODEX_FIG_ZH=".agents/skills/stage-figs-designer/SKILL_zh.md"
+CODEX_FIG_UI=".agents/skills/stage-figs-designer/agents/openai.yaml"
+CODEX_FIG_MARKERS=(
+    'image_gen'
+    'manus/figs/srcs/<slug>.pptx'
+    'manus/figs/srcs/<slug>.sources.md'
+    'manus/figs/srcs/<slug>.render.yml'
+    'role: illustrative-only'
+    '@oai/artifact-tool'
+    'soffice'
+    'source_sha256'
+    'output_sha256'
+    'slides_test.py'
+    'render_slides.py'
+    'view_image'
+    'bash execs/run.sh'
+    'bash execs/scpts/lint.sh'
+)
+for f in "${CODEX_FIG_EN}" "${CODEX_FIG_ZH}"; do
+    [[ -f "${f}" ]] || { fail "${f} is missing"; codex_fig_errors=1; continue; }
+    for marker in "${CODEX_FIG_MARKERS[@]}"; do
+        grep -qF -- "${marker}" "${f}" || {
+            fail "${f}: Codex figure pipeline is missing '${marker}'"
+            codex_fig_errors=1
+        }
+    done
+done
+for marker in 'editable PPTX' 'Image Gen' 'render the final PDF'; do
+    grep -qF -- "${marker}" "${CODEX_FIG_UI}" 2>/dev/null || {
+        fail "${CODEX_FIG_UI}: UI contract is missing '${marker}'"
+        codex_fig_errors=1
+    }
+done
+grep -qF 'allow_implicit_invocation: true' "${CODEX_FIG_UI}" 2>/dev/null || {
+    fail "${CODEX_FIG_UI}: the non-slash-only figure skill must allow implicit invocation"
+    codex_fig_errors=1
+}
+for root in .claude/skills .cursor/skills .kimi-code/skills; do
+    for f in SKILL.md SKILL_zh.md; do
+        path="${root}/stage-figs-designer/${f}"
+        for marker in 'image_gen' 'manus/figs/srcs/<slug>.pptx'; do
+            if grep -qF -- "${marker}" "${path}" 2>/dev/null; then
+                fail "${path}: contains Codex-only figure marker '${marker}'"
+                codex_fig_errors=1
+            fi
+        done
+    done
+done
+(( codex_fig_errors == 0 )) && note "Codex alone carries the complete Image Gen -> editable PPTX -> PDF figure contract"
 
 printf '\n'
 if (( FAILURES > 0 )); then

@@ -1,6 +1,6 @@
 interface:
   display_name: "Figure Designer"
-  short_description: "Plan, source, and render the manuscript's figures"
-  default_prompt: "Use $stage-figs-designer to plan or build this figure and keep its source under manus/figs/srcs/."
+  short_description: "Build sourced figures as editable PPTX and PDF"
+  default_prompt: "Use $stage-figs-designer to build one sourced figure as an editable PPTX, optionally use Image Gen for illustrative assets, and render the final PDF."
 policy:
   allow_implicit_invocation: true
