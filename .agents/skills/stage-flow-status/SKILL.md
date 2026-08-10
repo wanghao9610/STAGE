@@ -13,8 +13,8 @@ description: >-
 # Writing Flow Status — read-only overview
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the
-Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env
-|| true`, folded into the opening load call. Unset or empty → follow the user's dialogue
+Markdown this run writes; resolve it once at the start of the run — the probe is the first of the
+five calls step 1 sends together. Unset or empty → follow the user's dialogue
 language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request
 wins. English whatever it says: everything under `manus/`, the response to reviewers, and every
 structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric
@@ -143,7 +143,7 @@ writes, and never present a guess as a state.
    if you had opened each file yourself. If it is missing or fails, read the files directly and
    say in the reply that the scan fell back; if this skill's own directory cannot be resolved,
    any copy in the repository will do, since all four harness trees carry the same script:
-   `bash "$(find . -path '*/skills/stage-flow-status/scripts/scan.sh' | head -1)"`.
+   `bash "$(find . -path '*stage-flow-status/scripts/scan.sh' | head -1)"`.
 
    Resolve SECTION when given (§5); the scan is always project-wide, and scoping happens here,
    over what it returned.
