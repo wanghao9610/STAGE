@@ -1,26 +1,49 @@
 ---
 name: stage-peer-reviewer
 description: >-
-  Simulated program committee for the manuscript: convenes a five-perspective review panel — novelty &
-  related work, technical soundness, experimental rigor & reproducibility, clarity & presentation,
-  devil's advocate — under a citation-integrity contract (whitelist or verified references only, every
-  search logged), scores by anchored rubric bands with hard caps and an honest confidence (6-point
-  conference scale or journal tiers per venue.yml scale:), and writes one venue-shaped meta-review to
-  cycls/<cycle>/reviews/SIM_REVIEW_<date>.md whose weaknesses name the claim IDs they attack — so
-  /skill:stage-resp-writer treats simulated and real reviews identically. quick mode runs a single pass.
-  Builds first via execs/run.sh; a broken build is finding #1. Never edits the manuscript or the ledger.
-  Use when the user runs /skill:stage-peer-reviewer, when a run names it as the next action, or asks for
-  a mock review, a review panel, a pre-submission attack on the draft, or for the paper to be read as
-  reviewers would.
+  Simulated program committee. Convenes a five-perspective panel — novelty & related work, technical
+  soundness, experimental rigor & reproducibility, clarity & presentation, devil's advocate — under a
+  citation-integrity contract (whitelist or verified references only, every search logged), scoring by
+  anchored rubric bands with hard caps and honest confidence (6-point conference scale or journal tiers).
+  On this repo's manuscript it builds first, a broken build being finding #1, and writes
+  cycls/<cycle>/reviews/SIM_REVIEW_<date>.md whose weaknesses name the claim IDs they attack, so
+  /skill:stage-resp-writer reads simulated and real reviews alike; extern=<path> referees someone else's
+  paper instead — same panel and rubric, no build, no ledger, confidential search, report under wkdrs/.
+  quick mode runs a single pass. Never edits the manuscript or the ledger. Use when the user runs
+  /skill:stage-peer-reviewer, asks for a mock review, a review panel, a pre-submission attack, or to
+  referee an external paper.
 ---
 
 # Peer Reviewer — a five-perspective panel with an anchored rubric
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, `references/*_zh.md`, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `/skill:stage-peer-reviewer [MODE]` — `MODE` is `panel` (default) or `quick`; the cycle is
-the active one from `notes/story.md` (conventions §5); an `involve=<level>` token is stripped
-before the mode is read (§7.7).
+Invocation: `/skill:stage-peer-reviewer [MODE] [extern=<path>] [out=<path>]` — `MODE` is `panel`
+(default) or `quick`. With no `extern=`, the target is this repository's manuscript and the
+cycle is the active one from `notes/story.md` (conventions §5); an `involve=<level>` token is
+stripped before anything else is read (§7.7).
+
+**The external target (`extern=`).** `extern=<path>` points the panel at a paper this
+repository did not write — the PDF somebody asked you to referee. Everything below holds, with
+five substitutions that are the whole of the difference.
+**No cycle:** nothing is read from `notes/story.md`, `notes/claims.md`, or a `venue.yml`, so
+the venue and its scale (`conference-6` or `journal`) are asked once before the panel is
+briefed — mandatory at every involve level, because guessing them picks the rubric (§7.7) —
+and no `venue.yml` is written, these being facts about somebody else's submission (§9c).
+**No build:** the file is read as given and `execs/run.sh` is never pointed at it; a `.tex`
+source is read as source, with the partiality stated in the Summary exactly as a failed build
+would be.
+**No claim IDs:** there is no ledger to attack, so `attacked_claims` is empty everywhere and
+the meta-review writes `—`; the anchor stays mandatory in exchange.
+**Confidential by default:** a paper handed to a referee is under review until the user says
+it is public, so the citation-integrity contract's confidential mode is ON unless they do.
+**A different destination:** the report is `REFEREE_<date>.md` inside
+`wkdrs/reports/extern_<slug>_<date>/`, or at the path `out=<path>` names — `<slug>` is the
+target's basename lowercased, each run of non-alphanumerics turned to `-`. Nothing under
+`manus/`, `notes/`, `cycls/`, `mates/`, or `tasks/` is read, created, or edited for it, and
+writing an external review into `cycls/<cycle>/reviews/` is the one failure this path may
+never have: `/skill:stage-resp-writer` reads that directory as reviews of *this* paper and would
+draft a rebuttal to somebody else's.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
 every STAGE skill shares — read the whole file at the start of every run; there is no
@@ -49,7 +72,9 @@ each; the chair verifies every anchor, synthesizes one meta-review, and scores b
 rubric bands, never by averaging enthusiasm. `stage-clms-auditor` traces numbers mechanically
 and `stage-cite-auditor` checks the citation plumbing — run them first or expect plumbing noise;
 you judge the argument, the evidence, and the venue fit. You never edit the manuscript, never
-flip a ledger status, never soften a finding to be kind.
+flip a ledger status, never soften a finding to be kind. Under `extern=` the committee is a
+real one and you are drafting for the human who sits on it — the same five readings and the
+same rubric, owing their honesty to authors who never asked for your kindness either.
 
 ## Core Principles
 
@@ -84,13 +109,16 @@ flip a ledger status, never soften a finding to be kind.
    (Principle 5), which is what keeps a reference from being talked into existence by whoever
    wanted it. Nothing is rationed: the leads are fixed before the first request and the
    searching ends when the last one is settled. Confidential mode is
-   ON when `venue.yml` has `anonymized: true` or `.env` sets `ANON=true`: topic-term searches
+   ON when `venue.yml` has `anonymized: true`, when `.env` sets `ANON=true`, and — by default —
+   whenever the run carries `extern=` and the user has not said the paper is public: topic-term searches
    only — never the title, author guesses, or verbatim sentences — and it now binds each
    panelist directly, because each one is the thing making the request.
 4. **Weaknesses attack claims by ID.** Panelists receive the ledger and fill `attacked_claims`
    per major weakness; the chair carries the IDs into the meta-review. Claims sitting at
    `unsourced` or `proposed` are exactly the soft spots a sharp reviewer finds first: attack
-   them. A weakness that maps to no claim still carries its anchor.
+   them. A weakness that maps to no claim still carries its anchor. An `extern=` run has no
+   ledger at all, so `attacked_claims` is empty for every weakness and the meta-review writes
+   `—`; the anchor is not what it trades away.
 5. **The chair confirms before it publishes (§6.6).** A panel is the one fan-out whose reading
    the chair repeats rather than replaces — the second opinion is the entire product, and a
    verdict nobody checked is one reviewer's opinion wearing five hats. So every major
@@ -108,11 +136,14 @@ flip a ledger status, never soften a finding to be kind.
    able to tell simulated from received. A `verified` reference surviving into it carries its
    record inline (title, year, venue, URL). Per-perspective reviews, the citation audit, and
    fetch caches are working files in the run directory under `wkdrs/reports/` (§1.2) —
-   regenerable, never committed.
+   regenerable, never committed. An `extern=` run writes the same shape to `REFEREE_<date>.md`
+   at its own destination and never into `cycls/`; being nobody's rebuttal, it drops the
+   claim-ID column and keeps everything else.
 7. **Build first; a broken build reviews as broken.** The panel reads the PDF `execs/run.sh`
    produces — a real venue reviews your PDF, not your intentions. A failed build is finding #1,
    and the review proceeds over `manus/` sources with its partiality stated in the Summary and
-   in Synthesis Notes — never papered over (§7.4).
+   in Synthesis Notes — never papered over (§7.4). An `extern=` run has nothing to build: it
+   reads the file it was handed, and a source-only target states that partiality the same way.
 
 ## Workflow
 
@@ -123,20 +154,26 @@ Read the conventions whole, then `notes/story.md` (active cycle), `cycls/<cycle>
 per the list above. Resolve the mode (default `panel`) and the involve level once (§7.7).
 Missing story, ledger, or venue profile → stop and route to `/skill:stage-stry-coach`. A manuscript
 that is still skeletons → stop and route to `/skill:stage-sect-drafter`; a review of empty sections
-is noise.
+is noise. Under `extern=` none of that resolves and none of it is read: open the target
+instead, confirm it is readable, and ask the venue and scale. A target that cannot be opened
+is reported, never reviewed from its filename.
 
 ### Step 2: Build
 
 `execs/run.sh` (§3.3). Success → note the PDF path and page count for every brief. Failure →
 Principle 7. Either way, record what the panel reviews — date, build state, `git log -1`
-commit — so staleness is later detectable by exact comparison (§8).
+commit — so staleness is later detectable by exact comparison (§8). Under `extern=` this step
+is skipped whole; record the target's path, its page or word count, and the date, which is all
+the identity an external file has.
 
 ### Step 3: Prepare the run directory and digest
 
-Create `wkdrs/reports/peer_<cycle>_<date>/`. Write the chair's digest into it: paper location
-(PDF plus the source map from the outline), the claims table, the venue line (venue, scale,
-page limit), the confidential-mode flag. The digest is a map, not the territory — every
-panelist reads the paper itself, in full.
+Create `wkdrs/reports/peer_<cycle>_<date>/` — `wkdrs/reports/extern_<slug>_<date>/` under
+`extern=`. Write the chair's digest into it: paper location (PDF plus the source map from the
+outline), the claims table, the venue line (venue, scale, page limit), the confidential-mode
+flag. The digest is a map, not the territory — every panelist reads the paper itself, in full.
+An external digest carries the target path, the venue and scale the user confirmed, and the
+line "no claim ledger — `attacked_claims` is empty" in place of the claims table.
 
 ### Step 4: Dispatch the panel (or walk it in quick mode)
 
@@ -177,7 +214,9 @@ OFFLINE degradation noted when the host had no network (§3.5). Durable:
 `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` — the meta-review per the template, `mode:`
 honest, the 中文要点摘要 section appended when the dialogue is Chinese. Real date (§4); a
 same-day re-run replaces its file after saying so. Touch nothing else: not `manus/`, not
-`notes/claims.md`, not `venue.yml`, not `tasks/`.
+`notes/claims.md`, not `venue.yml`, not `tasks/`. Under `extern=` the durable file is instead
+`REFEREE_<date>.md` at the destination the external-target paragraph fixes, in the
+external-report shape of `references/review-template.md`; `cycls/` is not written at all.
 
 ### Step 8: Report and commit
 
@@ -189,6 +228,14 @@ dropped-item and disagreement counts, and the decisions record (§7.8). Routing:
 Offer one commit (§1): the one `SIM_REVIEW_<date>.md` file, subject
 `stage-peer-reviewer: <cycle> <mode> review`.
 
+An `extern=` run ends differently, because none of that applies to it. No routing — the
+sibling skills repair this repository's paper and there is nothing here for them to repair.
+No commit either: its report is not a repository artifact, and under the default destination
+it sits in `wkdrs/`, which git ignores and any clean regenerates — so the reply names the
+report's path and says, in one clause, that keeping it means copying it out or re-running with
+`out=<path>`. The recommendation is a draft for the human referee to edit and submit;
+submitting it anywhere is over the STOP line (§2) at every involve level.
+
 ## Output
 
 Registry row (§8): Simulated review — producer `stage-peer-reviewer`, durable path
@@ -197,6 +244,12 @@ Registry row (§8): Simulated review — producer `stage-peer-reviewer`, durable
 date in filename. Exact shapes: `references/review-template.md`, schema summary in conventions
 §8.8. The manuscript and the claim ledger leave this run byte-identical to how they entered —
 reviewing never edits.
+
+An `extern=` run adds no registry row, and that is the honest record rather than an omission:
+the registry is what `stage-flow-status` checks this paper's stages against, and a referee
+report on somebody else's paper is not one of its stages. Its whole output is the run
+directory — `REFEREE_<date>.md` beside the perspective reviews and `citation_audit.md`, at the
+default destination or the one `out=` named.
 
 Provenance (conventions §8): every artifact above under `notes/`, `tasks/`, `cycls/`, or
 `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended

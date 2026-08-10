@@ -1,7 +1,7 @@
 # Review Templates
 
-Four templates: the individual perspective review, the quick-mode combined review, the
-meta-review, and the citation audit. Fill every section; a section with nothing to say gets
+Five templates: the individual perspective review, the quick-mode combined review, the
+meta-review, the external-target referee report, and the citation audit. Fill every section; a section with nothing to say gets
 "None found." — an absent section reads as an unexamined one. All artifacts in English; the
 中文要点摘要 closes the meta-review when the dialogue is Chinese.
 
@@ -115,6 +115,19 @@ resolved, or "none">. Perspectives missing: <dropped panelist, or "none">.
 ## 中文要点摘要
 <推荐意见与置信度、主要问题 3 条以内、最高优先级修改项；不引入英文正文没有的内容。>
 ```
+
+## REFEREE_<date>.md
+
+The report an `extern=` run writes. The body is `meta_review.md` above with four changes and
+no others:
+
+- Frontmatter reads `type: referee_report`, `target: <the path extern= was given>`, `venue:`,
+  `scale:`, `mode:`, `generated:`, `recommendation:` — and no `cycle:`, because there is none.
+- `## Major Weaknesses` drops the "attacks <claim IDs>" clause from every line. The anchor and
+  the raised-by list stay; there is no ledger to name, not a licence to skip the location.
+- `## Action List` is omitted. It is the self-review section, and this paper is not ours to fix.
+- The file closes on one line naming what it is: a draft for the human referee to edit. What
+  the venue receives is what that person submits, never this file.
 
 ## citation_audit.md
 

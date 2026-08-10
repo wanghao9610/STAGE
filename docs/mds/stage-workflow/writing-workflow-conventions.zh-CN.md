@@ -51,7 +51,7 @@ STAGE 写作工作流中每个 skill 都遵守的规则。十六个 skill——`
 | `stage-copy-editor` | 完成一遍打磨后提供一次 | 只有这一遍改过的 `.tex` 文件，外加 `style` 那一遍写出的 `notes/style.md`——打磨报告留在 `wkdrs/` |
 | `stage-clms-auditor` | 完成审计后提供一次 | `notes/claims.md` 的状态翻转与新增的 `tasks/` 条目——审计报告留在 `wkdrs/` |
 | `stage-cite-auditor` | 仅当本次运行修过 bib 字段时提供 | `manus/bibs/reference.bib`——发现的问题留在 `wkdrs/` 报告里 |
-| `stage-peer-reviewer` | 每份评审提供一次 | 它写出的那一个 `SIM_REVIEW_*` 文件 |
+| `stage-peer-reviewer` | 每份评审提供一次，带 `extern=` 的运行则从不提供 | 它写出的那一个 `SIM_REVIEW_*` 文件。给外部论文写的审稿意见书不是仓库产物，不加入暂存 |
 | `stage-resp-writer` | 会话结束时提供一次 | `RESPONSE_*` 文件、`tasks/<cycle>_promises.md`、台账里的降级 |
 | `stage-subm-packer` | 打包时一次；`convert` 运行注册 venue 模板包时再一次 | `cycls/<cycle>/SUBMISSION_<date>.md`；`freeze/<cycle>_<date>` tag 随后落在这个提交上——包本身留在 `wkdrs/builds/`。`convert` 的提交是单独一次，只暂存那次运行在 `wkdrs/` 之外写下的东西——`cycls/<cycle>/template/` 下的模板包与 `tasks/<cycle>_venue.md`——好让冻结提交保持它自称的那一个文件 |
 
@@ -195,7 +195,7 @@ STAGE_LANG=
 | 图 | `stage-figs-designer` | `manus/figs/<slug>.pdf`、`manus/figs/srcs/<slug>.*` | 提纲 Figures 行 |
 | 参考文献 | `stage-refs-curator` | `manus/bibs/reference.bib`、`notes/refs/refs_index.md`、`notes/refs/<ABBREV>.md` | 索引中是否在列 |
 | 审计报告 | `stage-clms-auditor`、`stage-cite-auditor`、`stage-copy-editor` | `wkdrs/reports/CLAIMS_<date>.md`、`CITES_<date>.md`、`POLISH_<date>.md`（临时） | 文件名里的日期 |
-| 模拟评审 | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md`——评审组的综合评审；各视角的工作文件在 `wkdrs/reports/peer_<cycle>_<date>/` | 文件名里的日期 |
+| 模拟评审 | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md`——评审组的综合评审；各视角的工作文件在 `wkdrs/reports/peer_<cycle>_<date>/`。带 `extern=` 的运行不登记任何东西：它的 `REFEREE_<date>.md` 评的是别人的论文，不是本篇的阶段之一 | 文件名里的日期 |
 | 回复 | `stage-resp-writer` | `cycls/<cycle>/response/RESPONSE_<date>.md`，承诺在 `tasks/<cycle>_promises.md` | 承诺复选框 |
 | 投稿 | `stage-subm-packer` | `cycls/<cycle>/SUBMISSION_<date>.md`、git tag `freeze/<cycle>_<date>`、`wkdrs/builds/` 下的包、注册在 `cycls/<cycle>/template/` 的 venue 模板包、`tasks/<cycle>_venue.md` 里的 venue 待办 | `frozen:`；venue 待办复选框 |
 | 海报 | `stage-pstr-builder` | `cycls/<cycle>/poster/POSTER_PLAN.md`、`poster.tex`、注册在 `cycls/<cycle>/poster/template/` 的官方海报模板包、`wkdrs/builds/poster/` 下的渲染产物 | `state:`；每个分区的 Status |
@@ -306,7 +306,7 @@ frontmatter：`updated:`。`## Symbols`：`| Symbol | Meaning | First defined |`
 
 ### 8.8 评审与回复
 
-`SIM_REVIEW_<date>.md` 是评审组的综合评审，按 venue 的形状写。frontmatter：`type: peer_review`、`target:`、`cycle:`、`scale:`（conference-6 | journal）、`mode:`（panel | quick）、`generated:`、`recommendation:`。小节：`## Summary`、`## Strengths`、`## Major Weaknesses`（编号；每条带锚点，点名它攻击的 claim ID 与提出它的视角）、`## Minor Weaknesses`、`## Questions to the Authors`、`## Limitations & Ethics`、`## Concern Matrix`、`## Recommendation`（锚定的分数档或期刊档、置信度、每个触发的封顶都点名）、`## Synthesis Notes`。完整模板、五份视角简介与评分标准在 `stage-peer-reviewer` 的 `references/` 里；各视角评审与引用审计留在本次运行的 `wkdrs/reports/peer_<cycle>_<date>/` 目录。
+`SIM_REVIEW_<date>.md` 是评审组的综合评审，按 venue 的形状写。frontmatter：`type: peer_review`、`target:`、`cycle:`、`scale:`（conference-6 | journal）、`mode:`（panel | quick）、`generated:`、`recommendation:`。同一个 skill 带 `extern=` 的运行把同样这些小节写成 `wkdrs/` 下的一份 `REFEREE_<date>.md`，`type: referee_report`、`venue:` 取用户确认的值、不带 `cycle:`——它被有意地放在本表之外，因为下游没有任何东西读它。小节：`## Summary`、`## Strengths`、`## Major Weaknesses`（编号；每条带锚点，点名它攻击的 claim ID 与提出它的视角）、`## Minor Weaknesses`、`## Questions to the Authors`、`## Limitations & Ethics`、`## Concern Matrix`、`## Recommendation`（锚定的分数档或期刊档、置信度、每个触发的封顶都点名）、`## Synthesis Notes`。完整模板、五份视角简介与评分标准在 `stage-peer-reviewer` 的 `references/` 里；各视角评审与引用审计留在本次运行的 `wkdrs/reports/peer_<cycle>_<date>/` 目录。
 `RESPONSE_<date>.md` frontmatter：`cycle:`、`date:`、`sources:`（读过的评审文件）。小节：`## Point ledger` `| Point | Reviewer | Attacked claims | Evidence | Response summary | Promise? |`、`## Draft response`（在 `response_limit` 之内），承诺同步到 `tasks/<cycle>_promises.md` 作为 `- [ ]` 复选框。
 
 ### 8.9 `notes/adopt.md`
@@ -467,6 +467,6 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 | `stage-flow-status` | 只读的状态与唯一的下一步 |
 
 1. **标 † 的六个是 slash-only。** 只有用户点名时才跑：它们是决策点——接入、故事、提纲、回复、投稿、以及什么能上墙——而一个由 agent 自作主张走到的决策点，等于没有人做过这个决策。这张表是事实来源；执行它的守卫是 Claude、Cursor、Kimi 清单里的 `disable-model-invocation: true`，以及 Codex 的 `.agents/skills/<name>/agents/openai.yaml` 里的 `allow_implicit_invocation: false`，CI 会拿这四处与这里的标记逐一比对，所以在这里标了却没在四处都加守卫会让构建失败。
-2. **两个 skill 从不碰稿件。** `stage-peer-reviewer` 只写 `cycls/<cycle>/reviews/` 下的评审；`stage-flow-status` 什么都不写。只要不知道进展到哪了，先跑状态 skill——它读提纲、台账、清单与周期状态，给出唯一的下一步和它确切的命令。
+2. **两个 skill 从不碰稿件。** `stage-peer-reviewer` 只写 `cycls/<cycle>/reviews/` 下的评审——或者，带 `extern=` 评审外部论文时，只写 `wkdrs/` 下的东西；`stage-flow-status` 什么都不写。只要不知道进展到哪了，先跑状态 skill——它读提纲、台账、清单与周期状态，给出唯一的下一步和它确切的命令。
 3. **一次调用一个 skill，一个 skill 一件事。** 一节、一张表、一张图、一份回复——一次运行悄悄扩大范围正是这条规则针对的失败；下一件事是下一次调用。
 4. **点名了下一步动作，若落在那十个上，就去跑，而不是打印出来。** skill 收尾时都会点名接下来该做什么——状态 skill 唯一的下一步、lint 红灯点名是谁的东西坏了、审计把一条没有出处的主张退回给承载它的那一节——今天这些一律是递给读者的一条命令。当被点名的命令属于那十个、且目标已经定死时，就把它跑起来，而不是打印它：读者就是 agent 自己，打印一条命令给自己，等于转交给了没有人。那六个仍旧打印命令，因为"由作者敲下去"本身就是它们存在的意义所在的那个决定。三条限制保证这件事是安全的。**拾起发生在点名的那次运行结束之后，绝不在运行内部**——一个不许碰稿件的 skill，不会因为点名了后继者就伸得更长，因此 `stage-flow-status` 仍旧只是那个汇报者，后继者要等报告写完才开始。**目标没定死就发问，而不是猜**——哪一节、哪张表、哪张图、哪个周期（§5 负责解析）。以及**第 3 条原样有效**，一次一个 skill、一件事，而没有人敲下的那次运行，开跑前先说明自己要启动什么。

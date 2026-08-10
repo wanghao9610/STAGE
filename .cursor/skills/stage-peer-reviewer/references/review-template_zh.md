@@ -2,7 +2,7 @@
 
 > 本文件是 `review-template.md` 的中文对照版，随英文版同步维护，供人阅读；运行时装载的仍是英文版。两版冲突时，以 `review-template.md` 为准。
 
-四份模板：单视角评审、quick 模式的合并评审、综合评审、引用审计。每一节都要填；没什么可说的一节写 "None found."——缺失的一节读起来像是没查过的一节。所有产物都用英文写；对话是中文时，以 中文要点摘要 收尾综合评审。
+五份模板：单视角评审、quick 模式的合并评审、综合评审、外部评审对象的审稿意见书、引用审计。每一节都要填；没什么可说的一节写 "None found."——缺失的一节读起来像是没查过的一节。所有产物都用英文写；对话是中文时，以 中文要点摘要 收尾综合评审。
 
 ## review_<perspective>.md
 
@@ -111,6 +111,15 @@ resolved, or "none">. Perspectives missing: <dropped panelist, or "none">.
 ## 中文要点摘要
 <推荐意见与置信度、主要问题 3 条以内、最高优先级修改项；不引入英文正文没有的内容。>
 ```
+
+## REFEREE_<date>.md
+
+带 `extern=` 的运行写出的报告。正文就是上面的 `meta_review.md`，只有四处改动，此外没有别的：
+
+- frontmatter 写成 `type: referee_report`、`target: <extern= 拿到的那个路径>`、`venue:`、`scale:`、`mode:`、`generated:`、`recommendation:`——不带 `cycle:`，因为根本没有。
+- `## Major Weaknesses` 每一行去掉 "attacks <claim IDs>" 那一段。锚点与"由哪些视角提出"保留；没有台账可点名，不等于可以省掉位置。
+- `## Action List` 整节省略。那是自评那一节，而这篇论文不归我们修。
+- 文件以一行收尾，说清它是什么：给那位人类审稿人改的草稿。venue 收到的是那个人提交的东西，绝不是这份文件。
 
 ## citation_audit.md
 
