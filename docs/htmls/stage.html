@@ -44,6 +44,14 @@
   }
   ::selection { background: rgba(255, 216, 107, 0.25); }
   a { color: inherit; text-decoration: none; }
+  a.inline-link {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    text-decoration-color: var(--line-hi);
+    transition: color 0.2s, text-decoration-color 0.2s;
+  }
+  a.inline-link:hover { color: var(--gold); text-decoration-color: var(--gold); }
   img { max-width: 100%; }
 
   /* ---------- starfield canvas ---------- */
@@ -726,9 +734,9 @@
   <div class="aurora aurora-b" aria-hidden="true"></div>
   <span class="hero-badge">Authoring · Guiding · Editing</span>
   <h1>STAGE</h1>
-  <p class="hero-sub">Every STAR needs a STAGE</p>
+  <p class="hero-sub">Every <a class="inline-link" href="https://wanghao9610.github.io/STAR/" target="_blank" rel="noopener">STAR</a> needs a STAGE</p>
   <p class="hero-desc">
-    The academic-writing companion to <strong>STAR</strong> — it turns a research project into a
+    The academic-writing companion to <strong><a class="inline-link" href="https://wanghao9610.github.io/STAR/" target="_blank" rel="noopener">STAR</a></strong> — it turns a research project into a
     <strong>submitted paper</strong> without losing the chain of custody: every number traces to a
     fingerprinted evidence file or is visibly marked as missing, and every claim is tracked
     from proposal to verification in a single ledger.
