@@ -12,7 +12,7 @@ The exclusivity cuts hardest against the fabrication boundary (conventions §9):
 
 | Type | What it holds | Example |
 |---|---|---|
-| `env` | a fact about a machine or a TeX toolchain, usually learned by failing | this machine's TeX Live has no `newtxtext`; `arxiv.cls` builds here only under `LATEX_ENGINE=xelatex` |
+| `env` | a fact about a machine or a TeX toolchain, usually learned by failing | this machine's TeX Live has no `newtxtext`; `stage.cls` builds here only under `LATEX_ENGINE=xelatex` |
 | `pref` | a standing preference of the user's about how the writing is done | drafts arrive one section at a time and stop for review; never a batch |
 | `insight` | a judgment that outlived the run that produced it | the upstream `results.md` renumbers its rows on every rerun, so a `% src:` anchor must name the table id, never a row index |
 | `deadend` | something tried, rejected, and not worth retrying, with what it cost | framing the contribution as a new benchmark; the simulated panel read it as incremental, and a full intro rewrite came back to the method framing |
@@ -46,7 +46,7 @@ model_id: claude-opus-5[1m]
 source: wkdrs/builds/main.log
 ---
 
-`arxiv.cls` builds on this machine only under `LATEX_ENGINE=xelatex`.
+`stage.cls` builds on this machine only under `LATEX_ENGINE=xelatex`.
 
 **Why:** the TeX Live install here ships no `newtxtext`, and pdflatex halts in the preamble.
 **How to apply:** set the engine in `.env`, not on the command line — every skill builds through `execs/run.sh`.
@@ -71,11 +71,11 @@ The body opens with one sentence stating the fact, then carries only what a read
 `MEMORY.md` lists every memory beside it, one line each, newest first:
 
     - <type> · <scope> · <verified> · [<slug>](<slug>.md) — <one line>
-    - env · machine:mbp-a · 2026-08-03 · [xelatex-only](xelatex-only.md) — arxiv.cls builds here only under xelatex
+    - env · machine:mbp-a · 2026-08-03 · [xelatex-only](xelatex-only.md) — stage.cls builds here only under xelatex
 
 The first four fields are separated by a space, a middle dot, and a space; everything after the em dash is free text and may contain anything, that separator included. **The session hooks split on it byte-exactly** — reword the separator and they silently stop marking anything, with no error anywhere. The aging check is as literal about the type token: `env` stays English, whatever language the one-liner speaks. Only lines starting with `- ` are read, so the index file's own header is invisible to them.
 
-That one line is what a session judges relevance on, so it says what the fact *is*, not what it is about: "arxiv.cls builds here only under xelatex", not "notes on the build engine". Keep the index under roughly 60 lines; past that, group the entries under one heading per type — in this same file, never a second one: the hooks read no other file as an index, so a split-off index silently stops reaching sessions, while a heading is just another line they skip.
+That one line is what a session judges relevance on, so it says what the fact *is*, not what it is about: "stage.cls builds here only under xelatex", not "notes on the build engine". Keep the index under roughly 60 lines; past that, group the entries under one heading per type — in this same file, never a second one: the hooks read no other file as an index, so a split-off index silently stops reaching sessions, while a heading is just another line they skip.
 
 ## Retiring a memory
 

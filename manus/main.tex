@@ -5,18 +5,22 @@
 %% Lint:  bash execs/scpts/lint.sh   deterministic checks; any todo marker in
 %%                                   manus/ fails it — that is the point.
 %%
-%% Two layers, in load order:
+%% Three files in stys/, the two loaded here first:
 %%
-%%   stys/arxiv.cls   the look — page geometry, the title panel, headings,
-%%                    captions, floats, bibliography style. This is the layer a
-%%                    venue swap replaces: drop the venue's class and style
-%%                    files into manus/stys/ and change the line below to, say,
-%%                    \documentclass{stys/cvpr}. run.sh compiles with manus/ as
-%%                    the working directory and puts manus/stys/ on TEXINPUTS.
+%%   stys/stage.cls   the look — page geometry, the title panel, headings,
+%%                    captions, floats, and the citation package. This is the
+%%                    layer a venue swap replaces: drop the venue's class and
+%%                    style files into manus/stys/ and change the line below to,
+%%                    say, \documentclass{stys/cvpr}. run.sh compiles with manus/
+%%                    as the working directory and puts manus/stys/ on TEXINPUTS.
 %%
 %%   stys/stage.sty   the authoring layer — \todo plus the macros the writing
 %%                    skills emit into secs/ and tabs/. It survives every venue
 %%                    swap; keep this line whatever the class becomes.
+%%
+%%   stys/stage.bst   the reference list — named by \bibliographystyle near the
+%%                    end of this file rather than loaded here, and replaced by
+%%                    a venue kit's own .bst the same way the class is.
 %%
 %% Class options: onecolumn | twocolumn, plus anon and anything article takes.
 %% `anon` prints the title panel as "Anonymous Authors" and drops affiliations,
@@ -24,7 +28,7 @@
 %% the source half is ANON=true in .env, which makes lint.sh fail on identity
 %% anywhere under manus/ — comments included, because comments ship with a
 %% source upload. Keep the placeholders below anonymous until the camera-ready.
-\documentclass[twocolumn]{stys/arxiv}
+\documentclass[twocolumn]{stys/stage}
 \usepackage{stys/stage}
 
 %% ── Title panel ────────────────────────────────────────────────────────────
@@ -98,9 +102,13 @@ it is gone.
 %% Bibliography — uncomment once manus/bibs/reference.bib exists
 %% (execs/scpts/import.sh seeds it from a paired STAR repo, or
 %% /stage-refs-curator starts one from scratch). The class loads natbib, so
-%% \citep / \citet work and unsrtnat numbers entries in citation order; swap the
-%% style for whatever the venue's class expects.
-% \bibliographystyle{unsrtnat}
+%% \citep / \citet work; stys/stage.bst sorts entries by author and numbers them
+%% [3], and prints no DOI, URL, ISBN, or ISSN — those fields stay in
+%% reference.bib as provenance and are simply not typeset, which is how a
+%% conference reference list reads. run.sh puts stys/ on BSTINPUTS, so the bare
+%% name resolves. A venue's own style replaces it in the copy
+%% /stage-subm-packer generates; this line is the preprint's.
+% \bibliographystyle{stage}
 % \bibliography{bibs/reference}
 
 %% Appendix — \beginappendix breaks the page, prints the divider, and relabels

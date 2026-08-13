@@ -416,7 +416,7 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 | 图 | 渲染产物 `manus/figs/<slug>.pdf`；源文件 `manus/figs/srcs/<slug>.*`——每张图要么有源文件，要么有一条 MANIFEST 条目 |
 | 表格 | `manus/tabs/<slug>.tex` |
 | 参考文献 | `manus/bibs/reference.bib` |
-| venue 样式 | `manus/stys/`：只有 `arxiv.cls` 与 `stage.sty`，别无他物——`manus/` 会被 `lint.sh` 扫描，只放本工作流自己拥有的文件 |
+| venue 样式 | `manus/stys/`：只有 `stage.cls`、`stage.sty` 与 `stage.bst`，别无他物——`manus/` 会被 `lint.sh` 扫描，只放本工作流自己拥有的文件 |
 | 导入的证据（只读） | `mates/<source-slug>/**`，镜像上游路径；手工登记的投放在 `mates/manual/**`；台账 `mates/MANIFEST.md` |
 | 写作元数据 | `notes/` 下的固定文件：`story.md`、`claims.md`、`outline.md`、`notation.md`、`style.md`、`adopt.md`；阅读笔记在 `notes/refs/` |
 | 投稿周期 | `cycls/<venue>_<year>/`：`venue.yml`、`template/`（官方 venue 模板包，整份解包，逐字节，永不编辑）、`reviews/`、`response/`、`SUBMISSION_<date>.md`、`poster/`（海报计划与源文件，官方海报模板包放在 `poster/template/`） |
@@ -430,14 +430,19 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 1. **`mates/` 是只读的。** `import.sh` 与 `/stage-evid-curator` 是仅有的两个写入者，且只整文件地新增/替换并附指纹。内容层面的修正发生在上游，然后重新导入。
 2. **`wkdrs/` 永不提交。** 审计真正留下的东西是 `notes/claims.md` 里的状态翻转和 `tasks/` 里的条目，不是报告。
 3. **`execs/` 根目录是封闭的**（沿用 STAR 的规则）：`run.sh` + `update.sh`，此外什么都没有。
-4. **稿件永远编译成预印本；venue 的版式是一份生成出来的副本。** `manus/stys/` 分两层，这条分界是承重的：`arxiv.cls`
-   管外观，是 venue 的 class 要**替换**掉的那一层；`stage.sty` 管 `\todo`，以及各 skill 会写进 `secs/` 和 `tabs/`
-   的那些宏（`\parahead`、`\cmark`、`\tablestyle`、`\figref` …），每次换模板都**活下来**。项目自己的宏写在
+4. **稿件永远编译成预印本；venue 的版式是一份生成出来的副本。** `manus/stys/` 放三个文件，换 venue 时哪个被替换是承重的：
+   `stage.cls` 管外观，是 venue 的 class 要**替换**掉的那一层；`stage.bst` 管参考文献表，是 venue 自带的 `.bst`
+   要**替换**掉的那一层；`stage.sty` 管 `\todo`，以及各 skill 会写进 `secs/` 和 `tabs/`
+   的那些宏（`\parahead`、`\cmark`、`\tablestyle`、`\figref` …），每次换模板都**活下来**。`stage.bst` 是 `plainnat`
+   掐掉了四个字段：DOI、URL、ISBN、ISSN 仍留在 `reference.bib` 里——那是来源凭据，也是 `/stage-refs-curator`
+   重新取记录的输入——只是不排版出来；CVPR 自己的 `.bst` 就是这么做的，参考文献表读起来像顶会论文而不像数据库导出，
+   靠的正是这一点。`run.sh` 把入口所在的 `stys/` 放上 `BSTINPUTS`，所以 `\bibliographystyle{stage}` 按裸名就能解析，
+   生成副本里模板包自带的 `.bst` 同理。项目自己的宏写在
    `main.tex` 里，绝不写进 `stys/`。官方 venue 模板包整份、不加编辑地解包进 `cycls/<cycle>/template/`，与该周期的
    `venue.yml` 并列——绝不放进 `manus/`：那是 `lint.sh` 扫描的命名空间，模板包自带的示例 `.tex` 会污染它的 `\todo`
    计数和身份泄漏扫描。`venue.yml` 里的 `template:` 指名模板包中的那个 class；`stage-subm-packer convert` 读它，
    在 `wkdrs/` 下重新生成一份能在该 class 下编译的独立副本。`manus/main.tex` 始终保持
-   `\documentclass{stys/arxiv}`：没有就地替换，也没有第二份事实来源。
+   `\documentclass{stys/stage}`：没有就地替换，也没有第二份事实来源。
 5. **四棵 harness 目录树是副本，不是备选项。** 同样的十六个 skill 每套 harness 各发一份——`.claude/skills/`、
    `.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——彼此只差调用前缀和工具名（`Bash` / `Shell`、
    `AskUserQuestion` / `AskQuestion` / `request_user_input`、`Read` / `ReadFile`）。装载你自己那棵树下的副本并遵循它；

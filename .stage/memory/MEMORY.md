@@ -5,7 +5,7 @@ first. The session hooks under `.claude/hooks/`, `.codex/hooks/`, `.cursor/hooks
 and `.kimi-code/hooks/` parse these lines byte-exactly, so the shape is fixed:
 
     - <type> · <scope> · <verified> · [<slug>](<slug>.md) — <one line>
-    - env · machine:mbp-a · 2026-08-03 · [xelatex-only](xelatex-only.md) — arxiv.cls builds here only under xelatex
+    - env · machine:mbp-a · 2026-08-03 · [xelatex-only](xelatex-only.md) — stage.cls builds here only under xelatex
 
 `<type>` is `env`, `pref`, `insight`, or `deadend`. `<scope>` is `global`,
 `machine:<name>`, `cycle:<cycle>`, or `manus:<path>`. `<verified>` is the date

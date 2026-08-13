@@ -25,7 +25,7 @@
 
 - **给了 `kit=<path>`**——路径是一个 zip 或一个目录。把它整份、原封不动地解包或拷贝进 `cycls/<cycle>/template/`。若该目录已存在且内容不同，先展示差异再提问（规约 §7.2）：在一个周期底下把模板包换掉，等于把此前每一个决策所依据的页数预算换掉。
 - **没给 `kit=`**——`cycls/<cycle>/template/` 必须已经存在。不存在就停下，并给出唯一能解开它的东西：官方模板包的路径。
-- **`template:` 缺失、为空或为 `arxiv`**——不做转换。包就是用 `stys/arxiv.cls` 构建出的预印本形态，那也正是手稿本来编译成的样子。把这一点说出来，而不是转换成一个空。
+- **`template:` 缺失、为空或为 `arxiv`**——不做转换。包就是用 `stys/stage.cls` 构建出的预印本形态，那也正是手稿本来编译成的样子。把这一点说出来，而不是转换成一个空。
 
 模板包是纳入版本管理的，不是被忽略的：只有排版它的那个 class 也在同一段历史里，一个包才谈得上能从冻结 tag 复现。venue 禁止再分发的模板包由用户定夺——说清正要提交的是什么，让他们决定（§7.2）。
 
@@ -60,18 +60,18 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 ## 4. 生成 `compat.sty`
 
-`stage.sty` 覆盖的是写作 skill 会写进手稿的那些宏。它**刻意不**覆盖的，是 `stys/arxiv.cls` 在它之上再加载的那些内容级宏包——而一个照着那些宏包写出来的 section 或 table，在一个都不加载它们的 venue class 下会挂。`compat.sty` 恰好补这个缺口：
+`stage.sty` 覆盖的是写作 skill 会写进手稿的那些宏。它**刻意不**覆盖的，是 `stys/stage.cls` 在它之上再加载的那些内容级宏包——而一个照着那些宏包写出来的 section 或 table，在一个都不加载它们的 venue class 下会挂。`compat.sty` 恰好补这个缺口：
 
-| `arxiv.cls` 提供而 `stage.sty` 没有 | 在正文文件里表现为 |
+| `stage.cls` 提供而 `stage.sty` 没有 | 在正文文件里表现为 |
 |---|---|
 | `algorithm`、`algpseudocode` | `\begin{algorithm}`、`\State`、`\Require` |
-| `\algref{alg}{line}`——class 的双参形式（`arxiv.cls:104`） | 算法行级引用；`stage.sty` 只提供单参兜底 |
+| `\algref{alg}{line}`——class 的双参形式（`stage.cls:104`） | 算法行级引用；`stage.sty` 只提供单参兜底 |
 | `mathtools`、`bm` | `\coloneqq`、`\bm{}`、`\DeclarePairedDelimiter` |
 | `siunitx` | `\SI{}`、`\num{}` |
 | `nicematrix` | `NiceTabular` |
 | `enumitem` | `\begin{itemize}[leftmargin=*]` |
 
-**只加拷进来的正文文件真正用到的那些。** 逐条在 `secs/`、`tabs/`、`figs/` 里扫这些构造，命中了才把对应宏包加进去。把 `arxiv.cls` 的整份 `\RequirePackage` 清单抄进 `compat.sty`，正是制造 option clash 的办法：venue class 通常已经带选项加载过它自己的 hyperref、geometry 与 caption 设置，一次不带选项的二次加载会跟它打起来。
+**只加拷进来的正文文件真正用到的那些。** 逐条在 `secs/`、`tabs/`、`figs/` 里扫这些构造，命中了才把对应宏包加进去。把 `stage.cls` 的整份 `\RequirePackage` 清单抄进 `compat.sty`，正是制造 option clash 的办法：venue class 通常已经带选项加载过它自己的 hyperref、geometry 与 caption 设置，一次不带选项的二次加载会跟它打起来。
 
 生成的 `main.tex` 里的加载顺序：venue class，然后 `stys/stage`，然后 `compat`。`compat.sty` 里凡是 venue class 已经定义过的，一律用 `\providecommand`——绝不用 `\renewcommand` 盖掉一个 venue 的宏。
 
@@ -81,17 +81,17 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 要搬过去的：
 
-- **标题、作者、单位、贡献说明、关键词、元数据链接**，用 venue 的宏重新发射。每个 `arxiv.cls` 命令装的是什么，见下表。
+- **标题、作者、单位、贡献说明、关键词、元数据链接**，用 venue 的宏重新发射。每个 `stage.cls` 命令装的是什么，见下表。
 - **论文自己的 `\newcommand` / `\renewcommand`**，来自 `manus/main.tex` 的导言区——`\method` 那一类。它们属于这篇论文而不属于框架，所以既不在 `stage.sty` 也不在 `compat.sty` 里，而正文依赖它们。
 - **`\input{secs/...}` 的顺序**，与 `manus/main.tex` 定下的完全一致——`<n>_` 前缀是承重的（规约 §5.5）。
 - **`\bibliographystyle{...}`** 设为模板包的样式；`\bibliography{bibs/reference}`。
 - **附录**，若 `manus/main.tex` 有，则用 venue 自己的附录机制。venue 在"附录在参考文献之前还是之后"上做法不一；照模板包的示例走，并在报告里说明用了哪种顺序。
 
-### `arxiv.cls` 独占的部分
+### `stage.cls` 独占的部分
 
-下面每一个命令都由 `stys/arxiv.cls` 定义，别处都没有。在一个 venue class 下，每一个要么被原生等价物重新表达，要么被丢掉——原样留着，它就是一个未定义控制序列，副本编译不过。
+下面每一个命令都由 `stys/stage.cls` 定义，别处都没有。在一个 venue class 下，每一个要么被原生等价物重新表达，要么被丢掉——原样留着，它就是一个未定义控制序列，副本编译不过。
 
-| `arxiv.cls` 命令 | 行号 | 变成 |
+| `stage.cls` 命令 | 行号 | 变成 |
 |---|---|---|
 | `\affiliation[key]{...}` | 330 | venue 的单位宏 |
 | `\contribution[mark]{...}` | 335 | venue 的同等贡献 / 通讯作者说明，或一个 `\thanks` |
@@ -99,7 +99,7 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 | `\code` `\project` `\dataset` | 351–354 | 用 venue 自己的写法排一行链接，或丢掉；匿名下要涂掉 |
 | `\correspondence{...}` | 355 | venue 的通讯作者说明 |
 | `\paperdate{...}` | 356 | 丢掉——venue class 自己给论文集标日期 |
-| `\paperstyle{...}` `\papercolor{...}` | 359、180 | **丢掉。** 它们驱动的是 `arxiv.cls` 的标题面板，没有 venue 等价物 |
+| `\paperstyle{...}` `\papercolor{...}` | 359、180 | **丢掉。** 它们驱动的是 `stage.cls` 的标题面板，没有 venue 等价物 |
 | `\beginappendix` | 617 | venue 的附录机制，通常是 `\appendix` |
 | `\metadata[label]{value}` | — | 一行链接，或丢掉 |
 
@@ -107,7 +107,7 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 这是最容易漏、而且一漏就必然编译不过的那一处搬迁。
 
-`arxiv.cls` 把 abstract 当作**导言区命令** `\abstract{...}`，所以 `manus/main.tex` 在 `\begin{document}` 之前调用它，`/skill:stage-outl-planner` 的 `\input{secs/0_abstract}` 也待在导言区。而几乎每个 venue class 要的都是**正文里的环境** `\begin{abstract}...\end{abstract}`，位置在 `\maketitle` 之后。
+`stage.cls` 把 abstract 当作**导言区命令** `\abstract{...}`，所以 `manus/main.tex` 在 `\begin{document}` 之前调用它，`/skill:stage-outl-planner` 的 `\input{secs/0_abstract}` 也待在导言区。而几乎每个 venue class 要的都是**正文里的环境** `\begin{abstract}...\end{abstract}`，位置在 `\maketitle` 之后。
 
 所以：把 abstract 的正文抽出来——从 `manus/main.tex` 的 `\abstract{...}`，或者从导言区 `\input` 的那个文件里——再用 venue 自己的机制在正文里重新发射。**不要**把 `\input{secs/0_abstract}` 放进生成的导言区：venue class 要么根本没定义 `\abstract`（编译报错），要么定义了一个不兼容的（静默地排错）。`secs/` 的其余部分照常在正文里 `\input`，一字不改。
 

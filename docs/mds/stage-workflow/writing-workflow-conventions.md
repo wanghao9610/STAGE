@@ -414,7 +414,7 @@ Where a skill puts what it writes. Each destination is exclusive — a file belo
 | Figures | `manus/figs/<slug>.pdf` rendered; `manus/figs/srcs/<slug>.*` sources — every figure has a source file or a MANIFEST entry |
 | Tables | `manus/tabs/<slug>.tex` |
 | Bibliography | `manus/bibs/reference.bib` |
-| Venue styles | `manus/stys/`: `arxiv.cls` and `stage.sty`, and nothing else — `manus/` is scanned by `lint.sh` and holds only files this workflow owns |
+| Venue styles | `manus/stys/`: `stage.cls`, `stage.sty`, and `stage.bst`, and nothing else — `manus/` is scanned by `lint.sh` and holds only files this workflow owns |
 | Imported evidence (read-only) | `mates/<source-slug>/**` mirroring upstream paths; hand-registered drops in `mates/manual/**`; ledger `mates/MANIFEST.md` |
 | Writing metadata | `notes/` fixed files: `story.md`, `claims.md`, `outline.md`, `notation.md`, `style.md`, `adopt.md`; reading notes in `notes/refs/` |
 | Submission cycles | `cycls/<venue>_<year>/`: `venue.yml`, `template/` (the official venue kit, unpacked whole, byte-for-byte, never edited), `reviews/`, `response/`, `SUBMISSION_<date>.md`, `poster/` (the poster plan and its source, with an official poster kit under `poster/template/`) |
@@ -431,15 +431,22 @@ Rules the table alone does not carry:
    and entries in `tasks/`, not in reports.
 3. **`execs/` root is closed** (STAR's rule): `run.sh` + `update.sh` and nothing else.
 4. **The manuscript always compiles as the preprint; a venue's format is a generated copy.**
-   `manus/stys/` holds two layers and the split is load-bearing: `arxiv.cls` owns the look and is
-   what a venue class replaces; `stage.sty` owns `\todo` plus the macros skills write into `secs/`
-   and `tabs/` (`\parahead`, `\cmark`, `\tablestyle`, `\figref` …) and survives every swap.
-   Project-specific macros go in `main.tex`, never in `stys/`. An official venue kit unpacks whole
+   `manus/stys/` holds three files and which of them a venue swap replaces is load-bearing:
+   `stage.cls` owns the look and is what a venue class replaces; `stage.bst` owns the reference
+   list and is what a venue's own `.bst` replaces; `stage.sty` owns `\todo` plus the macros skills
+   write into `secs/` and `tabs/` (`\parahead`, `\cmark`, `\tablestyle`, `\figref` …) and survives
+   every swap. `stage.bst` is `plainnat` with four fields silenced — a DOI, URL, ISBN, or ISSN
+   stays in `reference.bib`, where it is provenance and the input to `/stage-refs-curator`'s
+   re-fetches, and is simply not typeset, which is the arrangement CVPR's own `.bst` makes and the
+   reason a reference list here reads like a conference paper's. `run.sh` puts the entry point's
+   `stys/` on `BSTINPUTS`, so `\bibliographystyle{stage}` resolves by bare name and so does a kit's
+   `.bst` inside a generated copy. Project-specific macros go in `main.tex`, never in `stys/`.
+   An official venue kit unpacks whole
    and unedited into `cycls/<cycle>/template/`, beside that cycle's `venue.yml` — never under
    `manus/`, a scanned namespace where a kit's example `.tex` would trip `lint.sh`'s `\todo` count
    and its identity-leak scan. `template:` in `venue.yml` names the class inside the kit;
    `stage-subm-packer convert` reads it and regenerates a standalone copy under `wkdrs/` that
-   compiles under that class. `manus/main.tex` keeps its `\documentclass{stys/arxiv}`: there is no
+   compiles under that class. `manus/main.tex` keeps its `\documentclass{stys/stage}`: there is no
    in-place swap and no second source of truth.
 5. **The four harness trees are copies, not alternatives.** The same sixteen skills ship once per
    harness — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` —

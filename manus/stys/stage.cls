@@ -1,4 +1,4 @@
-%% manus/stys/arxiv.cls — STAGE's default document class: a compact,
+%% manus/stys/stage.cls — STAGE's default document class: a compact,
 %% arXiv-style preprint look.
 %%
 %% This file owns the LOOK: page geometry, fonts, the title panel, headings,
@@ -19,7 +19,7 @@
 %%                           notes, and the links row are suppressed
 %%   everything else         forwarded to article unchanged (e.g. 11pt, letterpaper)
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{stys/arxiv}[2026/08/03 STAGE preprint class]
+\ProvidesClass{stys/stage}[2026/08/03 STAGE preprint class]
 
 %% ---------------------------------------------------------------------------
 %% Options
@@ -179,7 +179,7 @@
 }
 \newcommand{\papercolor}[1]{%
   \@ifundefined{sa@theme@#1}{%
-    \ClassError{stys/arxiv}{Unknown paper color `#1'}{Available colors are green, blue, and black.}%
+    \ClassError{stys/stage}{Unknown paper color `#1'}{Available colors are green, blue, and black.}%
   }{%
     \csname sa@theme@#1\endcsname
   }%
@@ -358,7 +358,7 @@
 
 \newcommand{\paperstyle}[1]{%
   \@ifundefined{sa@maketitle@#1}{%
-    \ClassError{stys/arxiv}{Unknown paper style `#1'}{Available styles are fancy and simple.}%
+    \ClassError{stys/stage}{Unknown paper style `#1'}{Available styles are fancy and simple.}%
   }{%
     \gdef\sa@paperstyle{#1}%
   }%

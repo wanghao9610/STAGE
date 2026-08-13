@@ -136,6 +136,11 @@ mkdir -p "${BUILD_DIR}"
 # package's stys/, which is what makes the package self-contained.
 export TEXINPUTS="${MAIN_DIR}/stys:${TEXINPUTS:-}"
 
+# BSTINPUTS is the same arrangement for BibTeX, which has its own search path and
+# does not read TEXINPUTS. It is what lets \bibliographystyle{stage} find
+# manus/stys/stage.bst, and a venue kit's own .bst its generated copy's stys/.
+export BSTINPUTS="${MAIN_DIR}/stys:${BSTINPUTS:-}"
+
 log "Engine: ${LATEX_ENGINE}; output: ${BUILD_DIR}"
 
 # -cd compiles with the entry point's directory as the working directory so

@@ -7,9 +7,11 @@
 %% unsourced value in the paper is one of these, and execs/scpts/lint.sh counts
 %% them — plus the small set of macros that section and table files use.
 %%
-%% The look lives in the class (manus/stys/arxiv.cls by default): geometry,
-%% fonts, the title panel, headings, captions, bibliography style. Nothing here
-%% styles a page; nothing there is safe to write into a section file.
+%% The look lives in the class (manus/stys/stage.cls by default): geometry,
+%% fonts, the title panel, headings, captions, the citation package. The
+%% reference list's own shape lives in a third file, stys/stage.bst, which
+%% \bibliographystyle names. Nothing here styles a page; nothing there is safe
+%% to write into a section file.
 %%
 %% Provided here:
 %%   \todo{...}                 the unsourced-value marker (conventions §9a)
@@ -27,7 +29,7 @@
 %% Packages
 %% ---------------------------------------------------------------------------
 %% Content-level only, and all without options, so a second load under a class
-%% that already pulled them in is a silent no-op. stys/arxiv.cls loads these too
+%% that already pulled them in is a silent no-op. stys/stage.cls loads these too
 %% and in the order cleveref needs; this list is what keeps a section or table
 %% file compiling under a venue class that loads none of them.
 \RequirePackage{graphicx}
@@ -111,7 +113,7 @@
 \renewcommand{\tabref}[1]{Table~\ref{#1}}
 \providecommand{\eqnref}[1]{}
 \renewcommand{\eqnref}[1]{Equation~\eqref{#1}}
-%% \algref is left to the class where one defines it (stys/arxiv.cls extends
+%% \algref is left to the class where one defines it (stys/stage.cls extends
 %% algorithmicx's two-argument form for line references); this is the fallback
 %% for a venue class that ships no algorithm support.
 \providecommand{\algref}[1]{Algorithm~\ref{#1}\xspace}

@@ -12,7 +12,7 @@ description: >-
 
 调用方式：`$stage-subm-packer [camera | convert] [kit=<path>]`——不带参数则为当前周期打一个送审包，周期按规约 §5 从 `notes/story.md` 的 `cycle:` 解析；`camera` 为同一个周期打 camera-ready 包，并把承诺关口装上；`convert` 只把论文改排成本周期的 venue 模板并报出该版式下的页数，跳过所有冻结关口。`kit=<path>` 在转换前注册一份官方 venue 模板包（zip 或目录）。无法识别的参数则点名这三种模式并提问。
 
-**转换流程。** `references/venue-convert.md`——模板包契约、`stys/arxiv.cls` 独占而 venue class 必须替换掉的那些命令、abstract 的搬家、`compat.sty`、匿名映射。转换之前读它；不做转换的运行不需要它。
+**转换流程。** `references/venue-convert.md`——模板包契约、`stys/stage.cls` 独占而 venue class 必须替换掉的那些命令、abstract 的搬家、`compat.sty`、匿名映射。转换之前读它；不做转换的运行不需要它。
 
 **通用规约。** 每次运行开始时整份读完 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——不做分节选读。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §1 git（冻结 tag `freeze/<cycle>_<date>` 只在这里创建）、§3 构建工具链与 `ANON`、§5 周期解析、§9 编造边界。本文件只写本 skill 特有的部分，更严处以本文件为准。
 

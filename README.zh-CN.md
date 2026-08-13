@@ -63,7 +63,7 @@ STAGE/
 │   ├── figs/               # 渲染好的图（PDF）；figs/srcs/ 存放每张图的源文件
 │   ├── tabs/               # 表格，由证据生成
 │   ├── bibs/               # reference.bib
-│   └── stys/               # arxiv.cls（版式）+ stage.sty（\todo 与写作宏）
+│   └── stys/               # stage.cls（版式）+ stage.sty（\todo 与写作宏）
 ├── mates/                  # 导入的证据——只读
 │   ├── <source-slug>/      # 按上游 STAR 路径镜像的快照
 │   ├── manual/             # 人工登记的证据文件
@@ -116,7 +116,7 @@ STAGE/
 | `figs/` | Figures | 渲染好的 PDF；`srcs/` 存放可编辑的源文件 |
 | `tabs/` | Tables | 表格 `.tex` 文件，由证据生成 |
 | `bibs/` | Bibliographies | `reference.bib` |
-| `stys/` | Styles | `arxiv.cls` 与 `stage.sty`——venue 模板包放在 `cycls/<cycle>/template/`，不在这里 |
+| `stys/` | Styles | `stage.cls` 与 `stage.sty`——venue 模板包放在 `cycls/<cycle>/template/`，不在这里 |
 | `mates/` | Materials | 导入的证据快照——只读 |
 | `cycls/` | Cycles | 每次投稿尝试一个目录 |
 | `execs/` | Executions | 入口脚本；工具脚本放在 `scpts/` |
@@ -128,24 +128,27 @@ STAGE/
 
 ## 论文模板
 
-`manus/` 自带一套紧凑的 arXiv 风格预印本模板，拆成两层，因为换 venue 模板时，一层必须被替换，另一层必须活下来：
+`manus/` 自带一套紧凑的 arXiv 风格预印本模板，按"换 venue 模板时会遭遇什么"拆成三个文件——两个是被替换掉的那部分，一个必须活下来：
 
 | 分层 | 文件 | 负责 | 在 venue 版式里 |
 | --- | --- | --- | --- |
-| 版式层 | `manus/stys/arxiv.cls` | 页面尺寸、字体、标题面板、标题层级、图表标题、浮动体、参考文献样式 | 被 venue 自己的 class **替换** |
+| 版式层 | `manus/stys/stage.cls` | 页面尺寸、字体、标题面板、标题层级、图表标题、浮动体、引用宏包 | 被 venue 自己的 class **替换** |
+| 参考文献层 | `manus/stys/stage.bst` | 条目怎么排：按作者排序、`[3]` 式编号，且不打印 DOI、URL、ISBN、ISSN | 被模板包自带的 `.bst` **替换** |
 | 写作层 | `manus/stys/stage.sty` | `\todo{...}`，以及写作 skill 会写进 `secs/`、`tabs/` 的那些宏 | **逐字带过去**——不论 class 换成什么，`\usepackage{stys/stage}` 这一行都留着 |
 
-扩展这两个文件时请守住这条分界：章节或表格文件里会出现的东西放进 package，只有页面外观需要的东西放进 class。项目自己的宏（`\newcommand{\method}{...}`）写在 `main.tex` 里，不要写进 `stys/`——模板文件会被替换或更新。
+`stage.bst` 是 `plainnat` 掐掉了四个字段，CVPR 自己的样式就是这么做的：DOI 或 URL 仍留在 `reference.bib` 里——那是该条目的来源凭据，也是 `/stage-refs-curator` 重新取记录的依据——只是不排版出来，于是参考文献表读起来像一篇会议论文，而不像一份数据库导出。
+
+扩展 class 或 package 时请守住这条分界：章节或表格文件里会出现的东西放进 package，只有页面外观需要的东西放进 class。项目自己的宏（`\newcommand{\method}{...}`）写在 `main.tex` 里，不要写进 `stys/`——这三个模板文件都会被替换或更新。
 
 **怎么转成会议模板。** 不是就地换 class。`manus/main.tex` 永远编译成预印本；venue 版式是一份**生成出来的副本**：
 
 1. 下载 venue 的官方作者模板包（CVPR、NeurIPS、ACL、某个 IEEE 期刊——它以什么形式发布就是什么）。
 2. `/stage-subm-packer convert kit=<zip 或目录的路径>`——模板包整份、不加编辑地解包进 `cycls/<cycle>/template/`，与该周期的 `venue.yml` 并列。它刻意不放进 `manus/`：那棵树会被 `lint.sh` 扫描，而模板包自带的示例 `.tex` 会触发 `\todo` 计数和身份泄漏扫描。`venue.yml` 的 `template:` 指名的是模板包里那个 class。
-3. 这次运行会读模板包自带的示例 `.tex` 以取得它要的宏，在 `wkdrs/` 下写出一份独立副本——venue 的 class、逐字带过去的 `stage.sty`、一个为"`arxiv.cls` 提供过而 venue class 没有"的部分生成的精简 `compat.sty`、一份用 venue 的宏重新发射你的标题/作者/abstract 的 `main.tex`，以及原封不动的 `secs/`、`tabs/`、`figs/`、`bibs/`——然后构建它，并报出**该版式下**的页数，那才是 `page_limit_main` 真正指的那个数。
+3. 这次运行会读模板包自带的示例 `.tex` 以取得它要的宏，在 `wkdrs/` 下写出一份独立副本——venue 的 class、逐字带过去的 `stage.sty`、一个为"`stage.cls` 提供过而 venue class 没有"的部分生成的精简 `compat.sty`、一份用 venue 的宏重新发射你的标题/作者/abstract 的 `main.tex`，以及原封不动的 `secs/`、`tabs/`、`figs/`、`bibs/`——然后构建它，并报出**该版式下**的页数，那才是 `page_limit_main` 真正指的那个数。
 
 `manus/` 永不被编辑，副本每次运行都从头重新生成，模板也绝不去抓、绝不凭记忆写：官方模板包是唯一来源。转换替你做不了的事，会落成 `tasks/<cycle>_venue.md` 里的一行 `- [ ]`，点名由哪个 skill 来修——是一份被跟踪的清单，而不是聊天窗口里的一句话。压页数期间想跑多少次 `convert` 就跑多少次——它跳过所有冻结关口，所以在手稿里还有 `\todo` 时照样能用。
 
-**class 选项**——`\documentclass[twocolumn]{stys/arxiv}`：`onecolumn` | `twocolumn`，外加 `anon`，以及 `article` 支持的其他选项。导言区中，`\paperstyle{fancy|simple}` 选择带框或平铺的标题面板，`\papercolor{green|blue|black}` 选择配色。
+**class 选项**——`\documentclass[twocolumn]{stys/stage}`：`onecolumn` | `twocolumn`，外加 `anon`，以及 `article` 支持的其他选项。导言区中，`\paperstyle{fancy|simple}` 选择带框或平铺的标题面板，`\papercolor{green|blue|black}` 选择配色。
 
 **标题面板**——在导言区收集，由 `\maketitle` 一次排版：
 

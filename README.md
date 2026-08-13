@@ -63,7 +63,7 @@ STAGE/
 │   ├── figs/               # Rendered figures (PDF); figs/srcs/ holds every figure's source
 │   ├── tabs/               # Tables, generated from evidence
 │   ├── bibs/               # reference.bib
-│   └── stys/               # arxiv.cls (the look) + stage.sty (\todo and authoring macros)
+│   └── stys/               # stage.cls (the look) + stage.sty (\todo and authoring macros)
 ├── mates/                  # Imported evidence — read-only
 │   ├── <source-slug>/      # Snapshots mirroring upstream STAR paths
 │   ├── manual/             # Hand-registered evidence drops
@@ -116,7 +116,7 @@ The abbreviated directory names follow STAR's convention:
 | `figs/` | Figures | Rendered PDFs; `srcs/` their editable sources |
 | `tabs/` | Tables | Table `.tex` files, generated from evidence |
 | `bibs/` | Bibliographies | `reference.bib` |
-| `stys/` | Styles | `arxiv.cls` and `stage.sty` — venue kits live in `cycls/<cycle>/template/`, not here |
+| `stys/` | Styles | `stage.cls` and `stage.sty` — venue kits live in `cycls/<cycle>/template/`, not here |
 | `mates/` | Materials | Imported evidence snapshots — read-only |
 | `cycls/` | Cycles | One directory per submission attempt |
 | `execs/` | Executions | Entrypoint scripts; `scpts/` the utilities |
@@ -128,24 +128,27 @@ Three rules the tree alone does not carry: `mates/` is read-only (`import.sh` an
 
 ## Manuscript template
 
-`manus/` ships a compact, arXiv-style preprint template, split into two layers, because one of them has to survive a venue swap and the other is the thing being swapped:
+`manus/` ships a compact, arXiv-style preprint template, split into three files by what a venue swap does to each — two of them are the thing being swapped, and one has to survive it:
 
 | Layer | File | Owns | In the venue's format |
 | --- | --- | --- | --- |
-| The look | `manus/stys/arxiv.cls` | page geometry, fonts, the title panel, headings, captions, floats, bibliography style | **replaced** by the venue's own class |
+| The look | `manus/stys/stage.cls` | page geometry, fonts, the title panel, headings, captions, floats, the citation package | **replaced** by the venue's own class |
+| The reference list | `manus/stys/stage.bst` | how an entry is typeset: sorted by author, numbered `[3]`, and no DOI, URL, ISBN, or ISSN printed | **replaced** by the kit's own `.bst` |
 | The authoring layer | `manus/stys/stage.sty` | `\todo{...}` plus the macros the writing skills emit into `secs/` and `tabs/` | **carried over verbatim** — the line `\usepackage{stys/stage}` stays whatever the class becomes |
 
-Keep that split when you extend either file: anything a section or table file writes belongs in the package; anything only the page look needs belongs in the class. Project-specific macros (`\newcommand{\method}{...}`) go in `main.tex`, never in `stys/` — both template files get replaced or updated under you.
+`stage.bst` is `plainnat` with four fields silenced, which is the arrangement CVPR's own style makes: a DOI or URL stays in `reference.bib`, where it is the entry's provenance and what `/stage-refs-curator` re-fetches from, and is simply not typeset — so the reference list reads like a conference paper's rather than like a database export.
+
+Keep that split when you extend the class or the package: anything a section or table file writes belongs in the package; anything only the page look needs belongs in the class. Project-specific macros (`\newcommand{\method}{...}`) go in `main.tex`, never in `stys/` — all three template files get replaced or updated under you.
 
 **Getting into a conference template.** You do not swap the class in place. `manus/main.tex` always compiles as the preprint; the venue's format is a **generated copy**:
 
 1. Download the venue's official author kit (CVPR, NeurIPS, ACL, an IEEE journal — whatever it ships as).
 2. `/stage-subm-packer convert kit=<path-to-zip-or-dir>` — the kit unpacks whole and unedited into `cycls/<cycle>/template/`, beside that cycle's `venue.yml`. It stays out of `manus/` deliberately: that tree is scanned by `lint.sh`, and a kit's own example `.tex` would trip the `\todo` count and the identity-leak scan. `template:` in `venue.yml` names the class inside the kit.
-3. The run reads the kit's own example `.tex` for the macros it wants, writes a standalone copy under `wkdrs/` — the venue's class, `stage.sty` verbatim, a small generated `compat.sty` for what `arxiv.cls` provided and the venue class does not, a `main.tex` re-emitting your title/authors/abstract through the venue's macros, and `secs/`, `tabs/`, `figs/`, `bibs/` unchanged — then builds it and reports the page count **in that format**, which is the number `page_limit_main` actually means.
+3. The run reads the kit's own example `.tex` for the macros it wants, writes a standalone copy under `wkdrs/` — the venue's class, `stage.sty` verbatim, a small generated `compat.sty` for what `stage.cls` provided and the venue class does not, a `main.tex` re-emitting your title/authors/abstract through the venue's macros, and `secs/`, `tabs/`, `figs/`, `bibs/` unchanged — then builds it and reports the page count **in that format**, which is the number `page_limit_main` actually means.
 
 `manus/` is never edited, the copy is regenerated from scratch every run, and the template is never fetched or written from memory: an official kit is the only source. Whatever the conversion cannot do for you lands as a `- [ ]` line in `tasks/<cycle>_venue.md`, naming the skill that fixes it — a tracked list rather than a note in a chat window. Re-run `convert` as often as you like while trimming to the page limit — it skips every freeze gate, so it works on a manuscript that still has `\todo` markers in it.
 
-**Class options** — `\documentclass[twocolumn]{stys/arxiv}`: `onecolumn` | `twocolumn`, plus `anon` and anything `article` takes. Inside the preamble, `\paperstyle{fancy|simple}` picks a framed or flat title panel and `\papercolor{green|blue|black}` sets the theme.
+**Class options** — `\documentclass[twocolumn]{stys/stage}`: `onecolumn` | `twocolumn`, plus `anon` and anything `article` takes. Inside the preamble, `\paperstyle{fancy|simple}` picks a framed or flat title panel and `\papercolor{green|blue|black}` sets the theme.
 
 **Title panel** — collected in the preamble, typeset once by `\maketitle`:
 

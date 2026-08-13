@@ -41,7 +41,7 @@ reformats the paper into the cycle's venue template and reports the page count i
 skipping every freeze gate. `kit=<path>` registers an official venue template kit (a zip or a
 directory) before converting. An unrecognized argument names the three modes and asks.
 
-**Conversion procedure.** `references/venue-convert.md` — the kit contract, what `stys/arxiv.cls`
+**Conversion procedure.** `references/venue-convert.md` — the kit contract, what `stys/stage.cls`
 owns and a venue class must replace, the abstract relocation, `compat.sty`, and the anonymity
 mapping. Read it before converting; it is not needed on a run that does not convert.
 

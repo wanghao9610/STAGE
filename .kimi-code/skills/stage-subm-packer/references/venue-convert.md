@@ -61,7 +61,7 @@ nobody is allowed to edit, on every pack, forever.
 - **No `kit=`** — `cycls/<cycle>/template/` must already exist. Missing, and the
   run stops with the one thing that unblocks it: the official kit's path.
 - **`template:` absent, empty, or `arxiv`** — no conversion. The package is the
-  preprint form built from `stys/arxiv.cls`, which is what the manuscript already
+  preprint form built from `stys/stage.cls`, which is what the manuscript already
   compiles as. Say so rather than converting to nothing.
 
 The kit is tracked, not ignored: a package is only reproducible from a freeze tag
@@ -117,14 +117,14 @@ the generated `main.tex`, never an edit to `reference.bib`.
 ## 4. Generate `compat.sty`
 
 `stage.sty` covers the macros the writing skills emit. What it deliberately does
-**not** cover is the content-level packages `stys/arxiv.cls` loads on top of it —
+**not** cover is the content-level packages `stys/stage.cls` loads on top of it —
 and a section or table written against those breaks under a venue class that loads
 none of them. `compat.sty` closes exactly that gap:
 
-| Provided by `arxiv.cls`, absent from `stage.sty` | Reaches body files as |
+| Provided by `stage.cls`, absent from `stage.sty` | Reaches body files as |
 |---|---|
 | `algorithm`, `algpseudocode` | `\begin{algorithm}`, `\State`, `\Require` |
-| `\algref{alg}{line}` — the class's two-argument form (`arxiv.cls:104`) | a line-level algorithm reference; `stage.sty` provides only the one-argument fallback |
+| `\algref{alg}{line}` — the class's two-argument form (`stage.cls:104`) | a line-level algorithm reference; `stage.sty` provides only the one-argument fallback |
 | `mathtools`, `bm` | `\coloneqq`, `\bm{}`, `\DeclarePairedDelimiter` |
 | `siunitx` | `\SI{}`, `\num{}` |
 | `nicematrix` | `NiceTabular` |
@@ -132,7 +132,7 @@ none of them. `compat.sty` closes exactly that gap:
 
 **Add only what the copied body files actually use.** Scan `secs/`, `tabs/`, and
 `figs/` for each construct and include its package only on a hit. Copying
-`arxiv.cls`'s whole `\RequirePackage` list into `compat.sty` is how option clashes
+`stage.cls`'s whole `\RequirePackage` list into `compat.sty` is how option clashes
 get manufactured: the venue class has usually loaded its own hyperref, geometry,
 and caption setup with options that a bare second load will fight.
 
@@ -151,7 +151,7 @@ Carried over:
 
 - **Title, authors, affiliations, contribution notes, keywords, metadata links**,
   re-emitted through the venue's macros. See the table below for what each
-  `arxiv.cls` command holds.
+  `stage.cls` command holds.
 - **Paper-specific `\newcommand` / `\renewcommand`** from `manus/main.tex`'s own
   preamble — `\method` and its kind. These are the paper's, not the framework's,
   so they are not in `stage.sty` or `compat.sty`, and the body depends on them.
@@ -162,13 +162,13 @@ Carried over:
   mechanism. Venues differ on whether the appendix precedes or follows the
   references; follow the kit's example, and say in the report which order was used.
 
-### What `arxiv.cls` owns
+### What `stage.cls` owns
 
-Every command below is defined by `stys/arxiv.cls` and by nothing else. Under a
+Every command below is defined by `stys/stage.cls` and by nothing else. Under a
 venue class each one is either re-expressed through a native equivalent or dropped
 — left as-is, it is an undefined control sequence and the copy does not compile.
 
-| `arxiv.cls` command | Line | Becomes |
+| `stage.cls` command | Line | Becomes |
 |---|---|---|
 | `\affiliation[key]{...}` | 330 | the venue's affiliation macro |
 | `\contribution[mark]{...}` | 335 | the venue's equal-contribution / corresponding-author note, or a `\thanks` |
@@ -176,7 +176,7 @@ venue class each one is either re-expressed through a native equivalent or dropp
 | `\code` `\project` `\dataset` | 351–354 | a links line in the venue's own idiom, or dropped; redacted under anonymity |
 | `\correspondence{...}` | 355 | the venue's corresponding-author note |
 | `\paperdate{...}` | 356 | dropped — venue classes date the proceedings themselves |
-| `\paperstyle{...}` `\papercolor{...}` | 359, 180 | **dropped.** These drive `arxiv.cls`'s title panel and have no venue equivalent |
+| `\paperstyle{...}` `\papercolor{...}` | 359, 180 | **dropped.** These drive `stage.cls`'s title panel and have no venue equivalent |
 | `\beginappendix` | 617 | the venue's appendix mechanism, usually `\appendix` |
 | `\metadata[label]{value}` | — | a links line, or dropped |
 
@@ -184,7 +184,7 @@ venue class each one is either re-expressed through a native equivalent or dropp
 
 The one relocation that is easy to miss and always breaks the build when missed.
 
-`arxiv.cls` takes the abstract as a **preamble command**, `\abstract{...}`, so
+`stage.cls` takes the abstract as a **preamble command**, `\abstract{...}`, so
 `manus/main.tex` calls it before `\begin{document}` and `/skill:stage-outl-planner`'s
 `\input{secs/0_abstract}` sits in the preamble too. Nearly every venue class wants
 a **body environment**, `\begin{abstract}...\end{abstract}` after `\maketitle`.

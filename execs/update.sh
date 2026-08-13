@@ -330,7 +330,13 @@ if [[ "${ADOPT}" == true ]]; then
         "execs/scpts/lint.sh"
         "execs/scpts/fmt.sh"
         "manus/main.tex"
+        # The three template-layer files main.tex loads by path or by name: the
+        # preprint class, the authoring package, and the bibliography style its
+        # \bibliographystyle line names. A paper that already has any of them
+        # keeps its own, like every file here.
+        "manus/stys/stage.cls"
         "manus/stys/stage.sty"
+        "manus/stys/stage.bst"
         "mates/MANIFEST.md"
     )
     # Layout directories the writing workflow expects to exist.
