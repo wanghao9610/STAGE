@@ -29,11 +29,7 @@
     // extensions.latex
     "[latex]": {
         "editor.defaultFormatter": "James-Yu.latex-workshop",
-        "editor.formatOnSave": true,
-        // One sentence per line means source lines as long as their sentence
-        // (conventions §3.7). Wrapping is a view, never a line break in the
-        // file — the formatter would undo a hard wrap on the next save anyway.
-        "editor.wordWrap": "on"
+        "editor.formatOnSave": true
     },
     // Root search: a **/ glob so detection also works when the window is not
     // opened at the repo root. A workspace-relative "manus/main.tex" matches
@@ -52,11 +48,19 @@
     // and an empty string with no folder open (outDir would become /wkdrs).
     "latex-workshop.latex.outDir": "../wkdrs/builds",
     "latex-workshop.mathpreviewpanel.cursor.enabled": true,
-    "latex-workshop.message.error.show": false,
+    // A failed build must be visible: manus/stys/arxiv.cls requires pdftex, so a
+    // wrong engine dies with no PDF, and a suppressed popup leaves only a log
+    // fragment to go on. Warnings stay quiet — undefined refs to floats that are
+    // still planned are the normal mid-draft state here.
+    "latex-workshop.message.error.show": true,
     "latex-workshop.message.warning.show": false,
     "latex-workshop.showContextMenu": true,
     "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
     "latex-workshop.latex.autoBuild.run": "onSave",
+    // Never: onBuilt deletes the aux after every compile, then the next latexmk
+    // fabricates an empty stub and runs bibtex on it first — "I found no
+    // \citation / \bibdata / \bibstyle commands" — and never reaches pdflatex.
+    // Aux files live in gitignored wkdrs/builds/; latexmk needs them to rebuild.
     "latex-workshop.latex.autoClean.run": "onBuilt",
     "latex-workshop.formatting.latex": "latexindent",
     "latex-workshop.formatting.latexindent.path": "latexindent",
@@ -64,35 +68,23 @@
     // gitignored and absent in a fresh clone, and latexindent exits non-zero
     // when -g points into a directory that does not exist yet — which surfaces
     // as a "Formatting failed" popup on the first save, before any build.
-    // -m lets latexindent move line breaks, which is what one-sentence-per-line
-    // needs; the rule itself comes from .latexindent.yaml at the repo root, the
-    // same file execs/scpts/fmt.sh reads, so a save and a script run cannot
-    // disagree. %WORKSPACE_FOLDER% is workspaceFolders[0] — wrong in a
-    // multi-root window, empty with no folder open — and here that is harmless:
-    // a config latexindent cannot find leaves the file indented but unbroken,
-    // and fmt.sh finishes the job. defaultIndent is repeated literally rather
-    // than as %INDENT% for exactly that fallback: %INDENT% follows the editor's
-    // tab settings, and an editor that disagrees with the yaml would reindent
-    // the file on every save and have fmt.sh undo it on every run.
     "latex-workshop.formatting.latexindent.args": [
-        "-m",
-        "-l=%WORKSPACE_FOLDER%/.latexindent.yaml",
         "-g",
         "%TMPDIR%/indent.log",
         "%TMPFILE%",
-        "-y=defaultIndent: '    '"
+        "-y=defaultIndent: '%INDENT%'"
     ],
+    // PdfLaTeX first, because "first" is the recipe LaTeX Workshop builds with
+    // when latex-workshop.latex.recipe.default is unset — which matches .env's
+    // LATEX_ENGINE=pdflatex and execs/run.sh, the repo's only sanctioned build.
+    // No XeLaTeX recipe: manus/stys/arxiv.cls disables sans f-ligatures through
+    // microtype's \DisableLigatures, which needs pdftex, so xelatex stops there
+    // with an error and produces nothing. LuaLaTeX does build and is kept.
     "latex-workshop.latex.recipes": [
         {
             "name": "PdfLaTeX",
             "tools": [
                 "pdflatexmk"
-            ]
-        },
-        {
-            "name": "XeLaTeX",
-            "tools": [
-                "xelatexmk"
             ]
         },
         {
@@ -115,21 +107,10 @@
                 "-outdir=%OUTDIR%",
                 "%DOC%"
             ],
-            "env": {}
-        },
-        {
-            "name": "xelatexmk",
-            "command": "latexmk",
-            "args": [
-                "-synctex=1",
-                "-xelatex",
-                "-interaction=nonstopmode",
-                "-file-line-error",
-                "-cd",
-                "-outdir=%OUTDIR%",
-                "%DOC%"
-            ],
-            "env": {}
+            "env": {
+                "TEXINPUTS": "%DIR%/stys:",
+                "BSTINPUTS": "%DIR%/stys:"
+            }
         },
         {
             "name": "lualatexmk",
@@ -143,7 +124,10 @@
                 "-outdir=%OUTDIR%",
                 "%DOC%"
             ],
-            "env": {}
+            "env": {
+                "TEXINPUTS": "%DIR%/stys:",
+                "BSTINPUTS": "%DIR%/stys:"
+            }
         }
     ]
 }
