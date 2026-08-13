@@ -57,6 +57,8 @@
     "latex-workshop.showContextMenu": true,
     "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
     "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.view.pdf.viewer": "tab",
+    "latex-workshop.view.pdf.tab.editorGroup": "right",
     // Never: onBuilt deletes the aux after every compile, then the next latexmk
     // fabricates an empty stub and runs bibtex on it first — "I found no
     // \citation / \bibdata / \bibstyle commands" — and never reaches pdflatex.
