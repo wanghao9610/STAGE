@@ -24,11 +24,17 @@ editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.z
 conventions — are kept in step for human readers only and are never loaded at runtime, so this
 SKILL.md stays authoritative.
 
-Invocation: `/stage-flow-status [SECTION]` — no argument reports the whole flow; a section
-argument, resolved per conventions §5 by number, file slug, or title against `notes/outline.md`,
-narrows the outline board and claim detail to that section. An `involve=<level>` token is
-stripped before SECTION resolves (§7) and changes nothing else here. An ambiguous section
-argument is the one question this skill may ask (§5); it asks nothing else.
+Invocation: `/stage-flow-status [SECTION] [DESCRIPTION]` — no argument reports the whole flow; a
+section argument, resolved per conventions §5 by number, file slug, or title against
+`notes/outline.md`, narrows the outline board and claim detail to that section. An
+`involve=<level>` token is stripped before SECTION resolves (§7) and changes nothing else here. An
+ambiguous section argument is the one question this skill may ask (§5); it asks nothing else.
+Anything left after `SECTION` is a description (conventions §7.13): in your own words, what this
+run is for. Prose that resolves to no section is description alone, not a missing target — report
+the whole flow, and say so in the reply's first line. A description can steer what the report
+reads hardest — which unknown is worth a second look, which line is worth quoting rather than
+counting — but it drops nothing the report owes, and it never moves the next action, which the
+priority order fixes down to the tie-break.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
 every STAGE skill shares; this file states what is specific to this one and wins wherever it is

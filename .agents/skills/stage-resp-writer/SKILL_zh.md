@@ -10,7 +10,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`$stage-resp-writer [CYCLE]`——不带参数时取 `notes/story.md` 里的当前周期（规约 §5）；给出 `CYCLE` 参数则直接点名 `cycls/` 下的一个目录；对不上 → 列出候选并提问（§7）。
+调用方式：`$stage-resp-writer [CYCLE] [DESCRIPTION] [involve=high]`——不带参数时取 `notes/story.md` 里的当前周期（规约 §5）；给出 `CYCLE` 参数则直接点名 `cycls/` 下的一个目录；对不上 → 列出候选并提问（§7）。周期之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么——哪位审稿人最让作者不安、这份回复必须赢下什么。它是本次运行可以顺着走、也可以作为某条意见立场的理由记下来的一条线索，绝不代替本 skill 逐条要征求的那道认可，更不构成任何承诺：承诺只在回复真正作出承诺的地方产生，并落在 `tasks/<cycle>_promises.md` 里。没有点名任何周期的散文就是纯描述：用当前周期，并先说明这一点。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完；不做分节选读。对本 skill 约束最紧的几节：§5 周期解析、§7 对话、§8 产物登记表（回复与承诺的 schema）、§9 编造边界。
 本文件只写本 skill 特有的部分，更严处以本文件为准。

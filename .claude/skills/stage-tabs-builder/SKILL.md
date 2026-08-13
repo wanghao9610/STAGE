@@ -9,7 +9,7 @@ description: >-
   Tables row and the claim ledger. Use when the user runs /stage-tabs-builder, when a run names it as the
   next action, or asks to build, fill, extend, or fix a results, ablation, or comparison table, or to
   turn imported results into LaTeX.
-argument-hint: "[TABLE]"
+argument-hint: "[TABLE] [involve=low]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
   Bash(bash execs/scpts/lint.sh:*), Bash(execs/scpts/lint.sh:*),
@@ -21,7 +21,7 @@ allowed-tools: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `/stage-tabs-builder [TABLE]` — `TABLE` matches the Tables table of `notes/outline.md` by ID (`T2`), file slug (`main_results`), or purpose phrase, with §5's matching manners applied to Tables rows; absent or ambiguous, list the rows with their statuses and ask (§7). A table not yet in the outline is described in the argument and gets its outline row first. One table per invocation.
+Invocation: `/stage-tabs-builder [TABLE] [involve=low]` — `TABLE` matches the Tables table of `notes/outline.md` by ID (`T2`), file slug (`main_results`), or purpose phrase, with §5's matching manners applied to Tables rows; absent or ambiguous, list the rows with their statuses and ask (§7). A table not yet in the outline is described in the argument and gets its outline row first. One table per invocation. There is no separate description slot here: free text is already the table's own description — that is how a purpose phrase resolves a Tables row, and how a table with no row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the table is for; it never supplies what goes in a cell, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}`. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own `Read` call, never `cat`-ed into a Bash command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — this skill is its enforcement at the table level), §8 (the artifact registry and its staleness rule), and §5 (resolution). This file states what is specific to this skill and wins wherever it is stricter.
 

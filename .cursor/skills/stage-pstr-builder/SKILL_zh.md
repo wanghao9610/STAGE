@@ -11,7 +11,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`/stage-pstr-builder [plan | render | check] [kit=<path>]`——不带参数时，对着计划和磁盘上的文件审计这张海报，并提出唯一的下一步动作；`plan` 选出哪些内容能上墙并写出 `POSTER_PLAN.md`；`render` 依计划生成 `poster.tex` 并编译成品；`check` 跑可读性与溯源闸。`kit=<path>` 在渲染前登记会议官方的海报模板包（一个 zip 或一个目录）。轮次取当前活跃的那个，按 §5 从 `notes/story.md` 的 `cycle:` 解析；参数不认识时列出四个模式并询问（§7）。
+调用方式：`/stage-pstr-builder [plan | render | check] [kit=<path>] [DESCRIPTION] [involve=high]`——不带参数时，对着计划和磁盘上的文件审计这张海报，并提出唯一的下一步动作；`plan` 选出哪些内容能上墙并写出 `POSTER_PLAN.md`；`render` 依计划生成 `poster.tex` 并编译成品；`check` 跑可读性与溯源闸。`kit=<path>` 在渲染前登记会议官方的海报模板包（一个 zip 或一个目录）。轮次取当前活跃的那个，按 §5 从 `notes/story.md` 的 `cycle:` 解析；参数不认识时列出四个模式并询问（§7）。模式与 `kit=` 之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么——听众是谁、场次多长、一个路过的人应该带走什么。它是海报方案可以顺着走、也可以记下来的一条线索，绝不替代本 skill 在任何东西上墙之前必问的那道取舍确认。没有点名任何模式的散文就是纯描述：照旧按无参数那样审一遍海报，并先说明这一点。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。
 
 **版式流程。** `references/poster-layout.md`——两种受支持的版式及其分区图、尺寸表、字号下限与有效字号如何计算、自带模板的契约，以及会议模板包如何顶替它。在 `plan`、`render`、`check` 之前读它；不带参数、又没发现待办的审计运行用不上它。
 

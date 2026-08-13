@@ -16,9 +16,17 @@ description: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `/skill:stage-resp-writer [CYCLE]` — with no argument, the active cycle from
-`notes/story.md` (conventions §5); a `CYCLE` argument names a directory under `cycls/` directly;
-no match → list the candidates and ask (§7).
+Invocation: `/skill:stage-resp-writer [CYCLE] [DESCRIPTION] [involve=high]` — with no argument,
+the active cycle from `notes/story.md` (conventions §5); a `CYCLE` argument names a directory
+under `cycls/` directly; no match → list the candidates and ask (§7). Anything left after the
+cycle is a description (conventions §7.13): in your own words, what this run is for — which
+reviewer worries the author most, what the rebuttal has to win. It is a lead the run may follow
+and may record as the reason behind a point's stance, never an instruction that stands in for the
+per-point approval this skill asks for, and never a promise: a promise is made only where the
+response makes one, and it lands in `tasks/<cycle>_promises.md`. Prose that names no cycle is
+description alone: use the active cycle, and say so first. An optional `involve=low|medium|high`
+token may accompany any argument: it sets this run's involve level (conventions §7.7), is part of
+neither the argument nor the description, and is stripped before either is read.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
 every STAGE skill shares — read the whole file at the start of every run; there is no

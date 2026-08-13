@@ -28,12 +28,20 @@ editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.z
 conventions — are kept in step for human readers only and are never loaded at runtime, so this
 SKILL.md stays authoritative.
 
-Invocation: `/stage-subm-packer [camera | convert] [kit=<path>]` — no argument packs a review
-submission for the active cycle, resolved per conventions §5 from `cycle:` in `notes/story.md`;
-`camera` packs the camera-ready for the same cycle and arms the promise gate; `convert` only
-reformats the paper into the cycle's venue template and reports the page count in that format,
-skipping every freeze gate. `kit=<path>` registers an official venue template kit (a zip or a
-directory) before converting. An unrecognized argument names the three modes and asks.
+Invocation: `/stage-subm-packer [camera | convert] [kit=<path>] [DESCRIPTION] [involve=high]` — no
+argument packs a review submission for the active cycle, resolved per conventions §5 from `cycle:`
+in `notes/story.md`; `camera` packs the camera-ready for the same cycle and arms the promise gate;
+`convert` only reformats the paper into the cycle's venue template and reports the page count in
+that format, skipping every freeze gate. `kit=<path>` registers an official venue template kit (a
+zip or a directory) before converting. An unrecognized argument names the three modes and asks.
+Anything left after the mode and `kit=` is a description (conventions §7.13): in your own words,
+what this run is for. It is a lead the run may follow and may record in the packing report, and it
+authorizes nothing: no description waives a freeze gate, closes a promise, or moves a submission —
+those sit on the STOP line (conventions §2) and are asked at every involve level. Prose that names
+no mode is description alone: pack the review submission as with no argument, and say so first. An
+optional `involve=low|medium|high` token may accompany any argument: it sets this run's involve
+level (conventions §7.7), is part of neither the argument nor the description, and is stripped
+before either is read.
 
 **Conversion procedure.** `references/venue-convert.md` — the kit contract, what `stys/stage.cls`
 owns and a venue class must replace, the abstract relocation, `compat.sty`, and the anonymity

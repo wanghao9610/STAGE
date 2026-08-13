@@ -17,10 +17,15 @@ description: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, `references/*_zh.md`, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `$stage-peer-reviewer [MODE] [extern=<path>] [out=<path>]` — `MODE` is `panel`
-(default) or `quick`. With no `extern=`, the target is this repository's manuscript and the
-cycle is the active one from `notes/story.md` (conventions §5); an `involve=<level>` token is
-stripped before anything else is read (§7.7).
+Invocation: `$stage-peer-reviewer [MODE] [extern=<path>] [out=<path>] [DESCRIPTION]` — `MODE` is
+`panel` (default) or `quick`. With no `extern=`, the target is this repository's manuscript and
+the cycle is the active one from `notes/story.md` (conventions §5); an `involve=<level>` token is
+stripped before anything else is read (§7.7). Anything left after the mode and the `extern=` /
+`out=` tokens is a description (conventions §7.13): in your own words, what this run is for —
+which venue's bar to review against, which weakness the author already fears. It steers where the
+panel presses hardest and it is recorded in the review's header; it never softens a score, waives
+a rubric cap, or excuses a broken build, which stays finding #1 whatever the description says.
+Prose that names no mode is description alone: run the full `panel`, and say so first.
 
 **The external target (`extern=`).** `extern=<path>` points the panel at a paper this
 repository did not write — the PDF somebody asked you to referee. Everything below holds, with

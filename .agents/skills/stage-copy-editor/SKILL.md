@@ -16,12 +16,22 @@ description: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `$stage-copy-editor [SECTION | style]` — a section argument resolves by number, file
-slug, or title against `notes/outline.md` (conventions §5; ambiguity → ask); no argument polishes
-every section the outline lists as `drafted` or later, in outline order. The literal `style` runs
-the profile branch instead: it writes `notes/style.md` and touches no prose; `style preset:<name>`
-starts from that preset, `style sample=<path>` (repeatable) measures those files, and an
-unrecognized token is asked about, never guessed.
+Invocation: `$stage-copy-editor [SECTION | style] [DESCRIPTION] [involve=low]` — a section
+argument resolves by number, file slug, or title against `notes/outline.md` (conventions §5;
+ambiguity → ask); no argument polishes every section the outline lists as `drafted` or later, in
+outline order. The literal `style` runs the profile branch instead: it writes `notes/style.md` and
+touches no prose; `style preset:<name>` starts from that preset, `style sample=<path>`
+(repeatable) measures those files, and an unrecognized token is asked about, never guessed.
+Anything left after that is a description (conventions §7.13): in your own words, what this run is
+for — a lead the pass may follow and may record, never an instruction that stands in for a
+confirmation point. Prose that resolves to no section and is not `style` is description alone:
+polish every section the outline lists as `drafted` or later, and say so first. A lone token that
+looks like a section and matches none is not a description: list the candidates and ask (§5.3). A
+description may say what this pass is for — cut for space, de-jargon, fix the tense drift — and it
+never licenses a change to meaning, to a number, or to a citation, which stay outside this skill
+whatever it says. An optional `involve=low|medium|high` token may accompany any argument: it sets
+this run's involve level (conventions §7.7), is part of neither the argument nor the description,
+and is stripped before either is read.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
 every STAGE skill shares — read the whole file at the start of every run (there is no

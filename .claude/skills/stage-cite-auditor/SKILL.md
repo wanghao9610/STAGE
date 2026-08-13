@@ -8,7 +8,7 @@ description: >-
   wkdrs/reports/CITES_<date>.md (ephemeral) plus tasks/ follow-ups, and routes every fix to
   /stage-refs-curator or /stage-sect-drafter. Use when the user runs /stage-cite-auditor, when a run
   names it as the next action, or asks whether the citations and related-work claims hold up.
-argument-hint: "[SECTION]"
+argument-hint: "[SECTION] [DESCRIPTION]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Agent, Bash(git status:*), Bash(git diff:*), Bash(git log:*),
   Bash(git add:*), Bash(git commit:*)
@@ -18,9 +18,16 @@ allowed-tools: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `/stage-cite-auditor [SECTION]` — a section argument resolves per conventions §5 and
-narrows the assertion and missing-citation scans; key resolution and bib hygiene always run over
-the whole manuscript and bib; no argument audits everything.
+Invocation: `/stage-cite-auditor [SECTION] [DESCRIPTION]` — a section argument resolves per
+conventions §5 and narrows the assertion and missing-citation scans; key resolution and bib
+hygiene always run over the whole manuscript and bib; no argument audits everything. Anything left
+after the section is a description (conventions §7.13): in your own words, what this run is for.
+Prose that resolves to no section is description alone, not a missing target — audit everything,
+and say so in the reply's first line. A lone token that looks like a section and matches none is
+not a description: list the candidates and ask (§5.3). A description can steer which assertions
+get the closest read; it never narrows the key-resolution and bib-hygiene scans, which always run
+whole. An `involve=<level>` token is stripped before the section or the description is read
+(§7.7); this skill fixes nothing itself, so the level moves nothing here.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
 every STAGE skill shares — read the whole file at the start of every run (there is no

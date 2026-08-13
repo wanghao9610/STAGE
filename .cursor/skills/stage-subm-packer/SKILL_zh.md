@@ -11,7 +11,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`/stage-subm-packer [camera | convert] [kit=<path>]`——不带参数则为当前周期打一个送审包，周期按规约 §5 从 `notes/story.md` 的 `cycle:` 解析；`camera` 为同一个周期打 camera-ready 包，并把承诺关口装上；`convert` 只把论文改排成本周期的 venue 模板并报出该版式下的页数，跳过所有冻结关口。`kit=<path>` 在转换前注册一份官方 venue 模板包（zip 或目录）。无法识别的参数则点名这三种模式并提问。
+调用方式：`/stage-subm-packer [camera | convert] [kit=<path>] [DESCRIPTION] [involve=high]`——不带参数则为当前周期打一个送审包，周期按规约 §5 从 `notes/story.md` 的 `cycle:` 解析；`camera` 为同一个周期打 camera-ready 包，并把承诺关口装上；`convert` 只把论文改排成本周期的 venue 模板并报出该版式下的页数，跳过所有冻结关口。`kit=<path>` 在转换前注册一份官方 venue 模板包（zip 或目录）。无法识别的参数则点名这三种模式并提问。模式与 `kit=` 之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么。它是本次运行可以顺着走、也可以记进打包报告的一条线索，但它不授权任何事：没有哪句描述能豁免一道冻结闸门、结掉一条承诺，或者把投稿往前推一步——那些都在 STOP 线上（规约 §2），在任何 involve 档位下都要问。没有点名任何模式的散文就是纯描述：照旧按无参数那样打送审包，并先说明这一点。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。
 
 **转换流程。** `references/venue-convert.md`——模板包契约、`stys/stage.cls` 独占而 venue class 必须替换掉的那些命令、abstract 的搬家、`compat.sty`、匿名映射。转换之前读它；不做转换的运行不需要它。
 

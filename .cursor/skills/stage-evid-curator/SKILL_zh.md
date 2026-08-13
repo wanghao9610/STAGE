@@ -10,7 +10,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。`mates/MANIFEST.md` 及其条目一律用英文写——每个写作类 skill 都要机器读它——中文回复里路径、哈希、指标名同样保留英文；聊天摘要跟随对话语言。
 
-调用方式：`/stage-evid-curator [import | register <path> | check]`——不带参数跑 `check`；`import` 把后续参数原样透传给 `execs/scpts/import.sh`；`register` 接收要收编的文件（已经在 `mates/manual/` 下，或在别处、需要复制进来）。无法识别的记号要问，绝不猜。
+调用方式：`/stage-evid-curator [import | register <path> | check] [DESCRIPTION] [involve=low]`——不带参数跑 `check`；`import` 把后续参数原样透传给 `execs/scpts/import.sh`；`register` 接收要收编的文件（已经在 `mates/manual/` 下，或在别处、需要复制进来）。无法识别的记号要问，绝不猜。模式、以及该模式自己吃掉的东西——`import` 透传给 `execs/scpts/import.sh` 的参数、`register` 要收编的那个路径——之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么，它是本次运行可以顺着走的一条线索；在 `register` 上，它是出处那道提问可以取用的材料，而不是那道提问的替代。没有点名任何模式的散文就是纯描述：跑 `check`，并先说明这一点。孤立一个看着像模式却对不上的词不是描述：它仍是上面那个不认识的记号。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。没有哪一档能让一个文件不带指纹就被登记，或让它的出处被假定而不是被问出来。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——不做分节选读。它对本 skill 约束最紧的是 §8（产物登记表，其 §8.2 正是本文件抄下来的 manifest schema）、§9（编造边界——手稿里每个数字都拿 `mates/` 来量）、§4（真实日期，每条条目都要盖）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 

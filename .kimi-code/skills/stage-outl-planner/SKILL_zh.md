@@ -11,7 +11,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`/skill:stage-outl-planner [involve=low|medium|high]`——一个仓库一篇论文（规约 §5）：没有目标参数；故事就是 `notes/story.md`，当前周期是它 frontmatter 里的 `cycle:`，页数上限来自那个周期的 `venue.yml`；可选的 `involve=` 记号设定本次运行的参与度档位（规约 §7），并会被剥离。
+调用方式：`/skill:stage-outl-planner [DESCRIPTION] [involve=high]`——一个仓库一篇论文（规约 §5）：没有目标参数；故事就是 `notes/story.md`，当前周期是它 frontmatter 里的 `cycle:`，页数上限来自那个周期的 `venue.yml`；可选的 `involve=` 记号设定本次运行的参与度档位（规约 §7），并会被剥离。这里没有目标要解析，那个记号之后剩下的一切都是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么——"消融必须放得下，从 §2 里匀"就是本次运行可以顺着走、也可以作为某个预算的理由记下来的一条线索，但它绝不替代章节清单与图表方案这两项确认，那两项在任何 involve 档位下都要连同算式一起摆出来确认。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线。每次运行开始时整份读完——不做分节选读——用它自己的 `ReadFile`，绝不通过 Shell `cat`。对本 skill 约束最紧的几节：规约 §5（手稿与周期解析）、§7（对话）、§8（登记表，以及 outline / notation 的 schema）、§9（编造边界：§9(a)——骨架不陈述任何事实、任何数字；§9(c)——未确认的页数上限不算上限）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 

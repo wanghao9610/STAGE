@@ -10,7 +10,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`/skill:stage-cite-auditor [SECTION]`——章节参数按规约 §5 解析，把断言扫描与缺引用扫描收窄到那一节；key 解析与 bib 卫生检查始终跑遍整篇手稿与整份 bib；不带参数则全部审计。
+调用方式：`/skill:stage-cite-auditor [SECTION] [DESCRIPTION]`——章节参数按规约 §5 解析，把断言扫描与缺引用扫描收窄到那一节；key 解析与 bib 卫生检查始终跑遍整篇手稿与整份 bib；不带参数则全部审计。章节之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么。解析不到任何章节的散文就是纯描述，不是缺目标——照旧全篇审，并在回复第一行说明这一点。孤立一个看着像章节却对不上的词不是描述：列出候选并提问（§5.3）。描述可以引导哪些论断值得读得最细；它不会收窄 key 解析与 bib 卫生这两项扫描，那两项永远整篇跑。`involve=<level>` 记号在章节与描述被读取之前就被剥离（§7.7）；本 skill 自己不改任何东西，这一档在这里也就不动什么。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完（不做分节选读）。对本 skill 约束最紧的几节：§9 编造边界（§9b——关于被引论文的断言必须能对着阅读笔记核查）、§8 产物登记表（笔记、索引与 bib 住在哪）、§7 对话、§1 git。本文件只写本 skill 特有的部分，更严处以本文件为准。
 

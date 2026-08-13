@@ -10,7 +10,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill 及其 `references/`）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`references/*_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`/stage-peer-reviewer [MODE] [extern=<path>] [out=<path>]`——`MODE` 是 `panel`（默认）或 `quick`。不带 `extern=` 时，评审对象是本仓库的手稿，周期取 `notes/story.md` 里的当前周期（规约 §5）；`involve=<level>` 记号在读取其他任何东西之前被剥离（§7.7）。
+调用方式：`/stage-peer-reviewer [MODE] [extern=<path>] [out=<path>] [DESCRIPTION]`——`MODE` 是 `panel`（默认）或 `quick`。不带 `extern=` 时，评审对象是本仓库的手稿，周期取 `notes/story.md` 里的当前周期（规约 §5）；`involve=<level>` 记号在读取其他任何东西之前被剥离（§7.7）。模式与 `extern=` / `out=` 记号之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么——按哪个会议的标准来审、作者自己最怕哪一处弱点。它引导评审组往哪里压得最狠，并被记进评审报告的抬头；它绝不放松任何评分、豁免任何评分上限，也不为编译失败开脱——无论描述怎么说，编译失败都是第 1 条发现。没有点名任何模式的散文就是纯描述：照旧跑完整的 `panel`，并先说明这一点。
 
 **外部评审对象（`extern=`）。** `extern=<path>` 把评审组指向一篇本仓库没有写的论文——别人请你审的那份 PDF。下面的一切照旧，只有五处替换，而这五处就是全部差别。
 **没有周期：** 不读 `notes/story.md`、`notes/claims.md`，也不读任何 `venue.yml`，所以 venue 与它的刻度（`conference-6` 还是 `journal`）要在给评审组下简介之前问一次——每个参与度档位都必问，因为猜它就等于替用户选了评分标准（§7.7）——并且不写任何 `venue.yml`，这些是关于别人那次投稿的事实（§9c）。
