@@ -8,7 +8,7 @@ description: >-
 
 > 本文件是 `SKILL.md` 的中文对照版，随英文版同步维护，供人阅读；运行时装载的仍是 `SKILL.md`。两版冲突时，以 `SKILL.md` 为准。
 
-**回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
+**回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
 调用方式：`/skill:stage-refs-curator [PAPER | add PAPER [PAPER …] | discover [SECTION | TOPIC] | seed | tidy | position | verify | score] [involve=low]`——不带参数时普查 `manus/bibs/reference.bib`、`notes/refs/` 与索引，审查卫生状况，并提出唯一的下一步动作；一个光秃秃的 arXiv id、DOI、论文 URL 或带引号的标题，是把那一篇收进来，而 `add` 接收多篇（按换行与逗号切分；不属于上述任何形式的片段整体当作一个标题读）；`discover` 从论文自己的故事与主张出发做主题检索并给出排序候选——唯一一个能找出没人点过名的论文的模式，而且一篇都不擅自收进来；`seed` 从 `mates/` 转换导入的 STAR refs；`tidy` 是离线的 bib 卫生整理；`position` 为相关工作给底盘聚类；`verify` 重抓每一条并逐字段比对；`score` 只刷新影响力指标，别的什么都不动。一个标题解析到多条记录、或者没有一条干净地对上，要提问（§7），绝不猜。这里没有独立的描述位：自由文本本身就是论文标题，或者 `discover` 据以检索的那个主题——所以规约 §7.13 说的那句描述*就是*这个参数，不再从中剥出别的东西。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），不属于参数，在参数被读取之前就被剥离。没有哪一档能让一个字段凭记忆写出来而不是抄自本次运行取回的记录，也没有哪一档会不问一声就把检索到的论文收进基库。
 
@@ -50,7 +50,7 @@ description: >-
 
 1. 经 `mates/MANIFEST.md` 定位导入的 refs 树（`<slug>/metds/refs/**`）。一个都没有 → 说出来，路由到 `/skill:stage-evid-curator`（或 `execs/scpts/import.sh`），然后停下。
 2. 把 `manus/bibs/reference.bib` 里没有的上游 `reference.bib` 条目逐字节合并进来，每条都置于一行 `% src: mates/<slug>/metds/refs/reference.bib (seeded YYYY-MM-DD)` 之下——上游 key 保持不变。每条合并进来的条目同一次运行就补上它的 index §4 行：来源写 `mates/<slug>`，没有记录 URL，日期写播种日。
-3. 把每份上游的单篇笔记转换成 `notes/refs/<ABBREV>.md`，按 §8 的笔记 schema：`## What it does` 取自上游笔记；`## Relation to ours` 对着本文的 `notes/story.md` 与主张台账重写——STAR 笔记关联的是一个方法，这份笔记关联的是一篇手稿；`## Citable facts` 只取上游笔记自身陈述过的事实，每条标注 `(via mates/<slug>/...)`。转换出来的笔记逐字带上上游笔记的 `depth:`——只有播种来的笔记才有这个字段——标着 `abstract-and-intro` 的那些进索引 §8 的待读清单，因为上游读到的还不够这里 Step 3 所要求的。已经有笔记的论文跳过并点名。
+3. 把每份上游的单篇笔记转换成 `notes/refs/<ABBREV>.md`，按 §8 的笔记 schema：`## What it does` 取自上游笔记；`## Relation to ours` 对着本文的 `notes/story.md` 与主张记录表重写——STAR 笔记关联的是一个方法，这份笔记关联的是一篇手稿；`## Citable facts` 只取上游笔记自身陈述过的事实，每条标注 `(via mates/<slug>/...)`。转换出来的笔记逐字带上上游笔记的 `depth:`——只有播种来的笔记才有这个字段——标着 `abstract-and-intro` 的那些进索引 §8 的待读清单，因为上游读到的还不够这里 Step 3 所要求的。已经有笔记的论文跳过并点名。
 4. 每份转换出来的笔记加一行索引。`mates/` 本身绝不被编辑——只读（§10）。
 
 ### Step 2a：发现候选（`discover`）
@@ -70,9 +70,9 @@ description: >-
 1. 抓记录——DBLP → Crossref → Semantic Scholar → arXiv；"命中"意味着标题、第一作者姓氏、年份 ±1 全部吻合——只有一个字段吻合不算命中。原始内容在使用之前先缓存到 `wkdrs/refs_<date>/raw/<citekey>.<source>.<ext>`。抓不到记录，或有几条候选但没有干净的赢家 → 在 `%% Needs manual check` 块里写一行，细节（候选、URL、试过什么）写进 index 的 §6；这一篇到此为止。
 2. 把条目誊写进 `manus/bibs/reference.bib`，置于它的 `% src:` 出处行之下，citekey 写 `<Year>_<Method>_<FirstAuthorSurname>`，只做封闭清单里的规范化。同一次运行补上它的 index §4 行，记录 URL 与抓取日期同 `% src:` 行一致；`Method` 是自拟的标 †，只有预印本的标 ‡。
 3. 论文本身也要读——arXiv abs/HTML、ACL Anthology、CVF open access，或项目页；至少读摘要、intro、方法与主结果表。论文自己的页面挂出了仓库时，抓一次它的星标与最近提交——只认官方仓库——补齐该条目的代码分量。正文抓不到 → 保留 bib 条目，不写笔记——绝不凭记忆写笔记——并在摘要里说明这一点。
-4. 按 §8 的 schema 写 `notes/refs/<ABBREV>.md`——frontmatter `title:`、`venue:`、`year:`、`bibkey:`（完整 citekey）、`added:`（真实日期，§4）；`## What it does`；对着故事与主张台账写的 `## Relation to ours`；按原则 2 写的 `## Citable facts`。`ABBREV` 用论文自己的代号（`CLIP`、`DETR`），没有代号就造一个 CamelCase 的，冲突时加 `_<year>`。再补上它的索引行：§2 记这份笔记，§5 记它的分数、每个子指标与抓取日期。
+4. 按 §8 的 schema 写 `notes/refs/<ABBREV>.md`——frontmatter `title:`、`venue:`、`year:`、`bibkey:`（完整 citekey）、`added:`（真实日期，§4）；`## What it does`；对着故事与主张记录表写的 `## Relation to ours`；按原则 2 写的 `## Citable facts`。`ABBREV` 用论文自己的代号（`CLIP`、`DETR`），没有代号就造一个 CamelCase 的，冲突时加 `_<year>`。再补上它的索引行：§2 记这份笔记，§5 记它的分数、每个子指标与抓取日期。
 
-**把阅读扇出去（原则 9）。** 一次运行里多于一篇——一份 `add` 清单，或 `discover` 那一轮用户挑中的一批——就按一篇论文一个委派者拆开——用`coder` 类型的 `Agent` 子代理，在同一条消息里一次派出去，它们才是并行的。前面不加提问（§6.1）；宿主根本不提供派发、或者拒绝了这次调用，就退回来在这里读，并在摘要里说明。第 1、2 步仍在家里跑——条目是照着书目记录誊的，而委派者不抓记录——但不是整份清单全跑完才轮到第一个读者开工。逐篇来：解析记录、誊写条目、定下笔记的文件名、把这一篇的读者派出去，然后才开始下一篇的记录。这两条流打的不是同一批主机——记录走 DBLP 与 Crossref，页面走 arXiv 与各 venue 站点——所以谁也不花谁的速率，一边退避不再让另一边停摆；而"先把每条记录都解析完"的做法，会让 DBLP 一场限流风暴期间所有读者全程空转。出门的是第 3 步，每份任务书带着它那篇论文的候选页面（顺序照第 3 步点的名）、它对某台 host 两次自己的请求之间等多少秒（`references/source-policy_zh.md`，限速一节）、它自己在 `wkdrs/refs_<date>/raw/` 下的缓存前缀、它要写的那个笔记路径、逐字的收集者合同、故事与主张台账（这样 `## Relation to ours` 就在读到论文的那个地方写），以及范围那一句"只读这一篇；只抓它自己的页面；只写那一个笔记文件"。involve 为 `high` 时，派发之前先把分工说出来（§6.8）。第 4 步随后拿回来的东西逐篇在家里跑：索引行、`% src:` 那一行、影响力分与整批自查——全在没有委派者会打开的文件里。`floor_evidence` 写着 `not reached` 的那一份没有写出笔记，让 bib 条目单独留着——那就是第 3 步里正文抓不到那条路的扇出形态；而一份声称够到了阅读底线、却报不出笔记文件的返回是自相矛盾的，那篇论文在这里重读一遍（§6.3）。
+**把阅读扇出去（原则 9）。** 一次运行里多于一篇——一份 `add` 清单，或 `discover` 那一轮用户挑中的一批——就按一篇论文一个委派者拆开——用`coder` 类型的 `Agent` 子代理，在同一条消息里一次派出去，它们才是并行的。前面不加提问（§6.1）；宿主根本不提供派发、或者拒绝了这次调用，就退回来在这里读，并在摘要里说明。第 1、2 步仍在家里跑——条目是照着书目记录誊的，而委派者不抓记录——但不是整份清单全跑完才轮到第一个读者开工。逐篇来：解析记录、誊写条目、定下笔记的文件名、把这一篇的读者派出去，然后才开始下一篇的记录。这两条流打的不是同一批主机——记录走 DBLP 与 Crossref，页面走 arXiv 与各 venue 站点——所以谁也不花谁的速率，一边退避不再让另一边停摆；而"先把每条记录都解析完"的做法，会让 DBLP 一场限流风暴期间所有读者全程空转。出门的是第 3 步，每份任务书带着它那篇论文的候选页面（顺序照第 3 步点的名）、它对某台 host 两次自己的请求之间等多少秒（`references/source-policy_zh.md`，限速一节）、它自己在 `wkdrs/refs_<date>/raw/` 下的缓存前缀、它要写的那个笔记路径、逐字的收集者合同、故事与主张记录表（这样 `## Relation to ours` 就在读到论文的那个地方写），以及范围那一句"只读这一篇；只抓它自己的页面；只写那一个笔记文件"。involve 为 `high` 时，派发之前先把分工说出来（§6.8）。第 4 步随后拿回来的东西逐篇在家里跑：索引行、`% src:` 那一行、影响力分与整批自查——全在没有委派者会打开的文件里。`floor_evidence` 写着 `not reached` 的那一份没有写出笔记，让 bib 条目单独留着——那就是第 3 步里正文抓不到那条路的扇出形态；而一份声称够到了阅读底线、却报不出笔记文件的返回是自相矛盾的，那篇论文在这里重读一遍（§6.3）。
 
 ### Step 4：对这一批做自检
 

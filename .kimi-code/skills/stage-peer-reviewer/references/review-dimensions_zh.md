@@ -108,4 +108,4 @@ leads: [{query, what_it_would_settle}]     # only what you could not run; the ch
 failures: [{step_or_host, error}]
 ```
 
-锚点是论文里的位置——`§3.2`、`Tab. 2`、`Fig. 4`、`Eq. (5)`，或一个 tex 源码行号。每条 strength 与 weakness 都要带一个；没有锚点的条目会在综合阶段被丢弃，并把这次丢弃报出来。`attacked_claims` 列出这条 weakness 所削弱的主张台账 ID（`notes/claims.md`）——都不适用时写 `[]`；主席把这些 ID 带进综合评审，好让回复阶段无需重新推导就能映射每一次攻击。打分用的是发给你的那份 rubric 文件里的锚定档，不是你的直觉：先说出档位，再把论文对着该档的描述核一遍。在期刊刻度下，按 `rubric-journal.md` 里的映射，把你的档位倾向以 6 分制等价值填进 `overall_lean`。
+锚点是论文里的位置——`§3.2`、`Tab. 2`、`Fig. 4`、`Eq. (5)`，或一个 tex 源码行号。每条 strength 与 weakness 都要带一个；没有锚点的条目会在综合阶段被丢弃，并把这次丢弃报出来。`attacked_claims` 列出这条 weakness 所削弱的主张记录表 ID（`notes/claims.md`）——都不适用时写 `[]`；主席把这些 ID 带进综合评审，好让回复阶段无需重新推导就能映射每一次攻击。打分用的是发给你的那份 rubric 文件里的锚定档，不是你的直觉：先说出档位，再把论文对着该档的描述核一遍。在期刊刻度下，按 `rubric-journal.md` 里的映射，把你的档位倾向以 6 分制等价值填进 `overall_lean`。

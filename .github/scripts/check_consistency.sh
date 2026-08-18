@@ -469,7 +469,7 @@ CONV_HEADINGS=(
     '5. Manuscript, section, and cycle resolution'
     '6. Delegation'
     '7. Dialogue'
-    '8. The artifact registry'
+    '8. The output table'
     '9. The fabrication boundary'
     '10. Project layout'
     '11. The skill roster'
@@ -645,7 +645,7 @@ done < <(find "${SKILL_ROOTS[@]}" -name 'SKILL_zh.md' | sort)
 # no fold is involved, so only a hand-typed space can land between two Chinese
 # characters. The scan is therefore narrower than the description one: Han and
 # CJK punctuation only. A Chinese character beside a *symbol* is correct
-# typography and stays free — 规约 §9, 评审意见 → 要点台账, 陈述处 ⇄ 证据,
+# typography and stays free — 规约 §9, 评审意见 → 要点记录表, 陈述处 ⇄ 证据,
 # 标 † 的五个, "# 2 · 配置", 回到顶部 ↑, the box-drawing rules in the workflow
 # diagram, and "——" spaced on both sides.
 #     One exception, and it is a real one: 中文要点摘要 is a section title, and

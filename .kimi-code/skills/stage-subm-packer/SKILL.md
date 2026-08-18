@@ -121,7 +121,7 @@ third-party file nobody here is allowed to edit.
    preprint build's, is what `page_limit_main` means: `lint.sh` measures a different document in
    a different class, which is a drafting proxy and not the answer.
 
-9. **Fan out the sweeps, never the gates (§6).** Step 5's completeness sweep splits by registry
+9. **Fan out the sweeps, never the gates (§6).** Step 5's completeness sweep splits by output table
    artifact — one delegate for the outline's three tables, one for the claim ledger, one for notes
    and bib, one for the promises file — each returning its own shortfalls as findings and nothing
    else; Step 6's checklist walk is one delegate per checklist item once the family carries more
@@ -213,7 +213,7 @@ third-party file nobody here is allowed to edit.
 
 ## Output
 
-Registry row (conventions §8): Submission — `cycls/<cycle>/SUBMISSION_<date>.md`, git tag
+Output-table row (conventions §8): Submission — `cycls/<cycle>/SUBMISSION_<date>.md`, git tag
 `freeze/<cycle>_<date>`, package under `wkdrs/builds/`; state field `frozen:`.
 
 `SUBMISSION_<date>.md` frontmatter: `cycle:`, `date:`, `frozen:` (the tag name), `package:` (the

@@ -14,7 +14,7 @@ model_trail:                    # append-only: one entry per write session, neve
 
 ## 1. 范围
 
-<!-- 驱动本次运行的是什么：论文的 story 与主张台账、mates/ 下导入的 refs 树，或用户给的
+<!-- 驱动本次运行的是什么：论文的 story 与主张记录表、mates/ 下导入的 refs 树，或用户给的
      topic。存放原始内容的运行缓存：wkdrs/refs_<date>/raw/。
      模式：survey | intake | add | discover | seed | tidy | position | score | verify。
      跑过的每一条检索式，各自带上返回了多少条命中——命中为零的也写：查了没有是一个结果，

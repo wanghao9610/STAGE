@@ -29,7 +29,7 @@ verdict is not a judgment call.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
 every STAGE skill shares — read the whole file at the start of every run (there is no
-section-selective loading). The sections that bind this skill hardest: §8 the artifact registry
+section-selective loading). The sections that bind this skill hardest: §8 the output table
 and its staleness rule, §9 the fabrication boundary (§9a is this skill's charter), §5 resolution,
 §1 git. This file states what is specific to this skill and wins wherever it is stricter.
 
@@ -132,7 +132,7 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
 
 ## Output
 
-- `wkdrs/reports/CLAIMS_<date>.md` — registry row: Audit reports, producer `stage-clms-auditor`,
+- `wkdrs/reports/CLAIMS_<date>.md` — output-table row: Audit reports, producer `stage-clms-auditor`,
   ephemeral, date in filename. Frontmatter `date:`, `scope:`; sections: `## Verdict` (numbers
   audited; matched / mismatched / unsourced / declared-`\todo` counts; staleness state),
   `## Trace table` — `| Where | Value | Trace | Evidence | Verdict |`, failures first,

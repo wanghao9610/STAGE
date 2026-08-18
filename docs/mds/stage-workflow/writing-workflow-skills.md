@@ -4,7 +4,7 @@
 
 STAGE provides sixteen connected writing workflow skills that turn imported evidence and a story into a submitted paper with an auditable claim trail: a repo wired to its research project, a read-only evidence base with a fingerprint per file, a story whose contributions are tracked claims, an outline with page budgets, sections drafted against evidence, tables generated from evidence rather than typed, figures with editable sources, a verified bibliography, prose polished without touching numbers, every number and citation audited, a simulated review in the venue's own format, a response with tracked promises, a frozen, packaged submission, and the poster that carries the accepted result into a hall.
 
-This guide is one tight paragraph per skill. The rules every skill shares — git, the STOP line, `.env` and the build toolchain, dates, resolution, delegation, dialogue, the artifact registry, the fabrication boundary, and the layout — live in [writing-workflow-conventions.md](writing-workflow-conventions.md); skills cite its § numbers. This directory is upstream-managed: edit it only in the STAGE template repo, never in a paper instance — `execs/update.sh` overwrites it.
+This guide is one tight paragraph per skill. The rules every skill shares — git, the STOP line, `.env` and the build toolchain, dates, resolution, delegation, dialogue, the output table, the fabrication boundary, and the layout — live in [writing-workflow-conventions.md](writing-workflow-conventions.md); skills cite its § numbers. This directory is upstream-managed: edit it only in the STAGE template repo, never in a paper instance — `execs/update.sh` overwrites it.
 
 ## The pipeline
 
@@ -141,6 +141,6 @@ The read-only map of the whole flow: per-section, per-figure, per-table status f
 
 ## Where everything is defined
 
-- Shared rules and § numbers: [writing-workflow-conventions.md](writing-workflow-conventions.md) — the artifact registry is §8, the fabrication boundary §9, the layout §10.
+- Shared rules and § numbers: [writing-workflow-conventions.md](writing-workflow-conventions.md) — the output table is §8, the fabrication boundary §9, the layout §10.
 - The skills themselves: `.claude/skills/<name>/SKILL.md` (canonical) and `.agents/skills/<name>/SKILL.md` (derived), synced into instances by `execs/update.sh`; `SKILL_zh.md` beside each is its Chinese edition, kept in step for human readers and never loaded at runtime.
 - The user-facing overview and quick start: the repository [README](../../../README.md).

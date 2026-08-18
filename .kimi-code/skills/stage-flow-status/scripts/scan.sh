@@ -2,7 +2,7 @@
 #
 # STAGE writing-flow data collector — one digest instead of one read per file.
 #
-# The registry (conventions §8) is a fixed, flat set: six files under notes/, one
+# The output table (conventions §8) is a fixed, flat set: six files under notes/, one
 # manifest, one cycle directory, a promise list, and four listings. Opening each
 # one costs a round trip, and a round trip costs a model turn — the reading
 # itself is microseconds. This prints all of it at once.
@@ -125,7 +125,7 @@ cap_list() {  # stdin, capped, with the remainder counted
     '
 }
 
-# A registry file: its path, then frontmatter, then rows. Absence is a state the
+# A output-table file: its path, then frontmatter, then rows. Absence is a state the
 # skill reports, so a missing file prints its name and "(absent)" rather than
 # nothing — a silent gap reads as a scan that forgot to look.
 #

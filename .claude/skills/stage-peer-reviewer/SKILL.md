@@ -59,7 +59,7 @@ draft a rebuttal to somebody else's.
 every STAGE skill shares — read the whole file at the start of every run; there is no
 section-selective loading. The sections that bind this skill hardest: §2 the STOP line, §5
 cycle resolution, §6 delegation (the panel is this workflow's largest sanctioned fan-out, and
-§6.9 is what lets a panelist run its own searches, and what that costs), §8 the artifact registry, §9 the fabrication
+§6.9 is what lets a panelist run its own searches, and what that costs), §8 the output table, §9 the fabrication
 boundary — §9b's review-side extension is this skill's charter.
 This file states what is specific to this skill and wins wherever it is stricter.
 
@@ -248,15 +248,15 @@ submitting it anywhere is over the STOP line (§2) at every involve level.
 
 ## Output
 
-Registry row (§8): Simulated review — producer `stage-peer-reviewer`, durable path
+Output-table row (§8): Simulated review — producer `stage-peer-reviewer`, durable path
 `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` (the panel meta-review; per-perspective reviews,
 `citation_audit.md`, and fetch caches live in `wkdrs/reports/peer_<cycle>_<date>/`), state:
 date in filename. Exact shapes: `references/review-template.md`, schema summary in conventions
 §8.8. The manuscript and the claim ledger leave this run byte-identical to how they entered —
 reviewing never edits.
 
-An `extern=` run adds no registry row, and that is the honest record rather than an omission:
-the registry is what `stage-flow-status` checks this paper's stages against, and a referee
+An `extern=` run adds no output-table row, and that is the honest record rather than an omission:
+the output table is what `stage-flow-status` checks this paper's stages against, and a referee
 report on somebody else's paper is not one of its stages. Its whole output is the run
 directory — `REFEREE_<date>.md` beside the perspective reviews and `citation_audit.md`, at the
 default destination or the one `out=` named.

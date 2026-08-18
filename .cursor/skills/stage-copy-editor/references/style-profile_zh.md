@@ -26,7 +26,7 @@
 
 有两个档位被刻意标成*判断*。把它们当成量出来的数报告，就是把一项从没跑过的检查报成跑过了（规约 §7.4）；一遍打磨只说它看见了什么、改了几处，不多说。
 
-`hedging: minimal` 是唯一一个有杀伤半径的档位，所以它的边界写进了文件本身：它管的是填充——"we believe"、"it seems that"、"somewhat"、"arguably"——绝不管证据所要求的限定语。证据只覆盖 ADE20K 时写"improves on ADE20K"是最小限定；写"improves across benchmarks"是改了主张，那归 `/stage-sect-drafter` 和台账，不归这里。
+`hedging: minimal` 是唯一一个有杀伤半径的档位，所以它的边界写进了文件本身：它管的是填充——"we believe"、"it seems that"、"somewhat"、"arguably"——绝不管证据所要求的限定语。证据只覆盖 ADE20K 时写"improves on ADE20K"是最小限定；写"improves across benchmarks"是改了主张，那归 `/stage-sect-drafter` 和记录表，不归这里。
 
 ## 三条入口
 
@@ -148,6 +148,6 @@ grep -niFf wkdrs/reports/.never.txt manus/secs/*.tex
 ## 什么绝不进这份档案
 
 - **归别的文件管的规则。** 术语决定归 `notes/notation.md` 的术语规范；页数预算归 `notes/outline.md`；页数上限或匿名要求归 `venue.yml`。一个复述了其中之一的档位，制造出的是第二个真相源，而它一定会漂。
-- **关于内容的规则。** "永远对比三个 baseline"是提纲的决定。"不要过度宣称"是台账和 §9 的活。这份档案对论文说什么没有意见。
+- **关于内容的规则。** "永远对比三个 baseline"是提纲的决定。"不要过度宣称"是记录表和 §9 的活。这份档案对论文说什么没有意见。
 - **关于英文以外语言的规则。** 无论 `STAGE_LANG` 取什么值，`manus/` 下的一切都是英文（规约 §7.6）；档案的 `Notes` 列可以用本次运行的语言写，它的设定不行。
 - **作者本次运行没有确认过的东西。** 档位是作者的，不是这一遍的——没被回答的档位取预设默认值并记录为"代为决定"，绝不编出来再当成他们的意思。

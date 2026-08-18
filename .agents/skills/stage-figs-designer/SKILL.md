@@ -19,7 +19,7 @@ description: >-
 
 Invocation: `$stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no argument audits the Figures table in `notes/outline.md` against disk and proposes one next action; `plan` creates or revises the Figures table from the story and section briefs; `teaser` resolves to the teaser and runs its checklist; anything else names one figure, resolved by outline ID (`F1`), file slug, or purpose/section text against `notes/outline.md` (conventions §5 — ambiguity is asked about, never guessed). Build work is one figure per invocation. There is no separate description slot here: free text is already the figure's own description — that is how a figure resolves by purpose or section text, and how one with no Figures row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the figure is for; it never supplies a plotted number, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}` in the caption. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
 
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline every STAGE skill loads: read the whole file at the start of every run — there is no section-selective loading. It binds this skill hardest at §5 (resolving which figure is meant), §8 (the artifact registry and exact staleness), §9 (the fabrication boundary — figures state claims too), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
+**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline every STAGE skill loads: read the whole file at the start of every run — there is no section-selective loading. It binds this skill hardest at §5 (resolving which figure is meant), §8 (the output table and exact staleness), §9 (the fabrication boundary — figures state claims too), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
 
 **Reusing an earlier load.** A second STAGE skill in the same conversation does not pay for the conventions twice: skip the re-read only when the same file's text is still verbatim visible in this conversation. A summary that survived a context compaction, or a memory of having read it, does not count — when in doubt, read it again.
 
@@ -100,7 +100,7 @@ Report pass / fail / todo for every item:
 
 Fails become the figure's todo list; the teaser row stays short of `final` while any item fails.
 
-### Step 7: Update the registry and report
+### Step 7: Update the output table and report
 
 1. Flip Status honestly: `planned` before a source exists; `sketch` while evidence or the source map is incomplete; `draft` when PPTX and PDF exist but any render, provenance, visual, build, lint, or teaser check remains; `final` only when all applicable checks pass. Fill Source with the PPTX or registered `mates/` path and update the outline provenance fields (§8).
 2. Report rows changed; PPTX, asset, source-map, render-record, and PDF paths; `% src:` anchors used; Image Gen prompts/assets created; render hashes; visual, build, lint, checklist, or audit verdicts; and the exact route for anything unresolved.
@@ -113,6 +113,6 @@ Fails become the figure's todo list; the teaser row stays short of `final` while
 - `manus/figs/srcs/<slug>.assets/` — accepted generated raster assets used by the PPTX; absent when none are needed.
 - `manus/figs/srcs/<slug>.render.yml` — exact PPTX/PDF hashes, renderer identity, and real render date.
 - `manus/figs/<slug>.pdf` — the one-page PDF exported from that PPTX, or an honest statement of the blocked render step.
-- `notes/outline.md` — Figures rows (`ID, File, Purpose, Section, Source, Status`) and registry provenance.
+- `notes/outline.md` — Figures rows (`ID, File, Purpose, Section, Source, Status`) and output-table provenance.
 - Chat digest per Step 7. Nothing under `mates/`, nothing in `manus/secs/`, and no committed files under `wkdrs/`.
 - Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` and one appended `model_trail:` entry. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

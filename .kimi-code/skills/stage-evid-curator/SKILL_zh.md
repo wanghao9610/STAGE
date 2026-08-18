@@ -8,7 +8,7 @@ description: >-
 
 > 本文件是 `SKILL.md` 的中文对照版，随英文版同步维护，供人阅读；运行时装载的仍是 `SKILL.md`。两版冲突时，以 `SKILL.md` 为准。
 
-**回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。`mates/MANIFEST.md` 及其条目一律用英文写——每个写作类 skill 都要机器读它——中文回复里路径、哈希、指标名同样保留英文；聊天摘要跟随对话语言。
+**回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名。`mates/MANIFEST.md` 及其条目一律用英文写——每个写作类 skill 都要机器读它——中文回复里路径、哈希、指标名同样保留英文；聊天摘要跟随对话语言。
 
 调用方式：`/skill:stage-evid-curator [import | register <path> | check] [DESCRIPTION] [involve=low]`——不带参数跑 `check`；`import` 把后续参数原样透传给 `execs/scpts/import.sh`；`register` 接收要收编的文件（已经在 `mates/manual/` 下，或在别处、需要复制进来）。无法识别的记号要问，绝不猜。模式、以及该模式自己吃掉的东西——`import` 透传给 `execs/scpts/import.sh` 的参数、`register` 要收编的那个路径——之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么，它是本次运行可以顺着走的一条线索；在 `register` 上，它是出处那道提问可以取用的材料，而不是那道提问的替代。没有点名任何模式的散文就是纯描述：跑 `check`，并先说明这一点。孤立一个看着像模式却对不上的词不是描述：它仍是上面那个不认识的记号。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。没有哪一档能让一个文件不带指纹就被登记，或让它的出处被假定而不是被问出来。
 
@@ -89,7 +89,7 @@ description: >-
 
 - 写入限于 `mates/`：`mates/MANIFEST.md` 里的 `source-type: manual` 条目、复制到 `mates/manual/` 下的文件，以及只通过运行 `execs/scpts/import.sh` 触及的 star 那一侧。此外哪里都不写。
 - 已登记的证据文件绝不被编辑，star 与 manual 都一样（原则 2），并且 `mates/` 下的任何东西都绝不删除：看起来过时的东西列成一个问题，删除是用户在 git 里可见的行为。
-- 这里绝不写：`manus/**`、`notes/**`（`claims.md` 是 `/skill:stage-clms-auditor` 的台账，`refs/` 是 `/skill:stage-refs-curator` 的地盘）、`cycls/**`、`wkdrs/**`。这里不跑 LaTeX 构建。
+- 这里绝不写：`manus/**`、`notes/**`（`claims.md` 是 `/skill:stage-clms-auditor` 的记录表，`refs/` 是 `/skill:stage-refs-curator` 的地盘）、`cycls/**`、`wkdrs/**`。这里不跑 LaTeX 构建。
 - 只在本地：读文件、算校验和、以及对 `STAR_HOME` 处本地克隆跑脚本——不需要网络，也不用网络。
 - 只用真实日期：`imported:` 与每个检查日期都取自系统时钟。
 - Git：只读；本 skill 绝不提交。`mates/` 是被跟踪的，所以每一次登记与刷新都会出现在 `git status` 里，由用户去提交。

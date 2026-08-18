@@ -40,7 +40,7 @@ priority order fixes down to the tie-break.
 every STAGE skill shares; this file states what is specific to this one and wins wherever it is
 stricter. Step 1 loads eight of its twelve sections — §0 vocabulary, §3 the `.env` runtime, §5
 section and cycle resolution, §6 delegation, §7 dialogue's reporting rules, §8 the artifact
-registry with its staleness rule, §9 the fabrication boundary, §11 the skill roster — and that is
+output table with its staleness rule, §9 the fabrication boundary, §11 the skill roster — and that is
 the whole read: this is the most-run skill in the flow, and the four it leaves out are a fifth of
 the file that no read-only report can use.
 
@@ -79,7 +79,7 @@ writes, and never present a guess as a state.
    /stage-sect-drafter, /stage-tabs-builder, /stage-figs-designer, /stage-refs-curator,
    /stage-copy-editor, /stage-clms-auditor, /stage-cite-auditor, /stage-peer-reviewer,
    /stage-resp-writer, /stage-subm-packer.
-2. **Files are the only source of truth.** Everything reported comes from the registry artifacts
+2. **Files are the only source of truth.** Everything reported comes from the output-table artifacts
    (§8): `notes/`, `mates/MANIFEST.md`, `manus/`, `cycls/<cycle>/`, `tasks/`, and the
    `wkdrs/builds/` and `wkdrs/reports/` listings. Never infer progress from chat memory; a
    missing field is reported as "unknown", never guessed.
@@ -139,7 +139,7 @@ writes, and never present a guess as a state.
    number its sections differently — load the whole file with `sed -n '/^## 0\./,$p'` and say in
    the reply that the excerpts fell back.
 
-   The digest is the registry (§8) in one pass: the frontmatter and table rows of `notes/story.md`,
+   The digest is the output table (§8) in one pass: the frontmatter and table rows of `notes/story.md`,
    `outline.md`, `claims.md`, `notation.md`, `style.md` and `adopt.md`; `mates/MANIFEST.md`
    entries with their `imported:` stamps; `notes/refs/` notes, the index rows, and every
    `reference.bib` citekey; each cycle's `venue.yml`, `reviews/`, `response/`, submission records
@@ -194,7 +194,7 @@ writes, and never present a guess as a state.
 
 ## Output
 
-Registry row (conventions §8): Status — no artifact on disk; read-only, reports in chat; no state
+Output-table row (conventions §8): Status — no artifact on disk; read-only, reports in chat; no state
 field.
 
 Report order: cycle state → outline board → claim coverage → evidence, refs, and style → build and lint →
@@ -203,6 +203,6 @@ reason. Compact tables and tallies, never prose per row; "unknown" where a field
 whole reply under ~500 words.
 
 **Provenance** is one line (§8): the models this paper's artifacts name as their last writer,
-with a count each — `claude-opus-5[1m] ×7, gpt-5 ×2` — followed by how many registry artifacts
+with a count each — `claude-opus-5[1m] ×7, gpt-5 ×2` — followed by how many output-table artifacts
 carry no `model_trail` yet, named when there are three or fewer. It reports, never gates: a
 missing trail is a file written before the field existed, not a next action.

@@ -150,7 +150,7 @@ from the same ones instead of each session inventing a voice.
 
 - Polished prose in `manus/secs/*.tex` and caption text in `manus/tabs/*.tex` — byte-identical
   in every number, key, label, `% src:` comment, and `\todo`.
-- `wkdrs/reports/POLISH_<date>.md` — registry row: Audit reports, producer `stage-copy-editor`,
+- `wkdrs/reports/POLISH_<date>.md` — output-table row: Audit reports, producer `stage-copy-editor`,
   ephemeral, date in filename. Frontmatter `date:`, `scope:`; sections `## Edits` (per-section
   counts by kind), `## Systematic issues` (numbered; locations and route each), `## Canon`
   (violations fixed; unknown terms flagged), `## Style` (one line per dial in `notes/style.md`:
@@ -160,7 +160,7 @@ from the same ones instead of each session inventing a voice.
 - `tasks/polish_followups.md` — one checkbox per finding this skill may not fix itself: the
   durable backlog.
 - `notes/style.md` on a `style` run and on no other — the dial table, the prefer/avoid and never
-  lists, and the samples, to the conventions §8.11 schema (registry row: Style profile). A polish
+  lists, and the samples, to the conventions §8.11 schema (output-table row: Style profile). A polish
   run reads it and never writes it, and a `style` run writes nothing
   else durable — measurement scratch under `wkdrs/` (gitignored, regenerable) excepted.
 - No writes to the ledger, the outline, the notation canon, `mates/`, or the bib — ownership of

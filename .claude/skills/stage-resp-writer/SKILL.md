@@ -35,7 +35,7 @@ the description, and is stripped before either is read.
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
 every STAGE skill shares — read the whole file at the start of every run; there is no
 section-selective loading. The sections that bind this skill hardest: §5 cycle resolution, §7
-dialogue, §8 the artifact registry (the response and promise schemas), §9 the fabrication
+dialogue, §8 the output table (the response and promise schemas), §9 the fabrication
 boundary.
 This file states what is specific to this skill and wins wherever it is stricter.
 
@@ -140,7 +140,7 @@ One commit per session (conventions §1), subject `stage-resp-writer: <cycle> re
 
 ## Output
 
-Registry row (§8): Response — producer `stage-resp-writer`, paths
+Output-table row (§8): Response — producer `stage-resp-writer`, paths
 `cycls/<cycle>/response/RESPONSE_<date>.md` plus promises in `tasks/<cycle>_promises.md`, state:
 promise checkboxes; side effect: `weakened` downgrades in `notes/claims.md`. Exact shapes:
 

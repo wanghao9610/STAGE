@@ -29,7 +29,7 @@ whole. An `involve=<level>` token is stripped before the section or the descript
 every STAGE skill shares — read the whole file at the start of every run (there is no
 section-selective loading). The sections that bind this skill hardest: §9 the fabrication
 boundary (§9b — assertions about cited papers must be checkable against reading notes), §8 the
-artifact registry (where notes, index, and bib live), §7 dialogue, §1 git. This file states what
+output table (where notes, index, and bib live), §7 dialogue, §1 git. This file states what
 is specific to this skill and wins wherever it is stricter.
 
 **Reusing an earlier load.** Skip the re-read only when the same conventions file's text is still
@@ -116,7 +116,7 @@ re-reading routes to `$stage-refs-curator`.
 
 ## Output
 
-- `wkdrs/reports/CITES_<date>.md` — registry row: Audit reports, producer `stage-cite-auditor`,
+- `wkdrs/reports/CITES_<date>.md` — output-table row: Audit reports, producer `stage-cite-auditor`,
   ephemeral, date in filename. Frontmatter `date:`, `scope:`; sections: `## Verdict` (keys
   checked / undefined; assertions supported / unsupported / unverifiable; missing-citation and
   hygiene counts), `## Keys` (undefined with locations; uncited entries), `## Assertions` —

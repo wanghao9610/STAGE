@@ -19,7 +19,7 @@ description: >-
 
 Invocation: `/skill:stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no argument audits the Figures table in `notes/outline.md` against the files on disk and proposes one next action; `plan` creates or revises the Figures table from the story and section briefs; `teaser` resolves to the teaser figure and runs its checklist; anything else names one figure, resolved by outline ID (`F1`), file slug, or purpose/section text against `notes/outline.md` (conventions §5 — ambiguity is asked about, never guessed). Build work is one figure per invocation. There is no separate description slot here: free text is already the figure's own description — that is how a figure resolves by purpose or section text, and how one with no Figures row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the figure is for; it never supplies a plotted number, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}` in the caption. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
 
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline every STAGE skill loads: read the whole file at the start of every run — there is no section-selective loading. It binds this skill hardest at §5 (resolving which figure is meant), §8 (the artifact registry and its staleness rule), §9 (the fabrication boundary — figures state claims too), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
+**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline every STAGE skill loads: read the whole file at the start of every run — there is no section-selective loading. It binds this skill hardest at §5 (resolving which figure is meant), §8 (the output table and its staleness rule), §9 (the fabrication boundary — figures state claims too), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
 
 **Reusing an earlier load.** A second STAGE skill in the same conversation does not pay for the conventions twice: skip the re-read only when the same file's text is still verbatim visible in this conversation. A summary that survived a context compaction, or a memory of having read it, does not count — when in doubt, read it again.
 
@@ -83,9 +83,9 @@ Walk every item and report pass / fail / todo per item:
 
 Fails become the figure's todo list; the teaser's row stays short of `final` while any item fails.
 
-### Step 6: Update the registry and report
+### Step 6: Update the output table and report
 
-1. Flip the figure's Status honestly (`planned → sketch → draft → final`), fill its Source column, touch the outline's `updated:` — the Figures row is this skill's registry state (§8).
+1. Flip the figure's Status honestly (`planned → sketch → draft → final`), fill its Source column, touch the outline's `updated:` — the Figures row is this skill's output-table state (§8).
 2. Digest in chat: rows changed, files written, `src:` anchors used, checklist or audit verdicts, and routing — unregistered artwork or missing evidence → `/skill:stage-evid-curator`; placement → `/skill:stage-sect-drafter`; caption claims → `/skill:stage-clms-auditor`.
 3. Commit once for the working session, subject naming this skill (§1).
 
@@ -93,6 +93,6 @@ Fails become the figure's todo list; the teaser's row stays short of `final` whi
 
 - `manus/figs/srcs/<slug>.*` — the editable source, a `src:` comment on every data series.
 - `manus/figs/<slug>.pdf` — the rendered figure, or an honest statement of the render step that remains.
-- `notes/outline.md` — Figures table rows (`ID, File, Purpose, Section, Source, Status`), the registry state field for figures (§8).
+- `notes/outline.md` — Figures table rows (`ID, File, Purpose, Section, Source, Status`), the output-table state field for figures (§8).
 - Chat digest per Step 6. Nothing under `mates/` (read-only), nothing in `manus/secs/`, no reports in `wkdrs/`.
 - Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

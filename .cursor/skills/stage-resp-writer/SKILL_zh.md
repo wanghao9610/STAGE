@@ -2,14 +2,14 @@
 name: stage-resp-writer
 disable-model-invocation: true
 description: >-
-  把 cycls/<cycle>/reviews/ 里的每一份评审——用户投放的 received_<id>.md 文件，以及来自 /stage-peer-reviewer 的 SIM_REVIEW_* 文件——变成一本逐点台账，把每一次攻击映射到主张与证据，然后在 venue 的 response_limit 之内起草回复。写 cycls/<cycle>/response/RESPONSE_<date>.md，把每一条许下的改动同步成 tasks/<cycle>_promises.md 里的一个复选框，并把让步掉的主张在 notes/claims.md 里降级为 weakened。绝不编辑手稿，也绝不编辑评审文件本身。只要用户运行 /stage-resp-writer，或要求起草一份 rebuttal 或回复信、逐点回答评审人、或者决定让步什么，都应使用本 skill。
+  把 cycls/<cycle>/reviews/ 里的每一份评审——用户投放的 received_<id>.md 文件，以及来自 /stage-peer-reviewer 的 SIM_REVIEW_* 文件——变成一本逐点记录表，把每一次攻击映射到主张与证据，然后在 venue 的 response_limit 之内起草回复。写 cycls/<cycle>/response/RESPONSE_<date>.md，把每一条许下的改动同步成 tasks/<cycle>_promises.md 里的一个复选框，并把让步掉的主张在 notes/claims.md 里降级为 weakened。绝不编辑手稿，也绝不编辑评审文件本身。只要用户运行 /stage-resp-writer，或要求起草一份 rebuttal 或回复信、逐点回答评审人、或者决定让步什么，都应使用本 skill。
 ---
 
 # Response Writer —— 逐点辩护，承诺上账
 
 > 本文件是 `SKILL.md` 的中文对照版，随英文版同步维护，供人阅读；运行时装载的仍是 `SKILL.md`。两版冲突时，以 `SKILL.md` 为准。
 
-**回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
+**回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
 调用方式：`/stage-resp-writer [CYCLE] [DESCRIPTION] [involve=high]`——不带参数时取 `notes/story.md` 里的当前周期（规约 §5）；给出 `CYCLE` 参数则直接点名 `cycls/` 下的一个目录；对不上 → 列出候选并提问（§7）。周期之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么——哪位审稿人最让作者不安、这份回复必须赢下什么。它是本次运行可以顺着走、也可以作为某条意见立场的理由记下来的一条线索，绝不代替本 skill 逐条要征求的那道认可，更不构成任何承诺：承诺只在回复真正作出承诺的地方产生，并落在 `tasks/<cycle>_promises.md` 里。没有点名任何周期的散文就是纯描述：用当前周期，并先说明这一点。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。
 
@@ -20,18 +20,18 @@ description: >-
 
 ## 角色
 
-你是异议提出之后的辩护律师。`stage-peer-reviewer` 提前模拟这场攻击；venue 的真实评审以 `received_<id>.md` 的形式落进 `cycls/<cycle>/reviews/`；你用同一条流水线回应两者——每一条意见，都基于证据记录，在 venue 的格式与长度之内作答。让步什么是用户的决定，而一次让步要在台账里上账，不是埋在客气的措辞里。你绝不编辑手稿——许下的修改路由给起草类 skill——绝不编辑评审文件，也绝不论证超出 `mates/` 能证明的范围。
+你是异议提出之后的辩护律师。`stage-peer-reviewer` 提前模拟这场攻击；venue 的真实评审以 `received_<id>.md` 的形式落进 `cycls/<cycle>/reviews/`；你用同一条流水线回应两者——每一条意见，都基于证据记录，在 venue 的格式与长度之内作答。让步什么是用户的决定，而一次让步要在记录表里上账，不是埋在客气的措辞里。你绝不编辑手稿——许下的修改路由给起草类 skill——绝不编辑评审文件，也绝不论证超出 `mates/` 能证明的范围。
 
 ## 核心原则
 
-1. **每条意见都有一行。** 把 `reviews/` 里的一切解析进逐点台账——自由格式的 `received_*.md` 与 `SIM_REVIEW_*` 同一条流水线。没有行的意见就是一个没被回答的评审人，而 venue 会注意到没被回答的评审人。
-2. **攻击映射到主张与证据。** 把每条意见对着 `notes/claims.md` 匹配：哪条主张在挨打，哪条带指纹的 `mates/` 条目为它辩护。SIM 评审已经点名了 claim ID；自由格式的评审在这里映射，而不确定的映射要在台账行里写明"不确定"，不能静默地猜过去。
+1. **每条意见都有一行。** 把 `reviews/` 里的一切解析进逐点记录表——自由格式的 `received_*.md` 与 `SIM_REVIEW_*` 同一条流水线。没有行的意见就是一个没被回答的评审人，而 venue 会注意到没被回答的评审人。
+2. **攻击映射到主张与证据。** 把每条意见对着 `notes/claims.md` 匹配：哪条主张在挨打，哪条带指纹的 `mates/` 条目为它辩护。SIM 评审已经点名了 claim ID；自由格式的评审在这里映射，而不确定的映射要在记录表行里写明"不确定"，不能静默地猜过去。
 3. **三种处置；代价大的那些归用户。** rebut——证据在手，引用它；promise——论文会改，一个复选框由此诞生；concede——这条主张守不住，它的状态降为 `weakened`。让步与承诺永远经过用户，一次一条，走 AskQuestion（§7）；有证据支撑的反驳可以直接进行，事后一并列出供复核。提问时把评审人的原话和你打算发出的措辞一并引出来，而不是各自的概括（§7.12）。
 4. **回复里的数字遵守 §9a。** 引给评审人看的数字，要么追溯到一条带指纹的 `mates/` 条目，要么就不进入草稿。没有导入证据的"新结果"是一条"要把它做出来"的承诺——绝不是在 rebuttal 中途铸出来的一个数字。
 5. **承诺是一笔债。** 草稿里每一句"我们将……"都在 `tasks/<cycle>_promises.md` 里有一条对应的 `- [ ]`，点名它对应的意见与目标；只要还有框没勾，`/stage-subm-packer` 就拒绝打包 camera-ready。凡是用户没有确认团队真会去做的，一律不承诺。
-6. **venue 的回复规则是用户确认过的事实（§9c）。** `response_type` 与 `response_limit` 来自 `cycls/<cycle>/venue.yml`；缺失或未确认的取值要问，绝不臆造。`response_type: none` → 为修订版建好逐点台账与承诺，跳过起草，并说明为什么。
+6. **venue 的回复规则是用户确认过的事实（§9c）。** `response_type` 与 `response_limit` 来自 `cycls/<cycle>/venue.yml`；缺失或未确认的取值要问，绝不臆造。`response_type: none` → 为修订版建好逐点记录表与承诺，跳过起草，并说明为什么。
 
-7. **解析并行分派（§6）。** `cycls/<cycle>/reviews/` 下的文件超过两份 → 一份评审一个委派者，各自把那份评审的意见按台账行返回——意见 ID、逐字引文、严重程度、以及它攻击的主张 ID——别的什么都不返回。不切开的是它之后的一切：处置方式是对着全部意见一起定的，代价高的那几种是用户的决定、停在确认点上（§6.5），而回复是一份文档、写到一个限额里。给评审人引用的每个数字，不管由谁写下，都按原则 4 进入（§6.4）。
+7. **解析并行分派（§6）。** `cycls/<cycle>/reviews/` 下的文件超过两份 → 一份评审一个委派者，各自把那份评审的意见按记录表行返回——意见 ID、逐字引文、严重程度、以及它攻击的主张 ID——别的什么都不返回。不切开的是它之后的一切：处置方式是对着全部意见一起定的，代价高的那几种是用户的决定、停在确认点上（§6.5），而回复是一份文档、写到一个限额里。给评审人引用的每个数字，不管由谁写下，都按原则 4 进入（§6.4）。
 
 ## 工作流
 
@@ -41,11 +41,11 @@ description: >-
 
 ### Step 2：把评审解析成意见点
 
-逐个文件：先定下评审人标签——`received_R2.md` → R2，`SIM_REVIEW_<date>.md` → SIM-<date>——然后把正文切成原子意见点：一条 weakness、一个问题或一项要求各算一条。意见 ID 沿用评审人自己的编号（`R2.W1`），没有就按阅读顺序编号。引用原文或紧贴原意地转述；把评审人的话带进台账时，绝不软化它们。
+逐个文件：先定下评审人标签——`received_R2.md` → R2，`SIM_REVIEW_<date>.md` → SIM-<date>——然后把正文切成原子意见点：一条 weakness、一个问题或一项要求各算一条。意见 ID 沿用评审人自己的编号（`R2.W1`），没有就按阅读顺序编号。引用原文或紧贴原意地转述；把评审人的话带进记录表时，绝不软化它们。
 
 ### Step 3：映射与处置
 
-逐条意见：被攻击的 claim ID（SIM 评审自带；自由格式的对着台账推断），然后从台账 Evidence 列一路到它的 `mates/` 锚点，找出辩护证据。为每条提出 rebut / promise / concede，各配一行理由，然后按意见顺序走完原则 3 的批准流程，并留一份滚动记录，好让后面的答复能看见前面的。
+逐条意见：被攻击的 claim ID（SIM 评审自带；自由格式的对着记录表推断），然后从记录表 Evidence 列一路到它的 `mates/` 锚点，找出辩护证据。为每条提出 rebut / promise / concede，各配一行理由，然后按意见顺序走完原则 3 的批准流程，并留一份滚动记录，好让后面的答复能看见前面的。
 
 ### Step 4：在限制之内起草
 

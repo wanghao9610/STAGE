@@ -58,7 +58,7 @@ source: wkdrs/builds/main.log
 | `scope` | `global`, `machine:<name>`, `cycle:<cycle>`, or `manus:<path>` — where the fact is true, not where it was learned |
 | `language` | the body's language (conventions §7.6, the reply-language rule); frontmatter keys stay English |
 | `verified` | the date the fact was last confirmed true, from the system clock (conventions §4, real dates) |
-| `model_id` | the model that wrote or last re-verified it, verbatim (conventions §8, the artifact registry; fallbacks in `model_id_spec.md`) |
+| `model_id` | the model that wrote or last re-verified it, verbatim (conventions §8, the output table; fallbacks in `model_id_spec.md`) |
 | `source` | the artifact the fact came out of, or `conversation` |
 | `supersedes` | optional: the slug this memory replaces |
 

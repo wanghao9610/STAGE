@@ -21,7 +21,7 @@ Invocation: `/stage-pstr-builder [plan | render | check] [kit=<path>] [DESCRIPTI
 
 **Layout procedure.** `references/poster-layout.md` — the two supported layouts and their zone maps, the size table, the point-size floors and how effective size is computed, the house template's contract, and how a venue kit replaces it. Read it before `plan`, `render`, or `check`; it is not needed on a no-argument audit that finds nothing to do.
 
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own `Read` call, never `cat`-ed into a Shell command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — a poster states claims to strangers, with the authors' names on it), §5 (resolving the cycle), §8 (the artifact registry and its staleness rule), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
+**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own `Read` call, never `cat`-ed into a Shell command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — a poster states claims to strangers, with the authors' names on it), §5 (resolving the cycle), §8 (the output table and its staleness rule), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
 
 **Reusing an earlier load.** A second STAGE skill in the same conversation does not pay for this twice: skip the re-read only when the same file's text is still verbatim visible in this conversation. A summary that survived a context compaction and a memory of having read it do not count. When in doubt, read it again — a wasted read costs one message, a wrong assumption costs a print run.
 
@@ -100,7 +100,7 @@ Walk every item and report pass / fail per item:
 
 Failures become the poster's todo list; `state:` does not reach `final` while any item fails.
 
-### Step 6: Update the registry and report
+### Step 6: Update the output table and report
 
 1. Flip `state:` in `POSTER_PLAN.md` honestly (`planned → drafted → final`), record each zone's Status, bump `updated:` (real date, §4), and append the `model_trail:` entry for this run (§8).
 2. Report in chat: the takeaway as it will be read, claims in and out with their statuses, figures used, `% src:` anchors read with their stamps, gate verdicts per item, the render path and its measured size. Route what is not yours — a figure that fails at poster size to `/stage-figs-designer`, evidence drift or an unregistered number to `/stage-evid-curator`, a claim that needs the ledger moved to `/stage-clms-auditor`, an unconfirmed venue fact to `/stage-stry-coach`.
@@ -108,7 +108,7 @@ Failures become the poster's todo list; `state:` does not reach `final` while an
 
 ## Output
 
-- `cycls/<cycle>/poster/POSTER_PLAN.md` — takeaway, zone table, exclusions; `state:` is this skill's registry state (§8).
+- `cycls/<cycle>/poster/POSTER_PLAN.md` — takeaway, zone table, exclusions; `state:` is this skill's output-table state (§8).
 - `cycls/<cycle>/poster/poster.tex` — the poster source, one `% src:` comment per number, no `\todo`.
 - `cycls/<cycle>/poster/template/` — the official venue poster kit when one was supplied, unpacked whole and unedited.
 - `wkdrs/builds/poster/poster.pdf` — the render, regenerable and never committed, or an honest statement of the render step that remains.

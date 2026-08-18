@@ -8,7 +8,7 @@
 
 **语言：** [English](README.md) | 简体中文
 
-STAGE 把一个研究项目变成一篇提交的论文，并保证全程证据链不断。它把稿件、导入的实验证据、写作元数据和投稿周期分别放在约定好的目录中，给研究者和 AI 写作助手同一个构建入口、同一份共享规范，并提供一条完整的写作工作流——证据导入、故事、提纲、起草、图表制作、审计、模拟评审、回复、投稿打包。稿件中的每一个数字要么可追溯到一份带指纹的证据文件，要么被显式标记为缺失；每一条论断（claim）都在同一本台账中从提出一路跟踪到验证。
+STAGE 把一个研究项目变成一篇提交的论文，并保证全程证据链不断。它把稿件、导入的实验证据、写作元数据和投稿周期分别放在约定好的目录中，给研究者和 AI 写作助手同一个构建入口、同一份共享规范，并提供一条完整的写作工作流——证据导入、故事、提纲、起草、图表制作、审计、模拟评审、回复、投稿打包。稿件中的每一个数字要么可追溯到一份带指纹的证据文件，要么被显式标记为缺失；每一条论断（claim）都在同一本记录表中从提出一路跟踪到验证。
 
 STAGE 是 [STAR](https://github.com/wanghao9610/STAR)（*Systematic Toolchain for AI Research*，系统化 AI 研究工具链，[文档站点](https://wanghao9610.github.io/STAR/)）在写作侧的伴侣仓库：STAR 负责推进研究、产出方法文档、实验结果和阶段小结；STAGE 把它们快照为只读证据，在其上写出论文。配对是可选的——STAGE 也可以完全独立使用，证据由人工登记。
 
@@ -30,7 +30,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
   - [6. 启动写作工作流](#6-启动写作工作流)
 - [写作工作流](#写作工作流)
 - [通往投稿的十步路径](#通往投稿的十步路径)
-- [证据、指纹与论断台账](#证据指纹与论断台账)
+- [证据、指纹与论断记录表](#证据指纹与论断记录表)
 - [项目记忆](#项目记忆)
 - [更新 STAGE 的 skill 与工作流文档](#更新-stage-的-skill-与工作流文档)
 - [项目约定](#项目约定)
@@ -42,7 +42,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 
 - **统一的稿件结构**：章节、图（含源文件）、表、参考文献、venue 样式，各归其位，都在 `manus/` 下。
 - **只读的证据层**：STAR 产物（或人工登记的文件）被快照进 `mates/`，每个文件带一枚指纹，记录在 `mates/MANIFEST.md`。证据单向流动——要改一个数字，去上游改好再重新导入；绝不直接编辑 `mates/`。
-- **作为枢纽的论断台账**：`notes/claims.md` 把每条论断的陈述位置 ⇄ 证据 ⇄ 状态连在一起。写作提出论断，审计验证论断，回复捍卫论断。
+- **作为枢纽的论断记录表**：`notes/claims.md` 把每条论断的陈述位置 ⇄ 证据 ⇄ 状态连在一起。写作提出论断，审计验证论断，回复捍卫论断。
 - **统一的构建入口**：`execs/run.sh` 用 latexmk 把 `manus/main.tex` 编译到树外的 `wkdrs/builds/`，并打印 PDF 路径和页数。
 - **确定性检查放在脚本里，判断放在 skill 里**：`execs/scpts/lint.sh` 机械地抓未定义引用、`\todo` 标记、超页和匿名泄漏；十六个 skill 处理一切需要判断的事。
 - **完整的写作生命周期**：十六个相互配合的 skill，按运行顺序依次是——接线仓库、整理证据、打磨故事、规划提纲、逐节起草、由证据生成表格、设计图、维护参考文献、润色文字、审计每个数字、审计每条引用、模拟评审、撰写回复、打包投稿、做海报、汇报状态。
@@ -67,7 +67,7 @@ STAGE/
 ├── mates/                  # 导入的证据——只读
 │   ├── <source-slug>/      # 按上游 STAR 路径镜像的快照
 │   ├── manual/             # 人工登记的证据文件
-│   └── MANIFEST.md         # 指纹台账：每个证据文件一条记录
+│   └── MANIFEST.md         # 指纹记录表：每个证据文件一条记录
 ├── notes/                  # 写作元数据
 │   ├── story.md            # 另有：claims.md、outline.md、notation.md、style.md、adopt.md
 │   └── refs/               # 逐篇阅读笔记 + refs_index.md
@@ -221,7 +221,7 @@ STAGE_LANG=
 
 `INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code 与 Codex 里，文件编辑前的权限提示也会被跳过。`medium`（默认）按文档所写发问，`high` 逐条确认。硬门槛任何档位都要问：红线、删除与覆盖、以及每一个以"已确认"身份进入 `venue.yml` 的取值。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 3_method involve=low`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)。
 
-`STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、台账状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)。
+`STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)。
 
 ### 3. 路径 A：与 STAR 仓库配对
 
@@ -264,7 +264,7 @@ bash execs/scpts/fmt.sh    # 一句一行；--check 只报告偏离，不写入
 | 故事已定稿，可以搭骨架 | `/stage-outl-planner` |
 | 回到一篇写作中的论文 | `/stage-flow-status` |
 
-`/stage-flow-status` 是最值得记住的一个：它读取盘上的提纲、台账、manifest 和周期状态，给出唯一的下一步行动及其准确命令，你永远不必回忆上次写到哪里。
+`/stage-flow-status` 是最值得记住的一个：它读取盘上的提纲、记录表、manifest 和周期状态，给出唯一的下一步行动及其准确命令，你永远不必回忆上次写到哪里。
 
 **两个会话钩子，每台机器装一次。** 一个会在每次会话开头，把[项目记忆](#项目记忆)索引摆到 agent 面前；另一个报出运行时给出的模型 id，好让 skill 写出的每份产物都记下是谁写的——`model_id` 加一条追加的 `model_trail` 条目（工作流规约 §8；各运行时的退路见 `docs/mds/stage-workflow/model_id_spec.md`）。Claude、Codex、Cursor 出厂就把两个都分别在 `.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json` 里注册好了。Kimi 没有项目级钩子配置，所以跑一次 `bash .kimi-code/hooks/install.sh`——它把这两个钩子连同下面那个提交守卫一起写进你的全局 Kimi 配置，写之前先备份，重复跑不会有第二次改动，此后这台机器上的每篇 STAGE 论文都覆盖到。在 Codex 上，注册好还不等于在跑：项目钩子要先信任该项目、再批准该钩子才会触发，所以在 Codex CLI 里跑 `/hooks` 批准它，钩子变更后再批准一次。在此之前不会有任何记忆到达会话，每份产物都只能记成 `unrecorded`，也没有任何地方会提示这个缺口。在某个钩子出现之前就接入的论文仓库，保留的是它自己的注册文件——`execs/update.sh` 从不覆盖，只会点名其中缺了哪个钩子。
 
@@ -293,24 +293,24 @@ STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事�
 | --- | --- | --- |
 | `stage-proj-adopt` † | 把新的或已有的论文仓库接进 STAGE：把配对 STAR 仓库写进 `.env`、确定目标 venue、盘点并映射已有 tex 树，把草稿里已有的数字转为 `unsourced` 论断进入审计待办 | `notes/adopt.md` |
 | `stage-evid-curator` | 证据接收与映射：运行 `import.sh`、登记 `mates/manual/` 下的手工文件、规整杂乱导出、提出论断⇄证据映射、暴露过期——绝不就地修改证据 | `mates/<slug>/**`、`mates/manual/**`、`mates/MANIFEST.md` 条目 |
-| `stage-stry-coach` † | 对话优先的故事打磨：pitch、问题、核心想法、带论断编号的贡献列表、venue 理由；播种论断台账和经用户确认的 venue 档案 | `notes/story.md`、播种的 `notes/claims.md`、`cycls/<cycle>/venue.yml` |
+| `stage-stry-coach` † | 对话优先的故事打磨：pitch、问题、核心想法、带论断编号的贡献列表、venue 理由；播种论断记录表和经用户确认的 venue 档案 | `notes/story.md`、播种的 `notes/claims.md`、`cycls/<cycle>/venue.yml` |
 | `stage-outl-planner` † | 故事 → 骨架：页数预算合计不超 venue 上限的章节表、图和表的计划、论断→章节分配、骨架 `.tex` 文件、记号表种子 | `notes/outline.md`、`manus/secs/*.tex` 骨架、`notes/notation.md` |
 | `stage-sect-drafter` | 每次调用起草或修改一个章节，依据章节简报、映射的证据、论断和记号规范；没有指纹的数字一律写成 `\todo{}` | `manus/secs/<n>_<slug>.tex` |
 | `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<slug>.tex` |
 | `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<slug>.pdf` + 源文件 |
 | `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子，没有时用 `discover` 按主题检索并提议候选 | `manus/bibs/reference.bib`、`notes/refs/<ABBREV>.md`、`notes/refs/refs_index.md` |
 | `stage-copy-editor` | 对一个章节或全稿做润色：清晰、流畅、记号一致、按预算删减——绝不改技术含义和任何数字；`style` 模式改为把作者的行文档位记下来 | `manus/` 下被润色的正文、`wkdrs/reports/POLISH_<date>.md`、`notes/style.md` |
-| `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转台账状态，检查证据过期 | `notes/claims.md` 的状态翻转、`wkdrs/reports/CLAIMS_<date>.md`、`tasks/` 条目 |
+| `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转记录表状态，检查证据过期 | `notes/claims.md` 的状态翻转、`wkdrs/reports/CLAIMS_<date>.md`、`tasks/` 条目 |
 | `stage-cite-auditor` | 每个 `\cite` key 都能解析；关于被引论文的每个断言都能对上一份阅读笔记——对不上的断言被标记，绝不悄悄改掉 | `wkdrs/reports/CITES_<date>.md`、`tasks/` 条目 |
 | `stage-peer-reviewer` | 模拟程序委员会：五视角评审团（新颖性与相关工作、技术正确性、实验严谨性、清晰度、魔鬼代言人），引用只认 whitelist/verified，按锚定评分带 + 封顶规则打分；`quick` 为单遍精简模式；绝不修改稿件 | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
-| `stage-resp-writer` † | 把真实与模拟评审解析成逐点台账，把每个攻击映射到论断和证据，在 venue 限制内起草回复，把每个承诺的修改记为复选框 | `cycls/<cycle>/response/RESPONSE_<date>.md`、`tasks/<cycle>_promises.md`、`notes/claims.md` 里降级为 `weakened` 的行 |
+| `stage-resp-writer` † | 把真实与模拟评审解析成逐点记录表，把每个攻击映射到论断和证据，在 venue 限制内起草回复，把每个承诺的修改记为复选框 | `cycls/<cycle>/response/RESPONSE_<date>.md`、`tasks/<cycle>_promises.md`、`notes/claims.md` 里降级为 `weakened` 的行 |
 | `stage-subm-packer` † | 投稿前检查与打包：build + lint 必须通过、走查检查单、完整性扫描、依官方模板包转成 venue 自己的版式、打包、投稿记录、冻结标签——camera-ready 模式在承诺未清空前拒绝打包 | `cycls/<cycle>/SUBMISSION_<date>.md`、标签 `freeze/<cycle>_<date>`、`cycls/<cycle>/template/` 下的模板包、`tasks/<cycle>_venue.md` 里的 venue 待办 |
-| `stage-pstr-builder` † | 把录用的论文压成一张纸：一句核心结论、论断台账里状态为 `verified` 的论断、从 `manus/figs/` 原样复用的图——外加一道按印刷尺寸折算有效字号的可读性闸，且不许 `\todo` 上墙 | `cycls/<cycle>/poster/POSTER_PLAN.md` + `poster.tex`，渲染产物在 `wkdrs/builds/poster/` |
+| `stage-pstr-builder` † | 把录用的论文压成一张纸：一句核心结论、论断记录表里状态为 `verified` 的论断、从 `manus/figs/` 原样复用的图——外加一道按印刷尺寸折算有效字号的可读性闸，且不许 `\todo` 上墙 | `cycls/<cycle>/poster/POSTER_PLAN.md` + `poster.tex`，渲染产物在 `wkdrs/builds/poster/` |
 | `stage-flow-status` | 全流程的只读地图：章节/图/表状态、按状态统计的论断覆盖、证据新鲜度、周期状态、最近一次构建——以及唯一的下一步行动和它的准确命令 | 聊天内报告；从不写文件 |
 
-**投给多个会议。** 一个 venue 就是一个 cycle。`cycls/<venue>_<year>/` 拥有这次尝试的 `venue.yml`、`template/` 下的官方模板包、评审、回复、`SUBMISSION_<date>.md` 和冻结 tag；稿件、证据和论断台账则由所有尝试共享。
+**投给多个会议。** 一个 venue 就是一个 cycle。`cycls/<venue>_<year>/` 拥有这次尝试的 `venue.yml`、`template/` 下的官方模板包、评审、回复、`SUBMISSION_<date>.md` 和冻结 tag；稿件、证据和论断记录表则由所有尝试共享。
 
-- **顺序投**——被拒之后改投别家——是原生路径。`/stage-stry-coach` 用那个 venue 经确认的档案建出下一个 cycle，`/stage-subm-packer convert kit=<path>` 把新模板包注册进去。旧 cycle 里的东西一样不动，所以"当时投的是哪个版式"永远能从它的冻结 tag 复现；共享台账里 `weakened` 和 `unsourced` 的论断，就是下一轮最先要修的东西。
+- **顺序投**——被拒之后改投别家——是原生路径。`/stage-stry-coach` 用那个 venue 经确认的档案建出下一个 cycle，`/stage-subm-packer convert kit=<path>` 把新模板包注册进去。旧 cycle 里的东西一样不动，所以"当时投的是哪个版式"永远能从它的冻结 tag 复现；共享记录表里 `weakened` 和 `unsourced` 的论断，就是下一轮最先要修的东西。
 - **并行投**——同时要一份 CVPR 版和一份 NeurIPS 版，或者只是想比页数——做法一样，仍然一个 venue 一个 cycle：把 `notes/story.md` 的 `cycle:` 指向你要的那个，再转换。副本落在 `wkdrs/builds/<cycle>_<template>_<date>/`，目录名带 cycle 和 template，所以彼此不会覆盖。
 - **同一个 cycle 里挂两套模板包**不支持，而且是刻意的。`cycls/<cycle>/template/` 是单数目录，`venue.yml` 的 `template:` 指名的是包里的某一个 class；往一个正在用的 cycle 上换模板包，会先给你看差异再询问，因为它会改变此前每个决定所依据的页数预算。
 
@@ -322,18 +322,18 @@ STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事�
 
 1. **接线仓库** —— `/stage-proj-adopt`（新克隆的模板也可以只填 `.env`）：STAR 配对、目标 venue、已有内容盘点 → `notes/adopt.md`。
 2. **引入证据** —— STAR 来源用 `bash execs/scpts/import.sh`，手工文件用 `/stage-evid-curator`：`mates/` 下的带指纹快照，每个文件一条 `MANIFEST.md` 记录。
-3. **打磨故事** —— `/stage-stry-coach`：pitch、贡献、venue 理由写进 `notes/story.md`；每条贡献成为台账里一条 `proposed` 论断；venue 的页数上限和截稿日期以用户确认的事实写进 `cycls/<cycle>/venue.yml`。
+3. **打磨故事** —— `/stage-stry-coach`：pitch、贡献、venue 理由写进 `notes/story.md`；每条贡献成为记录表里一条 `proposed` 论断；venue 的页数上限和截稿日期以用户确认的事实写进 `cycls/<cycle>/venue.yml`。
 4. **搭论文骨架** —— `/stage-outl-planner`：带页数预算的章节表、图表计划、论断→章节分配写进 `notes/outline.md`；骨架 `.tex` 文件出现在 `manus/secs/` 下，`main.tex` 中对应的 `\input` 行被取消注释；`notes/notation.md` 被播种。
 5. **建参考文献基座** —— `/stage-refs-curator`：`notes/refs/` 里带可引用事实的阅读笔记、干净的 `reference.bib`、相关工作定位。
-6. **起草** —— `/stage-sect-drafter` 每次一个章节，依据简报、证据和论断；`/stage-tabs-builder` 从证据生成表格；`/stage-figs-designer` 把每张图从源文件做到渲染 PDF。台账状态翻到 `drafted`。
+6. **起草** —— `/stage-sect-drafter` 每次一个章节，依据简报、证据和论断；`/stage-tabs-builder` 从证据生成表格；`/stage-figs-designer` 把每张图从源文件做到渲染 PDF。记录表状态翻到 `drafted`。
 7. **润色** —— `/stage-copy-editor`：清晰、流畅、记号一致；含义和数字碰不得。想先定文风的话，`/stage-copy-editor style` 把它记成 `notes/style.md` 里可量的档位。
-8. **审计** —— `/stage-clms-auditor` 把每个数字追溯到指纹；`/stage-cite-auditor` 核查每条引用和断言；每个失败都变成一条 `tasks/` 条目和一个台账状态，而不是埋在报告里的一行。
-9. **评审与回复** —— `/stage-peer-reviewer` 召集五视角模拟评审团（或用 `quick` 单遍模式），把 meta-review 写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点台账、一份不超 venue 限制的回复，以及 `tasks/` 里的承诺复选框。
+8. **审计** —— `/stage-clms-auditor` 把每个数字追溯到指纹；`/stage-cite-auditor` 核查每条引用和断言；每个失败都变成一条 `tasks/` 条目和一个记录表状态，而不是埋在报告里的一行。
+9. **评审与回复** —— `/stage-peer-reviewer` 召集五视角模拟评审团（或用 `quick` 单遍模式），把 meta-review 写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点记录表、一份不超 venue 限制的回复，以及 `tasks/` 里的承诺复选框。
 10. **打包冻结** —— `/stage-subm-packer`：build 和 lint 必须通过、走查检查单、依已注册的模板包把论文转成 venue 自己的版式、包放到 `wkdrs/builds/` 下、写出 `SUBMISSION_<date>.md`、打出标签 `freeze/<cycle>_<date>`。camera-ready 模式在 `tasks/<cycle>_promises.md` 还有未勾选项时拒绝打包。先跑 `/stage-subm-packer convert kit=<path>`，并按需要跑很多次——单独的转换跳过所有冻结关口，所以在论文还在压页数时照样能用。
 11. **做海报** —— `/stage-pstr-builder`，录用之后：`plan` 挑出那一句核心结论和挣到墙面的 `verified` 论断，并记下砍掉了什么；`render` 生成 `cycls/<cycle>/poster/poster.tex` 并编译；闸按纸张已确认的物理尺寸核对有效字号，并拒绝 `\todo`。图从 `manus/figs/` 原样取用——要新图就退回 `/stage-figs-designer`。
 
 
-## 证据、指纹与论断台账
+## 证据、指纹与论断记录表
 
 三条原则承载整个设计：
 
@@ -351,7 +351,7 @@ STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事�
 
 `source-stamp` 就是指纹：上游文件自己的 `generated:`/`updated:`/`finalized:` 日期。过期检测靠与上游当前值的精确比对（`import.sh --diff`），从不看文件 mtime——于是"论文脚下的数字变了"是一次机械检查，而不是一段记忆。
 
-**B. 论断台账是枢纽。** `notes/claims.md` 把每条论断的陈述位置 ⇄ 证据 ⇄ 状态连在一起：
+**B. 论断记录表是枢纽。** `notes/claims.md` 把每条论断的陈述位置 ⇄ 证据 ⇄ 状态连在一起：
 
 ```markdown
 | ID | Claim | Type | Stated in | Evidence | Status |

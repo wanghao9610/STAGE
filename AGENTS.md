@@ -27,7 +27,7 @@ Behavioral guidelines to reduce common LLM writing mistakes. They bias toward ca
 - Don't "improve" adjacent prose, captions, or formatting; don't rewrite what isn't broken. Match the manuscript's voice, even if you'd write it differently.
 - Never renumber sections in passing: the `<n>_` prefix binds outline rows, the ledger's `Stated in` column, and the `\input` order in `main.tex` together (conventions §5.5).
 - Minimum prose that makes the point: no filler, no padding toward a page budget, no second sentence restating the first.
-- The registry moves with the text it tracks — the claim row, the outline row, the notation entry — in the same change, not as cleanup after it.
+- The output table moves with the text it tracks — the claim row, the outline row, the notation entry — in the same change, not as cleanup after it.
 
 The test: every changed line traces to the user's request, and every number in it to a fingerprint.
 

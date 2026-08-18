@@ -738,7 +738,7 @@
   <p class="hero-desc">
     <strong><a class="inline-link" href="https://wanghao9610.github.io/STAR/index_zh.html" hreflang="zh-CN" target="_blank" rel="noopener">STAR</a></strong> 的学术写作伴侣 —— 把一个研究项目变成一篇<strong>正式投稿的论文</strong>，
     全程不丢失监管链：手稿中的每个数字都能追溯到带指纹的证据文件，或显著标记为缺失；
-    每个论断都在同一份台账中从提出追踪到核实。
+    每个论断都在同一份记录表中从提出追踪到核实。
   </p>
   <div class="hero-ctas">
     <a class="btn btn-primary" href="#quickstart">✦ 开始使用</a>
@@ -775,7 +775,7 @@
       </div>
       <div class="card reveal" style="--card-glow: rgba(76,195,255,0.16); --card-c: #4cc3ff">
         <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
-        <h3>论断台账作为中枢</h3>
+        <h3>论断记录表作为中枢</h3>
         <p><code>notes/claims.md</code> 把每个论断的表述 ⇄ 证据 ⇄ 状态连接起来 —— <code>proposed → drafted → verified</code> —— 从故事种子一直到投稿。</p>
       </div>
       <div class="card wide reveal" style="--card-glow: rgba(62,230,192,0.14); --card-c: #3ee6c0">
@@ -826,7 +826,7 @@
 │   ├── <span class="dir">bibs/</span>    <span class="cm"># reference.bib</span>
 │   └── <span class="dir">stys/</span>    <span class="cm"># stage.cls（外观）+ stage.sty（宏）</span>
 ├── <span class="dir">mates/</span>       <span class="cm"># 导入的证据 —— 只读</span>
-│   └── <span class="file">MANIFEST.md</span> <span class="cm"># 指纹台账</span>
+│   └── <span class="file">MANIFEST.md</span> <span class="cm"># 指纹记录表</span>
 ├── <span class="dir">notes/</span>       <span class="cm"># 故事、论断、大纲、符号约定</span>
 │   └── <span class="dir">refs/</span>    <span class="cm"># 每篇论文的阅读笔记</span>
 ├── <span class="dir">cycls/</span>       <span class="cm"># 投稿周期：&lt;venue&gt;_&lt;year&gt;/</span>
@@ -842,7 +842,7 @@
       <div class="legend reveal">
         <div class="legend-row"><code>manus/</code><span><strong>Manuscripts</strong> —— 论文的 LaTeX 源文件</span></div>
         <div class="legend-row"><code>mates/</code><span><strong>Materials</strong> —— 带指纹的证据快照，只读</span></div>
-        <div class="legend-row"><code>notes/</code><span><strong>写作元数据</strong> —— 故事、大纲与论断台账</span></div>
+        <div class="legend-row"><code>notes/</code><span><strong>写作元数据</strong> —— 故事、大纲与论断记录表</span></div>
         <div class="legend-row"><code>cycls/</code><span><strong>Cycles</strong> —— 每次投稿尝试一个目录</span></div>
         <div class="legend-row"><code>tasks/</code><span><strong>Tasks</strong> —— 修改草稿与承诺勾选框</span></div>
         <div class="legend-row"><code>wkdrs/</code><span><strong>Work directories</strong> —— 构建与临时报告，绝不提交</span></div>
@@ -880,7 +880,7 @@
           <h3>规划<small>打磨故事，搭起论文骨架。</small></h3>
         </div>
         <div class="skills">
-          <div class="skill"><code>/stage-stry-coach †</code><p>对话式的故事打磨：卖点、带论断 ID 的贡献、投稿理由 —— 同时播种论断台账。</p></div>
+          <div class="skill"><code>/stage-stry-coach †</code><p>对话式的故事打磨：卖点、带论断 ID 的贡献、投稿理由 —— 同时播种论断记录表。</p></div>
           <div class="skill"><code>/stage-outl-planner †</code><p>故事 → 骨架：章节页数预算、图表计划、论断→章节分配。</p></div>
           <div class="skill"><code>/stage-refs-curator</code><p>参考文献治理、带可引用事实的阅读笔记、去找没人点过名的工作、相关工作的定位。</p></div>
         </div>
@@ -917,7 +917,7 @@
         </div>
         <div class="skills">
           <div class="skill"><code>/stage-peer-reviewer</code><p>五视角的模拟程序委员会，在引用诚信契约下评审。</p></div>
-          <div class="skill"><code>/stage-resp-writer †</code><p>评审 → 要点台账 → 篇幅符合会议限制的回复信，每个承诺的修改都是一个勾选框。</p></div>
+          <div class="skill"><code>/stage-resp-writer †</code><p>评审 → 要点记录表 → 篇幅符合会议限制的回复信，每个承诺的修改都是一个勾选框。</p></div>
           <div class="skill"><code>/stage-subm-packer †</code><p>预检、用官方模板套件转换版式、打包、投稿记录、冻结标签。</p></div>
         </div>
       </div>
@@ -928,7 +928,7 @@
           <h3>纵览<small>报告全局进度，指出下一步。</small></h3>
         </div>
         <div class="skills">
-          <div class="skill"><code>/stage-flow-status</code><p>只读的全局地图 —— 大纲、台账、清单、投稿周期状态 —— 并给出唯一的下一步动作及其确切命令。从不写入。</p></div>
+          <div class="skill"><code>/stage-flow-status</code><p>只读的全局地图 —— 大纲、记录表、清单、投稿周期状态 —— 并给出唯一的下一步动作及其确切命令。从不写入。</p></div>
         </div>
       </div>
     </div>
