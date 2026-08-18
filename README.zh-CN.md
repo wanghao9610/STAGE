@@ -124,7 +124,7 @@ STAGE/
 | `mds/` | Markdowns | 按主题分组的 Markdown 文档 |
 | `srcs/` | Static sources | 文档引用的图片及其他静态资源 |
 
-三条目录树本身写不下的规则：`mates/` 只读（只有 `import.sh` 和 `/stage-evid-curator` 可以写入，且只做带指纹的整文件新增或替换）；`wkdrs/` 永不提交（可留存的审计结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目落盘，而不是报告文件）；`execs/` 根目录封闭（只有 `run.sh` + `update.sh`——工具脚本一律放 `execs/scpts/`）。
+三条目录树本身写不下的规则：`mates/` 只读（只有 `import.sh` 和 `/stage-evid-curator` 可以写入，且只做带指纹的整文件新增或替换）；`wkdrs/` 永不提交（可留存的审计结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目写进文件，而不是报告文件）；`execs/` 根目录封闭（只有 `run.sh` + `update.sh`——工具脚本一律放 `execs/scpts/`）。
 
 ## 论文模板
 
@@ -266,7 +266,7 @@ bash execs/scpts/fmt.sh    # 一句一行；--check 只报告偏离，不写入
 
 `/stage-flow-status` 是最值得记住的一个：它读取盘上的提纲、台账、manifest 和周期状态，给出唯一的下一步行动及其准确命令，你永远不必回忆上次写到哪里。
 
-**两个会话钩子，每台机器装一次。** 一个会在每次会话开头，把[项目记忆](#项目记忆)索引摆到 agent 面前；另一个报出运行时给出的模型 id，好让 skill 写出的每份产物都记下是谁写的——`model_id` 加一条追加的 `model_trail` 条目（工作流规约 §8；各运行时的兜底见 `docs/mds/stage-workflow/model_id_spec.md`）。Claude、Codex、Cursor 出厂就把两个都分别在 `.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json` 里注册好了。Kimi 没有项目级钩子配置，所以跑一次 `bash .kimi-code/hooks/install.sh`——它把这两个钩子连同下面那个提交守卫一起写进你的全局 Kimi 配置，写之前先备份，重复跑不会有第二次改动，此后这台机器上的每篇 STAGE 论文都覆盖到。在 Codex 上，注册好还不等于在跑：项目钩子要先信任该项目、再批准该钩子才会触发，所以在 Codex CLI 里跑 `/hooks` 批准它，钩子变更后再批准一次。在此之前不会有任何记忆到达会话，每份产物都只能记成 `unrecorded`，也没有任何地方会提示这个缺口。在某个钩子出现之前就接入的论文仓库，保留的是它自己的注册文件——`execs/update.sh` 从不覆盖，只会点名其中缺了哪个钩子。
+**两个会话钩子，每台机器装一次。** 一个会在每次会话开头，把[项目记忆](#项目记忆)索引摆到 agent 面前；另一个报出运行时给出的模型 id，好让 skill 写出的每份产物都记下是谁写的——`model_id` 加一条追加的 `model_trail` 条目（工作流规约 §8；各运行时的退路见 `docs/mds/stage-workflow/model_id_spec.md`）。Claude、Codex、Cursor 出厂就把两个都分别在 `.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json` 里注册好了。Kimi 没有项目级钩子配置，所以跑一次 `bash .kimi-code/hooks/install.sh`——它把这两个钩子连同下面那个提交守卫一起写进你的全局 Kimi 配置，写之前先备份，重复跑不会有第二次改动，此后这台机器上的每篇 STAGE 论文都覆盖到。在 Codex 上，注册好还不等于在跑：项目钩子要先信任该项目、再批准该钩子才会触发，所以在 Codex CLI 里跑 `/hooks` 批准它，钩子变更后再批准一次。在此之前不会有任何记忆到达会话，每份产物都只能记成 `unrecorded`，也没有任何地方会提示这个缺口。在某个钩子出现之前就接入的论文仓库，保留的是它自己的注册文件——`execs/update.sh` 从不覆盖，只会点名其中缺了哪个钩子。
 
 **另外两个钩子，做的是决定而不是注入。** Claude 与 Codex 带一个参与度放行钩子：只要 `.env` 写着 `INVOLVE=low`，它就替文件编辑前的权限提示作答；其他任何档位它什么都不做。Cursor 与 Kimi Code 不带它——Cursor 根本没有在文件编辑前触发的钩子事件，Kimi 自己的 `PreToolUse` 只写了 deny、没有 allow。四套树都带 `stage_commit_guard.sh`，而这一个在任何档位都跑：它拒掉[规约](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md) §1 明令禁止的 git 命令——一把梭或强制暂存、历史改写、删除或移动冻结 tag，以及暂存文件超过 10 MB 的提交。Claude、Codex 与 Kimi Code 把它挂在匹配 `Bash` 的 `PreToolUse` 上，Cursor 挂在 `beforeShellExecution` 上——那里才是它决定一条 shell 命令的地方。它是 `INVOLVE=low` 自行回答提交征询之下的那层地板：它拒掉的命令，归你自己去跑。
 
@@ -411,7 +411,7 @@ curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update
 2. 证据放在 `mates/`，且只读——`execs/scpts/import.sh` 与 `/stage-evid-curator` 是仅有的两个写入者。数字错了，去它的源头改再重新导入，绝不就地编辑证据文件。
 3. 写作元数据放在 `notes/`：固定文件 `story.md`、`claims.md`、`outline.md`、`notation.md`、`style.md`、`adopt.md`，阅读笔记放 `notes/refs/`。
 4. 投稿周期放在 `cycls/<venue>_<year>/`，venue 官方模板包整包解压进该周期的 `template/`；修订便签、承诺清单与 venue 跟进项放 `tasks/`。
-5. 构建产物与临时报告放在 `wkdrs/`，永不提交；可留存的结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目落盘，而不是报告文件。
+5. 构建产物与临时报告放在 `wkdrs/`，永不提交；可留存的结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目写进文件，而不是报告文件。
 6. 用 `execs/run.sh` 作为唯一构建入口，工具脚本放 `execs/scpts/`；运行环境路径从 `.env` 读取，不要在脚本里硬编码本机路径。
 7. `manus/` 里的每个数字，要么可追溯到一条带指纹的 `mates/` 记录，要么写成 `\todo{...}`——没有第三种状态；写进文档的日期一律取自系统时钟。
 8. 一次会话学到、而上面这些文件都不认领的东西，记进 `.stage/memory/`——先提议再写入，只对本机成立的放 `.stage/memory/local/`；记忆永远不为某个数字、某条会场规则、某句关于被引论文的断言充当来源。
@@ -425,7 +425,7 @@ curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update
 - 把 `manus/main.tex` 里的标题、作者、机构换成真实信息。双盲周期内保持匿名占位——`.env` 里 `ANON=true` 会让 `lint.sh` 在 `manus/` 下搜身份泄漏，注释也算。
 - 复制 `.env.example` 为 `.env`，设好 `STAR_HOME`（不与 STAR 配对就留空）、`LATEX_ENGINE`、`ANON` 与可选的 `INVOLVE`、`STAGE_LANG`。
 - 用 `/stage-stry-coach` 建立第一个投稿周期和它的 `venue.yml`；页数上限、截止日期与检查单只以你确认的事实录入，绝不臆造。
-- venue 官方模板包整包解压到 `cycls/<cycle>/template/`，不要放进 `manus/`——那是 `lint.sh` 扫描的命名空间，模板包自带的示例 `.tex` 会污染 `\todo` 计数和身份扫描。
+- venue 官方模板包整包解压到 `cycls/<cycle>/template/`，不要放进 `manus/`——那是 `lint.sh` 扫描的目录树，模板包自带的示例 `.tex` 会污染 `\todo` 计数和身份扫描。
 - 更新 `LICENSE` 中的年份和版权所有者。
 - 替换 `docs/htmls/stage.html`、`docs/htmls/stage_zh.html` 与 `docs/srcs/`——它们是 STAGE 自己的落地页和图片，不属于你的论文。`docs/index.html` 和 `docs/index_zh.html` 是把这两个页面挂到站点根目录的软链接。两个页面之间的中英切换用的是绝对链接（`/STAGE/index_zh.html`），要把其中的 `/STAGE` 前缀改成你自己的仓库名，否则语言切换会失效。`docs/mds/stage-workflow/` 保持不动，`execs/update.sh` 会负责更新它。
 - 删掉用不到的工具目录。`.agents/`（Codex）、`.claude/`、`.cursor/`、`.kimi-code/` 各自是同一套十六个 skill 的完整副本，每套 40–55 个文件；留下你所用 agent 会读的那一套，其余 `rm -rf` 即可。

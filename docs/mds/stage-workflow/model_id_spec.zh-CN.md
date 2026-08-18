@@ -1,4 +1,4 @@
-# 模型 id 兜底
+# 模型 id 的退路
 
 **语言：** [English](model_id_spec.md) | 简体中文
 
@@ -17,7 +17,7 @@
 
 ## Claude Code 与 Codex：为什么 id 要在写入当刻才读
 
-`model` 字段只挂在 `SessionStart` 上：`/clear`、resume、compact、fork 之后它会缺失；即便有，它描述的也只是会话开启那一刻——之后 `/model` 换模型不会触发任何钩子，于是以某个模型开始、用另一个模型写入的会话，记下的会是开始时那个。这两个运行时都保有逐回合的实际记录，因此只要载荷里给出了它，注入行带来的就是一条命令而不是 id。记录该值的当刻跑它：
+`model` 字段只挂在 `SessionStart` 上：`/clear`、resume、compact、fork 之后它会缺失；即便有，它描述的也只是会话开启那一刻——之后 `/model` 换模型不会触发任何钩子，于是以某个模型开始、用另一个模型写入的会话，记下的会是开始时那个。这两个运行时都保有逐回合的实际记录，因此只要payload里给出了它，注入行带来的就是一条命令而不是 id。记录该值的当刻跑它：
 
 ```bash
 bash "$CLAUDE_PROJECT_DIR"/.claude/hooks/stage_model_id.sh --resolve <transcript_path> [session_model]

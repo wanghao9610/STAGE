@@ -75,7 +75,7 @@ description: 在 Codex harness 中拥有手稿的图清单，并且每次只完�
 
 视觉检查后，对最终 PPTX 与 PDF 计算 SHA-256，把两个 hash、renderer 名称/版本和 `date +%Y-%m-%d` 写进 `<slug>.render.yml`；绝不把 mtime 当作新鲜度证据。把 `<slug>.sources.md` 再对 PPTX notes 和可见元素核一遍。然后运行 `bash execs/run.sh` 与 `bash execs/scpts/lint.sh`，因为改动一张已引用的图可能改变手稿页数，也可能暴露 todo/reference 闸。缺 renderer 或 QA 工具是降级检查：Status 留在 `final` 之前，准确点名缺失命令，绝不用另一条未记录的导出路径替代 PPTX→PDF 链。
 
-把 `\includegraphics{figs/<slug>}` 报给 `$stage-sect-drafter`；摆放与 LaTeX caption 仍是起草者的写入面。
+把 `\includegraphics{figs/<slug>}` 报给 `$stage-sect-drafter`；摆放与 LaTeX caption 仍归起草者写。
 
 ### Step 6：teaser 检查清单（`teaser` 运行时）
 

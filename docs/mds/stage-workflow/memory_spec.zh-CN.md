@@ -58,7 +58,7 @@ source: wkdrs/builds/main.log
 | `scope` | `global`、`machine:<name>`、`cycle:<cycle>` 或 `manus:<path>`——事实在哪里成立，不是在哪里学到的 |
 | `language` | 正文语言（规约 §7.6，回复语言规则）；frontmatter 的键始终英文 |
 | `verified` | 最后一次确认它为真的日期，取自系统时钟（规约 §4，真实日期） |
-| `model_id` | 写它或最后复核它的模型，原样抄录（规约 §8，产物登记表；兜底见 `model_id_spec.md`） |
+| `model_id` | 写它或最后复核它的模型，原样抄录（规约 §8，产物登记表；退路见 `model_id_spec.md`） |
 | `source` | 这条事实是从哪个产物里出来的，或者 `conversation` |
 | `supersedes` | 可选：这条记忆取代了哪个 slug |
 

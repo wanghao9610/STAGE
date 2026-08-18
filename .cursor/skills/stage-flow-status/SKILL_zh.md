@@ -53,9 +53,9 @@ description: >-
    bash execs/scpts/lint.sh --no-build; bash execs/scpts/import.sh --diff
    ```
 
-   规约分三次调用而不是一次，是因为每个工具返回都有自己的体积上限，超过大约 30 KB 的 shell 返回会被落到文件里，读回来又要花一次往返——正是这条单消息要省掉的那一次。装载的八节加起来 60 KB，共用一个返回装不下；这样切开，每一份都稳稳在线以下，摘要独占一个返回（它是唯一随论文长大的那部分），两条脚本信号占第五个，否则它们那几行会搭在最接近溢出的那个返回上。某段摘录什么都没打印出来——同步过来的规约副本可能换了编号——就用 `sed -n '/^## 0\./,$p'` 整份装载，并在回复里说明摘录退化了。
+   规约分三次调用而不是一次，是因为每个工具返回都有自己的大小上限，超过大约 30 KB 的 shell 返回会被存成文件，读回来又要花一次往返——正是这条单消息要省掉的那一次。装载的八节加起来 60 KB，共用一个返回装不下；这样切开，每一份都稳稳在线以下，摘要独占一个返回（它是唯一随论文长大的那部分），两条脚本信号占第五个，否则它们那几行会搭在最接近溢出的那个返回上。某段摘录什么都没打印出来——同步过来的规约副本可能换了编号——就用 `sed -n '/^## 0\./,$p'` 整份装载，并在回复里说明这次改成了整份装载。
 
-   摘要是登记表（§8）的一次过：`notes/story.md`、`outline.md`、`claims.md`、`notation.md`、`style.md`、`adopt.md` 的 frontmatter 与表格行；`mates/MANIFEST.md` 的条目连同 `imported:` 时间戳；`notes/refs/` 的笔记、索引行，以及 `reference.bib` 的每个 citekey；每个周期的 `venue.yml`、`reviews/`、`response/`、投稿记录与模板目录；`tasks/` 的复选框；`manus/` 下深度 1 的目录清单；`wkdrs/builds` 与 `wkdrs/reports` 连同修改时间；以及只读的那部分 git 面，冻结 tag 在内。它只收集、从不判断——没有状态符号、没有漂移检查、没有排序、没有收敛到某一节——所以每条规则都留在本文件和规约里。把它打印的东西当作文件内容来读，就像你自己打开过每个文件一样。脚本缺失或失败，就直接读文件，并在回复里说明扫描退化了；解析不出本 skill 自己的目录时，仓库里任意一份都可以，四棵树带的是同一个脚本：`bash "$(find . -path '*stage-flow-status/scripts/scan.sh' | head -1)"`。
+   摘要是登记表（§8）的一次过：`notes/story.md`、`outline.md`、`claims.md`、`notation.md`、`style.md`、`adopt.md` 的 frontmatter 与表格行；`mates/MANIFEST.md` 的条目连同 `imported:` 时间戳；`notes/refs/` 的笔记、索引行，以及 `reference.bib` 的每个 citekey；每个周期的 `venue.yml`、`reviews/`、`response/`、投稿记录与模板目录；`tasks/` 的复选框；`manus/` 下深度 1 的目录清单；`wkdrs/builds` 与 `wkdrs/reports` 连同修改时间；以及只读的那部分 git 面，冻结 tag 在内。它只收集、从不判断——没有状态符号、没有漂移检查、没有排序、没有收敛到某一节——所以每条规则都留在本文件和规约里。把它打印的东西当作文件内容来读，就像你自己打开过每个文件一样。脚本缺失或失败，就直接读文件，并在回复里说明这次扫描没跑成；解析不出本 skill 自己的目录时，仓库里任意一份都可以，四棵树带的是同一个脚本：`bash "$(find . -path '*stage-flow-status/scripts/scan.sh' | head -1)"`。
 
    给了 SECTION 就解析它（§5）；扫描永远是全项目的，收敛在这里做，对着它返回的内容做。
 2. **周期状态。** 一行：周期名；`confirmed:` 是否已设；评审是否在位（`SIM_*` 与 `received_*` 计数）；回复是否存在；承诺未清/总数；是否已冻结（tag 或 SUBMISSION 文件）。没有 story 文件 → 流程还没开始：用一句话说出来，第 3–6 步整段跳过——不出提纲面板、不出主张计数、不出证据行、不出 lint 判定、不出 provenance——直接到第 7 步。下面每一块看板读的都是尚不存在的文件，而一个脚手架仓库诚实的报告就是那一句话加上下一步动作，再无别的。

@@ -50,5 +50,5 @@ description: >-
 
 - `wkdrs/reports/CLAIMS_<date>.md`——登记表行：Audit reports，生产者 `stage-clms-auditor`，临时，日期在文件名里。frontmatter `date:`、`scope:`；小节：`## Verdict`（审计了多少数字；matched / mismatched / unsourced / 声明为 `\todo` 的计数；过期状态）、`## Trace table`——`| Where | Value | Trace | Evidence | Verdict |`，失败在前、`## Staleness`（`import.sh --diff` 的输出）、`## Ledger`（每次翻转：ID、旧 → 新、为什么）、`## Handoffs`（留给 `/stage-cite-auditor` 的被引工作数字）、`## Tasks filed`。
 - `notes/claims.md` 里的状态翻转、Evidence 补全与 `updated:`；`tasks/claims_followups.md` 里每个失败一条 `- [ ]`——这些是持久成果。
-- 绝不编辑 `manus/`、`mates/` 或 bib：判定、翻转与任务就是全部写入面。
+- 绝不编辑 `manus/`、`mates/` 或 bib：判定、翻转与任务就是它能写的全部。
 - 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

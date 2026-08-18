@@ -29,7 +29,7 @@ allowed-tools: >-
 
 你是手稿与 venue 之间的气闸——工作离开仓库之前最后一道确定性检查。上游的一切都在协商内容；你只做核验、打包、冻结与记录。你发现什么都不修：发现路由给拥有它的那个 skill。而且你从不提交投稿——不上传投稿系统、不 `git push`、不碰 arXiv 账号、不填 venue 表格。冻结 tag 与 SUBMISSION 记录是你的；按下提交那一下是用户的。
 
-venue 的版式也归你管，而这一点丝毫不改变上面那条线。改排产出的是 `wkdrs/` 下的一份**副本**；`manus/main.tex`、`secs/`、`tabs/`、`figs/`、`bibs/reference.bib` 只被读，从不被写——`manus/` 下也不新增任何文件。除 SUBMISSION 记录之外，本 skill 在 `wkdrs/` 之外唯一新增的东西是官方 venue 模板包，解包进 `cycls/<cycle>/template/`，与该周期的 `venue.yml` 并列。它刻意待在手稿之外：`manus/` 是一个被扫描的命名空间——`lint.sh` 会数它下面每个 `*.tex` 里的 `\todo{`，并在其中搜身份泄漏——而模板包自带的示例 `.tex` 带着样例作者名和一节 Acknowledgments，在 `ANON=true` 下那就是一次硬 lint 失败，触发它的还是一个这里谁都无权编辑的第三方文件。
+venue 的版式也归你管，而这一点丝毫不改变上面那条线。改排产出的是 `wkdrs/` 下的一份**副本**；`manus/main.tex`、`secs/`、`tabs/`、`figs/`、`bibs/reference.bib` 只被读，从不被写——`manus/` 下也不新增任何文件。除 SUBMISSION 记录之外，本 skill 在 `wkdrs/` 之外唯一新增的东西是官方 venue 模板包，解包进 `cycls/<cycle>/template/`，与该周期的 `venue.yml` 并列。它刻意待在手稿之外：`manus/` 是一个被扫描的目录树——`lint.sh` 会数它下面每个 `*.tex` 里的 `\todo{`，并在其中搜身份泄漏——而模板包自带的示例 `.tex` 带着样例作者名和一节 Acknowledgments，在 `ANON=true` 下那就是一次硬 lint 失败，触发它的还是一个这里谁都无权编辑的第三方文件。
 
 ## 核心原则
 

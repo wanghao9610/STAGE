@@ -371,7 +371,7 @@ elif [[ -n "${SKILL_NAME}" ]]; then
 else
     # SYNC_PATHS is what gets diffed, dirty-checked, archived, and extracted —
     # directories and single files alike. SPARSE_PATHS is what the sparse
-    # checkout materializes, and it holds directories only: `sparse-checkout
+    # checkout creates files, and it holds directories only: `sparse-checkout
     # set` is cone-mode by default, where every argument is read as a directory,
     # so naming a file there would match nothing. A file's parent directory goes
     # in instead; fetching a few siblings we do not copy is cheaper than getting
@@ -393,7 +393,7 @@ else
     # Parent directories of every synced or kept single file. The harness
     # configs are named explicitly rather than left to cone mode's ancestor
     # rule: harness_rels() checks them in the fetched tree, and a config the
-    # checkout never materialized would read as "upstream does not have it".
+    # checkout that never created it would read as "upstream does not have it".
     for f in "${SYNC_FILES[@]}" "${HARNESS_FILES[@]}"; do
         d="$(dirname -- "${f}")"
         [[ "${d}" == "." ]] || SPARSE_PATHS+=("${d}")
@@ -445,7 +445,7 @@ git clone \
 if [[ "${ADOPT}" == false ]]; then
     # SPARSE_PATHS is directories only (see above); the existence check below
     # then runs over SYNC_PATHS, which is the exact list the tar copies — so a
-    # file that the sparse checkout failed to materialize stops the run here
+    # file that the sparse checkout failed to create stops the run here
     # instead of being silently skipped.
     git -C "${SOURCE_DIR}" sparse-checkout set "${SPARSE_PATHS[@]}"
 

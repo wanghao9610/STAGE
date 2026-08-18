@@ -83,7 +83,7 @@ Resolve `soffice` through the bundled workspace dependencies; never hardcode a m
 
 After visual QA, compute SHA-256 over the final PPTX and PDF and write `<slug>.render.yml` with both hashes, the renderer name/version, and `date +%Y-%m-%d`; never use mtime as freshness evidence. Re-read `<slug>.sources.md` against the PPTX notes and visible elements. Then run `bash execs/run.sh` and `bash execs/scpts/lint.sh`, because a changed included figure can move the manuscript's page count or expose a todo/reference gate. A missing renderer or QA tool is a degraded check: keep Status short of `final`, name the exact missing command, and do not replace the PPTX→PDF chain with a different undocumented export.
 
-Report `\includegraphics{figs/<slug>}` for `$stage-sect-drafter`; placement and the LaTeX caption remain the drafter's write surface.
+Report `\includegraphics{figs/<slug>}` for `$stage-sect-drafter`; placement and the LaTeX caption are the drafter's to write.
 
 ### Step 6: Teaser checklist (`teaser` runs)
 

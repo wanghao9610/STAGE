@@ -410,7 +410,7 @@ done < <(printf '%s\n' "${SKILLS}")
 #     and skip the re-read only when the text is still verbatim in context.
 #     Nothing above guards any of it — a manifest could drop the language probe,
 #     lose the conventions block, or cat the conventions into a shell command
-#     (guaranteeing the >30 KB spill the one-message shape exists to avoid), and
+#     (guaranteeing the >30 KB result the one-message shape exists to avoid), and
 #     every check stayed green. The literals pinned here are the strings that
 #     discipline rides on; rewording one centrally means updating this check in
 #     the same commit.

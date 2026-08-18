@@ -145,7 +145,7 @@ writes, and never present a guess as a state.
    ```
 
    The conventions ride in three calls rather than one because each tool result has its own size
-   limit, and a Bash result past roughly 30 KB is spilled to a file that costs a round trip to
+   limit, and a Bash result past roughly 30 KB is written out to a file that costs a round trip to
    read back — the exact round trip the single message exists to avoid. The eight loaded sections
    are 60 KB together, so they cannot share one result; split this way each is comfortably under,
    the digest gets a result to itself since it is the one part that grows with the paper, and the

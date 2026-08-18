@@ -61,7 +61,7 @@ In the main agent, writing nothing — a manuscript tree is small, and no fan-ou
 
 ### Step 2: Confirmation point 1 — the mapping
 
-Ask via AskUserQuestion, one question at a time, only about what the probe could not settle: which candidate is the main file, which directories are prose vs evidence vs junk, whether a paired STAR repo exists (that fills `STAR_HOME`), the target venue when nothing names one. Options come from the probe with the recommendation marked. Nothing is written until this point clears.
+Ask via AskUserQuestion, one question at a time, only about what the survey could not settle: which candidate is the main file, which directories are prose vs evidence vs junk, whether a paired STAR repo exists (that fills `STAR_HOME`), the target venue when nothing names one. Options come from the survey with the recommendation marked. Nothing is written until this point clears.
 
 ### Step 3: Confirmation point 2 — the move plan
 
@@ -119,6 +119,6 @@ Write `notes/adopt.md`: the confirmed mapping, every move executed (old → new)
 ## Dialogue Discipline
 
 - Both confirmation points go through AskUserQuestion, one question per call. If it is unavailable (headless / scripted), fall back to plain text — still one at a time, still requiring an explicit answer before any write.
-- Lead with what the probe found and what it could not settle. An unknown reported as unknown is the point; a confidently wrong main-file guess costs every downstream skill.
+- Lead with what the survey found and what it could not settle. An unknown reported as unknown is the point; a confidently wrong main-file guess costs every downstream skill.
 - Say plainly what adoption did not do: it sourced no claim, judged no writing, imported no evidence — `/stage-clms-auditor`, the drafting skills, and `/stage-evid-curator` own those, in that order of urgency.
 - Reply in the user's language; the record stays English; paths, metric names, and quoted claims keep their original form inside Chinese dialogue.

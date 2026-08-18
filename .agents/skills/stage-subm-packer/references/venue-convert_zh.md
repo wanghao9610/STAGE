@@ -21,7 +21,7 @@
 
 `venue.yml` 的 `template:` 指名的是**模板包里那个 class**，不是目录：`template: cvpr` 意味着生成的 `main.tex` 写 `\documentclass{stys/cvpr}`。一份模板包会带好几个 class 与 style 文件、常常不止一个像样的入口，所以需要这个字段来挑一个。
 
-它刻意不放在 `manus/` 下。那棵树是一个**被扫描的命名空间**——`lint.sh` 会数它下面每个 `*.tex` 里的 `\todo{`，并在其中搜身份泄漏——而模板包自带的示例 `.tex` 带着样例作者名和一节 Acknowledgments。在 `ANON=true` 下，那就是一次由第三方文件引发的硬 lint 失败，而那个文件谁都无权编辑，于是每次打包都失败，永远如此。
+它刻意不放在 `manus/` 下。那棵树是一个**被扫描的目录树**——`lint.sh` 会数它下面每个 `*.tex` 里的 `\todo{`，并在其中搜身份泄漏——而模板包自带的示例 `.tex` 带着样例作者名和一节 Acknowledgments。在 `ANON=true` 下，那就是一次由第三方文件引发的硬 lint 失败，而那个文件谁都无权编辑，于是每次打包都失败，永远如此。
 
 - **给了 `kit=<path>`**——路径是一个 zip 或一个目录。把它整份、原封不动地解包或拷贝进 `cycls/<cycle>/template/`。若该目录已存在且内容不同，先展示差异再提问（规约 §7.2）：在一个周期底下把模板包换掉，等于把此前每一个决策所依据的页数预算换掉。
 - **没给 `kit=`**——`cycls/<cycle>/template/` 必须已经存在。不存在就停下，并给出唯一能解开它的东西：官方模板包的路径。
@@ -51,7 +51,7 @@
 逐字节、不加编辑地拷进去：
 
 - `cycls/<cycle>/template/` 里每一个 `.cls`、`.sty`、`.bst` → 副本的 `stys/`（模板包的示例 `.tex`、README 与样例图留在原地——副本只装编译这篇论文所需的东西，别的都不装）
-- `manus/stys/stage.sty` → 副本的 `stys/`——**写作层原样发出。** 它是一个自足的 package，不带选项地加载内容级宏包（所以在已经拉过这些包的 class 下二次加载是静默的空操作），并且携带 `\todo`、`\parahead`、`\cmark`、`\tablestyle`、`x`/`y`/`z`/`P`/`Y` 列类型、`Light*` 行底色、`\figref`/`\tabref`/`\eqnref`、`accentcolor` 兜底以及 `\graphicspath{{figs/}}`。这一层本来就是为跨模板存活而设计的；不要在 `compat.sty` 里重新实现它的任何一部分。
+- `manus/stys/stage.sty` → 副本的 `stys/`——**写作层原样发出。** 它是一个自足的 package，不带选项地加载内容级宏包（所以在已经拉过这些包的 class 下二次加载是静默的空操作），并且携带 `\todo`、`\parahead`、`\cmark`、`\tablestyle`、`x`/`y`/`z`/`P`/`Y` 列类型、`Light*` 行底色、`\figref`/`\tabref`/`\eqnref`、`accentcolor` 备用定义以及 `\graphicspath{{figs/}}`。这一层本来就是为跨模板存活而设计的；不要在 `compat.sty` 里重新实现它的任何一部分。
 - `manus/secs/`、`manus/tabs/` → 不加编辑
 - `manus/figs/*.pdf` → 副本的 `figs/`。**不含 `figs/srcs/`**：论文需要的是渲染出的图，而一个绘图脚本或 `.drawio` 文件可能把路径、用户名或机器名带进一次匿名投稿。
 - `manus/bibs/reference.bib` → 副本的 `bibs/`
@@ -65,7 +65,7 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 | `stage.cls` 提供而 `stage.sty` 没有 | 在正文文件里表现为 |
 |---|---|
 | `algorithm`、`algpseudocode` | `\begin{algorithm}`、`\State`、`\Require` |
-| `\algref{alg}{line}`——class 的双参形式（`stage.cls:104`） | 算法行级引用；`stage.sty` 只提供单参兜底 |
+| `\algref{alg}{line}`——class 的双参形式（`stage.cls:104`） | 算法行级引用；`stage.sty` 只提供单参备用定义 |
 | `mathtools`、`bm` | `\coloneqq`、`\bm{}`、`\DeclarePairedDelimiter` |
 | `siunitx` | `\SI{}`、`\num{}` |
 | `nicematrix` | `NiceTabular` |

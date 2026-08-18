@@ -25,7 +25,7 @@ Per paper, stop at the first source that yields a matching record:
    - `http://export.arxiv.org/api/query?id_list=<id>` (Atom)
    - becomes `@misc` with `eprint`, `archivePrefix = {arXiv}`, `primaryClass`, `year`
 
-Cache every fetched payload under `wkdrs/refs_<date>/raw/<citekey>.<source>.<ext>` **before** using it. `wkdrs/` is regenerable and never committed (conventions §1.2), so the cache is what makes the run's own self-audit and a same-day re-run cheap; what outlives it is the `% src:` line in the bib and the entry's row in `notes/refs/refs_index.md`, which are tracked.
+Cache every fetched record under `wkdrs/refs_<date>/raw/<citekey>.<source>.<ext>` **before** using it. `wkdrs/` is regenerable and never committed (conventions §1.2), so the cache is what makes the run's own self-audit and a same-day re-run cheap; what outlives it is the `% src:` line in the bib and the entry's row in `notes/refs/refs_index.md`, which are tracked.
 
 **A batch of three or more resolves its ids first.** One Semantic Scholar batch call — `POST https://api.semanticscholar.org/graph/v1/paper/batch?fields=externalIds,title,year,venue,authors`, up to 500 ids in the body, the same endpoint the score refresh uses — over every input that already carries an arXiv id or a DOI, and the `externalIds` it returns take each paper straight to its DBLP key or DOI at sources 1–2. Nothing about where a field comes from changes: the entry is still transcribed from the DBLP or Crossref record and still matched on all three fields. What goes away is the per-paper title search that produced most of the requests, and with them most of the backoff — a ten-paper `add` of arXiv ids costs one batch call and ten keyed lookups instead of ten searches. An input that is a title has no id to batch and resolves exactly as before.
 
@@ -185,7 +185,7 @@ Then return exactly these fields and nothing else:
 
 ## Self-audit before finishing
 
-1. Every citekey in `reference.bib` has a cached payload in the run dir **and** a provenance row in `refs_index.md` **and** a `% src:` line above the entry carrying that row's URL and date. A seeded entry's row says `mates/<...>`; a user-supplied entry's row says so.
+1. Every citekey in `reference.bib` has a cached record in the run dir **and** a provenance row in `refs_index.md` **and** a `% src:` line above the entry carrying that row's URL and date. A seeded entry's row says `mates/<...>`; a user-supplied entry's row says so.
 2. Re-fetch 5 entries at random (all of them in `verify` mode); diff field-by-field against the file. Any mismatch → correct the file to match the source, then re-check that entry's whole batch.
 3. Parse the file with a bib parser if one is already installed; otherwise check brace balance and key uniqueness mechanically. Never install one to run this check — say it was done by hand.
 4. No entry has an empty required field; no key appears twice.

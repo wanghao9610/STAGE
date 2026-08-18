@@ -15,7 +15,7 @@ model_trail:                    # append-only: one entry per write session, neve
 ## 1. Scope
 
 <!-- What drove this run: the paper's story and claim ledger, an imported refs tree under mates/,
-     or a topic the user gave. The run cache holding the raw payloads: wkdrs/refs_<date>/raw/.
+     or a topic the user gave. The run cache holding the raw records: wkdrs/refs_<date>/raw/.
      Mode: survey | intake | add | discover | seed | tidy | position | score | verify.
      Every query that was run, each with the number of hits it returned — the zero-hit ones
      too: "we looked and found nothing" is a result, and only the log tells it apart from
