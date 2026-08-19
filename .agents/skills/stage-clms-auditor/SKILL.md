@@ -83,6 +83,17 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    (§6.2). The staleness gate runs first and runs here — it decides whether any verdict this run
    produces can flip anything up at all.
 
+8. **Hand-registered evidence carries no upstream check.** Evidence imported from a STAR run has
+   already passed that run's analysis, which reports a chosen configuration alongside the spread on
+   its own axis and repeats as median and range. `mates/manual/**` has not: nobody upstream asked
+   whether the value is the best of several. So where a `matched` number traces to
+   `mates/manual/**` and the evidence itself shows a selection — one cell of a grid, one run out of
+   several, a configuration picked after comparing — the verdict stands (Principle 1 admits no
+   third state) and the report carries one line: the manuscript states a selected number without
+   its spread, with one `tasks/` item to add the spread or to say in the text what it was selected
+   over. Whether a value is correct and whether it is honestly reported are different questions;
+   this audit answers the first and owes the reader a word when the second is unanswered.
+
 ## Workflow
 
 1. **Load.** Read the conventions whole; then `notes/claims.md`, `mates/MANIFEST.md`, and
@@ -136,10 +147,11 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
   ephemeral, date in filename. Frontmatter `date:`, `scope:`; sections: `## Verdict` (numbers
   audited; matched / mismatched / unsourced / declared-`\todo` counts; staleness state),
   `## Trace table` — `| Where | Value | Trace | Evidence | Verdict |`, failures first,
-  `## Staleness` (the `import.sh --diff` output), `## Ledger` (each flip: ID, old → new, why),
+  `## Staleness` (the `import.sh --diff` output), `## Selected without spread` (Principle 8: matched
+  numbers from `mates/manual/**` that state a picked value), `## Ledger` (each flip: ID, old → new, why),
   `## Handoffs` (cited-work numbers left to `$stage-cite-auditor`), `## Tasks filed`.
 - Status flips, Evidence completions, and `updated:` in `notes/claims.md`; one `- [ ]` per
   failure in `tasks/claims_followups.md` — the durable outcomes.
-- Never edits `manus/`, `mates/`, or the bib: verdicts, flips, and tasks are the entire write
-  surface.
+- Never edits `manus/`, `mates/`, or the bib: verdicts, flips, and tasks are all it
+  writes.
 - Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

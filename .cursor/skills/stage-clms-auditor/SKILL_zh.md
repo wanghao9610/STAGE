@@ -30,6 +30,14 @@ description: >-
 6. **翻转是挣来的——两个方向都是。** 一条主张只有在它名下每个数字都对上了新鲜的证据、且它所有证据链接都能解析时，才从 `drafted` 翻成 `verified`。它名下只要有一个裸的无来源数字 → `unsourced`。此前是 `verified` 的主张今天没通过就失去这个状态——退回 `drafted`，并附一条说明为什么的任务。一次 mismatch 永远不会把任何东西往上翻。
 7. **追溯并行分派（§6）。** 范围里的 `.tex` 文件超过一个 → 范围内每个 `manus/secs/` 与 `manus/tabs/` 文件一个委派者，各自对自己那些数字按原则 3 的顺序走，把被引的 `mates/` 文件在它的锚点处打开，每个数字返回一行——tex 里的值、锚点处的值、判定——别的什么都不返回。`notes/claims.md` 只有一个写入者，而且是主 agent：Step 7 要把所有委派者的行同时读一遍，一条主张会在不止一个文件里被陈述，而两个委派者一起改的那行记录表，总有一个的修改会丢（§6.2）。过期关卡先跑，并且在这里跑——它决定本次运行产出的判定究竟能不能把任何东西往上翻。
 
+8. **手工登记的证据没有上游把关。** 从 STAR run 导入的证据已经过那次运行的分析——它报选中的配置时会
+   同时报同轴上的散布，重复运行报中位数与极差。`mates/manual/**` 没有：上游没有任何人问过这个值
+   是不是"跑了几次里最好的那次"。因此当一个判为 `matched` 的数字追溯到 `mates/manual/**`、
+   而证据本身显示这是一次挑选——网格里的一格、几次运行里的一次、比较之后选定的一个配置——判定不变
+   （原则 1 不容第三种状态），但报告里要写一行：手稿给出的是一个被挑出来的数字、没有给出它的散布，
+   并开一条 `tasks/` 条目，或补上散布，或在正文里说清它是在什么之中被选出来的。一个值对不对，和它
+   报得诚不诚实，是两个问题；本次审计回答第一个，第二个没人回答时，欠读者一句话。
+
 ## 工作流
 
 1. **装载。** 整份读完规约；然后读 `notes/claims.md`、`mates/MANIFEST.md` 与 `notes/outline.md`。真实日期取自系统时钟（规约 §4）。
@@ -48,7 +56,7 @@ description: >-
 
 ## 输出
 
-- `wkdrs/reports/CLAIMS_<date>.md`——登记表行：Audit reports，生产者 `stage-clms-auditor`，临时，日期在文件名里。frontmatter `date:`、`scope:`；小节：`## Verdict`（审计了多少数字；matched / mismatched / unsourced / 声明为 `\todo` 的计数；过期状态）、`## Trace table`——`| Where | Value | Trace | Evidence | Verdict |`，失败在前、`## Staleness`（`import.sh --diff` 的输出）、`## Ledger`（每次翻转：ID、旧 → 新、为什么）、`## Handoffs`（留给 `/stage-cite-auditor` 的被引工作数字）、`## Tasks filed`。
+- `wkdrs/reports/CLAIMS_<date>.md`——登记表行：Audit reports，生产者 `stage-clms-auditor`，临时，日期在文件名里。frontmatter `date:`、`scope:`；小节：`## Verdict`（审计了多少数字；matched / mismatched / unsourced / 声明为 `\todo` 的计数；过期状态）、`## Trace table`——`| Where | Value | Trace | Evidence | Verdict |`，失败在前、`## Staleness`（`import.sh --diff` 的输出）、`## Selected without spread`（原则 8：追溯到 `mates/manual/**`、判为 matched 却给的是一个被挑出来的值）、`## Ledger`（每次翻转：ID、旧 → 新、为什么）、`## Handoffs`（留给 `/stage-cite-auditor` 的被引工作数字）、`## Tasks filed`。
 - `notes/claims.md` 里的状态翻转、Evidence 补全与 `updated:`；`tasks/claims_followups.md` 里每个失败一条 `- [ ]`——这些是持久成果。
 - 绝不编辑 `manus/`、`mates/` 或 bib：判定、翻转与任务就是它能写的全部。
 - 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。
