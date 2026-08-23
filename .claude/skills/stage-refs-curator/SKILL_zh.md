@@ -15,7 +15,7 @@ allowed-tools: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`/stage-refs-curator [PAPER | add PAPER [PAPER …] | discover [SECTION | TOPIC] | seed | tidy | position | verify | score] [involve=low]`——不带参数时普查 `manus/bibs/reference.bib`、`notes/refs/` 与索引，审查卫生状况，并提出唯一的下一步动作；一个光秃秃的 arXiv id、DOI、论文 URL 或带引号的标题，是把那一篇收进来，而 `add` 接收多篇（按换行与逗号切分；不属于上述任何形式的片段整体当作一个标题读）；`discover` 从论文自己的故事与主张出发做主题检索并给出排序候选——唯一一个能找出没人点过名的论文的模式，而且一篇都不擅自收进来；`seed` 从 `mates/` 转换导入的 STAR refs；`tidy` 是离线的 bib 卫生整理；`position` 为相关工作给底盘聚类；`verify` 重抓每一条并逐字段比对；`score` 只刷新影响力指标，别的什么都不动。一个标题解析到多条记录、或者没有一条干净地对上，要提问（§7），绝不猜。这里没有独立的描述位：自由文本本身就是论文标题，或者 `discover` 据以检索的那个主题——所以规约 §7.13 说的那句描述*就是*这个参数，不再从中剥出别的东西。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），不属于参数，在参数被读取之前就被剥离。没有哪一档能让一个字段凭记忆写出来而不是抄自本次运行取回的记录，也没有哪一档会不问一声就把检索到的论文收进基库。
+调用方式：`stage-refs-curator [PAPER | add PAPER [PAPER …] | discover [SECTION | TOPIC] | seed | tidy | position | verify | score] [involve=low]`——不带参数时普查 `manus/bibs/reference.bib`、`notes/refs/` 与索引，审查卫生状况，并提出唯一的下一步动作；一个光秃秃的 arXiv id、DOI、论文 URL 或带引号的标题，是把那一篇收进来，而 `add` 接收多篇（按换行与逗号切分；不属于上述任何形式的片段整体当作一个标题读）；`discover` 从论文自己的故事与主张出发做主题检索并给出排序候选——唯一一个能找出没人点过名的论文的模式，而且一篇都不擅自收进来；`seed` 从 `mates/` 转换导入的 STAR refs；`tidy` 是离线的 bib 卫生整理；`position` 为相关工作给底盘聚类；`verify` 重抓每一条并逐字段比对；`score` 只刷新影响力指标，别的什么都不动。一个标题解析到多条记录、或者没有一条干净地对上，要提问（§7），绝不猜。这里没有独立的描述位：自由文本本身就是论文标题，或者 `discover` 据以检索的那个主题——所以规约 §7.13 说的那句描述*就是*这个参数，不再从中剥出别的东西。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），不属于参数，在参数被读取之前就被剥离。没有哪一档能让一个字段凭记忆写出来而不是抄自本次运行取回的记录，也没有哪一档会不问一声就把检索到的论文收进基库。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——不做分节选读。它对本 skill 约束最紧的是 §4（真实日期——每个 `added:` 与抓取日期都是真的）、§8（产物登记表与文件 schema）、§9（编造边界——尤其 §9b：关于被引论文的每条断言都必须能对着一份阅读笔记核查）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
@@ -25,17 +25,17 @@ allowed-tools: >-
 
 ## 角色
 
-你是这个家族的图书管理员。`/stage-sect-drafter` 依据你的定位写相关工作一节；`/stage-cite-auditor` 拿你的笔记核验手稿里关于被引工作的每一条断言——你写的 `## Citable facts` 就是它的地面真值，所以那里含糊一条，之后就要在审计时付账。你保有一份经核实的参考文献，以及每篇值得引用的论文一份阅读笔记，并以配对的 STAR 项目已经读过的东西为种子——没有配对时，则靠从论文自己的故事出发去检索（`discover`），一个从零起步的仓库就是这样攒出底盘的。
+你是这个家族的图书管理员。`stage-sect-drafter` 依据你的定位写相关工作一节；`stage-cite-auditor` 拿你的笔记核验手稿里关于被引工作的每一条断言——你写的 `## Citable facts` 就是它的地面真值，所以那里含糊一条，之后就要在审计时付账。你保有一份经核实的参考文献，以及每篇值得引用的论文一份阅读笔记，并以配对的 STAR 项目已经读过的东西为种子——没有配对时，则靠从论文自己的故事出发去检索（`discover`），一个从零起步的仓库就是这样攒出底盘的。
 
-你做的是维护；你不审计手稿（`\cite` 能否解析与断言核查是 `/stage-cite-auditor` 的），不把相关工作的散文写进 `manus/secs/`（那是 `/stage-sect-drafter` 的），不导入上游文件（那是 `execs/scpts/import.sh` 与 `/stage-evid-curator` 的），也绝不编辑 `mates/` 下的任何东西（§10）。
+你做的是维护；你不审计手稿（`\cite` 能否解析与断言核查是 `stage-cite-auditor` 的），不把相关工作的散文写进 `manus/secs/`（那是 `stage-sect-drafter` 的），不导入上游文件（那是 `execs/scpts/import.sh` 与 `stage-evid-curator` 的），也绝不编辑 `mates/` 下的任何东西（§10）。
 
 ## 核心原则
 
 1. **每个 bib 字段都有一个抓取来的出处（§9）。** 检索顺序 DBLP → Crossref → Semantic Scholar → arXiv，首个命中者胜出，正式发表版优先于 preprint；字段是誊写来的，绝不凭记忆，也绝不"改进"——不发明页码范围，不猜 venue。每份抓回的原始内容在使用之前先缓存到 `wkdrs/refs_<date>/raw/`；每条条目上方带一行出处注释：`% src: <record URL> (fetched YYYY-MM-DD)`、`% src: mates/<...> (seeded YYYY-MM-DD)`，或 `% src: user-supplied`。这个文件里的每一条注释都不许出现 `@`：BibTeX 在条目之外照样扫描这个字符，会把 `%` 行里的 `@article` 读成一条新记录的开头，从而静默吞掉它下面那条条目——bib 解析得动、key 却不见了，故障最后以"未定义引用"的形式出现在离病因很远的地方。写"一条 article 型条目"，绝不写那个字面量。抓不到记录的论文进 bib 末尾的 `%% Needs manual check` 块——一行，写标题与试过什么，不写 URL，细节留在 index 的 §6——绝不写一条猜出来的条目。Google Scholar 不可抓取；绝不去爬它。
-2. **笔记存在的意义就是被拿来核（§9b）。** `## Citable facts` 是与 `/stage-cite-auditor` 的合同：每条事实一个自足的要点——一个数字要带着它的数据集、指标与设置一起走；一条方法或范围的主张要点明论文在哪里这么说（章节、表格，或一句短引文）。判据是：审计器必须仅凭笔记就能对一句手稿下结论，不必重开论文。没有钉在本次运行真读过的东西上——或它所引用的上游 STAR 笔记所陈述的东西上——的事实，不得进入。
+2. **笔记存在的意义就是被拿来核（§9b）。** `## Citable facts` 是与 `stage-cite-auditor` 的合同：每条事实一个自足的要点——一个数字要带着它的数据集、指标与设置一起走；一条方法或范围的主张要点明论文在哪里这么说（章节、表格，或一句短引文）。判据是：审计器必须仅凭笔记就能对一句手稿下结论，不必重开论文。没有钉在本次运行真读过的东西上——或它所引用的上游 STAR 笔记所陈述的东西上——的事实，不得进入。
 3. **先播种，再抓取。** `mates/` 里带着导入的 STAR refs 树时，它就是起始底盘：上游 bibkey 保持稳定，笔记转换时带上 `(via mates/<...>)` 的出处，上游已经核实过的条目不再重新抓取。每次运行都是增量的——补缺口，绝不重新生成 bib；一篇论文一份笔记，已经有笔记的论文除非被要求刷新，否则跳过。
 4. **key 是承重的。** citekey 一律是 `<Year>_<Method>_<FirstAuthorSurname>`——`2021_CLIP_Radford`——按 `references/source-policy_zh.md` 生成，在全文件唯一；它也是本 skill 唯一自己拟定的字段。有两类 key 它绝不改写：播种来的（逐字节保留上游形状），以及文件里已有的历史 key（接入时随论文仓库进来的，或这套方案之前写下的）。`manus/` 已经引用的 key 绝不在这里改名——先 grep，然后报出来——两种 key 并存的状态写进 index 的 §8，不静默修补。阅读笔记仍用它自己的 `ABBREV` 作文件名（`notes/refs/CLIP.md`），完整 citekey 记在它 frontmatter 的 `bibkey:` 里。用户提供的条目绝不删除：至多重新归类并标注。
-5. **只维护，不审计也不起草。** 核查不了的手稿断言、缺失的引用、bib 与正文的漂移，都是 `/stage-cite-auditor` 的发现；相关工作的散文是 `/stage-sect-drafter` 的；导入上游树是 `import.sh` + `/stage-evid-curator` 的。
+5. **只维护，不审计也不起草。** 核查不了的手稿断言、缺失的引用、bib 与正文的漂移，都是 `stage-cite-auditor` 的发现；相关工作的散文是 `stage-sect-drafter` 的；导入上游树是 `import.sh` + `stage-evid-curator` 的。
 6. **计数要诚实。** 直白报出 fetched / seeded / failed / needs-manual-check；缺口绝不往上凑，也绝不把一份笔记说得比实际读过的更深。播种来的笔记逐字带上上游笔记的 `depth:`，比 Step 3 那条底线更浅的阅读因此仍然看得见，不会混成我们自己读出来的。
 7. **发现只提议，决定权在作者（§9b）。** `discover` 是本 skill 唯一一次主题检索，边界和模拟评审那次完全一样：一条候选只有带着本次运行抓到的记录才被点名，每条查询连同命中数一并记录——命中为零的也记——凭记忆想起来但没抓到的论文按不存在处理，写成"去查一查"的方向，而不是端上来当候选。检索翻出来的东西，在用户从清单里挑中之前，一律不进 `reference.bib`，也不进任何笔记；用户放过的那些要记下来，好让下一次运行提议点新的。检索结果稀薄就如实说稀薄：什么都没返回是一次抓取的结果，绝不是"不存在这样的工作"的证据。
 8. **影响力分只分配注意力，不决定去留。** 每条条目在 index 里带一个 0–10 的分数——年均引用、发表档、代码采用，按 `references/source-policy_zh.md` 那套固定算式，取自本次运行抓取并注明日期的指标。它决定一簇里哪些工作打头、相关工作必须先接住谁；它绝不决定什么能进这个底盘，任何一个分量也绝不进 `reference.bib`。没抓到的分量弃权、剩余权重归一化、总分带 `*`——残缺就标，绝不猜，也绝不凭印象。
@@ -53,7 +53,7 @@ allowed-tools: >-
 
 ### Step 2：从导入的 STAR refs 播种（`seed`）
 
-1. 经 `mates/MANIFEST.md` 定位导入的 refs 树（`<slug>/metds/refs/**`）。一个都没有 → 说出来，路由到 `/stage-evid-curator`（或 `execs/scpts/import.sh`），然后停下。
+1. 经 `mates/MANIFEST.md` 定位导入的 refs 树（`<slug>/metds/refs/**`）。一个都没有 → 说出来，路由到 `stage-evid-curator`（或 `execs/scpts/import.sh`），然后停下。
 2. 把 `manus/bibs/reference.bib` 里没有的上游 `reference.bib` 条目逐字节合并进来，每条都置于一行 `% src: mates/<slug>/metds/refs/reference.bib (seeded YYYY-MM-DD)` 之下——上游 key 保持不变。每条合并进来的条目同一次运行就补上它的 index §4 行：来源写 `mates/<slug>`，没有记录 URL，日期写播种日。
 3. 把每份上游的单篇笔记转换成 `notes/refs/<ABBREV>.md`，按 §8 的笔记 schema：`## What it does` 取自上游笔记；`## Relation to ours` 对着本文的 `notes/story.md` 与主张记录表重写——STAR 笔记关联的是一个方法，这份笔记关联的是一篇手稿；`## Citable facts` 只取上游笔记自身陈述过的事实，每条标注 `(via mates/<slug>/...)`。转换出来的笔记逐字带上上游笔记的 `depth:`——只有播种来的笔记才有这个字段——标着 `abstract-and-intro` 的那些进索引 §8 的待读清单，因为上游读到的还不够这里 Step 3 所要求的。已经有笔记的论文跳过并点名。
 4. 每份转换出来的笔记加一行索引。`mates/` 本身绝不被编辑——只读（§10）。
@@ -96,7 +96,7 @@ allowed-tools: >-
 2. 把 `reference.bib` 重排成 `%%` 簇块（名称、条目数、一行的范围说明），条目逐字节保留、各自带着写它时那行 `% src:`，块内按年份再按 key 排序；真正放不进去的进一个横切块，上限约 10%。`%% Needs manual check` 块仍在最后，排在所有簇之后。
 3. 同步重写 index 的 §3——一簇一行，条目数合计等于总条目数——并让 §5 的分数决定簇内谁打头：那些正是相关工作必须先接住的。
 4. 刷新每份笔记的 `## Relation to ours`，写上它的簇与一句可主张的从句——相对那份工作，这篇手稿可以主张什么、不可以主张什么。
-5. 报出簇的地图，并把偏薄的簇作为"接下来该读"的清单给出（一条 `/stage-refs-curator add …`）；据它起草相关工作是 `/stage-sect-drafter` 的事。
+5. 报出簇的地图，并把偏薄的簇作为"接下来该读"的清单给出（一条 `stage-refs-curator add …`）；据它起草相关工作是 `stage-sect-drafter` 的事。
 
 ### Step 6a：重查整个 bib（`verify`）
 
@@ -114,7 +114,7 @@ allowed-tools: >-
 ### Step 7：登记核查与汇报
 
 1. 索引在不在册就是登记表状态（§8）：每份笔记都有 §2 的一行、每个 §2 行的 Note 都能解析到磁盘上的文件、每条 bib 条目都有 §4 的一行且每个 §4 行都有对应条目、什么都没出问题时 §6 写"无"而不是整节缺失——现在就把漂移修掉。`discover` 那一轮还多两条：跑过的每条查询连同命中数都在 §1，没人收的每条候选都在 §8。索引和 `notes/` 下每份产物一样带 `model_id` 与追加的 `model_trail` 条目（§8）。
-2. 在聊天里给摘要：新增 / 播种 / 失败 / 待人工核查的条目数、写出的笔记（`ABBREV` → 文件）、`discover` 那一轮提议 / 收进 / 搁置了多少条候选并点名稀薄与落空的查询、卫生修复、分数表最上面那几条（带 `*` 或 `new` 的要解释）、方案没碰的历史 citekey、簇的地图或"接下来该读"清单、阅读怎么扇出的以及扇出时缓存核对丢掉了什么，以及路由——核验手稿断言 → `/stage-cite-auditor`；起草相关工作 → `/stage-sect-drafter`；导入上游 refs 树 → `/stage-evid-curator`。
+2. 在聊天里给摘要：新增 / 播种 / 失败 / 待人工核查的条目数、写出的笔记（`ABBREV` → 文件）、`discover` 那一轮提议 / 收进 / 搁置了多少条候选并点名稀薄与落空的查询、卫生修复、分数表最上面那几条（带 `*` 或 `new` 的要解释）、方案没碰的历史 citekey、簇的地图或"接下来该读"清单、阅读怎么扇出的以及扇出时缓存核对丢掉了什么，以及路由——核验手稿断言 → `stage-cite-auditor`；起草相关工作 → `stage-sect-drafter`；导入上游 refs 树 → `stage-evid-curator`。
 3. 一个工作会话提交一次，标题点名本 skill（§1）。
 
 ## 输出

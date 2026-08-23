@@ -47,9 +47,9 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - **Deterministic checks in scripts, judgment in skills**: `execs/scpts/lint.sh` catches undefined references, `\todo` markers, page-limit overruns, and anonymity leaks mechanically; the sixteen skills handle everything that needs judgment.
 - **A complete writing lifecycle** through sixteen complementary skills, in the order they run: wire the repo, curate evidence, shape the story, outline the paper, draft each section, build tables from evidence, design figures, curate references, polish the prose, audit every number, audit every citation, simulate review, write the response, pack the submission, build the poster, and report status.
 - **Submission cycles as data**: each venue attempt lives in `cycls/<venue>_<year>/` with a user-confirmed `venue.yml` profile, received and simulated reviews, the response, and a frozen submission record.
-- **One workflow, four agent trees**: the same sixteen skills for Claude Code (`.claude/skills/`), Codex (`.agents/skills/`), Cursor (`.cursor/skills/`), and Kimi Code (`.kimi-code/skills/`), differing only in invocation prefix and tool names — plus one shared `AGENTS.md`, whose body is mirrored into `.cursor/rules/` as an always-on Cursor rule.
+- **One workflow, seven harnesses**: the same sixteen skills for Claude Code, Codex, Cursor, DSH, Kimi Code, Pi, and Qwen Code. Tool-neutral skill files live once under `.agents/skills/`, and the full `/stage` request router lives once under `.agents/commands/`; native trees link or delegate there and retain only harness-specific wording and argument adapters.
 - **A memory the paper owns**: what a session learns that no file in the repository holds — a TeX toolchain quirk, a standing preference of yours, a framing already tried and rejected — is recorded under `.stage/memory/` and put in front of the next session by a hook, in whichever tool you drive STAGE with.
-- **zh-CN mirrors for human readers**: `SKILL_zh.md` beside every `SKILL.md`, `*_zh.md` beside the peer-reviewer references, and `*.zh-CN.md` beside the conventions and the skills guide — kept in step, never loaded at runtime, and the English files stay authoritative.
+- **zh-CN mirrors for human readers**: `SKILL_zh.md` beside every `SKILL.md`, `*_zh.md` beside the peer-reviewer references, `stage.zh-CN.md` beside the shared request router, and `*.zh-CN.md` beside the workflow docs — kept in step, never loaded at runtime, and the English files stay authoritative.
 
 See [Writing workflow](#writing-workflow) for what each skill does and how to invoke it. The [Writing Workflow Skills Guide](docs/mds/stage-workflow/writing-workflow-skills.md) adds a paragraph per skill and the pipeline diagram; the rules every skill shares are in the [Writing Workflow Conventions](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
@@ -89,20 +89,25 @@ STAGE/
 │   ├── skills/             # Writing workflow skills for Claude Code
 │   ├── hooks/              # Hooks: project-memory index, session model id, involve gate, commit guard
 │   └── settings.json       # Registers all four hooks
-├── .agents/skills/         # Writing workflow skills for Codex (+ agents/openai.yaml each)
-├── .codex/                 # Codex hooks + hooks.json (skills live in .agents/)
+├── .agents/
+│   ├── skills/             # Tool-neutral shared skill store; the only target of skill links
+│   └── commands/           # Shared /stage router and its zh-CN reading edition
+├── .codex/                 # Codex hooks, config, and per-skill agents/openai.yaml manifests
 ├── .cursor/
 │   ├── skills/             # Writing workflow skills for Cursor
 │   ├── rules/              # Always-on rules: AGENTS.md body + skill-root ownership
 │   ├── hooks/              # Hooks, registered in hooks.json
 │   └── hooks.json
+├── .dsh/                   # DSH-native skills and hook-bridge registration
 ├── .kimi-code/
 │   ├── skills/             # Writing workflow skills for Kimi Code
 │   ├── hooks/              # Hooks + install.sh (Kimi registers globally)
 │   └── hooks.example.toml  # The registration snippet install.sh writes for you
+├── .pi/                    # Pi-native skills, prompts, agents, and capability extensions
+├── .qwen/                  # Qwen-native skills, commands, hooks, and settings
 ├── .cursorignore           # Keeps builds and LaTeX junk out of Cursor's index
 ├── .env.example            # Local configuration example
-├── AGENTS.md               # Shared instructions for AI writing agents
+├── AGENTS.md               # Shared instructions for AI writing agents (+ AGENTS.zh-CN.md)
 ├── CLAUDE.md               # Symlink to AGENTS.md, so Claude Code loads the same rules
 └── README.md
 ```
@@ -211,6 +216,8 @@ LATEX_ENGINE=pdflatex
 ANON=false
 # Upstream STAGE repo used by execs/update.sh
 STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
+# Harness trees kept current: comma-separated names | all | none
+STAGE_HARNESSES=
 # Optional. How much the skills ask before deciding: low | medium | high
 INVOLVE=medium
 # Optional. Reply and document language: en | zh; empty = follow the conversation
@@ -219,7 +226,7 @@ STAGE_LANG=
 
 `STAR_HOME` decides which quick-start path you are on. The local `.env` is ignored by Git.
 
-`INVOLVE` (optional, `low` | `medium` | `high`) sets how much the skills ask before they decide. At `low` a skill takes the recommended option on judgment calls and logs that it did, commits what its run wrote without asking and names each commit in its reply, and — in Claude Code and Codex — the permission prompt before each file edit is skipped; `medium` (the default) asks as documented; `high` confirms item by item. Hard gates are asked at every level: the STOP line, deletions and overwrites, and every `venue.yml` value entering as confirmed. To change the level for one run, add the same token when you call a skill: `/stage-sect-drafter 3_method involve=low`. Full rule: [conventions §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md).
+`INVOLVE` (optional, `low` | `medium` | `high`) sets how much the skills ask before they decide. At `low` a skill takes the recommended option on judgment calls and logs that it did, commits what its run wrote without asking and names each commit in its reply, and — in Claude Code, Codex, and Qwen Code — the permission prompt before each file edit is skipped; `medium` (the default) asks as documented; `high` confirms item by item. Hard gates are asked at every level: the STOP line, deletions and overwrites, and every `venue.yml` value entering as confirmed. To change the level for one run, add the same token when you call a skill: `/stage-sect-drafter 3_method involve=low`. Full rule: [conventions §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 `STAGE_LANG` (optional, `en` | `zh`) sets the language of chat replies and of the Markdown the workflow writes — `notes/`, `tasks/`, simulated reviews, `wkdrs/` reports. Left empty, everything follows the conversation's own language. Two things stay English whatever it says, because people outside the repository read them: the manuscript under `manus/`, and the response to reviewers. So do structural literals in any document — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names — which is what keeps a Chinese note machine-readable. Full rule: [conventions §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
@@ -266,9 +273,9 @@ The skeleton stands on its own — the layout, `.env`, `run.sh`, and `import.sh`
 
 `/stage-flow-status` is the one to remember: it reads the outline, ledger, manifest, and cycle state on disk and names the single next action with its exact command, so you never have to recall where you left off.
 
-**Two session hooks, once per machine.** One puts the [project memory](#project-memory) index in front of the agent at the start of every session; the other states the model id the runtime reports, so every artifact a skill writes records who wrote it — `model_id` and an appended `model_trail` entry (workflow conventions §8; the per-runtime fallbacks are in `docs/mds/stage-workflow/model_id_spec.md`). Claude, Codex, and Cursor ship both already registered in `.claude/settings.json`, `.codex/hooks.json`, and `.cursor/hooks.json`. Kimi has no project-level hook config, so run `bash .kimi-code/hooks/install.sh` once — it registers these two and the commit guard below in your global Kimi config, backs that file up first, does nothing on a second run, and then covers every STAGE paper on the machine. On Codex, registered is not yet running: a project hook fires only once the project is trusted and the hook approved, so run `/hooks` in the Codex CLI to approve it, and again whenever it changes. Until you do, no memory reaches the session, every artifact records `unrecorded`, and nothing points out the gap. A paper adopted before a hook existed keeps its own registration file — `execs/update.sh` never overwrites one, and names the hook missing from it instead.
+**Two session hooks.** One supplies the [project memory](#project-memory) index; the other states the runtime's model id so artifacts record `model_id` and `model_trail` (workflow conventions §8). Claude, Codex, Cursor, Pi, and Qwen register them from the project. Kimi and DSH need their one-time installers (`.kimi-code/hooks/install.sh`, `.dsh/hooks/install.sh`) because those harnesses keep hook registration outside the repository. Codex project hooks still require approval through `/hooks`.
 
-**Two more hooks that decide rather than inject.** Claude and Codex carry an involve gate: while `.env` reads `INVOLVE=low` it answers the permission prompt before a file edit, and at every other level it does nothing. Cursor and Kimi Code do not carry it — Cursor has no hook that fires before a file edit, and Kimi's own `PreToolUse` documents a deny and no allow. All four carry `stage_commit_guard.sh`, and that one runs at every level: it declines the git commands the [conventions](docs/mds/stage-workflow/writing-workflow-conventions.md) §1 forbid — blanket or forced staging, the history rewrites, deleting or moving a freeze tag, and a commit whose staged files exceed 10 MB. Claude, Codex and Kimi Code run it on `PreToolUse` matching `Bash`; Cursor on `beforeShellExecution`, which is where a shell command is decided there. It is the floor under `INVOLVE=low` answering the commit offer itself: what it declines is yours to run.
+**Two more hooks decide rather than inject.** Claude, Codex, and Qwen carry the `INVOLVE=low` edit-permission gate. Every harness carries `stage_commit_guard.sh`, which declines the git commands [conventions §1](docs/mds/stage-workflow/writing-workflow-conventions.md) forbids. Pi registers it in its project extension; DSH and Kimi use their hook bridges.
 
 ## Writing workflow
 
@@ -281,9 +288,14 @@ STAGE includes sixteen complementary skills that turn imported evidence and a st
 | Claude Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Codex | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
 | Cursor | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| DSH | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
 | Kimi Code | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
+| Pi | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Qwen Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 
-Five skills (marked † below) are slash-only: they run only when you name them explicitly, and the agent never starts them on its own initiative. They are the dialogue-heavy decision points — adoption, story, outline, response, submission — where an unrequested run would make choices that are yours to make. Each harness enforces it in its own way — `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests, `allow_implicit_invocation: false` in Codex's `agents/openai.yaml` — and CI checks all four against the roster in [conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md), which is where the † markers are decided, so a skill cannot end up guarded on three harnesses and open on the fourth. The table below is that roster with a column for what each skill writes; the output table (conventions §8) is the same set by output.
+Claude Code, Cursor, Pi, and Qwen Code also expose `/stage [what you want to do]`. It sends the request through the shared router in `.agents/commands/stage.md`; an empty request selects `stage-flow-status`. When the match is one of the six explicit-only skills, the router gives the exact `/stage-<name> <argument>` command and waits instead of starting it.
+
+Six skills (marked † below) are slash-only: adoption, story, outline, response, submission, and poster selection. Named harness manifests use `disable-model-invocation: true`; Codex uses `allow_implicit_invocation: false` in `.codex/skills/`, linked into the shared root. CI checks all seven against [conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 <div align="center">
   <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE writing workflow: sixteen skills in five phase bands — set up, plan, write, polish and audit, submission cycle — what each one writes, and how the drafting loop and the rejection loop close" width="100%">
@@ -367,7 +379,7 @@ The fabrication boundary (conventions §9) closes the loop: every number in `man
 
 ## Project memory
 
-What a session learns that no file in the repository owns — a build that only works under one engine on this machine, a standing preference of yours, a framing the simulated panel already rejected — is recorded in the paper at `.stage/memory/`, not in whichever tool you happened to be driving. One file per fact, one line per fact in `.stage/memory/MEMORY.md`, and a session hook puts that index in front of the agent at the start of every session, in all four tools.
+What a session learns that no file in the repository owns — a build that only works under one engine on this machine, a standing preference of yours, a framing the simulated panel already rejected — is recorded in the paper at `.stage/memory/`, not in whichever tool you happened to be driving. One file per fact, one line per fact in `.stage/memory/MEMORY.md`, and a session hook puts that index in front of the agent in every supported harness.
 
 Four kinds: `env` (a machine or TeX-toolchain fact, usually learned by failing), `pref` (how you want the writing done), `insight` (a judgment that outlived the run that produced it), and `deadend` (tried, rejected, not worth retrying — the one a paper needs most between cycles). Two rules keep the store from becoming a second, drifting copy of the repository:
 
@@ -386,9 +398,9 @@ bash execs/update.sh
 
 By default, the command updates these paths from STAGE's `main` branch:
 
-- `AGENTS.md` and `.cursor/rules/` — the shared agent instructions and the Cursor rule that copies their body; your own edits to them are replaced, and the two move as a pair, since one is the other's body and they must not drift
-- `.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `.kimi-code/skills/` — the same sixteen skills once per harness
-- `.claude/hooks/`, `.codex/hooks/`, `.cursor/hooks/`, `.kimi-code/hooks/` and `.kimi-code/hooks.example.toml` — the two session hooks (the project-memory index and the session's model id), the commit guard, and the involve gate where the harness supports one, once per harness; the store under `.stage/memory/` is the paper's own and is never synced
+- `AGENTS.md`, `AGENTS.zh-CN.md`, and `CLAUDE.zh-CN.md` always, and `.cursor/rules/` when Cursor is selected — the shared agent instructions, their Chinese reading editions, and Cursor's mirrored runtime copy; your own edits to selected paths are replaced, and a run that includes Cursor moves the runtime copies together
+- `.agents/skills/` and `.agents/commands/` first, then `.claude/skills/`, `.cursor/skills/`, `.dsh/skills/`, `.kimi-code/skills/`, `.pi/skills/`, and `.qwen/skills/` — the shared store and router plus every native harness copy; links are dereferenced when installed into a paper instance
+- the corresponding hook, command, prompt, agent, and extension trees, plus `.codex/skills/` for Codex's per-skill UI manifests
 - `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, the memory spec, and the model-id spec, in both editions
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
 - `execs/scpts/import.sh`, `execs/scpts/lint.sh`, `execs/scpts/fmt.sh` — the utilities, for the same reason: sixteen skills call `import.sh --diff` and five call `lint.sh --no-build`, and a caller reading an exit code means the one its own version documents. A ref older than a utility simply skips it with a printed line
@@ -396,25 +408,28 @@ By default, the command updates these paths from STAGE's `main` branch:
 
 The repository it pulls from is `STAGE_REPOSITORY`, resolved in that order: the environment, then `.env`, then the default `https://github.com/wanghao9610/STAGE.git`. Set it in `.env` to track a fork permanently, or prefix a single command — `STAGE_REPOSITORY=… bash execs/update.sh` — to override it once. Nothing else in `.env` is ever synced, which is why every script under `execs/` is safe to replace: an instance's configuration does not live in them.
 
-Harness configuration — `.cursorignore` and the three hook registrations (`.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`) — is installed only when missing, and never overwritten unless you pass `--force`, since a paper may have added its own settings to those files. When a kept file differs from upstream, the command prints a note naming how many; when a kept registration does not name the memory hook, it says so, because the alternative is a hook that silently never fires. Papers created before the updater learned to sync itself should refresh it once by hand, since an older `execs/update.sh` never overwrites itself:
+Which harness trees it touches is `STAGE_HARNESSES`, resolved from the environment, then `.env`, then `all`. Set `STAGE_HARNESSES=codex` to keep only Codex's `.codex/` tree current, or use any comma-separated set of `claude`, `codex`, `cursor`, `dsh`, `kimi`, `pi`, and `qwen`; `none` updates only the shared skeleton. A tree left out is not installed, updated, or deleted. The shared `.agents/skills/` and `.agents/commands/`, agent instructions in both editions, workflow docs, and `execs/` scripts remain in every run.
+
+Harness configuration — `.cursorignore`, `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.pi/settings.json`, and `.qwen/settings.json` — is installed only when missing and otherwise kept unless `--force` is supplied.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update.sh -o execs/update.sh
 ```
 
-The general form is `bash execs/update.sh [--diff] [ref] [--skill NAME] [--force] [--adopt]`:
+The general form is `bash execs/update.sh [--diff] [ref] [--harnesses LIST] [--skill NAME] [--force] [--adopt]`:
 
 - `--diff` previews an update without changing a file, and exits `2` when one is available, `0` when everything already matches, `1` on error — so a script can tell an available update from a failed check. Harness configuration that differs is listed as kept rather than counted, unless `--force` puts it back in scope.
 - A `ref` pins the update to a tag or branch.
-- `--skill NAME` updates that one skill across all four skill trees, and leaves the agent instructions, the workflow docs, and both entrypoints alone. An invalid name, or one missing from any of the four upstream skill directories, stops the command without overwriting anything.
+- `--harnesses LIST` overrides `STAGE_HARNESSES` for one run with comma-separated harness names, `all`, or `none`. Unselected trees are outside both the write set and the uncommitted-change check.
+- `--skill NAME` updates that one skill across the shared root and the selected harness trees, and leaves the agent instructions, workflow docs, and entrypoints alone.
 - `--force` updates the same paths with both refusals lifted: uncommitted changes under them are overwritten instead of stopping the command, and the harness configuration is overwritten instead of kept. It widens nothing — a file upstream does not have is still left alone, so your own skills and documents under those directories stay.
-- `--adopt` installs the skeleton into a paper repository that already exists, copying only what is absent (see [step 1b](#1b-or-adopt-a-paper-repo-that-already-exists)). It cannot be combined with `--force`: never touching an existing file is the whole contract.
+- `--adopt` installs the skeleton into a paper repository that already exists, copying only what is absent (see [step 1b](#1b-or-adopt-a-paper-repo-that-already-exists)); `--harnesses` limits which native trees are installed. It cannot be combined with `--force`: never touching an existing file is the whole contract.
 
 `bash execs/update.sh --help` carries the full usage summary, so it stays correct when the flags change.
 
 Files at matching paths are overwritten and new upstream files are added. Project-specific files that exist only in the updated directories are preserved. To avoid deleting custom content, files removed upstream are not removed locally. The update does not modify other directories, the current branch, Git remotes, or the staging area — the manuscript, `mates/`, `notes/`, and `cycls/` are never in scope. Commit current work before updating, then review and commit the result with `git status` and `git diff`.
 
-Working on STAGE itself rather than on a paper? `bash .github/scripts/check_consistency.sh` holds the invariants four hand-maintained skill trees cannot hold on their own: same skill set and file inventory everywhere, the slash-only guards agreeing across all four harnesses, invocation tokens and tool names native to each tree, the Cursor rule still mirroring `AGENTS.md`, descriptions inside the 1024-character `SKILL.md` limit, the opening load intact, and every `conventions §n` citation still resolving. It runs in CI on every push and pull request, and is upstream-maintainer tooling — `.github/` is not synced into paper repositories.
+Working on STAGE itself rather than on a paper? Run `bash .github/scripts/port.sh` to prove every generated harness matches the Claude-authored source and the shared-link topology, then `bash .github/scripts/check_consistency.sh` for the seven-tree semantic invariants. Both run in CI.
 
 ## Project conventions
 
@@ -427,7 +442,7 @@ Working on STAGE itself rather than on a paper? `bash .github/scripts/check_cons
 7. Every number in `manus/` either traces to a fingerprinted `mates/` entry or is written as `\todo{...}` — no third state — and every date written into an artifact comes from the system clock.
 8. What a session learns that no file above owns goes to `.stage/memory/`, offered before it is written, with machine-specific facts in `.stage/memory/local/`; a memory never sources a number, a venue rule, or a claim about a cited paper.
 
-The full collaboration and writing conventions are in [`AGENTS.md`](AGENTS.md) and [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md).
+The full collaboration and writing conventions are in [`AGENTS.md`](AGENTS.md) ([简体中文](AGENTS.zh-CN.md)) and [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md) ([简体中文](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)).
 
 ## Adapting STAGE to a new paper
 
@@ -439,7 +454,7 @@ When you start a paper from STAGE, these are the adjustments worth making:
 - Unpack the venue's official kit whole into `cycls/<cycle>/template/`, not into `manus/`: that tree is the namespace `lint.sh` scans, and a kit's example `.tex` would trip its `\todo` count and its identity scan.
 - Update the year and copyright holder in `LICENSE`.
 - Replace `docs/htmls/stage.html`, `docs/htmls/stage_zh.html`, and `docs/srcs/` — they are STAGE's own landing pages and images, not your paper's. `docs/index.html` and `docs/index_zh.html` are the symlinks that mount those pages at the site root. The language switch between them uses absolute links (`/STAGE/index_zh.html`), so change the `/STAGE` prefix to your own repository name or the switch breaks. Leave `docs/mds/stage-workflow/` alone — `execs/update.sh` keeps it current.
-- Delete the tool directories you do not use. `.agents/` (Codex), `.claude/`, `.cursor/`, and `.kimi-code/` are each a complete copy of the same sixteen skills, 40–55 files apiece; keep the one your agent reads and `rm -rf` the rest.
+- In an installed paper instance every selected harness is self-contained. In this template checkout, named trees may link shared files into `.agents/skills/`; materialize a tree before deleting the shared root. Keep `.agents/` with Codex, and keep each harness's hook/config files with its skills.
 
 The skeleton stands on its own: the directory layout, `.env`, `execs/run.sh`, and `execs/scpts/lint.sh` all work with no skills installed at all, so deleting every tool directory is a supported way to use it. One paper, one repository — a second paper is a second instance of the template, not a second tree here.
 

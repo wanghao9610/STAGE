@@ -24,7 +24,7 @@ Closed list. A `Setting` cell holds one of the literals below and nothing else; 
 
 Two dials are marked *judgment* on purpose. Reporting them as a measurement would be reporting a check that never ran (conventions §7.4); a pass states what it saw and how many places it changed, and nothing more.
 
-`hedging: minimal` is the dial with a blast radius, so it is the one whose limit is written into the file itself: it governs padding — "we believe", "it seems that", "somewhat", "arguably" — and never a qualifier the evidence requires. "improves on ADE20K" where evidence covers ADE20K alone is minimal hedging; "improves across benchmarks" is a claim change, and it belongs to `$stage-sect-drafter` and the ledger, not here.
+`hedging: minimal` is the dial with a blast radius, so it is the one whose limit is written into the file itself: it governs padding — "we believe", "it seems that", "somewhat", "arguably" — and never a qualifier the evidence requires. "improves on ADE20K" where evidence covers ADE20K alone is minimal hedging; "improves across benchmarks" is a claim change, and it belongs to `stage-sect-drafter` and the ledger, not here.
 
 ## Three ways in
 

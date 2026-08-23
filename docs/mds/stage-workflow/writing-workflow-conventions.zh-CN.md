@@ -96,7 +96,7 @@ skill 可以改文本、跑构建、跑**轻量验证**。任何**重的、贵�
 
 ## 3. `.env` 与构建工具链
 
-六个变量，按 `.env.example` 出厂的样子：
+七个变量，按 `.env.example` 出厂的样子：
 
 ```bash
 # Paired STAR project repo (optional — leave empty when writing without one)
@@ -107,15 +107,17 @@ LATEX_ENGINE=pdflatex
 ANON=false
 # Upstream STAGE repo used by execs/update.sh
 STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
+# Harness trees kept current: comma-separated names | all | none
+STAGE_HARNESSES=
 # Optional. How much the skills ask before deciding: low | medium | high
 INVOLVE=medium
 # Optional. Reply and document language: en | zh; empty = follow the conversation
 STAGE_LANG=
 ```
 
-其中四个由入口脚本读取。`STAGE_LANG` 是例外：没有脚本读它，读它的是 skill（§7.6）。
+其中五个由入口脚本读取。`STAGE_LANG` 与 `INVOLVE` 是例外：没有入口脚本读它们，读它们的是 skill（§7.6、§7.7）；`INVOLVE` 还会被三个在 `low` 档代答文件编辑权限提示的 harness 钩子读取（§7.7）。
 
-1. **仓库根目录的 `.env` 是这些取值的存放处**，而优先级是**环境变量 → `.env` → 文档写明的默认值**。每个入口脚本都是从文件里读出自己需要的键，而不是 source 整个文件，所以 `STAR_HOME=… bash execs/scpts/import.sh` 和 `LATEX_ENGINE=xelatex bash execs/run.sh` 说什么就是什么，不会被文件悄悄盖掉——这个顺序 `execs/update.sh` 处理 `STAGE_REPOSITORY` 时本来就在用，现在四个入口一致。临时覆盖用命令行变量，长期覆盖去改 `.env`。绝不猜某个本地路径，绝不硬编码，绝不凭对另一个项目的记忆填写。`.env` 本身被 git 忽略，且与机器绑定。
+1. **仓库根目录的 `.env` 是这些取值的存放处**，而优先级是**环境变量 → `.env` → 文档写明的默认值**。每个入口脚本都是从文件里读出自己需要的键，而不是 source 整个文件，所以 `STAR_HOME=… bash execs/scpts/import.sh` 和 `LATEX_ENGINE=xelatex bash execs/run.sh` 说什么就是什么，不会被文件悄悄盖掉——这个顺序 `execs/update.sh` 用于 `STAGE_REPOSITORY` 与 `STAGE_HARNESSES`，现在四个入口一致。临时覆盖用命令行变量或 `--harnesses`，长期覆盖去改 `.env`。绝不猜某个本地路径，绝不硬编码，绝不凭对另一个项目的记忆填写。`.env` 本身被 git 忽略，且与机器绑定。
 2. **每个变量都有可用默认值**，所以缺 `.env` 从不阻塞构建：`LATEX_ENGINE` 回落到 pdflatex，`ANON` 回落到 false，`STAGE_LANG` 回落到对话本身的语言。`STAR_HOME` 为空是被支持的状态——没有配对仓库地写作——此时 `import.sh` 要求 `--source`，证据以人工投放的形式到达。需要 `STAR_HOME` 却找不到的 skill 会提问（§7）；它绝不臆造一个路径。
 3. **每次构建都走 `execs/run.sh`**，它以**树外**方式跑 latexmk：`latexmk -<engine> -interaction=nonstopmode -halt-on-error -outdir=wkdrs/builds manus/main.tex`，engine 取自 `LATEX_ENGINE`。绝不在源码树里裸跑 latexmk：`manus/` 要保持没有 `.aux`/`.log` 垃圾，并且每个构建产物都能随 `wkdrs/` 一起丢弃。成功时 `run.sh` 打印 PDF 路径与页数；`lint.sh` 在它之上做确定性检查。
 4. **`ANON=true` 表示仓库处于投稿匿名模式。** `lint.sh` 会额外搜捕身份泄漏——`\author` 内容、致谢、`github.com/<user>`、`\thanks`——泄漏即硬失败。venue 档案里的 `anonymized:` 记录的是 venue 的要求；`ANON` 是操作开关，由用户来拨。发现两者不一致的 skill 要说出来并提问（§7），而不是静默改掉其中任何一个。
@@ -163,6 +165,7 @@ STAGE_LANG=
 6. **`STAGE_LANG` 决定回复和本次运行所写内容的语言。** `.env` 的 `STAGE_LANG=en|zh`（§3）同时决定两件事：聊天回复，以及一次运行新写的 Markdown——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。未设、为空或取任何其他值 → 跟随用户的对话语言，于是中文对话得到中文回复；运行中明确提出的语言要求优先于两者，并在本次运行的余下部分持续生效。skill 在**每次运行开始时解析一次**，只是一次一行的查询（`grep -sE '^STAGE_LANG=' .env || true`），搭在开场装载调用里，绝不为它单发一次调用。它管的是一次运行**写出**什么，而不是把已经写进文件的东西重新翻译一遍：已有文档保持它写成时的语言，改一份文档的语言是用户明确提出的要求，不是翻变量的副作用。
 
    **无论 `STAGE_LANG` 取什么值，这些一律英文。** 有两样东西会离开这个仓库、被并非作者的人读到，它们始终是英文：**`manus/` 下的一切**——正文、图表标题、`% src:` 注释、`\todo{}` 里的文字——以及**给评审的回复**（`cycls/<cycle>/response/`），那是程序委员会要读的。手稿的语言属于 venue 和用户；对话语言和 `STAGE_LANG` 都不会改写它。除此之外，**一切结构性字面量在任何语言写成的文档里都保持英文**：frontmatter 的键与取值、记录表状态（`proposed` / `drafted` / `verified` / `unsourced` / `weakened` / `dropped`）、claim 与评审点的 ID、文件路径、bibkey 及 `reference.bib` 里的一切、venue 名、数据集名与指标名，以及一切被脚本 grep 的字符串。中文笔记配英文结构仍然可被机器读取；被翻译过的状态值会让 `lint.sh` 和每一个读这行的 skill 失灵。
+
 7. **参与度档位：问多少，由用户定。** 工作流提出的每个问题只属于三类之一。**必问确认点**任何档位都要问：红线上的一切（§2——尤其是提交投稿）、每一个把关删除或覆盖的确认、每一个以"已确认"身份进入 `venue.yml` 的取值（§9c）、以及对用户本意的任何歧义（§5.3 是章节名的情形）。**裁量题**——第 3 条要求标出推荐项、且怎么选都安全的问题——是档位真正拨动的部分。**可推导的细节**——凡有约定默认值的——任何档位都静默决定；它们从来就不是问题。
 
    档位由用户设定；skill 在**每次运行开始时、问出第一个问题之前解析一次**，按优先级从三个来源取值：`.env` 里的 `INVOLVE`（`low` / `medium` / `high`；缺失、未设或非法 → `medium`，也正是 `.env.example` 出厂带的值），再被调用参数里的 `involve=<level>` 覆盖，再被运行中的自然语言（"少问点""都问我"）覆盖——最后一条指令在本次运行的余下部分生效。读它只是一次一行的查询（`grep -sE '^INVOLVE=' .env || true`），解析一次，搭在 skill 的开场装载调用里，绝不为它单发一次调用。
@@ -170,7 +173,7 @@ STAGE_LANG=
    **这个写法不是参数。** `involve=<level>` 在解析任何其他内容之前就从调用参数里剥离——章节（§5.2）、周期、模式都在其后。**每个** skill 都如此，包括 `SKILL.md` 里从未提到档位的那些：拿第一个参数去匹配提纲标题的 skill，不得把 `involve=low` 当成章节名。完全不接受参数的 skill 同样要剥离它。
 
    - `medium`——默认档：本文件与每份 `SKILL.md` 原样执行。档位不增不减。
-   - `low`——裁量题不再问：取你本会标为推荐的那一项，并记录在案（第 8 条）。提交与否就是其中一道（§1.6），它推荐的答案是"提交"；回复里仍要点名提交了什么。在 Claude Code 与 Codex 里，这个档位还一直伸到 harness：只要 `.env` 写着 `INVOLVE=low`，`stage_involve_gate.sh` 就替项目内文件编辑前的权限提示作答，项目根目录下的点目录仍旧照常提示。真正的开放题没有推荐项可取，任何档位都要问——拿不准一个问题属于哪一类时，按更需交互的那一类对待。
+   - `low`——裁量题不再问：取你本会标为推荐的那一项，并记录在案（第 8 条）。提交与否就是其中一道（§1.6），它推荐的答案是"提交"；回复里仍要点名提交了什么。在 Claude Code、Codex 与 Qwen Code 里，这个档位还一直伸到 harness：只要 `.env` 写着 `INVOLVE=low`，`stage_involve_gate.sh` 就替项目内文件编辑前的权限提示作答，项目根目录下的点目录仍旧照常提示。真正的开放题没有推荐项可取，任何档位都要问——拿不准一个问题属于哪一类时，按更需交互的那一类对待。
    - `high`——skill 原文打包进一个确认点的、或在确认点之间自行决定的裁量题，逐条单独问出（第 2 条）。
 
    凡是问出的问题，第 2 条一字不变：档位只决定哪些裁量题要问，从不决定问出的问题可以默认已答。
@@ -448,14 +451,16 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
    计数和身份泄漏扫描。`venue.yml` 里的 `template:` 指名模板包中的那个 class；`stage-subm-packer convert` 读它，
    在 `wkdrs/` 下重新生成一份能在该 class 下编译的独立副本。`manus/main.tex` 始终保持
    `\documentclass{stys/stage}`：没有就地替换，也没有第二份事实来源。
-5. **四棵 harness 目录树是副本，不是备选项。** 同样的十六个 skill 每套 harness 各发一份——`.claude/skills/`、
-   `.agents/skills/`、`.cursor/skills/`、`.kimi-code/skills/`——彼此只差调用前缀和工具名（`Bash` / `Shell`、
-   `AskUserQuestion` / `AskQuestion` / `request_user_input`、`Read` / `ReadFile`）。装载你自己那棵树下的副本并遵循它；
-   某次列目录列出了别的树里的副本，那只是告诉你文件在哪，不是告诉你哪一份约束你。
+5. **七种 harness 共用一份中立 skill 存储。** 同样的十六个 skill 发布在 `.agents/skills/`、`.claude/skills/`、
+   `.cursor/skills/`、`.dsh/skills/`、`.kimi-code/skills/`、`.pi/skills/` 与 `.qwen/skills/`。
+   `.agents/skills/` 是 `AGENTS.md` 约定要求的工具中立根，也是共用 skill 文件唯一的存放位置；命名 harness 树里每份逐字节一致的文件都链接到这里。
+   harness 专属清单仍是实文件，写本 harness 自己的调用方式与工具名。有本 harness 的原生副本就装载它；没有时，中立副本只写角色、不写别家的工具名，也可安全使用。
+   Codex 的逐 skill 界面清单放在 `.codex/skills/`，再链接进 Codex 扫描的 `.agents/skills/` 路径。完整的 `/stage` 请求路由器只放在
+   `.agents/commands/stage.md`，供人阅读的 `.agents/commands/stage.zh-CN.md` 放在它旁边；Claude、Cursor、Pi 与 Qwen 只保留一层原生入口，把各自的参数语法传给共用路由器，再选择本 harness 的技能树。
 
 ## 11. Skill 一览
 
-十六个 skill，调用方式：Claude Code 与 Cursor 里是 `/stage-<name>`，Codex 里是 `$stage-<name>`，Kimi Code 里是 `/skill:stage-<name>`。每个 skill 的完整说明见 [writing-workflow-skills.zh-CN.md](writing-workflow-skills.zh-CN.md)（英文：[writing-workflow-skills.md](writing-workflow-skills.md)）；每个 skill 写出什么见 §8。
+十六个 skill：Claude Code、Cursor、Pi 与 Qwen Code 里用 `/stage-<name>`，Codex 里用 `$stage-<name>`，DSH 与 Kimi Code 里用 `/skill:stage-<name>`。每个 skill 的完整说明见 [writing-workflow-skills.zh-CN.md](writing-workflow-skills.zh-CN.md)（英文：[writing-workflow-skills.md](writing-workflow-skills.md)）；每个 skill 写出什么见 §8。
 
 | Skill | 职责 |
 | --- | --- |
@@ -476,7 +481,7 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
 | `stage-pstr-builder` † | 选内容、渲染并检查本周期的海报 |
 | `stage-flow-status` | 只读的状态与唯一的下一步 |
 
-1. **标 † 的六个是 slash-only。** 只有用户点名时才跑：它们是决策点——接入、故事、提纲、回复、投稿、以及什么能上墙——而一个由 agent 自作主张走到的决策点，等于没有人做过这个决策。这张表是事实来源；执行它的守卫是 Claude、Cursor、Kimi 清单里的 `disable-model-invocation: true`，以及 Codex 的 `.agents/skills/<name>/agents/openai.yaml` 里的 `allow_implicit_invocation: false`，CI 会拿这四处与这里的标记逐一比对，所以在这里标了却没在四处都加守卫会让构建失败。
+1. **标 † 的六个是 slash-only。** 只有用户点名时才跑：它们是决策点——接入、故事、提纲、回复、投稿、以及什么能上墙——而一个由 agent 自作主张走到的决策点，等于没有人做过这个决策。这张表是事实来源；Claude、Cursor、DSH、Kimi、Pi 与 Qwen 清单用 `disable-model-invocation: true` 强制它，Codex 则在 `.codex/skills/<name>/agents/openai.yaml` 里用 `allow_implicit_invocation: false`，再链接进 `.agents/skills/`；CI 会逐一核对。
 2. **两个 skill 从不碰稿件。** `stage-peer-reviewer` 只写 `cycls/<cycle>/reviews/` 下的评审——或者，带 `extern=` 评审外部论文时，只写 `wkdrs/` 下的东西；`stage-flow-status` 什么都不写。只要不知道进展到哪了，先跑状态 skill——它读提纲、记录表、清单与周期状态，给出唯一的下一步和它确切的命令。
 3. **一次调用一个 skill，一个 skill 一件事。** 一节、一张表、一张图、一份回复——一次运行悄悄扩大范围正是这条规则针对的失败；下一件事是下一次调用。
 4. **点名了下一步动作，若落在那十个上，就去跑，而不是打印出来。** skill 收尾时都会点名接下来该做什么——状态 skill 唯一的下一步、lint 红灯点名是谁的东西坏了、审计把一条没有出处的主张退回给承载它的那一节——今天这些一律是递给读者的一条命令。当被点名的命令属于那十个、且目标已经定死时，就把它跑起来，而不是打印它：读者就是 agent 自己，打印一条命令给自己，等于转交给了没有人。那六个仍旧打印命令，因为"由作者敲下去"本身就是它们存在的意义所在的那个决定。三条限制保证这件事是安全的。**拾起发生在点名的那次运行结束之后，绝不在运行内部**——一个不许碰稿件的 skill，不会因为点名了后继者就伸得更长，因此 `stage-flow-status` 仍旧只是那个汇报者，后继者要等报告写完才开始。**目标没定死就发问，而不是猜**——哪一节、哪张表、哪张图、哪个周期（§5 负责解析）。以及**第 3 条原样有效**，一次一个 skill、一件事，而没有人敲下的那次运行，开跑前先说明自己要启动什么。

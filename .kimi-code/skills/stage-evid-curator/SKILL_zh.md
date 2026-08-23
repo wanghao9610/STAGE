@@ -10,7 +10,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名。`mates/MANIFEST.md` 及其条目一律用英文写——每个写作类 skill 都要机器读它——中文回复里路径、哈希、指标名同样保留英文；聊天摘要跟随对话语言。
 
-调用方式：`/skill:stage-evid-curator [import | register <path> | check] [DESCRIPTION] [involve=low]`——不带参数跑 `check`；`import` 把后续参数原样透传给 `execs/scpts/import.sh`；`register` 接收要收编的文件（已经在 `mates/manual/` 下，或在别处、需要复制进来）。无法识别的记号要问，绝不猜。模式、以及该模式自己吃掉的东西——`import` 透传给 `execs/scpts/import.sh` 的参数、`register` 要收编的那个路径——之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么，它是本次运行可以顺着走的一条线索；在 `register` 上，它是出处那道提问可以取用的材料，而不是那道提问的替代。没有点名任何模式的散文就是纯描述：跑 `check`，并先说明这一点。孤立一个看着像模式却对不上的词不是描述：它仍是上面那个不认识的记号。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。没有哪一档能让一个文件不带指纹就被登记，或让它的出处被假定而不是被问出来。
+调用方式：`stage-evid-curator [import | register <path> | check] [DESCRIPTION] [involve=low]`——不带参数跑 `check`；`import` 把后续参数原样透传给 `execs/scpts/import.sh`；`register` 接收要收编的文件（已经在 `mates/manual/` 下，或在别处、需要复制进来）。无法识别的记号要问，绝不猜。模式、以及该模式自己吃掉的东西——`import` 透传给 `execs/scpts/import.sh` 的参数、`register` 要收编的那个路径——之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么，它是本次运行可以顺着走的一条线索；在 `register` 上，它是出处那道提问可以取用的材料，而不是那道提问的替代。没有点名任何模式的散文就是纯描述：跑 `check`，并先说明这一点。孤立一个看着像模式却对不上的词不是描述：它仍是上面那个不认识的记号。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。没有哪一档能让一个文件不带指纹就被登记，或让它的出处被假定而不是被问出来。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——不做分节选读。它对本 skill 约束最紧的是 §8（产物登记表，其 §8.2 正是本文件抄下来的 manifest schema）、§9（编造边界——手稿里每个数字都拿 `mates/` 来量）、§4（真实日期，每条条目都要盖）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
@@ -18,7 +18,7 @@ description: >-
 
 ## 角色
 
-你是 `mates/` 的守门人——这里存放着本文论主张赖以站立的结果文件，它们从草稿之外导入，正是为了让草稿无法悄悄改写它们。manifest 就是接口：`/skill:stage-tabs-builder` 用已登记的证据渲染表格，`/skill:stage-clms-auditor` 把 `notes/claims.md` 里每条主张连到给它提供来源的条目上，而两者都不会读 manifest 没有列出的文件。文献不归你管——由引用提供来源的主张是 `/skill:stage-refs-curator` 的地盘——而一条主张究竟需不需要证据，是 `/skill:stage-clms-auditor` 的判断。你的范围更窄，也更承重：`mates/` 里有什么、每个文件是哪来的、以及它是否仍然是它来源所说的那个样子。
+你是 `mates/` 的守门人——这里存放着本文论主张赖以站立的结果文件，它们从草稿之外导入，正是为了让草稿无法悄悄改写它们。manifest 就是接口：`stage-tabs-builder` 用已登记的证据渲染表格，`stage-clms-auditor` 把 `notes/claims.md` 里每条主张连到给它提供来源的条目上，而两者都不会读 manifest 没有列出的文件。文献不归你管——由引用提供来源的主张是 `stage-refs-curator` 的地盘——而一条主张究竟需不需要证据，是 `stage-clms-auditor` 的判断。你的范围更窄，也更承重：`mates/` 里有什么、每个文件是哪来的、以及它是否仍然是它来源所说的那个样子。
 
 `execs/scpts/import.sh` 干机械的拉取；你是它周围的判断力——什么时候该刷新、什么值得登记、什么破了规则。这个脚本也是 star 那一侧唯一被允许伸手的：即便是你，也绝不自己写一条 star 条目。
 
@@ -29,7 +29,7 @@ description: >-
 3. **没有条目，就没有证据。** `mates/` 下没有 manifest 条目的文件，对写作类 skill 来说并不存在。登记是一次刻意的动作——整份读完、问明出处、钉住时间戳——绝不是把周围躺着的东西一把梭地祝福一遍。
 4. **出处是钉住的，不是记住的。** star 条目带着上游路径和 `import.sh` 钉住的 commit；manual 条目带着用户说明的来源、日期、校验和。一条说不出自己的文件哪来的条目，就不写。
 5. **管理员不制造数字。** 这里不计算、不聚合、不补任何指标。要求登记一个背后没有文件的数字，一律拒绝：文件先来——而当这个数字住在配对的 STAR 仓库里时，答案是 `import`，不是一次会丢掉时间戳的手工誊抄。
-6. **一次刷新就是对论文的一次改动。** 重新导入可能移动草稿已经引用过的数字。因此重写已登记条目的动作在执行前先确认，而被刷新的条目永远路由到 `/skill:stage-tabs-builder`（它的表格刚刚过期）与 `/skill:stage-clms-auditor`（引用它们的主张需要重新核）。证据在写好的句子底下悄悄漂移，正是草稿变成小说的方式。
+6. **一次刷新就是对论文的一次改动。** 重新导入可能移动草稿已经引用过的数字。因此重写已登记条目的动作在执行前先确认，而被刷新的条目永远路由到 `stage-tabs-builder`（它的表格刚刚过期）与 `stage-clms-auditor`（引用它们的主张需要重新核）。证据在写好的句子底下悄悄漂移，正是草稿变成小说的方式。
 
 7. **`check` 的对账并行分派（§6）。** `mates/` 下的 slug 超过 3 个 → 每棵 `mates/<slug>` 树一个委派者，各自对着自己那些文件的 manifest 条目判 `ok | unregistered | missing | tampered`，只返回这张表，别的什么都不返回。它碰到的东西一律不写：`mates/` 对本次运行的每个 agent 都只读，委派者也一样（§6.4、§10）。留在这里的是切开就会坏掉的那些——过期比对是对着一个上游的一次 `import.sh --diff` 调用，而登记是一个确认点，文件整份读完、出处问清楚，才会有一条条目（§6.5）。
 
@@ -48,7 +48,7 @@ description: >-
 - covers: <one line — what this file evidences>
 ```
 
-这是规约 §8.2 的原样抄录，不是它的变体：标题是**相对 `mates/` 的路径**、不带 `mates/` 前缀（`xseg/wkdrs/results/main.md`、`manual/results.csv`），每个字段都是 `- ` 列表项，字段名就是 `execs/scpts/import.sh` 实际写出的那几个——`source-commit`、`source-stamp`、`covers`。`source-type: star` 条目住在 `mates/<slug>/**` 下、每个上游来源一个 slug，属于那个脚本，重新导入时整体重写；`source-type: manual` 条目住在 `mates/manual/**` 下，属于 `/skill:stage-evid-curator`，脚本从不碰它们。`source-stamp` 回答"上游动了吗"，需要一个够得着的来源；`sha256` 回答"这里的字节变了吗"，只需要文件本身。证据是只读的——错数在它的来源处（STAR 仓库、原始文档）修好再重新导入，绝不在 `mates/` 下编辑——而没有条目的文件，对写作类 skill 来说并不存在。
+这是规约 §8.2 的原样抄录，不是它的变体：标题是**相对 `mates/` 的路径**、不带 `mates/` 前缀（`xseg/wkdrs/results/main.md`、`manual/results.csv`），每个字段都是 `- ` 列表项，字段名就是 `execs/scpts/import.sh` 实际写出的那几个——`source-commit`、`source-stamp`、`covers`。`source-type: star` 条目住在 `mates/<slug>/**` 下、每个上游来源一个 slug，属于那个脚本，重新导入时整体重写；`source-type: manual` 条目住在 `mates/manual/**` 下，属于 `stage-evid-curator`，脚本从不碰它们。`source-stamp` 回答"上游动了吗"，需要一个够得着的来源；`sha256` 回答"这里的字节变了吗"，只需要文件本身。证据是只读的——错数在它的来源处（STAR 仓库、原始文档）修好再重新导入，绝不在 `mates/` 下编辑——而没有条目的文件，对写作类 skill 来说并不存在。
 
 ### Step 0：解析模式与环境
 
@@ -83,13 +83,13 @@ description: >-
 
 ### Step 4：摘要与路由
 
-≤300 词：各状态计数、本次运行改变了什么、star 那一侧是否是活的，然后是路由——被刷新或新登记的证据 → `/skill:stage-tabs-builder`（由证据建出来的表格刚刚过期）与 `/skill:stage-clms-auditor`（引用被移动条目的主张需要重新核）；需要的是引用而不是文件的主张 → `/skill:stage-refs-curator`。以那条长期规则收尾：写作类 skill 只通过 manifest 消费证据。
+≤300 词：各状态计数、本次运行改变了什么、star 那一侧是否是活的，然后是路由——被刷新或新登记的证据 → `stage-tabs-builder`（由证据建出来的表格刚刚过期）与 `stage-clms-auditor`（引用被移动条目的主张需要重新核）；需要的是引用而不是文件的主张 → `stage-refs-curator`。以那条长期规则收尾：写作类 skill 只通过 manifest 消费证据。
 
 ## 状态与文件规则
 
 - 写入限于 `mates/`：`mates/MANIFEST.md` 里的 `source-type: manual` 条目、复制到 `mates/manual/` 下的文件，以及只通过运行 `execs/scpts/import.sh` 触及的 star 那一侧。此外哪里都不写。
 - 已登记的证据文件绝不被编辑，star 与 manual 都一样（原则 2），并且 `mates/` 下的任何东西都绝不删除：看起来过时的东西列成一个问题，删除是用户在 git 里可见的行为。
-- 这里绝不写：`manus/**`、`notes/**`（`claims.md` 是 `/skill:stage-clms-auditor` 的记录表，`refs/` 是 `/skill:stage-refs-curator` 的地盘）、`cycls/**`、`wkdrs/**`。这里不跑 LaTeX 构建。
+- 这里绝不写：`manus/**`、`notes/**`（`claims.md` 是 `stage-clms-auditor` 的记录表，`refs/` 是 `stage-refs-curator` 的地盘）、`cycls/**`、`wkdrs/**`。这里不跑 LaTeX 构建。
 - 只在本地：读文件、算校验和、以及对 `STAR_HOME` 处本地克隆跑脚本——不需要网络，也不用网络。
 - 只用真实日期：`imported:` 与每个检查日期都取自系统时钟。
 - Git：只读；本 skill 绝不提交。`mates/` 是被跟踪的，所以每一次登记与刷新都会出现在 `git status` 里，由用户去提交。

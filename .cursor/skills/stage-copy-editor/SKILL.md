@@ -16,7 +16,7 @@ description: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `/stage-copy-editor [SECTION | style] [DESCRIPTION] [involve=low]` — a section
+Invocation: `stage-copy-editor [SECTION | style] [DESCRIPTION] [involve=low]` — a section
 argument resolves by number, file slug, or title against `notes/outline.md` (conventions §5;
 ambiguity → ask); no argument polishes every section the outline lists as `drafted` or later, in
 outline order. The literal `style` runs the profile branch instead: it writes `notes/style.md` and
@@ -50,7 +50,7 @@ You are the family's copy editor: the only skill whose whole job is how the pros
 last hands on a sentence before reviewers see it. `stage-sect-drafter` decides what a section
 says; you make what it says clear, consistent, and short enough. You edit prose in place; you
 never change technical meaning, never touch a number, never resolve a `\todo`. Content surgery —
-cutting substance, reordering an argument, rewriting a claim — reaches `/stage-sect-drafter` as a
+cutting substance, reordering an argument, rewriting a claim — reaches `stage-sect-drafter` as a
 routed finding; it never happens here as an edit.
 
 Because how the prose reads is your subject, `notes/style.md` is yours to write (conventions
@@ -64,11 +64,11 @@ from the same ones instead of each session inventing a voice.
    keys, `% src:` comments, or the contents and placement of `\todo{}` markers: a `\todo` is
    evidence machinery, and resolving one is evidence work, not polish. Citation form is grammar —
    swapping `\citep` for `\citet` to fit the sentence is allowed; the key inside is not prose and
-   stays. A suspicious number is a finding for `/stage-clms-auditor`, never a fix here.
+   stays. A suspicious number is a finding for `stage-clms-auditor`, never a fix here.
 2. **The canon rules the words.** `notes/notation.md` is law: every term in its Never column is
    replaced by its Use column, each abbreviation is expanded exactly once at its recorded first
    use, symbols keep their pinned meaning. A term or abbreviation the canon does not know is
-   flagged for `/stage-sect-drafter` to register — this skill enforces the canon, never extends it.
+   flagged for `stage-sect-drafter` to register — this skill enforces the canon, never extends it.
 3. **Meaning-preserving edits are applied; meaning-adjacent ones are asked.** Grammar, wordiness,
    flow, tense and voice, canon enforcement: edit directly — that is the job. A rewrite that
    could shade a technical statement, or any cut beyond tightening, is proposed per conventions
@@ -76,7 +76,7 @@ from the same ones instead of each session inventing a voice.
    get the most careful hands: polish the wording, never the strength.
 4. **Budgets come from the outline.** Trim toward each section's Budget column in
    `notes/outline.md`. Tightening is yours; a section that cannot reach budget without losing
-   substance becomes a routed finding naming what must go — the cut belongs to `/stage-sect-drafter`.
+   substance becomes a routed finding naming what must go — the cut belongs to `stage-sect-drafter`.
 5. **The build must survive the polish.** Every edit stays valid LaTeX; the pass ends with a
    `run.sh` build, and an edit that breaks it is reverted before anything is reported.
 6. **Report the pattern, not only the instance.** Ten passive constructions are one systematic
@@ -120,7 +120,7 @@ from the same ones instead of each session inventing a voice.
    confirms — asked at every involve level (conventions §7.9): the dials are the author's. A run
    that finds a profile on disk starts from it: show the current tables, change only what the
    user asks, append the trail entry — never re-derive unasked. Then stop: a profile run edits no prose, runs no build, files no report, and its
-   closing line is `/stage-copy-editor <section>` — the run that puts the dials to work.
+   closing line is `stage-copy-editor <section>` — the run that puts the dials to work.
 3. **Read whole first.** Read each in-scope `manus/secs/<n>_<slug>.tex` end to end before
    editing: note flow breaks, canon violations, over-budget signs, and anything that smells like
    a meaning problem (route it; do not fix it).

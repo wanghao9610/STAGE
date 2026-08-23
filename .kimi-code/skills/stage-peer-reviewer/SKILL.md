@@ -18,16 +18,15 @@ description: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, `references/*_zh.md`, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `/skill:stage-peer-reviewer [MODE] [extern=<path>] [out=<path>] [DESCRIPTION]` —
-`MODE` is `panel` (default) or `quick`. With no `extern=`, the target is this repository's
-manuscript and the cycle is the active one from `notes/story.md` (conventions §5); an
-`involve=<level>` token is stripped before anything else is read (§7.7). Anything left after the
-mode and the `extern=` / `out=` tokens is a description (conventions §7.13): in your own words,
-what this run is for — which venue's bar to review against, which weakness the author already
-fears. It steers where the panel presses hardest and it is recorded in the review's header; it
-never softens a score, waives a rubric cap, or excuses a broken build, which stays finding #1
-whatever the description says. Prose that names no mode is description alone: run the full
-`panel`, and say so first.
+Invocation: `stage-peer-reviewer [MODE] [extern=<path>] [out=<path>] [DESCRIPTION]` — `MODE` is
+`panel` (default) or `quick`. With no `extern=`, the target is this repository's manuscript and
+the cycle is the active one from `notes/story.md` (conventions §5); an `involve=<level>` token is
+stripped before anything else is read (§7.7). Anything left after the mode and the `extern=` /
+`out=` tokens is a description (conventions §7.13): in your own words, what this run is for —
+which venue's bar to review against, which weakness the author already fears. It steers where the
+panel presses hardest and it is recorded in the review's header; it never softens a score, waives
+a rubric cap, or excuses a broken build, which stays finding #1 whatever the description says.
+Prose that names no mode is description alone: run the full `panel`, and say so first.
 
 **The external target (`extern=`).** `extern=<path>` points the panel at a paper this
 repository did not write — the PDF somebody asked you to referee. Everything below holds, with
@@ -48,7 +47,7 @@ it is public, so the citation-integrity contract's confidential mode is ON unles
 target's basename lowercased, each run of non-alphanumerics turned to `-`. Nothing under
 `manus/`, `notes/`, `cycls/`, `mates/`, or `tasks/` is read, created, or edited for it, and
 writing an external review into `cycls/<cycle>/reviews/` is the one failure this path may
-never have: `/skill:stage-resp-writer` reads that directory as reviews of *this* paper and would
+never have: `stage-resp-writer` reads that directory as reviews of *this* paper and would
 draft a rebuttal to somebody else's.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
@@ -138,7 +137,7 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
    audit.
 6. **One durable artifact, real-review shaped.** The meta-review
    `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` follows `references/review-template.md` exactly —
-   `/skill:stage-resp-writer` parses everything in `reviews/` through one pipeline and must not be
+   `stage-resp-writer` parses everything in `reviews/` through one pipeline and must not be
    able to tell simulated from received. A `verified` reference surviving into it carries its
    record inline (title, year, venue, URL). Per-perspective reviews, the citation audit, and
    fetch caches are working files in the run directory under `wkdrs/reports/` (§1.2) —
@@ -158,8 +157,8 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
 Read the conventions whole, then `notes/story.md` (active cycle), `cycls/<cycle>/venue.yml`
 (`scale:`, `anonymized:`, the venue's form), `notes/claims.md`, and this skill's `references/`
 per the list above. Resolve the mode (default `panel`) and the involve level once (§7.7).
-Missing story, ledger, or venue profile → stop and route to `/skill:stage-stry-coach`. A manuscript
-that is still skeletons → stop and route to `/skill:stage-sect-drafter`; a review of empty sections
+Missing story, ledger, or venue profile → stop and route to `stage-stry-coach`. A manuscript
+that is still skeletons → stop and route to `stage-sect-drafter`; a review of empty sections
 is noise. Under `extern=` none of that resolves and none of it is read: open the target
 instead, confirm it is readable, and ask the venue and scale. A target that cannot be opened
 is reported, never reviewed from its filename.
@@ -183,7 +182,7 @@ line "no claim ledger — `attacked_claims` is empty" in place of the claims tab
 
 ### Step 4: Dispatch the panel (or walk it in quick mode)
 
-Panel: five delegates, disjoint by perspective — `Agent` subagents of type `coder`, all five dispatched in a single message so the panelists run concurrently. No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
+Panel: five delegates, disjoint by perspective — `Agent` subagents (`subagent_type: coder`), all five dispatched in a single message so the panelists run concurrently. No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
 its perspective section from `references/review-dimensions.md` verbatim, both contracts
 verbatim, the digest, and the scope line "ONLY this perspective; return the collector
 contract's fields and nothing else". Each brief also carries the seconds that panelist waits
@@ -229,8 +228,8 @@ external-report shape of `references/review-template.md`; `cycls/` is not writte
 Digest ≤300 words (§7.1): the recommendation and confidence with the scale named, caps
 triggered, top majors with their attacked claim IDs (each explained at first use, §7.11),
 dropped-item and disagreement counts, and the decisions record (§7.8). Routing: answer it via
-`/skill:stage-resp-writer`; repair majors via `/skill:stage-sect-drafter`, `/skill:stage-clms-auditor`,
-`/skill:stage-refs-curator`, `/skill:stage-figs-designer`; clean enough to ship → `/skill:stage-subm-packer`.
+`stage-resp-writer`; repair majors via `stage-sect-drafter`, `stage-clms-auditor`,
+`stage-refs-curator`, `stage-figs-designer`; clean enough to ship → `stage-subm-packer`.
 Offer one commit (§1): the one `SIM_REVIEW_<date>.md` file, subject
 `stage-peer-reviewer: <cycle> <mode> review`.
 

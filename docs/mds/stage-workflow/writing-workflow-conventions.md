@@ -94,7 +94,7 @@ Skills may edit text, run builds, and run **light validation**. Anything **heavy
 
 ## 3. `.env` and the build toolchain
 
-The six variables, as `.env.example` ships them:
+The seven variables, as `.env.example` ships them:
 
 ```bash
 # Paired STAR project repo (optional — leave empty when writing without one)
@@ -105,15 +105,17 @@ LATEX_ENGINE=pdflatex
 ANON=false
 # Upstream STAGE repo used by execs/update.sh
 STAGE_REPOSITORY=https://github.com/wanghao9610/STAGE.git
+# Harness trees kept current: comma-separated names | all | none
+STAGE_HARNESSES=
 # Optional. How much the skills ask before deciding: low | medium | high
 INVOLVE=medium
 # Optional. Reply and document language: en | zh; empty = follow the conversation
 STAGE_LANG=
 ```
 
-Four of them are read by the entrypoint scripts. `STAGE_LANG` and `INVOLVE` are the exceptions: no entrypoint reads either, the skills do (§7.6, §7.7) — and `INVOLVE` is read once more by the two harness hooks that answer a permission prompt at `low` (§7.7).
+Five of them are read by the entrypoint scripts. `STAGE_LANG` and `INVOLVE` are the exceptions: no entrypoint reads either, the skills do (§7.6, §7.7) — and `INVOLVE` is read once more by the three harness hooks that answer a permission prompt at `low` (§7.7).
 
-1. **`.env` at the repository root is where these values live**, and the precedence is **environment, then `.env`, then the documented default**. Every entrypoint reads the keys it needs out of the file rather than sourcing it, so `STAR_HOME=… bash execs/scpts/import.sh` and `LATEX_ENGINE=xelatex bash execs/run.sh` mean what they say instead of being silently overridden by the file — the order `execs/update.sh` already used for `STAGE_REPOSITORY`, now the same in all four entrypoints. A one-off override is a command-line variable; a lasting one is an edit to `.env`. Never guess a local path, never hardcode one, never read them from memory of another project. `.env` itself is git-ignored and machine-specific.
+1. **`.env` at the repository root is where these values live**, and the precedence is **environment, then `.env`, then the documented default**. Every entrypoint reads the keys it needs out of the file rather than sourcing it, so `STAR_HOME=… bash execs/scpts/import.sh` and `LATEX_ENGINE=xelatex bash execs/run.sh` mean what they say instead of being silently overridden by the file — the order `execs/update.sh` uses for `STAGE_REPOSITORY` and `STAGE_HARNESSES`, now the same in all four entrypoints. A one-off override is a command-line variable or `--harnesses`; a lasting one is an edit to `.env`. Never guess a local path, never hardcode one, never read them from memory of another project. `.env` itself is git-ignored and machine-specific.
 2. **Every variable has a working default**, so a missing `.env` never blocks a build: `LATEX_ENGINE` falls back to pdflatex, `ANON` to false, `STAGE_LANG` to the conversation's own language. Empty `STAR_HOME` is a supported state — writing without a paired repository — in which `import.sh` requires `--source` and evidence arrives as manual drops. A skill that needs `STAR_HOME` and finds none asks (§7); it never invents a path.
 3. **Every build goes through `execs/run.sh`**, which runs latexmk **out-of-tree**: `latexmk -<engine> -interaction=nonstopmode -halt-on-error -outdir=wkdrs/builds manus/main.tex`, engine from `LATEX_ENGINE`. Never run latexmk bare into the source tree: `manus/` stays free of `.aux`/`.log` litter, and every build product is disposable together with `wkdrs/`. On success `run.sh` prints the PDF path and page count; `lint.sh` builds on it for the deterministic checks.
 4. **`ANON=true` means the repository is in submission-anonymity mode.** `lint.sh` additionally hunts identity leaks — `\author` contents, acknowledgments, `github.com/<user>`, `\thanks` — and a leak is a hard failure. The venue profile's `anonymized:` records what the venue demands; `ANON` is the operational switch and the user flips it. A skill that finds the two disagreeing says so and asks (§7) rather than silently editing either.
@@ -161,6 +163,7 @@ The tool-neutral half. **How** to ask — AskUserQuestion, a structured user-inp
 6. **`STAGE_LANG` sets the language of replies and of what a run writes.** `.env` `STAGE_LANG=en|zh` (§3) fixes both: chat replies, and the Markdown a run newly writes — `notes/`, `tasks/`, simulated reviews, `wkdrs/` reports. Unset, empty, or any other value → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request beats both and stands for the rest of the run. A skill **resolves it once at the start of the run**, a one-line lookup (`grep -sE '^STAGE_LANG=' .env || true`) folded into the opening load call, never a call of its own. It governs what a run **writes**, never a retranslation of what is already on disk: an existing document keeps the language it was written in, and changing one is an explicit user request, not a side effect of flipping the variable.
 
    **What stays English whatever `STAGE_LANG` says.** Two things leave this repository to be read by people who did not write them, and both are always English: **everything under `manus/`** — prose, captions, `% src:` comments, the text inside `\todo{}` — and **the response to reviewers** (`cycls/<cycle>/response/`), which a program committee reads. The manuscript's language belongs to the venue and the user; no dialogue language and no `STAGE_LANG` value ever rewrites it. Alongside those, **every structural literal stays English inside a document written in any language**: frontmatter keys and their values, ledger statuses (`proposed` / `drafted` / `verified` / `unsourced` / `weakened` / `dropped`), claim and review-point IDs, file paths, bibkeys and everything from `reference.bib`, venue names, dataset and metric names, and every string a script greps. A Chinese note with English structure stays machine-readable; a translated status value breaks `lint.sh` and every skill that reads the row.
+
 7. **The `involve` level: the user chooses how much is asked.** Every question a workflow poses is one of three kinds. **Mandatory confirmation points** are asked at every level: anything on the STOP line (§2 — submissions above all), every confirmation before a deletion or an overwrite, every `venue.yml` value entering as confirmed (§9c), and every ambiguity about what the user meant (§5.3 is the section-name case). **Judgment calls** — questions item 3 equips with a marked recommendation, where every offered option is safe — are what the level moves. **Derivable details** — anything with a conventional default — are decided silently at every level; they were never questions.
 
    The user sets the level; the skill **resolves it once at the start of the run**, before the first question, from three sources in precedence order: `INVOLVE` in `.env` (`low` / `medium` / `high`; absent, unset, or invalid → `medium`, which is what `.env.example` ships), then an `involve=<level>` token in the invocation, then plain language mid-run ("ask me less", "ask me everything") — the last instruction wins for the rest of the run. Reading it is a one-line lookup (`grep -sE '^INVOLVE=' .env || true`), resolved once, riding in the skill's opening load call rather than costing a call of its own.
@@ -168,7 +171,7 @@ The tool-neutral half. **How** to ask — AskUserQuestion, a structured user-inp
    **The token is not an argument.** `involve=<level>` is stripped from the invocation before anything else is resolved — the section (§5.2), the cycle, the mode. This holds in **every** skill, including ones whose `SKILL.md` never mentions the level: a skill matching its first argument against outline titles must not see `involve=low` and treat it as a section name. A skill that accepts no arguments at all still strips it.
 
    - `medium` — the default: this file and every `SKILL.md` exactly as written. The level adds nothing.
-   - `low` — a judgment call is not asked: take the option you would have marked recommended, and log it (item 8). The commit offer is one of them (§1.6), and what it recommends is to commit; the reply still names what was committed. In Claude Code and Codex the level also reaches the harness: while `.env` reads `INVOLVE=low`, `stage_involve_gate.sh` answers the permission prompt before a file edit inside the project, and the dot-directories at its root keep theirs. A genuinely open question has no recommendation to take, so it is asked at every level — and when unsure which kind a question is, treat it as the more interactive kind.
+   - `low` — a judgment call is not asked: take the option you would have marked recommended, and log it (item 8). The commit offer is one of them (§1.6), and what it recommends is to commit; the reply still names what was committed. In Claude Code, Codex, and Qwen Code the level also reaches the harness: while `.env` reads `INVOLVE=low`, `stage_involve_gate.sh` answers the permission prompt before a file edit inside the project, and the dot-directories at its root keep theirs. A genuinely open question has no recommendation to take, so it is asked at every level — and when unsure which kind a question is, treat it as the more interactive kind.
    - `high` — judgment calls the skill's text batches into one confirmation point, or takes autonomously between confirmation points, are asked one at a time (item 2).
 
    For every question that is asked, item 2 holds unchanged: the level decides which judgment calls are asked at all, never whether an asked question may be assumed answered.
@@ -453,16 +456,20 @@ Rules the table alone does not carry:
    `stage-subm-packer convert` reads it and regenerates a standalone copy under `wkdrs/` that
    compiles under that class. `manus/main.tex` keeps its `\documentclass{stys/stage}`: there is no
    in-place swap and no second source of truth.
-5. **The four harness trees are copies, not alternatives.** The same sixteen skills ship once per
-   harness — `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.kimi-code/skills/` —
-   differing only in invocation prefix and tool names (`Bash` / `Shell`, `AskUserQuestion` /
-   `AskQuestion` / `request_user_input`, `Read` / `ReadFile`). Load the copy under your own root and
-   follow it; a listing that surfaces another root's copy is telling you where a file is, not which
-   one binds you.
+5. **Seven harnesses share one neutral skill store.** The same sixteen skills ship in `.agents/skills/`,
+   `.claude/skills/`, `.cursor/skills/`, `.dsh/skills/`, `.kimi-code/skills/`, `.pi/skills/`, and
+   `.qwen/skills/`. `.agents/skills/` is the tool-neutral root required by the `AGENTS.md` convention
+   and the only path shared skill files are stored under; every byte-identical file in a named harness tree
+   links there. Harness-specific manifests remain real files and name that harness's invocation and
+   tools. Load your harness's native copy when one exists; otherwise the neutral copy is safe because it
+   names roles rather than another harness's tools. Codex's per-skill UI manifests live under
+   `.codex/skills/` and are linked into the `.agents/skills/` paths Codex scans. The complete `/stage`
+   request router lives once at `.agents/commands/stage.md`, with its human-readable `.agents/commands/stage.zh-CN.md` beside it; Claude, Cursor, Pi, and Qwen keep only thin
+   native entry points that pass their argument syntax to that shared router and select their own skill tree.
 
 ## 11. The skill roster
 
-Sixteen skills, invoked as `/stage-<name>` in Claude Code and Cursor, `$stage-<name>` in Codex, `/skill:stage-<name>` in Kimi Code. What each one does in full is [writing-workflow-skills.md](writing-workflow-skills.md); what each one writes is §8.
+Sixteen skills: `/stage-<name>` in Claude Code, Cursor, Pi, and Qwen Code; `$stage-<name>` in Codex; `/skill:stage-<name>` in DSH and Kimi Code. What each one does in full is [writing-workflow-skills.md](writing-workflow-skills.md); what each one writes is §8.
 
 | Skill | Role |
 | --- | --- |
@@ -483,7 +490,7 @@ Sixteen skills, invoked as `/stage-<name>` in Claude Code and Cursor, `$stage-<n
 | `stage-pstr-builder` † | select, render, and check the cycle's poster |
 | `stage-flow-status` | read-only status and the one next action |
 
-1. **The six marked † are slash-only.** Run them only when the user names them: they are the decision points — adoption, story, outline, response, submission, and what goes on the poster — and a decision point reached on an agent's own initiative is a decision nobody made. This table is the source of truth; the guards enforcing it are `disable-model-invocation: true` in the Claude, Cursor, and Kimi manifests and `allow_implicit_invocation: false` in `.agents/skills/<name>/agents/openai.yaml` for Codex, and CI checks all four against these markers, so marking a skill here without guarding it everywhere fails the build.
+1. **The six marked † are slash-only.** Run them only when the user names them: they are the decision points — adoption, story, outline, response, submission, and what goes on the poster — and a decision point reached on an agent's own initiative is a decision nobody made. This table is the source of truth; the guards enforcing it are `disable-model-invocation: true` in the Claude, Cursor, DSH, Kimi, Pi, and Qwen manifests and `allow_implicit_invocation: false` in `.codex/skills/<name>/agents/openai.yaml` for Codex, linked into `.agents/skills/`; CI checks every harness against these markers.
 2. **Two skills never touch the manuscript.** `stage-peer-reviewer` writes only its review under `cycls/<cycle>/reviews/` — or, refereeing an external paper with `extern=`, only under `wkdrs/`; `stage-flow-status` writes nothing at all. Run the status skill first whenever you do not know where things stand — it reads the outline, the ledger, the manifest, and the cycle state, and names the single next action with its exact command.
 3. **One skill per invocation, and one unit of work inside it.** A section, a table, a figure, a response — a run that quietly widens its scope is the failure this rule exists for; the next unit is the next invocation.
 4. **A named next action is taken, not printed, when it names one of the ten.** Skills end by naming what comes next — the status skill's single next action, a red lint gate naming the owner of what broke, an auditor routing an unsupported claim to the section that carries it — and each of those is a command handed to the reader. Where the named command is one of the ten and its target is settled, run it instead of printing it: the reader is the agent, and a command printed to itself is a handoff to nobody. The six keep the printed command, because typing it *is* the decision they exist to leave with the author. Three limits make that safe. **The pickup happens after the naming run has ended, never inside it** — a skill that may not touch the manuscript gains no reach by naming a successor, so `stage-flow-status` stays the reporter it is and its successor starts once the report is done. **An unsettled target is asked about rather than guessed** — which section, which table, which figure, which cycle (§5 resolves them). And **item 3 holds unchanged**, one skill and one unit of work, with a run nobody typed saying what it is starting before it begins.

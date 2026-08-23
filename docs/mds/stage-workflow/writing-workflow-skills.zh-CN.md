@@ -57,11 +57,14 @@ STAGE 提供十六个彼此衔接的写作工作流 skill，把导入的证据�
 | Claude Code | `.claude/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Codex | `.agents/skills/` | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
 | Cursor | `.cursor/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| DSH | `.dsh/skills/` | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
 | Kimi Code | `.kimi-code/skills/` | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
+| Pi | `.pi/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Qwen Code | `.qwen/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 
-四份目录装着同样的十六个 skill，只差调用前缀与工具名（`Bash` / `Shell`、`AskUserQuestion` / `AskQuestion` / `request_user_input`、`Read` / `ReadFile`）。跟着你自己那套 harness 目录下的副本走；列表里冒出另一套目录的副本，说明的是文件在哪，不是哪一份对你有约束力。
+七种 harness 都带同样的十六个 skill。工具中立的共用 skill 文件只在 `.agents/skills/` 存一份；命名 harness 树逐字节一致时链接过去，只有原生调用方式或工具措辞不同的文件才保留实文件。`/stage` 命令遵循同一归属规则：完整清单与路由策略放在 `.agents/commands/stage.md`，供人阅读的 `.agents/commands/stage.zh-CN.md` 放在它旁边，Claude、Cursor、Pi 与 Qwen 只保留原生参数适配层。有本 harness 的 skill 副本就跟它走；没有时，中立副本也可安全使用。
 
-六个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`、`stage-pstr-builder`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。这一条由各宿主各自强制，不靠自觉——Claude、Cursor、Kimi 三份 manifest 里的 `disable-model-invocation: true`，以及 Codex 的 `.agents/skills/<name>/agents/openai.yaml` 里的 `allow_implicit_invocation: false`。另外十个在任务明显匹配时也可以由 agent 自行拾起。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
+六个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`、`stage-pstr-builder`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。命名 harness 的清单用 `disable-model-invocation: true` 强制它；Codex 的 `allow_implicit_invocation: false` 放在 `.codex/skills/`，再链接进 `.agents/skills/`。另外十个在任务明显匹配时也可以由 agent 自行拾起。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
 
 每个 skill 都共用同一个参数形状——`<skill> [TARGET] [DESCRIPTION] [involve=<level>]`。`involve=low|medium|high` 最先被剥离，它设定这次运行问到什么程度（规约 §7.7）；每个 skill 都会剥它，包括那些 `argument-hint` 里没有标出它的。目标照上面的规则解析。剩下的一切是一句描述：用你自己的话说明这次运行是为了什么——`/stage-sect-drafter 4_experiments 消融才是重点，开篇就摆出来`。它是一条线索，不是一条命令：它可以把运行引到该 skill 自己的某条路径上，也可以提供运行随后记下的文字；但它绝不代替任何确认点，绝不替一个有歧义的章节名下结论，绝不放行一个没有指纹的数字，也绝不授权 STOP 线上的任何一件事。被描述引到某条路径上的运行，要在写任何东西之前说清自己走的是哪条，这样读错一次只赔一行字，而不是一处错改。若某个 skill 的首参数本身就是自由文本——`stage-refs-curator` 收论文标题，`stage-tabs-builder` 与 `stage-figs-designer` 收还没有提纲行的表或图的用途——那个参数就是描述。完整规则见[规约 §7.13](writing-workflow-conventions.zh-CN.md)。
 
@@ -144,5 +147,5 @@ Slash-only。海报不是把论文重新灌进一张更大的纸——它是取�
 ## 各处定义在哪
 
 - 共享规则与 § 编号：[writing-workflow-conventions.zh-CN.md](writing-workflow-conventions.zh-CN.md) —— 产物登记表是 §8，编造边界是 §9，布局是 §10。
-- skill 本身：`.claude/skills/<name>/SKILL.md`（权威）与 `.agents/skills/<name>/SKILL.md`（派生），由 `execs/update.sh` 同步进各实例；`SKILL_zh.md` 是随之维护的中文对照版，运行时不装载。
+- skill 本身：在 `.claude/skills/` 编写，再机械移植到其余六种 harness，并把共用文件去重到 `.agents/skills/`；`SKILL_zh.md` 是随之维护的中文对照版，运行时不装载。
 - 面向用户的总览与快速上手：仓库 [README.zh-CN](../../../README.zh-CN.md)。

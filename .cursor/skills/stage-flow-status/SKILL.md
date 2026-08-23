@@ -24,7 +24,7 @@ editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.z
 conventions — are kept in step for human readers only and are never loaded at runtime, so this
 SKILL.md stays authoritative.
 
-Invocation: `/stage-flow-status [SECTION] [DESCRIPTION]` — no argument reports the whole flow; a
+Invocation: `stage-flow-status [SECTION] [DESCRIPTION]` — no argument reports the whole flow; a
 section argument, resolved per conventions §5 by number, file slug, or title against
 `notes/outline.md`, narrows the outline board and claim detail to that section. An
 `involve=<level>` token is stripped before SECTION resolves (§7) and changes nothing else here. An
@@ -75,10 +75,10 @@ writes, and never present a guess as a state.
    no AskQuestion and no plan mode. Delegation is available and Principle 6 says where it pays; a
    delegate sent from here is read-only like the session that sent it. To act on what you show,
    point at the owner:
-   /stage-proj-adopt, /stage-evid-curator, /stage-stry-coach, /stage-outl-planner,
-   /stage-sect-drafter, /stage-tabs-builder, /stage-figs-designer, /stage-refs-curator,
-   /stage-copy-editor, /stage-clms-auditor, /stage-cite-auditor, /stage-peer-reviewer,
-   /stage-resp-writer, /stage-subm-packer.
+   stage-proj-adopt, stage-evid-curator, stage-stry-coach, stage-outl-planner,
+   stage-sect-drafter, stage-tabs-builder, stage-figs-designer, stage-refs-curator,
+   stage-copy-editor, stage-clms-auditor, stage-cite-auditor, stage-peer-reviewer,
+   stage-resp-writer, stage-subm-packer.
 2. **Files are the only source of truth.** Everything reported comes from the output-table artifacts
    (§8): `notes/`, `mates/MANIFEST.md`, `manus/`, `cycls/<cycle>/`, `tasks/`, and the
    `wkdrs/builds/` and `wkdrs/reports/` listings. Never infer progress from chat memory; a
@@ -107,7 +107,7 @@ writes, and never present a guess as a state.
 
 ## Workflow
 
-1. **One load, then reason.** Everything this skill reads arrives in a single message — five shell
+1. **One load, then reason.** Everything this skill reads arrives in a single message — five Shell
    calls sent together, which cost one round trip between them rather than one each. Steps 2–8
    work from what came back, and a file the digest already printed is never re-opened. This is
    the most-run skill in the flow, and the round trips are the whole of what makes it slow.
@@ -130,7 +130,7 @@ writes, and never present a guess as a state.
    ```
 
    The conventions ride in three calls rather than one because each tool result has its own size
-   limit, and a shell result past roughly 30 KB is written out to a file that costs a round trip to
+   limit, and a Shell result past roughly 30 KB is written out to a file that costs a round trip to
    read back — the exact round trip the single message exists to avoid. The eight loaded sections
    are 60 KB together, so they cannot share one result; split this way each is comfortably under,
    the digest gets a result to itself since it is the one part that grows with the paper, and the
@@ -165,30 +165,30 @@ writes, and never present a guess as a state.
    SECTION-scoped. A row whose file is missing on disk, or a file with no row, is drift — flag
    it, never fix it.
 4. **Claim coverage.** Ledger counts by status: proposed / drafted / verified / unsourced /
-   weakened / dropped. `unsourced > 0` is always a gap line naming /stage-clms-auditor.
+   weakened / dropped. `unsourced > 0` is always a gap line naming stage-clms-auditor.
 5. **Evidence, refs, and style.** MANIFEST entry count and newest `imported:`; `import.sh --diff`
    verdict (clean / drifted / unknown); bib keys against refs-index rows — a cited work with no
-   reading note is /stage-refs-curator's. Then one line for the style profile (§8.11): present
+   reading note is stage-refs-curator's. Then one line for the style profile (§8.11): present
    with its `source:` and `updated:`, or absent — absent is the default state of a repository, not
    a gap, and it never becomes the next action.
 6. **Build and lint.** Newest PDF under `wkdrs/builds/` with its date, from the digest's `WKDRS`
    block (or `build: none`); the lint verdict came back with step 1's message. `--no-build: no
    finished build` is not a red gate — it is `build: none` under another name, and the report
    says the paper has not been built rather than that lint failed.
-7. **Next action.** First match wins: (1) no `notes/adopt.md` → /stage-proj-adopt; (2) story
-   missing or unfinalized → /stage-stry-coach; (3) outline missing or unfinalized →
-   /stage-outl-planner; (4) evidence drifted → /stage-evid-curator; (5) open promises → the
-   skill the first open box's change needs (/stage-sect-drafter, /stage-tabs-builder,
-   /stage-figs-designer); (6) an outline row still planned / skeleton / sketch → its owner among
+7. **Next action.** First match wins: (1) no `notes/adopt.md` → stage-proj-adopt; (2) story
+   missing or unfinalized → stage-stry-coach; (3) outline missing or unfinalized →
+   stage-outl-planner; (4) evidence drifted → stage-evid-curator; (5) open promises → the
+   skill the first open box's change needs (stage-sect-drafter, stage-tabs-builder,
+   stage-figs-designer); (6) an outline row still planned / skeleton / sketch → its owner among
    those three, with the row named; (7) claims at `unsourced`, or `drafted` never verified →
-   /stage-clms-auditor; (8) all rows drafted but the newest `CITES_*` / `POLISH_*` report date
-   trails the outline's `updated:` → /stage-cite-auditor, then /stage-copy-editor; (9) no
-   simulated review this cycle → /stage-peer-reviewer; (10) all green → /stage-subm-packer.
+   stage-clms-auditor; (8) all rows drafted but the newest `CITES_*` / `POLISH_*` report date
+   trails the outline's `updated:` → stage-cite-auditor, then stage-copy-editor; (9) no
+   simulated review this cycle → stage-peer-reviewer; (10) all green → stage-subm-packer.
    Give the one-line reason with the exact command. When that command names one of the ten the
    agent may start (conventions §11.4) and its target is settled, it is picked up once this
    report is done rather than left for the author to type — this skill starts nothing itself.
 
-   **A red gate outranks the list.** When step 6 found `lint.sh` failing hard — the build broken, a `\todo{` that would ship, a page count over the limit, an identity leak under `ANON=true` — that is the next action whichever numbered rule matched, routed to the owner lint itself names: a marker to `/stage-sect-drafter` or `/stage-tabs-builder`, an over-limit paper to `/stage-copy-editor`, an undefined citation to `/stage-cite-auditor` or `/stage-refs-curator`. Nothing downstream of a red gate is worth recommending — `/stage-subm-packer` refuses it, and a simulated review of a manuscript that does not build reviews the wrong artifact. The list resumes once the gate is green.
+   **A red gate outranks the list.** When step 6 found `lint.sh` failing hard — the build broken, a `\todo{` that would ship, a page count over the limit, an identity leak under `ANON=true` — that is the next action whichever numbered rule matched, routed to the owner lint itself names: a marker to `stage-sect-drafter` or `stage-tabs-builder`, an over-limit paper to `stage-copy-editor`, an undefined citation to `stage-cite-auditor` or `stage-refs-curator`. Nothing downstream of a red gate is worth recommending — `stage-subm-packer` refuses it, and a simulated review of a manuscript that does not build reviews the wrong artifact. The list resumes once the gate is green.
 8. **Report and stop.** Render in the Output order, then stop: never writes, never commits — and
    for the same reason, never state or imply that anything was changed.
 

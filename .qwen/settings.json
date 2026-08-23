@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash .qwen/skills/stage-flow-status/scripts/scan.sh)",
+      "Bash(bash .qwen/skills/stage-flow-status/scripts/scan.sh *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "edit|write_file|notebook_edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$QWEN_PROJECT_DIR\"/.qwen/hooks/stage_involve_gate.sh",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "run_shell_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$QWEN_PROJECT_DIR\"/.qwen/hooks/stage_commit_guard.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$QWEN_PROJECT_DIR\"/.qwen/hooks/stage_model_id.sh",
+            "statusMessage": "Recording session model id for STAGE provenance",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "\"$QWEN_PROJECT_DIR\"/.qwen/hooks/stage_memory.sh",
+            "statusMessage": "Loading STAGE project memory",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
+  }
+}

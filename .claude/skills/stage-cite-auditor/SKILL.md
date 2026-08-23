@@ -18,7 +18,7 @@ allowed-tools: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `/stage-cite-auditor [SECTION] [DESCRIPTION]` — a section argument resolves per
+Invocation: `stage-cite-auditor [SECTION] [DESCRIPTION]` — a section argument resolves per
 conventions §5 and narrows the assertion and missing-citation scans; key resolution and bib
 hygiene always run over the whole manuscript and bib; no argument audits everything. Anything left
 after the section is a description (conventions §7.13): in your own words, what this run is for.
@@ -49,7 +49,7 @@ unverifiable until a reading note backs it. `stage-refs-curator` builds the bib 
 the bib, assertions against `## Citable facts`, prose against the papers it forgot to cite. You
 flag; you never fix: not a key, not a field, not a sentence — an audit that silently patches is
 an audit nobody can trust. Fully offline: nothing here fetches; whatever needs fetching or
-re-reading routes to `/stage-refs-curator`.
+re-reading routes to `stage-refs-curator`.
 
 ## Core Principles
 
@@ -73,11 +73,11 @@ re-reading routes to `/stage-refs-curator`.
    and datasets uncited at first use, numbers credited to others with no key.
 4. **Boundary with the claims audit.** A number attributed to a cited work is an assertion — it
    is audited here against the note's facts (§9b). Numbers about this work trace to `mates/`
-   fingerprints — `/stage-clms-auditor`'s lane (§9a). The two audits meet at the sentence's
+   fingerprints — `stage-clms-auditor`'s lane (§9a). The two audits meet at the sentence's
    `\cite`, and neither skips a number because it looked like the other's.
 5. **Hygiene is reported with the entries quoted.** Duplicates (same title or DOI under two
    keys), missing required fields, inconsistent venue naming, arXiv entries where the note
-   records a published version. The fix is `/stage-refs-curator`'s.
+   records a published version. The fix is `stage-refs-curator`'s.
 6. **Fan out the assertion audit (§6).** More than 20 in-scope citing sentences → split them one
    delegate per cited key, so every sentence about a given paper reaches the same reader with the
    same note in front of it, each returning one verdict per sentence — supported, unsupported, or
@@ -107,9 +107,9 @@ re-reading routes to `/stage-refs-curator`.
 6. **Check hygiene.** Principle 5's classes over the whole bib, entries quoted.
 7. **File failures.** Append one `- [ ]` per undefined key, unsupported or unverifiable
    assertion, missing citation, and hygiene defect to `tasks/cites_followups.md` under a
-   `## <date>` heading — location, quote, verdict, route: no note → `/stage-refs-curator` reads
+   `## <date>` heading — location, quote, verdict, route: no note → `stage-refs-curator` reads
    the paper into one; a seeded note marked `abstract-and-intro` → the same, read properly this
-   time; wrong sentence → `/stage-sect-drafter`; bib repair → `/stage-refs-curator`.
+   time; wrong sentence → `stage-sect-drafter`; bib repair → `stage-refs-curator`.
    A re-run checks off items it can prove resolved.
 8. **Report.** Write `wkdrs/reports/CITES_<date>.md` (`mkdir -p` first) per Output.
 9. **Digest in chat.** ≤300 words: counts per check, worst findings first, tasks filed, the one

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # STAGE upstream consistency check.
 #
-# Guards the invariants the four per-harness skill trees (.agents / .claude /
-# .cursor / .kimi-code), the shared agent instructions, and the workflow docs
+# Guards the invariants the shared skill store plus six named harness trees, the
+# shared agent instructions, and the workflow docs
 # are supposed to keep while being maintained by hand. The trees hold the same
 # sixteen skills and share their workflow shape. Explicit harness-local
 # capabilities are exceptions only when a dedicated check below pins both the
@@ -17,10 +17,10 @@ set -uo pipefail
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 cd "${ROOT_DIR}" || exit 1
 
-SKILL_ROOTS=(.agents/skills .claude/skills .cursor/skills .kimi-code/skills)
-# The three trees that guard implicit invocation through SKILL.md frontmatter;
-# .agents does it through agents/openai.yaml instead (check 4).
-FRONTMATTER_ROOTS=(.claude/skills .cursor/skills .kimi-code/skills)
+SKILL_ROOTS=(.agents/skills .claude/skills .cursor/skills .dsh/skills .kimi-code/skills .pi/skills .qwen/skills)
+# The six named trees guard implicit invocation through SKILL.md frontmatter;
+# Codex does it through .codex/skills/*/agents/openai.yaml instead (check 4).
+FRONTMATTER_ROOTS=(.claude/skills .cursor/skills .dsh/skills .kimi-code/skills .pi/skills .qwen/skills)
 CONV_EN="docs/mds/stage-workflow/writing-workflow-conventions.md"
 CONV_ZH="docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md"
 
@@ -37,7 +37,41 @@ frontmatter_has_line() { # $1 = file, $2 = exact line expected inside the leadin
     awk -v want="$2" 'NR == 1 { next } /^---[ \t]*$/ { exit } $0 == want { found = 1; exit } END { exit !found }' "$1"
 }
 
-# 1. The four roots carry the same, non-empty set of skill directories.
+# 0. Generated trees and shared-link topology match their declared source.
+section "Generated harness trees"
+if bash .github/scripts/port.sh --check; then
+    note "all seven trees reproduce from .claude plus their port rules"
+else
+    fail ".github/scripts/port.sh --check failed"
+fi
+
+link_errors=0
+for root in .claude/skills .cursor/skills .dsh/skills .kimi-code/skills .pi/skills .qwen/skills; do
+    while IFS= read -r link; do
+        target="$(readlink "${link}")"
+        case "${target}" in
+            ../../.agents/skills/*|../../../.agents/skills/*|../../../../.agents/skills/*) ;;
+            *) fail "${link} points outside .agents/skills: ${target}"; link_errors=1 ;;
+        esac
+        [[ -e "${link}" ]] || { fail "${link} is broken"; link_errors=1; }
+    done < <(find "${root}" -type l | sort)
+done
+manifest_links=0
+while IFS= read -r link; do
+    manifest_links=$(( manifest_links + 1 ))
+    target="$(readlink "${link}")"
+    [[ "${target}" == ../../../../.codex/skills/*/agents/openai.yaml ]] || {
+        fail "${link} must point to its .codex/skills manifest, got ${target}"
+        link_errors=1
+    }
+    [[ -e "${link}" ]] || { fail "${link} is broken"; link_errors=1; }
+done < <(find .agents/skills -path '*/agents/openai.yaml' -type l | sort)
+(( manifest_links == 16 )) || { fail ".agents has ${manifest_links} openai.yaml links, expected 16"; link_errors=1; }
+real_manifests="$(find .codex/skills -path '*/agents/openai.yaml' -type f | wc -l | tr -d ' ')"
+(( real_manifests == 16 )) || { fail ".codex has ${real_manifests} real openai.yaml manifests, expected 16"; link_errors=1; }
+(( link_errors == 0 )) && note "shared links resolve only through .agents; 16 Codex manifests live under .codex"
+
+# 1. The seven roots carry the same, non-empty set of skill directories.
 section "Skill directory sets"
 SKILLS="$(list_skills "${SKILL_ROOTS[0]}")"
 if [[ -z "${SKILLS}" ]]; then
@@ -49,7 +83,7 @@ else
             diff <(printf '%s\n' "${SKILLS}") <(list_skills "${root}") | sed 's/^/      /'
         fi
     done
-    note "$(printf '%s\n' "${SKILLS}" | wc -l | tr -d ' ') skills, same set in all four roots"
+    note "$(printf '%s\n' "${SKILLS}" | wc -l | tr -d ' ') skills, same set in all seven roots"
 fi
 
 # 2. Frontmatter name matches the directory name in every tree.
@@ -72,15 +106,15 @@ for root in "${SKILL_ROOTS[@]}"; do
 done
 (( name_errors == 0 )) && note "every manifest's name matches its directory"
 
-# 3. Per-skill file inventory is identical across the four trees, apart from the
+# 3. Per-skill file inventory is identical across the seven trees, apart from the
 #    Codex-only agents/ manifest directory.
 section "File inventory parity (ignoring .agents agents/ manifests)"
 parity_errors=0
 while IFS= read -r skill; do
-    baseline="$(cd ".claude/skills/${skill}" && find . -type f | sort)"
+    baseline="$(cd ".claude/skills/${skill}" && find -L . -type f | sort)"
     for root in "${SKILL_ROOTS[@]}"; do
         [[ "${root}" == ".claude/skills" ]] && continue
-        listing="$(cd "${root}/${skill}" && find . -type f ! -path './agents/*' | sort)"
+        listing="$(cd "${root}/${skill}" && find -L . -type f ! -path './agents/*' | sort)"
         if [[ "${listing}" != "${baseline}" ]]; then
             fail "${root}/${skill} file set differs from .claude/skills/${skill}:"
             diff <(printf '%s\n' "${baseline}") <(printf '%s\n' "${listing}") | sed 's/^/      /'
@@ -88,11 +122,11 @@ while IFS= read -r skill; do
         fi
     done
 done < <(printf '%s\n' "${SKILLS}")
-(( parity_errors == 0 )) && note "file sets match across all four trees"
+(( parity_errors == 0 )) && note "file sets match across all seven trees"
 
-# 4. The slash-only set is one decision expressed in three places, and they must
+# 4. The slash-only set is one decision expressed in seven places, and they must
 #    agree. The conventions roster (§11) marks it with † and is what every skill
-#    run loads; the Claude, Cursor and Kimi trees enforce it with
+#    run loads; the six named trees enforce it with
 #    `disable-model-invocation: true`;
 #    Codex enforces it with `allow_implicit_invocation: false` in
 #    agents/openai.yaml. A skill guarded in one place and not the others runs
@@ -107,7 +141,7 @@ if [[ -z "${SLASH_ONLY}" ]]; then
 fi
 
 while IFS= read -r skill; do
-    manifest=".agents/skills/${skill}/agents/openai.yaml"
+    manifest=".codex/skills/${skill}/agents/openai.yaml"
     if [[ ! -f "${manifest}" ]]; then
         fail "${manifest} is missing; every Codex skill needs its interface manifest"
         guard_errors=1
@@ -147,7 +181,68 @@ while IFS= read -r skill; do
         done
     done
 done < <(printf '%s\n' "${SKILLS}")
-(( guard_errors == 0 )) && note "$(printf '%s\n' "${SLASH_ONLY}" | wc -l | tr -d ' ') slash-only skills guarded identically in all four trees"
+(( guard_errors == 0 )) && note "$(printf '%s\n' "${SLASH_ONLY}" | wc -l | tr -d ' ') slash-only skills guarded identically in all seven trees"
+
+# 4a. The full /stage router and its Chinese reading edition are neutral content
+#     and live together under .agents.
+#     Native command files adapt only their harness's argument syntax and skill
+#     mechanism. Copying the roster into those files creates four policy surfaces
+#     whose explicit-only set can drift independently.
+section "Shared request router"
+router_errors=0
+ROUTER=".agents/commands/stage.md"
+ROUTER_ZH=".agents/commands/stage.zh-CN.md"
+router_rows() { # $1 = router file, $2 = row regex -> matching skill names, sorted
+    sed -nE "$2" "$1" | sort
+}
+ROUTER_ANY='s/^\| `(stage-[a-z-]+)` \|.*$/\1/p'
+ROUTER_DAGGER='s/^\| `(stage-[a-z-]+)` \| † \|.*$/\1/p'
+for router in "${ROUTER}" "${ROUTER_ZH}"; do
+    if [[ ! -f "${router}" ]]; then
+        fail "${router} is missing"
+        router_errors=1
+        continue
+    fi
+    ROUTER_SKILLS="$(router_rows "${router}" "${ROUTER_ANY}")"
+    if [[ "${ROUTER_SKILLS}" != "${SKILLS}" ]]; then
+        fail "${router} roster differs from the shared skill set:"
+        diff <(printf '%s\n' "${SKILLS}") <(printf '%s\n' "${ROUTER_SKILLS}") | sed 's/^/      /'
+        router_errors=1
+    fi
+    ROUTER_SLASH_ONLY="$(router_rows "${router}" "${ROUTER_DAGGER}")"
+    if [[ "${ROUTER_SLASH_ONLY}" != "${SLASH_ONLY}" ]]; then
+        fail "${router} explicit-only set differs from conventions §11:"
+        diff <(printf '%s\n' "${SLASH_ONLY}") <(printf '%s\n' "${ROUTER_SLASH_ONLY}") | sed 's/^/      /'
+        router_errors=1
+    fi
+done
+
+while IFS='|' read -r wrapper argument_marker; do
+    [[ -n "${wrapper}" ]] || continue
+    if [[ ! -f "${wrapper}" ]]; then
+        fail "missing native request-router entry point: ${wrapper}"
+        router_errors=1
+        continue
+    fi
+    grep -qF 'Read `.agents/commands/stage.md`' "${wrapper}" || {
+        fail "${wrapper} does not delegate to the shared router"
+        router_errors=1
+    }
+    grep -qF -- "${argument_marker}" "${wrapper}" || {
+        fail "${wrapper} does not carry its native argument marker ${argument_marker}"
+        router_errors=1
+    }
+    if grep -qE '^\| `stage-[a-z-]+`' "${wrapper}"; then
+        fail "${wrapper} duplicates the roster owned by ${ROUTER}"
+        router_errors=1
+    fi
+done <<'EOF'
+.claude/commands/stage.md|[$ARGUMENTS]
+.cursor/commands/stage.md|beside `/stage`
+.pi/prompts/stage.md|[$@]
+.qwen/commands/stage.md|[{{args}}]
+EOF
+(( router_errors == 0 )) && note "one bilingual neutral roster drives four native command entry points"
 
 # 5. Bilingual twins: every skill .md has its _zh.md counterpart and vice versa.
 section "Bilingual twins in skill trees"
@@ -158,7 +253,7 @@ while IFS= read -r f; do
     else
         [[ -f "${f%.md}_zh.md" ]] || { fail "${f} has no _zh.md counterpart"; twin_errors=1; }
     fi
-done < <(find "${SKILL_ROOTS[@]}" -type f -name '*.md')
+done < <(find -L "${SKILL_ROOTS[@]}" -type f -name '*.md')
 (( twin_errors == 0 )) && note "every skill .md file has its bilingual twin"
 
 # 6. Every manifest defers to the shared conventions document, by name.
@@ -179,100 +274,113 @@ for root in "${SKILL_ROOTS[@]}"; do
 done
 (( conv_ref_errors == 0 )) && note "every manifest names the conventions document"
 
-# 7. Invocation tokens are tree-appropriate: $stage-* in .agents, /stage-* in
-#    .claude and .cursor, /skill:stage-* in .kimi-code.
+# 7. Frontmatter advertises each harness's native invocation, while the generated
+#    body stays prefix-neutral so shared files can live under .agents.
 section "Invocation-token hygiene"
 token_errors=0
-check_absent() { # $1 = path, $2 = literal token that must not appear there
-    local hits
-    hits="$(grep -RnF -- "$2" "$1" 2>/dev/null || true)"
-    if [[ -n "${hits}" ]]; then
-        fail "$1 contains foreign invocation token '$2':"
-        printf '%s\n' "${hits}" | head -n 3 | sed 's/^/      /'
-        token_errors=1
-    fi
-}
+SKILL_ALT="$(printf '%s\n' "${SKILLS}" | paste -sd '|' -)"
 while IFS= read -r skill; do
-    check_absent .agents/skills "/${skill}"
-    check_absent .agents/skills "skill:${skill}"
-    for root in .claude/skills .cursor/skills; do
-        check_absent "${root}" "\$${skill}"
-        check_absent "${root}" "skill:${skill}"
+    for root in "${SKILL_ROOTS[@]}"; do
+        case "${root}" in
+            .agents/skills) expected="${skill}" ;;
+            .dsh/skills|.kimi-code/skills) expected="/skill:${skill}" ;;
+            *) expected="/${skill}" ;;
+        esac
+        for name in SKILL.md SKILL_zh.md; do
+            path="${root}/${skill}/${name}"
+            front="$(awk 'NR == 1 { next } /^---[ \t]*$/ { exit } { print }' "${path}")"
+            body="$(awk 'NR == 1 && /^---[ \t]*$/ { fm = 1; next } fm && /^---[ \t]*$/ { fm = 0; next } !fm { print }' "${path}")"
+            grep -qF -- "${expected}" <<<"${front}" || {
+                fail "${path}: frontmatter does not advertise native invocation ${expected}"
+                token_errors=1
+            }
+            prefixed="$(grep -nE '(\$|/|/skill:)('"${SKILL_ALT}"')([^a-z-]|$)' <<<"${body}" || true)"
+            if [[ -n "${prefixed}" ]]; then
+                fail "${path}: generated body contains a harness invocation prefix instead of a bare skill name:"
+                printf '%s\n' "${prefixed}" | head -n 3 | sed 's/^/      /'
+                token_errors=1
+            fi
+        done
     done
-    check_absent .kimi-code/skills "\$${skill}"
-    # Bare /stage-* is foreign in the Kimi tree; /skill:stage-* does not contain it.
-    check_absent .kimi-code/skills "/${skill}"
 done < <(printf '%s\n' "${SKILLS}")
 
-# The rewrite that retokenizes a ported skill targets "/stage-" or "$stage-",
-# and one repo path carries that substring: docs/mds/stage-workflow/. A rewrite
-# run without a guard turns it into "docs/mds/skill:stage-workflow/" or
-# "docs/mds$stage-workflow/", and every check above passes it — the token is
-# native to that tree, and check 6 matches the filename, not the directory. So
-# the rule is stated positively: every "docs/mds" in the skill trees is
-# followed by exactly "/stage-workflow/". The match is compared with its own
-# `-n` colon in front, which is what keeps a mangled "skill:" from being read
-# as the separator grep itself printed.
-mangled_paths="$(grep -rnoE 'docs/mds[^[:space:]`)]*' "${SKILL_ROOTS[@]}" 2>/dev/null |
+mangled_paths="$(grep -RnoE 'docs/mds[^[:space:]`)]*' "${SKILL_ROOTS[@]}" 2>/dev/null |
                  grep -vF ':docs/mds/stage-workflow/' || true)"
 if [[ -n "${mangled_paths}" ]]; then
     fail "docs/mds/ path damaged (a token rewrite hit the directory name):"
     printf '%s\n' "${mangled_paths}" | sed 's/^/      /'
     token_errors=1
 fi
-(( token_errors == 0 )) && note "invocation tokens are consistent per tree; docs/mds/ paths intact"
+(( token_errors == 0 )) && note "frontmatter uses native invocations; shared bodies use bare skill names"
 
-# 8. Harness vocabulary stays native to its tree. A skill that tells a Cursor
-#    agent to call AskUserQuestion, or a Kimi agent to call Read, names a tool
-#    that harness does not have — the run degrades to plain text, silently, at
-#    exactly the confirmation point the workflow put there.
+# 8. Harness vocabulary stays native to its tree. The port check proves the full
+#    transformation; these markers pin the high-risk question and dispatch tools
+#    whose foreign spelling silently degrades a confirmation or fan-out.
 section "Harness-specific tool vocabulary"
 vocab_errors=0
-check_foreign() { # $1 = tree, $2 = literal, $3 = what the tree calls it instead
-    local hits
-    hits="$(grep -RnF --include='*.md' -- "$2" "$1" 2>/dev/null || true)"
-    if [[ -n "${hits}" ]]; then
-        fail "$1 names '$2'; this tree's tool is $3:"
-        printf '%s\n' "${hits}" | head -n 3 | sed 's/^/      /'
+check_present() { # $1 = tree, $2 = literal native marker
+    if ! grep -RqF --include='*.md' -- "$2" "$1" 2>/dev/null; then
+        fail "$1 never names its native tool '$2'"
         vocab_errors=1
     fi
 }
-#            tree                  foreign literal        native name
-check_foreign .claude/skills       'AskQuestion'          'AskUserQuestion'
-check_foreign .claude/skills       'request_user_input'   'AskUserQuestion'
-check_foreign .claude/skills       '`ReadFile`'           '`Read`'
-check_foreign .claude/skills       'Shell'                'Bash'
-check_foreign .cursor/skills       'AskUserQuestion'      'AskQuestion'
-check_foreign .cursor/skills       'request_user_input'   'AskQuestion'
-check_foreign .cursor/skills       '`ReadFile`'           '`Read`'
-check_foreign .cursor/skills       'Bash'                 'Shell'
-check_foreign .kimi-code/skills    'AskQuestion'          'AskUserQuestion'
-check_foreign .kimi-code/skills    'request_user_input'   'AskUserQuestion'
-check_foreign .kimi-code/skills    '`Read`'               '`ReadFile`'
-check_foreign .kimi-code/skills    'Bash'                 'Shell'
-check_foreign .agents/skills       'AskUserQuestion'      'request_user_input'
-check_foreign .agents/skills       'AskQuestion'          'request_user_input'
-check_foreign .agents/skills       'Bash'                 'the shell, in prose'
-check_foreign .agents/skills       'Shell'                'the shell, in prose'
-for root in "${FRONTMATTER_ROOTS[@]}"; do
-    check_foreign "${root}" 'spawn_agent' 'a plain subagent'
-    check_foreign "${root}" 'update_plan' 'plan mode'
+check_absent_vocab() { # $1 = tree, remaining args = foreign literals
+    local tree="$1" literal hits
+    shift
+    for literal in "$@"; do
+        hits="$(grep -RnF --include='*.md' -- "$literal" "$tree" 2>/dev/null || true)"
+        if [[ -n "${hits}" ]]; then
+            fail "$tree contains foreign tool '$literal':"
+            printf '%s\n' "${hits}" | head -n 3 | sed 's/^/      /'
+            vocab_errors=1
+        fi
+    done
+}
+
+check_present .claude/skills 'AskUserQuestion'
+check_present .claude/skills '`Agent`'
+check_absent_vocab .claude/skills 'AskQuestion' 'ask_user_question' 'stage_questionnaire' '`Task`' '`subagent`' '`stage_subagent`'
+
+check_present .cursor/skills 'AskQuestion'
+check_present .cursor/skills '`Task`'
+check_absent_vocab .cursor/skills 'AskUserQuestion' 'ask_user_question' 'stage_questionnaire' '`Agent`' '`subagent`' '`stage_subagent`'
+
+check_present .dsh/skills 'ask_user_question'
+check_present .dsh/skills '`subagent`'
+check_absent_vocab .dsh/skills 'AskUserQuestion' 'AskQuestion' 'stage_questionnaire' '`Agent`' '`Task`' '`stage_subagent`'
+
+check_present .kimi-code/skills 'AskUserQuestion'
+check_present .kimi-code/skills '`Agent`'
+check_absent_vocab .kimi-code/skills 'AskQuestion' 'ask_user_question' 'stage_questionnaire' '`Task`' '`subagent`' '`stage_subagent`'
+
+check_present .pi/skills 'stage_questionnaire'
+check_present .pi/skills '`stage_subagent`'
+check_absent_vocab .pi/skills 'AskUserQuestion' 'AskQuestion' 'ask_user_question' 'star_questionnaire' 'star_subagent' '`Agent`' '`Task`' '`subagent`'
+
+check_present .qwen/skills '`ask_user_question`'
+check_present .qwen/skills '`agent`'
+check_absent_vocab .qwen/skills 'AskUserQuestion' 'AskQuestion' 'stage_questionnaire' '`Agent`' '`Task`' '`subagent`' '`stage_subagent`'
+
+check_absent_vocab .agents/skills 'AskUserQuestion' 'AskQuestion' 'ask_user_question' 'stage_questionnaire' 'request_user_input' '`Agent`' '`Task`' '`subagent`' '`stage_subagent`'
+
+for root in .dsh/skills .pi/skills; do
+    foreign_types="$(grep -RnE --include='*.md' 'subagent_type|spawn_agent|agent_type' "${root}" 2>/dev/null || true)"
+    if [[ -n "${foreign_types}" ]]; then
+        fail "${root} names a delegation type its native dispatch tool does not accept:"
+        printf '%s\n' "${foreign_types}" | head -n 3 | sed 's/^/      /'
+        vocab_errors=1
+    fi
 done
-# The delegation ban is stated once per skill that has one, and it has to be
-# stated in the tree's own words or it names nothing the agent can refuse. This
-# holds in all four trees, and the direction it fails in is not symmetric: a
-# nameless ban still stops a dispatch, while the nameless *permission* it used
-# to sit beside stopped one too — a host told "do not call the Agent tool unless
-# asked" cannot match an abstract "delegate" against the tool it was told to
-# leave alone, so the fan-out never fired and nothing said so. Both sides name
-# the tool now: Agent for Claude and Kimi, Task for Cursor, spawn_agent here.
-stale_generic="$(grep -RnE --include='*.md' 'no subagents|不派子代理' "${SKILL_ROOTS[@]}" || true)"
-if [[ -n "${stale_generic}" ]]; then
-    fail "a delegation ban is stated generically; each tree must name its own dispatch tool:"
-    printf '%s\n' "${stale_generic}" | sed 's/^/      /'
+pi_roster="$(sed -n 's/^name:[[:space:]]*//p' .pi/agents/*.md 2>/dev/null | sort -u)"
+pi_unknown="$(grep -RhoE --include='*.md' 'agent: "[a-z0-9-]+"' .pi/skills 2>/dev/null |
+              sed 's/.*"\(.*\)"/\1/' | sort -u |
+              grep -vxF -f <(printf '%s\n' "${pi_roster}") || true)"
+if [[ -n "${pi_unknown}" ]]; then
+    fail ".pi/skills dispatches to agent names absent from .pi/agents:"
+    printf '%s\n' "${pi_unknown}" | sed 's/^/      /'
     vocab_errors=1
 fi
-(( vocab_errors == 0 )) && note "each tree names only its own harness's tools"
+(( vocab_errors == 0 )) && note "each named tree uses its native question and dispatch tools; .agents stays role-based"
 
 # 9. The always-on Cursor rule body stays in sync with AGENTS.md.
 #    AGENTS.md: title + blank line, then the shared body.
@@ -315,10 +423,10 @@ while IFS= read -r manifest; do
         fail "${manifest}: description is ${len} characters, over the ${DESC_MAX}-character SKILL.md limit"
         desc_errors=1
     fi
-done < <(find "${SKILL_ROOTS[@]}" -name 'SKILL.md' | sort)
-(( desc_errors == 0 )) && note "all descriptions within ${DESC_MAX} characters in all four trees"
+done < <(find -L "${SKILL_ROOTS[@]}" -name 'SKILL.md' | sort)
+(( desc_errors == 0 )) && note "all descriptions within ${DESC_MAX} characters in all seven trees"
 
-# 11. Heading structure matches across the three trees that share it.
+# 11. Heading structure matches across the six named trees.
 #     Checks 1-3 compare file *sets*; nothing above compares what is inside
 #     them, so a step could be dropped from one tree, or reordered, and every
 #     check passed.
@@ -327,10 +435,9 @@ done < <(find "${SKILL_ROOTS[@]}" -name 'SKILL.md' | sort)
 #     stripped of backticks, so harness vocabulary inside a heading is free to
 #     differ. What remains must match exactly.
 #
-#     .agents is excluded on purpose: its headings carry Codex vocabulary in
-#     places the parenthesis rule does not reach. Check 12 holds its shape at
-#     the ## level instead.
-section "Heading structure (.claude / .cursor / .kimi-code)"
+#     .agents is excluded on purpose: neutral role wording can change a heading
+#     where the parenthesis rule does not reach. Check 12 holds its ## shape.
+section "Heading structure (six named harness trees)"
 norm_headings() { # $1 = file; prints one normalized heading per line
     awk '
         /^#/ {
@@ -355,7 +462,7 @@ struct_errors=0
 struct_files=0
 while IFS= read -r rel; do
     struct_files=$(( struct_files + 1 ))
-    for root in .cursor/skills .kimi-code/skills; do
+    for root in .cursor/skills .dsh/skills .kimi-code/skills .pi/skills .qwen/skills; do
         other="${root}/${rel}"
         [[ -f "${other}" ]] || continue   # inventory parity is check 3's job
         if ! diff -q <(norm_headings ".claude/skills/${rel}") <(norm_headings "${other}") > /dev/null; then
@@ -364,8 +471,8 @@ while IFS= read -r rel; do
             struct_errors=1
         fi
     done
-done < <(cd .claude/skills && find . -type f -name '*.md' | sed 's|^\./||' | sort)
-(( struct_errors == 0 )) && note "heading structure matches across the three trees (${struct_files} files)"
+done < <(cd .claude/skills && find -L . -type f -name '*.md' | sed 's|^\./||' | sort)
+(( struct_errors == 0 )) && note "heading structure matches across all six named trees (${struct_files} files)"
 
 # 12. Top-level section parity between .agents and .claude manifests.
 #     A SKILL.md's ## sections are its shape, not its wording — Role, Core
@@ -669,87 +776,80 @@ done < <(find . -path ./.git -prune -o -path ./wkdrs -prune -o \
          sed 's|^\./||' | sort)
 (( zh_desc_errors == 0 )) && note "every Chinese description is one line; no space inside a word in any Chinese file"
 
-# 17. Hooks exist, are executable, and are registered.
-#     Two hooks inject at the start of a session — the project-memory index and
-#     the model-id provenance line — and one decides at every level, the commit
-#     guard; all three ship one copy per harness, and each harness registers them
-#     in its own file. A script added without its registration entry is the
-#     silent failure this catches: the hook is present, nothing runs it, and no
-#     report says so. For the model-id hook that failure is invisible in a
-#     different way — the run still writes, and every artifact it writes records
-#     "unrecorded"; for the guard, a git command §1 forbids simply meets no floor.
+# 17. Hooks exist, parse, and are registered through each harness's native path.
 section "Hooks"
 hook_errors=0
 for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
-         .cursor/hooks/stage_model_id.sh .kimi-code/hooks/stage_model_id.sh \
+         .cursor/hooks/stage_model_id.sh .dsh/hooks/stage_model_id.sh \
+         .kimi-code/hooks/stage_model_id.sh .pi/extensions/stage-hooks/stage_model_id.sh \
+         .qwen/hooks/stage_model_id.sh \
          .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
-         .cursor/hooks/stage_memory.sh .kimi-code/hooks/stage_memory.sh \
+         .cursor/hooks/stage_memory.sh .dsh/hooks/stage_memory.sh \
+         .kimi-code/hooks/stage_memory.sh .pi/extensions/stage-hooks/stage_memory.sh \
+         .qwen/hooks/stage_memory.sh \
          .claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh \
-         .cursor/hooks/stage_commit_guard.sh .kimi-code/hooks/stage_commit_guard.sh \
+         .cursor/hooks/stage_commit_guard.sh .dsh/hooks/stage_commit_guard.sh \
+         .kimi-code/hooks/stage_commit_guard.sh .pi/extensions/stage-hooks/stage_commit_guard.sh \
+         .qwen/hooks/stage_commit_guard.sh \
          .claude/hooks/stage_involve_gate.sh .codex/hooks/stage_involve_gate.sh \
-         .kimi-code/hooks/install.sh; do
+         .qwen/hooks/stage_involve_gate.sh .dsh/hooks/install.sh .kimi-code/hooks/install.sh; do
     [[ -x "${f}" ]] || { fail "${f} is missing or not executable"; hook_errors=1; }
     [[ -f "${f}" ]] && ! bash -n "${f}" 2>/dev/null && { fail "${f} does not parse"; hook_errors=1; }
 done
-for f in .claude/settings.json .codex/hooks.json .cursor/hooks.json .kimi-code/hooks.example.toml; do
-    if [[ ! -f "${f}" ]]; then
-        fail "${f} is missing"
-        hook_errors=1
-        continue
-    fi
+
+for f in .claude/settings.json .codex/hooks.json .cursor/hooks.json .dsh/hooks.json \
+         .kimi-code/hooks.example.toml .pi/extensions/stage-hooks/index.ts .qwen/settings.json; do
+    [[ -f "${f}" ]] || { fail "${f} is missing"; hook_errors=1; continue; }
     for hook in stage_model_id.sh stage_memory.sh stage_commit_guard.sh; do
         grep -qF "${hook}" "${f}" || { fail "${f} does not register ${hook}"; hook_errors=1; }
     done
 done
-#     The involve gate answers a permission prompt, so it ships and registers
-#     only where a hook can decide one: Cursor has no event that fires before a
-#     file edit, and Kimi's PreToolUse documents a deny and no allow.
-for f in .claude/settings.json .codex/hooks.json; do
-    grep -qF stage_involve_gate.sh "${f}" || \
-        { fail "${f} does not register stage_involve_gate.sh"; hook_errors=1; }
-done
-#     Kimi loads no project-level config, so its registration snippet is only a
-#     snippet: the installer is what actually writes it, and a hook it does not
-#     write reaches no Kimi user however correct the snippet beside it is.
+
 for hook in stage_model_id.sh stage_memory.sh stage_commit_guard.sh; do
     grep -qF "${hook}" .kimi-code/hooks/install.sh || \
         { fail ".kimi-code/hooks/install.sh does not install ${hook}"; hook_errors=1; }
 done
-#     The guard is the hook that decides rather than reports, and each harness
-#     spells the decision its own way — a copy carrying another harness's spelling
-#     parses, runs, and silently never blocks anything. Claude and Codex answer
-#     PreToolUse with permissionDecision, Kimi the same without the event name its
-#     documented shape omits, and Cursor blocks on permission plus exit 2.
-for f in .claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh; do
+for literal in '@deepseek-ai/dsh-hooks-claude-code' './.dsh/hooks.json'; do
+    for f in .dsh/hooks/install.sh .dsh/cordis.patch.yml; do
+        grep -qF -- "${literal}" "${f}" || { fail "${f} no longer names ${literal}"; hook_errors=1; }
+    done
+done
+
+for f in .claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh \
+         .dsh/hooks/stage_commit_guard.sh .qwen/hooks/stage_commit_guard.sh; do
     grep -qF '"hookEventName":"PreToolUse","permissionDecision":"deny"' "${f}" || \
         { fail "${f} no longer emits a PreToolUse deny decision"; hook_errors=1; }
 done
 grep -qF '"hookSpecificOutput":{"permissionDecision":"deny"' .kimi-code/hooks/stage_commit_guard.sh || \
     { fail ".kimi-code/hooks/stage_commit_guard.sh no longer emits Kimi's deny shape"; hook_errors=1; }
-{ grep -qF '"permission":"deny"' .cursor/hooks/stage_commit_guard.sh && \
-  grep -qF 'exit 2' .cursor/hooks/stage_commit_guard.sh; } || \
-    { fail ".cursor/hooks/stage_commit_guard.sh lost its deny permission or its exit 2"; hook_errors=1; }
-#     Both gates read the same one-line INVOLVE lookup and answer only at low;
-#     a copy that lost the test would answer every level's prompt.
-for f in .claude/hooks/stage_involve_gate.sh .codex/hooks/stage_involve_gate.sh; do
-    grep -qF '"${involve}" == "low"' "${f}" || \
-        { fail "${f} no longer gates on INVOLVE=low"; hook_errors=1; }
+{ grep -qF '"permission":"deny"' .cursor/hooks/stage_commit_guard.sh && grep -qF 'exit 2' .cursor/hooks/stage_commit_guard.sh; } || \
+    { fail ".cursor/hooks/stage_commit_guard.sh lost its deny permission or exit 2"; hook_errors=1; }
+{ grep -qF 'exit 1' .pi/extensions/stage-hooks/stage_commit_guard.sh && \
+  grep -qF 'block: true' .pi/extensions/stage-hooks/index.ts; } || \
+    { fail ".pi stage hook extension no longer blocks a declined shell command"; hook_errors=1; }
+grep -qE '"matcher"[[:space:]]*:[[:space:]]*"bash"' .dsh/hooks.json || \
+    { fail ".dsh/hooks.json no longer matches DSH's lowercase bash tool"; hook_errors=1; }
+
+for f in .claude/settings.json .codex/hooks.json .qwen/settings.json; do
+    grep -qF stage_involve_gate.sh "${f}" || { fail "${f} does not register stage_involve_gate.sh"; hook_errors=1; }
 done
-#     The model-id hooks and the spec that documents their fallbacks name the
-#     same conventions section by prose, because a hook injects a sentence a
-#     model reads rather than a path a script resolves. Renumber §8 and the
-#     injected line points at the wrong rule while every other check stays green.
+for f in .claude/hooks/stage_involve_gate.sh .codex/hooks/stage_involve_gate.sh .qwen/hooks/stage_involve_gate.sh; do
+    grep -qF '"${involve}" == "low"' "${f}" || { fail "${f} no longer gates on INVOLVE=low"; hook_errors=1; }
+done
+
 for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
-         .cursor/hooks/stage_model_id.sh .kimi-code/hooks/stage_model_id.sh; do
+         .cursor/hooks/stage_model_id.sh .dsh/hooks/stage_model_id.sh \
+         .kimi-code/hooks/stage_model_id.sh .pi/extensions/stage-hooks/stage_model_id.sh \
+         .qwen/hooks/stage_model_id.sh; do
     grep -qF 'writing-workflow-conventions section 8' "${f}" 2>/dev/null || \
-        { fail "${f} no longer points at 'writing-workflow-conventions section 8'"; hook_errors=1; }
+        { fail "${f} no longer points at writing-workflow-conventions section 8"; hook_errors=1; }
 done
 for f in docs/mds/stage-workflow/model_id_spec.md docs/mds/stage-workflow/model_id_spec.zh-CN.md; do
-    [[ -f "${f}" ]] || { fail "${f} is missing; the hooks' injected line points at it"; hook_errors=1; }
+    [[ -f "${f}" ]] || { fail "${f} is missing"; hook_errors=1; }
 done
-(( hook_errors == 0 )) && note "session hooks, commit guard, and involve gate ship, parse, are registered, and cite §8"
+(( hook_errors == 0 )) && note "hooks ship, parse, and register natively in all seven harnesses"
 
-# 18. The provenance line is stated in the same skills in all four trees.
+# 18. The provenance line is stated in the same skills in all seven trees.
 #     Conventions §8 makes model_id / model_trail every producer's job; each
 #     manifest repeats it once so a run following the skill alone still records
 #     it. Which skills carry it is a decision — flow-status writes nothing and
@@ -779,20 +879,20 @@ for root in "${SKILL_ROOTS[@]:1}"; do
         prov_errors=1
     fi
 done
-(( prov_errors == 0 )) && note "$(printf '%s\n' "${PROV_BASELINE}" | wc -l | tr -d ' ') skills state the provenance line, the same set in all four trees"
+(( prov_errors == 0 )) && note "$(printf '%s\n' "${PROV_BASELINE}" | wc -l | tr -d ' ') skills state the provenance line, the same set in all seven trees"
 
-# 19. Codex alone has the image_gen -> editable PPTX -> rendered PDF figure
-#     pipeline. This is a deliberate harness-local capability, not a partial
-#     port: the English and Chinese Codex manifests must carry the complete
-#     source/evidence/render/QA contract, the Codex UI prompt must advertise it,
-#     and the other three harnesses must not acquire fragments of it by a broad
+# 19. The neutral root carries the optional local image_gen -> editable PPTX ->
+#     rendered PDF figure pipeline. It is a capability-conditional extension,
+#     not a requirement every harness pretends to have: the English and Chinese
+#     neutral manifests carry the full contract, Codex UI advertises it, and the
+#     six named harness trees do not acquire fragments of it by a broad
 #     sync. Literal markers are used because each one protects a distinct link
 #     in the chain a future edit could otherwise drop silently.
-section "Codex figure PPTX pipeline"
+section "Optional local figure PPTX pipeline"
 codex_fig_errors=0
 CODEX_FIG_EN=".agents/skills/stage-figs-designer/SKILL.md"
 CODEX_FIG_ZH=".agents/skills/stage-figs-designer/SKILL_zh.md"
-CODEX_FIG_UI=".agents/skills/stage-figs-designer/agents/openai.yaml"
+CODEX_FIG_UI=".codex/skills/stage-figs-designer/agents/openai.yaml"
 CODEX_FIG_MARKERS=(
     'image_gen'
     'manus/figs/srcs/<slug>.pptx'
@@ -813,7 +913,7 @@ for f in "${CODEX_FIG_EN}" "${CODEX_FIG_ZH}"; do
     [[ -f "${f}" ]] || { fail "${f} is missing"; codex_fig_errors=1; continue; }
     for marker in "${CODEX_FIG_MARKERS[@]}"; do
         grep -qF -- "${marker}" "${f}" || {
-            fail "${f}: Codex figure pipeline is missing '${marker}'"
+            fail "${f}: optional local figure pipeline is missing '${marker}'"
             codex_fig_errors=1
         }
     done
@@ -828,18 +928,18 @@ grep -qF 'allow_implicit_invocation: true' "${CODEX_FIG_UI}" 2>/dev/null || {
     fail "${CODEX_FIG_UI}: the non-slash-only figure skill must allow implicit invocation"
     codex_fig_errors=1
 }
-for root in .claude/skills .cursor/skills .kimi-code/skills; do
+for root in .claude/skills .cursor/skills .dsh/skills .kimi-code/skills .pi/skills .qwen/skills; do
     for f in SKILL.md SKILL_zh.md; do
         path="${root}/stage-figs-designer/${f}"
         for marker in 'image_gen' 'manus/figs/srcs/<slug>.pptx'; do
             if grep -qF -- "${marker}" "${path}" 2>/dev/null; then
-                fail "${path}: contains Codex-only figure marker '${marker}'"
+                fail "${path}: contains neutral-root-only figure marker '${marker}'"
                 codex_fig_errors=1
             fi
         done
     done
 done
-(( codex_fig_errors == 0 )) && note "Codex alone carries the complete Image Gen -> editable PPTX -> PDF figure contract"
+(( codex_fig_errors == 0 )) && note "the neutral root carries the optional pipeline; Codex UI links to it; named trees stay native"
 
 printf '\n'
 if (( FAILURES > 0 )); then

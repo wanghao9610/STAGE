@@ -26,7 +26,7 @@
 
 有两个档位被刻意标成*判断*。把它们当成量出来的数报告，就是把一项从没跑过的检查报成跑过了（规约 §7.4）；一遍打磨只说它看见了什么、改了几处，不多说。
 
-`hedging: minimal` 是唯一一个有杀伤半径的档位，所以它的边界写进了文件本身：它管的是填充——"we believe"、"it seems that"、"somewhat"、"arguably"——绝不管证据所要求的限定语。证据只覆盖 ADE20K 时写"improves on ADE20K"是最小限定；写"improves across benchmarks"是改了主张，那归 `$stage-sect-drafter` 和记录表，不归这里。
+`hedging: minimal` 是唯一一个有杀伤半径的档位，所以它的边界写进了文件本身：它管的是填充——"we believe"、"it seems that"、"somewhat"、"arguably"——绝不管证据所要求的限定语。证据只覆盖 ADE20K 时写"improves on ADE20K"是最小限定；写"improves across benchmarks"是改了主张，那归 `stage-sect-drafter` 和记录表，不归这里。
 
 ## 三条入口
 

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Table Builder"
+  short_description: "Generate booktabs tables from fingerprinted evidence only"
+  default_prompt: "Use $stage-tabs-builder to build this results table from the imported evidence, with a src comment per row."
+policy:
+  allow_implicit_invocation: true

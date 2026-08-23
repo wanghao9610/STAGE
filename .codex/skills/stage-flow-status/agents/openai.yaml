@@ -1,0 +1,6 @@
+interface:
+  display_name: "Writing Flow Status"
+  short_description: "Report where the paper stands and the single next action"
+  default_prompt: "Use $stage-flow-status to show where the paper stands and what the next action is."
+policy:
+  allow_implicit_invocation: true

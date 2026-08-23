@@ -1,0 +1,6 @@
+interface:
+  display_name: "Figure Designer"
+  short_description: "Build sourced figures as editable PPTX and PDF"
+  default_prompt: "Use $stage-figs-designer to build one sourced figure as an editable PPTX, optionally use Image Gen for illustrative assets, and render the final PDF."
+policy:
+  allow_implicit_invocation: true

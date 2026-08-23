@@ -1,6 +1,1 @@
-interface:
-  display_name: "Outline Planner"
-  short_description: "Outline the paper with page budgets and compilable section skeletons"
-  default_prompt: "Use $stage-outl-planner to turn the finalized story into an outline with page budgets and section skeletons."
-policy:
-  allow_implicit_invocation: false
+../../../../.codex/skills/stage-outl-planner/agents/openai.yaml

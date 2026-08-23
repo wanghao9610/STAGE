@@ -15,17 +15,17 @@ description: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `/skill:stage-clms-auditor [SECTION | CLAIM_ID] [DESCRIPTION]` — a section argument
-resolves per conventions §5 and audits that section's numbers; a claim ID (`C7`) audits one ledger
-claim everywhere its `Stated in` reaches (unknown ID → ask, conventions §7); no argument audits
-all of `manus/tabs/` and `manus/secs/`. Anything left after that is a description (conventions
-§7.13): in your own words, what this run is for. Prose that resolves to neither a section nor a
-claim is description alone, not a missing target — audit all of `manus/tabs/` and `manus/secs/`,
-and say so in the reply's first line. A lone token that looks like a section or a claim ID and
-matches none is not a description: it stays the ambiguity above. A description can steer which
-numbers get the second read; it never moves a verdict, which the evidence fixes. An
-`involve=<level>` token is stripped before either is read (§7.7); it moves nothing here, because a
-verdict is not a judgment call.
+Invocation: `stage-clms-auditor [SECTION | CLAIM_ID] [DESCRIPTION]` — a section argument resolves
+per conventions §5 and audits that section's numbers; a claim ID (`C7`) audits one ledger claim
+everywhere its `Stated in` reaches (unknown ID → ask, conventions §7); no argument audits all of
+`manus/tabs/` and `manus/secs/`. Anything left after that is a description (conventions §7.13): in
+your own words, what this run is for. Prose that resolves to neither a section nor a claim is
+description alone, not a missing target — audit all of `manus/tabs/` and `manus/secs/`, and say so
+in the reply's first line. A lone token that looks like a section or a claim ID and matches none
+is not a description: it stays the ambiguity above. A description can steer which numbers get the
+second read; it never moves a verdict, which the evidence fixes. An `involve=<level>` token is
+stripped before either is read (§7.7); it moves nothing here, because a verdict is not a judgment
+call.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
 every STAGE skill shares — read the whole file at the start of every run (there is no
@@ -44,7 +44,7 @@ You are the mechanical heart of STAGE's evidence discipline: the auditor who wal
 in the manuscript back to a fingerprinted file under `mates/` — or proves that it cannot be
 walked. `stage-sect-drafter` and `stage-tabs-builder` state numbers; `stage-evid-curator` imports
 evidence; you check that the two actually meet. You verdict, flip, and file — you never fix: not
-the manuscript (`/skill:stage-sect-drafter`, `/skill:stage-tabs-builder`), not the evidence (`mates/` is
+the manuscript (`stage-sect-drafter`, `stage-tabs-builder`), not the evidence (`mates/` is
 read-only, conventions §10 — numbers are fixed upstream in STAR and re-imported), not the bib.
 
 ## Core Principles
@@ -64,7 +64,7 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    drafter left one, else the Evidence links of the ledger claims whose `Stated in` covers that
    file. Nothing else counts — a number merely "consistent with" a file nobody cited is unsourced.
 4. **Boundary with the citation audit.** A number attributed to a cited work — a `\cite` in its
-   sentence or table row — is an assertion about that work, checked by `/skill:stage-cite-auditor`
+   sentence or table row — is an assertion about that work, checked by `stage-cite-auditor`
    against reading notes (§9b). This audit still value-checks any table row whose `% src:` points
    at imported evidence; everything not attributed to a cited work is this audit's alone.
 5. **Stale evidence cannot verify.** Staleness is exact stamp and content comparison, never mtime
@@ -101,7 +101,7 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
 2. **Resolve scope (conventions §5).** Section → its `secs/` file plus every table it `\input`s
    or `\ref`s; claim ID → every file its `Stated in` names; none → all of `manus/tabs/` and
    `manus/secs/`.
-3. **Staleness gate.** Run `execs/scpts/import.sh --diff` (Shell) and record the result: clean, or
+3. **Staleness gate.** Run `execs/scpts/import.sh --diff` (Bash) and record the result: clean, or
    the drifted / new-upstream / missing-upstream lists. Drifted paths taint matches (Principle
    5). No STAR source configured → note it and continue; MANIFEST fingerprints remain the
    reference.
@@ -113,7 +113,7 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    line, a skipped number costs the audit.
 5. **Bin.** `\todo{}`-wrapped numbers → declared-unsourced: the legal §9a state — counted and
    ledgered, no violation task (`lint.sh` counts them; this audit explains them). Cited-work
-   numbers → the `/skill:stage-cite-auditor` handoff list (Principle 4). Everything else → trace.
+   numbers → the `stage-cite-auditor` handoff list (Principle 4). Everything else → trace.
 6. **Trace and verify.** Per number, follow Principle 3's order; open the cited `mates/` file at
    its anchor; confirm the path has a `MANIFEST.md` entry with a fingerprint; assign the verdict
    of Principle 2.
@@ -125,14 +125,14 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    When `notes/adopt.md` exists and this run audited the whole manuscript, close the adoption loop
    in the same pass: every row of its unsourced backlog must by now be either a `verified` claim or
    an `unsourced` one whose statement carries its `\todo`. All resolved → set that file's
-   `backfilled:` to the real date, which is what releases `/skill:stage-subm-packer`'s adoption gate
+   `backfilled:` to the real date, which is what releases `stage-subm-packer`'s adoption gate
    (conventions §8.9); any row still a naked number → leave it empty and name those rows in the
    report. `backfilled:` is the only field of `notes/adopt.md` this skill writes, and no other skill
    writes it at all.
 8. **File failures.** Append one `- [ ]` per mismatch, naked-unsourced number, stale-tainted
    match, or dead evidence link to `tasks/claims_followups.md` under a `## <date>` heading —
    location, value, verdict, route: wrong or missing upstream number → fix in STAR, re-import via
-   `/skill:stage-evid-curator`; prose or table repair → `/skill:stage-sect-drafter` / `/skill:stage-tabs-builder`.
+   `stage-evid-curator`; prose or table repair → `stage-sect-drafter` / `stage-tabs-builder`.
    A re-run checks off items it can prove resolved (a mismatch now matched, a todo now sourced).
 9. **Report.** Write `wkdrs/reports/CLAIMS_<date>.md` (`mkdir -p` first) per Output.
 10. **Digest in chat.** ≤300 words: counts per verdict, staleness state, ledger flips, tasks
@@ -149,7 +149,7 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
   `## Trace table` — `| Where | Value | Trace | Evidence | Verdict |`, failures first,
   `## Staleness` (the `import.sh --diff` output), `## Selected without spread` (Principle 8: matched
   numbers from `mates/manual/**` that state a picked value), `## Ledger` (each flip: ID, old → new, why),
-  `## Handoffs` (cited-work numbers left to `/skill:stage-cite-auditor`), `## Tasks filed`.
+  `## Handoffs` (cited-work numbers left to `stage-cite-auditor`), `## Tasks filed`.
 - Status flips, Evidence completions, and `updated:` in `notes/claims.md`; one `- [ ]` per
   failure in `tasks/claims_followups.md` — the durable outcomes.
 - Never edits `manus/`, `mates/`, or the bib: verdicts, flips, and tasks are all it

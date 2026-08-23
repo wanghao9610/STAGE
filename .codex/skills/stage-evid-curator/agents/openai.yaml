@@ -1,0 +1,6 @@
+interface:
+  display_name: "Evidence Curator"
+  short_description: "Import, register, and reconcile the read-only evidence store"
+  default_prompt: "Use $stage-evid-curator to import or register my results and check that mates/ is current."
+policy:
+  allow_implicit_invocation: true

@@ -144,7 +144,7 @@ Load order in the generated `main.tex`: the venue class, then `stys/stage`, then
 
 Built from the venue's own macros (step 2) filled with values read out of
 `manus/main.tex`. Follow `\input` chains reachable from that preamble: values are
-not always written literally in `main.tex` — `$stage-outl-planner` moves the
+not always written literally in `main.tex` — `stage-outl-planner` moves the
 abstract into `manus/secs/0_abstract.tex` and leaves an `\input` behind.
 
 Carried over:
@@ -185,7 +185,7 @@ venue class each one is either re-expressed through a native equivalent or dropp
 The one relocation that is easy to miss and always breaks the build when missed.
 
 `stage.cls` takes the abstract as a **preamble command**, `\abstract{...}`, so
-`manus/main.tex` calls it before `\begin{document}` and `$stage-outl-planner`'s
+`manus/main.tex` calls it before `\begin{document}` and `stage-outl-planner`'s
 `\input{secs/0_abstract}` sits in the preamble too. Nearly every venue class wants
 a **body environment**, `\begin{abstract}...\end{abstract}` after `\maketitle`.
 
@@ -244,7 +244,7 @@ preprint build, which is a different document in a different class: useful as a
 drafting proxy, not as the answer to whether the paper fits. Compare this count
 against `page_limit_main`:
 
-- **pack run, over the limit** — a hard block, routed to `$stage-copy-editor`.
+- **pack run, over the limit** — a hard block, routed to `stage-copy-editor`.
 - **`convert` run, over the limit** — reported with the overflow, no gate.
 - **`confirmed:` unset in `venue.yml`** — report the count and say the limit is
   unconfirmed. An unconfirmed limit binds nothing (conventions §9c).

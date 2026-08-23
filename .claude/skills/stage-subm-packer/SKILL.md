@@ -34,7 +34,7 @@ editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.z
 conventions — are kept in step for human readers only and are never loaded at runtime, so this
 SKILL.md stays authoritative.
 
-Invocation: `/stage-subm-packer [camera | convert] [kit=<path>] [DESCRIPTION] [involve=high]` — no
+Invocation: `stage-subm-packer [camera | convert] [kit=<path>] [DESCRIPTION] [involve=high]` — no
 argument packs a review submission for the active cycle, resolved per conventions §5 from `cycle:`
 in `notes/story.md`; `camera` packs the camera-ready for the same cycle and arms the promise gate;
 `convert` only reformats the paper into the cycle's venue template and reports the page count in
@@ -98,7 +98,7 @@ third-party file nobody here is allowed to edit.
    skill in the roster allowed to create a tag, and it creates exactly one per pack.
 3. **Venue facts are user-confirmed or absent.** Page limits, deadlines, checklist family, and
    anonymization come from `cycls/<cycle>/venue.yml` and bind only when its `confirmed:` is set
-   (§9c). An unconfirmed profile stops the run — route to /stage-stry-coach; never fill in a
+   (§9c). An unconfirmed profile stops the run — route to stage-stry-coach; never fill in a
    limit from memory to keep the pack moving.
 4. **Camera-ready honors every promise.** In `camera` mode, any unchecked `- [ ]` in
    `tasks/<cycle>_promises.md` refuses the pack: each box is a change promised to a reviewer in
@@ -159,13 +159,13 @@ third-party file nobody here is allowed to edit.
    `backfilled:` is empty. That is the adopted-draft state in which the manuscript's pre-existing
    numbers trace to nothing while `lint.sh` — which counts markers, and they carry none — reports
    clean (conventions §9a, §8.9). The marker count proves less than it appears to, so refuse and
-   route to `/stage-clms-auditor` to work the backlog down and set the field. A repository with no
+   route to `stage-clms-auditor` to work the backlog down and set the field. A repository with no
    `notes/adopt.md` never started from a draft and skips this gate.
    Then run `execs/run.sh` (record the PDF path and page count), then
    `execs/scpts/lint.sh --no-build`. Any hard failure stops the run and routes: `\todo` → the
-   number's owner (/stage-sect-drafter or /stage-tabs-builder; /stage-clms-auditor when
-   unclear); undefined citations → /stage-cite-auditor or /stage-refs-curator; over the page
-   limit → /stage-copy-editor; identity leak → name the file and line. Lint's page count is the
+   number's owner (stage-sect-drafter or stage-tabs-builder; stage-clms-auditor when
+   unclear); undefined citations → stage-cite-auditor or stage-refs-curator; over the page
+   limit → stage-copy-editor; identity leak → name the file and line. Lint's page count is the
    preprint build's; step 7 re-checks it in the venue's own format, and that is the count the
    limit means (Principle 8).
 5. **Completeness sweep.** Check: outline Sections rows at `polished` or better, Figures and
@@ -187,7 +187,7 @@ third-party file nobody here is allowed to edit.
    `execs/run.sh --main <copy>/main.tex`. The copy goes to
    `wkdrs/builds/<cycle>_<template>_<date>/` in `convert` mode and becomes the package's source
    directory in a pack run. Compare the copy's page count against `page_limit_main`: over the
-   limit is a hard block in a pack run, routed to `/stage-copy-editor`, and a reported number in
+   limit is a hard block in a pack run, routed to `stage-copy-editor`, and a reported number in
    `convert`. Report what was mapped, what was dropped for having no venue equivalent, and what
    needs a human — never drop content to make the copy compile.
    **What the conversion leaves for a human goes in `tasks/<cycle>_venue.md`**, not only in the
@@ -205,7 +205,7 @@ third-party file nobody here is allowed to edit.
    open items, and records this run's conversion findings in the SUBMISSION record instead; it
    writes no task file, because a file written after step 2's tree check would leave the freeze
    tag sitting on a tree that is no longer clean. A pack whose `cycls/<cycle>/template/` is
-   missing stops and routes to `/stage-subm-packer convert kit=<path>`.
+   missing stops and routes to `stage-subm-packer convert kit=<path>`.
 8. **Package.** Assemble `wkdrs/builds/<cycle>_<date>/`: the built PDF (review or camera per
    mode), the supplementary when the venue and outline define one, and the source directory —
    step 7's converted copy when the cycle has a template, otherwise the arXiv-ready form:
@@ -237,7 +237,7 @@ one checkbox line per finding —
 
 ```markdown
 - [ ] V1 — `\keywords{...}` has no equivalent in this kit and was dropped; decide whether the
-      keywords belong in the abstract instead → /stage-sect-drafter
+      keywords belong in the abstract instead → stage-sect-drafter
 - [x] V2 — appendix placed after the references, following the kit's example
 ```
 

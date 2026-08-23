@@ -8,7 +8,7 @@ model_trail:                    # append-only: one entry per write session, neve
 
 # Reference Index —— <主题>（<YYYY-MM-DD>）
 
-<!-- 由 $stage-refs-curator 写出。本文件是 manus/bibs/reference.bib 的审计线索：每条条目的出处
+<!-- 由 stage-refs-curator 写出。本文件是 manus/bibs/reference.bib 的审计线索：每条条目的出处
      都记在这里，因此 bib 里的任何字段都能对照它来自的那条记录复查。第 4 节里没有行的条目，
      不允许存在。 -->
 
@@ -58,7 +58,7 @@ model_trail:                    # append-only: one entry per write session, neve
 <!-- 每条一行，算式与分档见 source-policy_zh.md"影响力分"一节：子指标带各自的抓取日期，然后是
      加权总分。`*` 标残缺总分（某分量没抓到，权重已归一化）；`new` 标发表 ≤18 个月的论文。星标
      只给论文自己页面挂出的仓库——unofficial 仓库在此登记，绝不计分。指标会漂移：日期说明新鲜
-     度，$stage-refs-curator score 重建整表。 -->
+     度，stage-refs-curator score 重建整表。 -->
 
 | Citekey | 年均引用（抓取日） | 发表档 | 星标（仓库，抓取日） | 总分 |
 | --- | --- | --- | --- | --- |
@@ -80,7 +80,7 @@ model_trail:                    # append-only: one entry per write session, neve
 <!-- 值得再跑一轮补的缺口（某个类别偏薄、被引却没有笔记的工作、方案没碰的历史 citekey），
      以及 discover 翻出来但没人收的每一条候选——是哪条检索式找到它的、为什么被放过，好让
      下一次运行提议点新的、而不是同一份清单。
-     转交：拿这些笔记核验稿件里的断言 → $stage-cite-auditor；按聚类起草 Related Work →
-     $stage-sect-drafter；以后单加一篇 → $stage-refs-curator <arxiv-id>；去找没人点过名的
-     工作 → $stage-refs-curator discover；重查整个 bib →
-     $stage-refs-curator verify；引用与星标漂了 → $stage-refs-curator score。 -->
+     转交：拿这些笔记核验稿件里的断言 → stage-cite-auditor；按聚类起草 Related Work →
+     stage-sect-drafter；以后单加一篇 → stage-refs-curator <arxiv-id>；去找没人点过名的
+     工作 → stage-refs-curator discover；重查整个 bib →
+     stage-refs-curator verify；引用与星标漂了 → stage-refs-curator score。 -->

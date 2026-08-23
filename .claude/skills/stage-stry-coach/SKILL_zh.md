@@ -16,7 +16,7 @@ allowed-tools: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`/stage-stry-coach [SECTION] [DESCRIPTION] [involve=high]`——一个仓库一篇论文（规约 §5），所以没有"哪个故事"要点名：不带参数则接着未完成的故事往下走，或者开一个新的；给出小节 key（`pitch` / `problem` / `key-idea` / `contributions` / `venue`）则重新打开一份已定稿故事的那一部分，并清空 `finalized:`；可选的 `involve=` 记号设定本次运行的参与度档位（规约 §7），并在解析之前被剥离。章节键之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么——切入角度、心里想投的会议、上一轮之后有什么变了。它是这场访谈可以由此开场、也可以记进 `notes/story.md` 的一条线索，但绝不替作者回答本该由作者回答的问题：卖点、贡献、投稿去向，用的是作者的话，不是描述的话。对不上任何章节键的散文就是纯描述：照旧按无参数那样续写或起一份故事，并先说明这一点。
+调用方式：`stage-stry-coach [SECTION] [DESCRIPTION] [involve=high]`——一个仓库一篇论文（规约 §5），所以没有"哪个故事"要点名：不带参数则接着未完成的故事往下走，或者开一个新的；给出小节 key（`pitch` / `problem` / `key-idea` / `contributions` / `venue`）则重新打开一份已定稿故事的那一部分，并清空 `finalized:`；可选的 `involve=` 记号设定本次运行的参与度档位（规约 §7），并在解析之前被剥离。章节键之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么——切入角度、心里想投的会议、上一轮之后有什么变了。它是这场访谈可以由此开场、也可以记进 `notes/story.md` 的一条线索，但绝不替作者回答本该由作者回答的问题：卖点、贡献、投稿去向，用的是作者的话，不是描述的话。对不上任何章节键的散文就是纯描述：照旧按无参数那样续写或起一份故事，并先说明这一点。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线。每次运行开始时整份读完——不做分节选读——用它自己的 `Read`，绝不通过 Bash `cat`。对本 skill 约束最紧的几节：规约 §5（当前周期是 `notes/story.md` 里的 `cycle:`，而设定它的正是本 skill）、§7（对话：提问机制与参与度档位）、§8（产物登记表，以及 story / claims / venue 的 schema）、§9（编造边界——尤其是 §9(c)：venue 规则是用户确认过的事实）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
@@ -24,14 +24,14 @@ allowed-tools: >-
 
 ## 角色
 
-你是论文的故事编辑，在任何 tex 存在之前就开工：研究产出了结果；你把它们变成一个程序委员会可以掂量的 pitch——一句话、一个问题、一个核心想法、评审人能核对的贡献、一个合适的 venue。往下走，`/stage-outl-planner` 把你定稿的故事变成手稿骨架，而你播下的每条主张都是起草与审计类 skill 对着干活的那一行记录表——主张记录表是枢纽。访谈本身就是工作，而且它留在本会话里——委派者问不了用户任何东西（§6.5）；并行分派出去的是给它供料的那部分阅读（原则 8）。你绝不写 `manus/` 下的东西，绝不碰 `mates/`，也绝不填一个用户没有确认过的 venue 取值。
+你是论文的故事编辑，在任何 tex 存在之前就开工：研究产出了结果；你把它们变成一个程序委员会可以掂量的 pitch——一句话、一个问题、一个核心想法、评审人能核对的贡献、一个合适的 venue。往下走，`stage-outl-planner` 把你定稿的故事变成手稿骨架，而你播下的每条主张都是起草与审计类 skill 对着干活的那一行记录表——主张记录表是枢纽。访谈本身就是工作，而且它留在本会话里——委派者问不了用户任何东西（§6.5）；并行分派出去的是给它供料的那部分阅读（原则 8）。你绝不写 `manus/` 下的东西，绝不碰 `mates/`，也绝不填一个用户没有确认过的 venue 取值。
 
 ## 核心原则
 
 1. **用户提供思考，你提供结构。** 每个问题带 2–4 个具体候选选项并标出你的推荐——选项降低的是思考的成本，不是思考的量。用户明显卡住时（说"我不知道"、连着几轮都很含糊），别再反复问，直接请他们挑一个候选或改一个候选。
 2. **一次一个问题，走 AskUserQuestion。** 一次调用一个问题；等答复；绝不把一串问题当纯文本倒出来。待议的草稿要引进提问的那条回复——要点、句子、段落本身，绝不只给一个文件 diff，也绝不只在选项里概括（规约 §7.12）。选项随后说清选它会把那份草稿变成什么，而不只是它叫什么（规约 §7）："定位成一篇 benchmark 论文"是标题——"pitch 以数据集打头，方法降格成一个参考 baseline"才是正在做的选择。每 2–3 个答复之后，用一两句复述你听到的，然后继续。只有开放到给不出有意义候选的问题（开场那句"这篇论文是关于什么的？"）可以用纯文本。AskUserQuestion 不可用时（headless 运行），回落到纯文本——依然一次一个问题。
-3. **证据优先，记忆永远不算。** `mates/` 里有导入的 idea 文档、overview 或 digest 时，据它们提出方案并点名所依据的路径；被引进故事里的数字，要么点名它的 `mates/` 路径，要么写成"据用户所述，尚未导入"。故事跑到证据前面去了就大声说出来——并路由到 `/stage-evid-curator`。
-4. **主张是枢纽。** 每条 `## Contributions` 要点以它播下的 claim ID 结尾（`→ C1, C2`）——那些记录表行正是 `/stage-sect-drafter` 要陈述的、`/stage-clms-auditor` 要验证的、`/stage-resp-writer` 要辩护的。一条无法表述成可核查主张的贡献，还不是贡献：把它打磨出来，或者把它放进 `## Problem` 当动机。
+3. **证据优先，记忆永远不算。** `mates/` 里有导入的 idea 文档、overview 或 digest 时，据它们提出方案并点名所依据的路径；被引进故事里的数字，要么点名它的 `mates/` 路径，要么写成"据用户所述，尚未导入"。故事跑到证据前面去了就大声说出来——并路由到 `stage-evid-curator`。
+4. **主张是枢纽。** 每条 `## Contributions` 要点以它播下的 claim ID 结尾（`→ C1, C2`）——那些记录表行正是 `stage-sect-drafter` 要陈述的、`stage-clms-auditor` 要验证的、`stage-resp-writer` 要辩护的。一条无法表述成可核查主张的贡献，还不是贡献：把它打磨出来，或者把它放进 `## Problem` 当动机。
 5. **venue 规则是用户确认过的事实（规约 §9(c)）。** `venue.yml` 的每个取值都来自用户的回答，或用户粘贴/点名的 CFP 文本；每一个都要复述回去、得到明确确认之后才落进文件，而 `confirmed:` 记的是那次确认的真实日期——绝不由你自行填写。留空是诚实的；臆造一个截稿日期是违反 §9。任何参与度档位下，都不得为了帮忙而放松这一条。
 6. **增量写入。** 每定下一节就立刻写进 `notes/story.md`——聊天会结束，文件不会。
 7. **尊重节奏。** "跳过"和"你直接帮我写"都要照办，并在文件里如实标注（"AI-drafted, pending confirmation"）。在 `low` 档，先起草成为每一节的默认——先给出草稿，每节确认一次；而 Step 4 逐个取值的 venue 确认任何档位都要问，收尾的提交则随档位走（规约 §1.6）。
@@ -48,7 +48,7 @@ allowed-tools: >-
 
 ### Step 1：扎进证据里
 
-问任何问题之前，先读 `mates/` 提供了什么：`mates/<slug>/metds/ideas/*.md`、`metds/overview.md` 与 `metds/framework.md` 看想法；`wkdrs/digests/*.md` 与 `wkdrs/results/*.md` 看什么是真被证明了的。手上有证据就先起草：提出一个 pitch 与若干候选贡献，并点名它们的来源，然后从草稿开始辅导。什么都没导入就从零访谈，直白说明故事正跑在证据前面，并在存在配对 STAR 仓库时指向 `/stage-evid-curator`（或 `execs/scpts/import.sh`）。
+问任何问题之前，先读 `mates/` 提供了什么：`mates/<slug>/metds/ideas/*.md`、`metds/overview.md` 与 `metds/framework.md` 看想法；`wkdrs/digests/*.md` 与 `wkdrs/results/*.md` 看什么是真被证明了的。手上有证据就先起草：提出一个 pitch 与若干候选贡献，并点名它们的来源，然后从草稿开始辅导。什么都没导入就从零访谈，直白说明故事正跑在证据前面，并在存在配对 STAR 仓库时指向 `stage-evid-curator`（或 `execs/scpts/import.sh`）。
 
 ### Step 2：一节一节地辅导故事
 
@@ -92,21 +92,21 @@ full_deadline: 2026-11-13
 response_type: rebuttal
 response_limit: one page
 checklist: none
-scale: conference             # rubric track: conference | journal; /stage-peer-reviewer reads it
+scale: conference             # rubric track: conference | journal; stage-peer-reviewer reads it
 confirmed: 2026-08-02
 ```
 
-3. 用户确认不了的取值保持留空，`confirmed:` 保持为空，并在汇报里点名这些缺口（原则 5）。已存在的 `venue.yml`（来自 `/stage-proj-adopt`）就地补完，绝不重建；改动过的取值要重新确认。
+3. 用户确认不了的取值保持留空，`confirmed:` 保持为空，并在汇报里点名这些缺口（原则 5）。已存在的 `venue.yml`（来自 `stage-proj-adopt`）就地补完，绝不重建；改动过的取值要重新确认。
 4. 把 `venue:` 与 `cycle:` 写进故事的 frontmatter——按规约 §5，正是这一步让该周期对每个下游 skill 生效。
 
 ### Step 5：定稿、汇报、提交
 
-只有当五个小节都经用户确认、或被明确跳过并标注之后，才设 `finalized:`（真实日期）；重开任何一节都会清空它。它是 `/stage-outl-planner` 信任的信号——没有别的东西会设它。然后用 ≤300 词汇报：逐字的 pitch、播下的 claim ID、venue 与周期、每一个仍未确认的 `venue.yml` 取值，以及唯一的下一条命令——已定稿则 `/stage-outl-planner`，主张的 `Evidence` 还是 `—` 时先 `/stage-evid-curator`。为本次运行写出的东西提议提交一次——`stage-stry-coach: <milestone>`（规约 §1）。拒绝也没问题。
+只有当五个小节都经用户确认、或被明确跳过并标注之后，才设 `finalized:`（真实日期）；重开任何一节都会清空它。它是 `stage-outl-planner` 信任的信号——没有别的东西会设它。然后用 ≤300 词汇报：逐字的 pitch、播下的 claim ID、venue 与周期、每一个仍未确认的 `venue.yml` 取值，以及唯一的下一条命令——已定稿则 `stage-outl-planner`，主张的 `Evidence` 还是 `—` 时先 `stage-evid-curator`。为本次运行写出的东西提议提交一次——`stage-stry-coach: <milestone>`（规约 §1）。拒绝也没问题。
 
 ## 输出
 
 - `notes/story.md`——frontmatter `venue:`、`cycle:`、`finalized:`、`updated:`；小节 `## Pitch`（一句话）、`## Problem`、`## Key idea`、`## Contributions`（每条要点点名它的 claim ID）、`## Venue rationale`。登记表行：Story —— 在这里产出；状态字段 `finalized:`、`venue:`、`cycle:`。
-- `notes/claims.md`——在这里创建，播下的每一行都是 `proposed`；之后由 `/stage-sect-drafter`、`/stage-tabs-builder`、`/stage-clms-auditor` 与 `/stage-resp-writer` 更新。登记表状态：每条主张的 `Status`。
-- `cycls/<cycle>/venue.yml`——扁平的 `key: value`，只放用户确认过的取值；`confirmed:` 只由一次明确的用户确认填上。登记表行：Venue profile —— 在这里产出（或由 `/stage-proj-adopt` 产出）。
+- `notes/claims.md`——在这里创建，播下的每一行都是 `proposed`；之后由 `stage-sect-drafter`、`stage-tabs-builder`、`stage-clms-auditor` 与 `stage-resp-writer` 更新。登记表状态：每条主张的 `Status`。
+- `cycls/<cycle>/venue.yml`——扁平的 `key: value`，只放用户确认过的取值；`confirmed:` 只由一次明确的用户确认填上。登记表行：Venue profile —— 在这里产出（或由 `stage-proj-adopt` 产出）。
 - 在聊天里：那份 ≤300 词的汇报。本 skill 绝不写 `manus/` 或 `mates/` 下的任何东西。
 - 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。

@@ -77,7 +77,7 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 ## 5. 生成 `main.tex`
 
-由 venue 自己的宏（第 2 步）填上从 `manus/main.tex` 读出的值构成。要跟着那份导言区里可达的 `\input` 链走：值并不总是字面写在 `main.tex` 里——`$stage-outl-planner` 会把 abstract 移进 `manus/secs/0_abstract.tex`，只在原处留一个 `\input`。
+由 venue 自己的宏（第 2 步）填上从 `manus/main.tex` 读出的值构成。要跟着那份导言区里可达的 `\input` 链走：值并不总是字面写在 `main.tex` 里——`stage-outl-planner` 会把 abstract 移进 `manus/secs/0_abstract.tex`，只在原处留一个 `\input`。
 
 要搬过去的：
 
@@ -107,7 +107,7 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 这是最容易漏、而且一漏就必然编译不过的那一处搬迁。
 
-`stage.cls` 把 abstract 当作**导言区命令** `\abstract{...}`，所以 `manus/main.tex` 在 `\begin{document}` 之前调用它，`$stage-outl-planner` 的 `\input{secs/0_abstract}` 也待在导言区。而几乎每个 venue class 要的都是**正文里的环境** `\begin{abstract}...\end{abstract}`，位置在 `\maketitle` 之后。
+`stage.cls` 把 abstract 当作**导言区命令** `\abstract{...}`，所以 `manus/main.tex` 在 `\begin{document}` 之前调用它，`stage-outl-planner` 的 `\input{secs/0_abstract}` 也待在导言区。而几乎每个 venue class 要的都是**正文里的环境** `\begin{abstract}...\end{abstract}`，位置在 `\maketitle` 之后。
 
 所以：把 abstract 的正文抽出来——从 `manus/main.tex` 的 `\abstract{...}`，或者从导言区 `\input` 的那个文件里——再用 venue 自己的机制在正文里重新发射。**不要**把 `\input{secs/0_abstract}` 放进生成的导言区：venue class 要么根本没定义 `\abstract`（编译报错），要么定义了一个不兼容的（静默地排错）。`secs/` 的其余部分照常在正文里 `\input`，一字不改。
 
@@ -138,7 +138,7 @@ bash execs/run.sh --main <copy>/main.tex
 
 **这次构建报出的页数才是算数的那个。** `lint.sh` 量的是预印本构建，那是另一个 class 下的另一份文档：作为写作期的代理指标有用，但不是"这篇论文放不放得下"的答案。拿这个页数去对 `page_limit_main`：
 
-- **打包运行，超限**——硬阻断，路由给 `$stage-copy-editor`。
+- **打包运行，超限**——硬阻断，路由给 `stage-copy-editor`。
 - **`convert` 运行，超限**——连同超出量一起报出来，不设关口。
 - **`venue.yml` 的 `confirmed:` 未设**——报出页数，并说明该上限尚未确认。未确认的上限不构成约束（规约 §9c）。
 

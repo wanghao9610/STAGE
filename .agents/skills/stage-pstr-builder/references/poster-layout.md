@@ -104,7 +104,7 @@ Two sizes escape the class's base font and must be checked separately: text **in
 figure PDF, which scales with the box the figure is placed in, not with the document font; and
 anything set in an explicit `\fontsize`. The `check` gate names the smallest text on the sheet with
 its computed size, and a figure whose internal labels fall under 20pt at its placed width is a
-finding for `$stage-figs-designer` — never a re-plot here (SKILL.md Principle 4).
+finding for `stage-figs-designer` — never a re-plot here (SKILL.md Principle 4).
 
 ## 4. The house template
 
@@ -141,7 +141,7 @@ Rules that hold whichever class is in play:
 1. **One block per zone row, in the plan's order.** A block with no row, or a row with no block, is
    the drift the no-argument audit reports.
 2. **`% src:` sits on the line above the number it sources**, one comment per number — the same
-   discipline `$stage-tabs-builder` applies to table rows, so `$stage-clms-auditor` can walk the
+   discipline `stage-tabs-builder` applies to table rows, so `stage-clms-auditor` can walk the
    poster the way it walks a table.
 3. **Figures are included by relative path from `manus/figs/`**, unmodified. Scale with the
    `width` argument only; never `trim`, `clip`, or a recolor.
@@ -161,7 +161,7 @@ map is a mapping onto whatever structure the kit provides rather than onto `tikz
 Everything in §3 still applies — a supplied kit sets a look, not a legibility floor, and its example
 content is an example, not a constraint. When the kit will not compile as delivered, the fix goes in
 the generated `poster.tex` or in the report, never in the kit's files: this is
-`$stage-subm-packer`'s Principle 7 boundary, and it holds for the same reason — a class edited to
+`stage-subm-packer`'s Principle 7 boundary, and it holds for the same reason — a class edited to
 compile locally is wrong in a way that surfaces at the print shop.
 
 ## 6. Checks that need a command

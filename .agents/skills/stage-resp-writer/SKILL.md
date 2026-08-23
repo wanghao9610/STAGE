@@ -1,13 +1,13 @@
 ---
 name: stage-resp-writer
 description: >-
-  Turn every review in cycls/<cycle>/reviews/ — received_<id>.md files dropped by the user and
-  SIM_REVIEW_* files from $stage-peer-reviewer — into a point ledger mapping each attack to
+  Turn every review in cycls/cycle/reviews/ — received_id.md files dropped by the user and
+  SIM_REVIEW_* files from stage-peer-reviewer — into a point ledger mapping each attack to
   claims and evidence, then draft the response within the venue's response_limit. Writes
-  cycls/<cycle>/response/RESPONSE_<date>.md, mirrors every promised change as a checkbox in
-  tasks/<cycle>_promises.md, and downgrades conceded claims to weakened in notes/claims.md.
+  cycls/cycle/response/RESPONSE_date.md, mirrors every promised change as a checkbox in
+  tasks/cycle_promises.md, and downgrades conceded claims to weakened in notes/claims.md.
   Never edits the manuscript or the review files themselves. Use when the user
-  invokes $stage-resp-writer, or asks to draft a rebuttal or response letter, answer reviewers
+  invokes stage-resp-writer, or asks to draft a rebuttal or response letter, answer reviewers
   point by point, or decide what to concede.
 ---
 
@@ -15,7 +15,7 @@ description: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 
-Invocation: `$stage-resp-writer [CYCLE] [DESCRIPTION] [involve=high]` — with no argument, the
+Invocation: `stage-resp-writer [CYCLE] [DESCRIPTION] [involve=high]` — with no argument, the
 active cycle from `notes/story.md` (conventions §5); a `CYCLE` argument names a directory under
 `cycls/` directly; no match → list the candidates and ask (§7). Anything left after the cycle is a
 description (conventions §7.13): in your own words, what this run is for — which reviewer worries
@@ -60,14 +60,14 @@ prove.
 3. **Three dispositions; the costly ones are user-owned.** rebut — evidence in hand, cite it;
    promise — the paper will change, a checkbox is born; concede — the claim cannot be defended,
    its status drops to `weakened`. Concessions and promises always go through the user, one
-   point at a time through one direct question each (§7); evidence-backed rebuttals may proceed
-   and are listed for review afterwards. The question quotes the reviewer's point and the
-   wording you would send, neither of them summarized (§7.12).
+   point at a time via your question tool (§7); evidence-backed rebuttals may proceed and are
+   listed for review afterwards. The question quotes the reviewer's point and the wording
+   you would send, neither of them summarized (§7.12).
 4. **Response numbers obey §9a.** A number quoted to a reviewer either traces to a fingerprinted
    `mates/` entry or it does not enter the draft. "New results" without imported evidence are a
    promise to produce them — never a figure minted mid-rebuttal.
 5. **A promise is a debt.** Every "we will …" in the draft has a matching `- [ ]` in
-   `tasks/<cycle>_promises.md` naming its point and target; `$stage-subm-packer` refuses to pack
+   `tasks/<cycle>_promises.md` naming its point and target; `stage-subm-packer` refuses to pack
    camera-ready while a box is unchecked. Promise nothing the user has not confirmed the team
    will actually do.
 6. **Venue response rules are user-confirmed facts (§9c).** `response_type` and `response_limit`
@@ -89,7 +89,7 @@ prove.
 Read the conventions file whole. `notes/story.md` → active cycle; `cycls/<cycle>/venue.yml` →
 `response_type`, `response_limit`; `notes/claims.md`; then list `cycls/<cycle>/reviews/`. An
 empty `reviews/` → stop: name the drop path (`cycls/<cycle>/reviews/received_<id>.md`) and note
-that `$stage-peer-reviewer` can simulate a panel meanwhile. The parse that follows fans out per
+that `stage-peer-reviewer` can simulate a panel meanwhile. The parse that follows fans out per
 review file (Principle 7).
 
 ### Step 2: Parse reviews into points
@@ -128,9 +128,9 @@ own wording; measure the draft against it, report the measurement, and trim unti
 ### Step 6: Report and commit
 
 Digest ≤300 words: points by disposition, promises opened, claims weakened, measured length vs
-`response_limit`. Routing: promised experiments run upstream in STAR, then `$stage-evid-curator`
-re-imports; promised edits → `$stage-sect-drafter` / `$stage-tabs-builder`; promise state at a
-glance → `$stage-flow-status`; the camera-ready gate that reads the boxes → `$stage-subm-packer`.
+`response_limit`. Routing: promised experiments run upstream in STAR, then `stage-evid-curator`
+re-imports; promised edits → `stage-sect-drafter` / `stage-tabs-builder`; promise state at a
+glance → `stage-flow-status`; the camera-ready gate that reads the boxes → `stage-subm-packer`.
 One commit per session (conventions §1), subject `stage-resp-writer: <cycle> response <date>`.
 
 ## Output
@@ -154,7 +154,7 @@ sources: [reviews/received_R2.md, reviews/SIM_REVIEW_<date>.md]
 
 ```markdown
 # Promises — <cycle>
-- [ ] R2.W2: add ablation on X — run upstream, then $stage-evid-curator + $stage-tabs-builder
+- [ ] R2.W2: add ablation on X — run upstream, then stage-evid-curator + stage-tabs-builder
 ```
 
 In chat: the Step 6 digest. Review files are read-only inputs and the manuscript is untouched —

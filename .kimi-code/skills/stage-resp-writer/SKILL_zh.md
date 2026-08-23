@@ -11,7 +11,7 @@ description: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`/skill:stage-resp-writer [CYCLE] [DESCRIPTION] [involve=high]`——不带参数时取 `notes/story.md` 里的当前周期（规约 §5）；给出 `CYCLE` 参数则直接点名 `cycls/` 下的一个目录；对不上 → 列出候选并提问（§7）。周期之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么——哪位审稿人最让作者不安、这份回复必须赢下什么。它是本次运行可以顺着走、也可以作为某条意见立场的理由记下来的一条线索，绝不代替本 skill 逐条要征求的那道认可，更不构成任何承诺：承诺只在回复真正作出承诺的地方产生，并落在 `tasks/<cycle>_promises.md` 里。没有点名任何周期的散文就是纯描述：用当前周期，并先说明这一点。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。
+调用方式：`stage-resp-writer [CYCLE] [DESCRIPTION] [involve=high]`——不带参数时取 `notes/story.md` 里的当前周期（规约 §5）；给出 `CYCLE` 参数则直接点名 `cycls/` 下的一个目录；对不上 → 列出候选并提问（§7）。周期之后剩下的文字是一句描述（规约 §7.13）：用你自己的话说明这次运行是为了什么——哪位审稿人最让作者不安、这份回复必须赢下什么。它是本次运行可以顺着走、也可以作为某条意见立场的理由记下来的一条线索，绝不代替本 skill 逐条要征求的那道认可，更不构成任何承诺：承诺只在回复真正作出承诺的地方产生，并落在 `tasks/<cycle>_promises.md` 里。没有点名任何周期的散文就是纯描述：用当前周期，并先说明这一点。任意参数后面都可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），既不属于参数也不属于描述，在两者被读取之前就被剥离。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完；不做分节选读。对本 skill 约束最紧的几节：§5 周期解析、§7 对话、§8 产物登记表（回复与承诺的 schema）、§9 编造边界。
 本文件只写本 skill 特有的部分，更严处以本文件为准。
@@ -28,7 +28,7 @@ description: >-
 2. **攻击映射到主张与证据。** 把每条意见对着 `notes/claims.md` 匹配：哪条主张在挨打，哪条带指纹的 `mates/` 条目为它辩护。SIM 评审已经点名了 claim ID；自由格式的评审在这里映射，而不确定的映射要在记录表行里写明"不确定"，不能静默地猜过去。
 3. **三种处置；代价大的那些归用户。** rebut——证据在手，引用它；promise——论文会改，一个复选框由此诞生；concede——这条主张守不住，它的状态降为 `weakened`。让步与承诺永远经过用户，一次一条，走 AskUserQuestion（§7）；有证据支撑的反驳可以直接进行，事后一并列出供复核。提问时把评审人的原话和你打算发出的措辞一并引出来，而不是各自的概括（§7.12）。
 4. **回复里的数字遵守 §9a。** 引给评审人看的数字，要么追溯到一条带指纹的 `mates/` 条目，要么就不进入草稿。没有导入证据的"新结果"是一条"要把它做出来"的承诺——绝不是在 rebuttal 中途铸出来的一个数字。
-5. **承诺是一笔债。** 草稿里每一句"我们将……"都在 `tasks/<cycle>_promises.md` 里有一条对应的 `- [ ]`，点名它对应的意见与目标；只要还有框没勾，`/skill:stage-subm-packer` 就拒绝打包 camera-ready。凡是用户没有确认团队真会去做的，一律不承诺。
+5. **承诺是一笔债。** 草稿里每一句"我们将……"都在 `tasks/<cycle>_promises.md` 里有一条对应的 `- [ ]`，点名它对应的意见与目标；只要还有框没勾，`stage-subm-packer` 就拒绝打包 camera-ready。凡是用户没有确认团队真会去做的，一律不承诺。
 6. **venue 的回复规则是用户确认过的事实（§9c）。** `response_type` 与 `response_limit` 来自 `cycls/<cycle>/venue.yml`；缺失或未确认的取值要问，绝不臆造。`response_type: none` → 为修订版建好逐点记录表与承诺，跳过起草，并说明为什么。
 
 7. **解析并行分派（§6）。** `cycls/<cycle>/reviews/` 下的文件超过两份 → 一份评审一个委派者，各自把那份评审的意见按记录表行返回——意见 ID、逐字引文、严重程度、以及它攻击的主张 ID——别的什么都不返回。不切开的是它之后的一切：处置方式是对着全部意见一起定的，代价高的那几种是用户的决定、停在确认点上（§6.5），而回复是一份文档、写到一个限额里。给评审人引用的每个数字，不管由谁写下，都按原则 4 进入（§6.4）。
@@ -37,7 +37,7 @@ description: >-
 
 ### Step 1：装载
 
-整份读完规约文件。`notes/story.md` → 当前周期；`cycls/<cycle>/venue.yml` → `response_type`、`response_limit`；`notes/claims.md`；然后列出 `cycls/<cycle>/reviews/`。`reviews/` 为空 → 停下：点名投放路径（`cycls/<cycle>/reviews/received_<id>.md`），并说明这期间 `/skill:stage-peer-reviewer` 可以先模拟一个评审组。紧接着的解析按评审文件并行分派（原则 7）。
+整份读完规约文件。`notes/story.md` → 当前周期；`cycls/<cycle>/venue.yml` → `response_type`、`response_limit`；`notes/claims.md`；然后列出 `cycls/<cycle>/reviews/`。`reviews/` 为空 → 停下：点名投放路径（`cycls/<cycle>/reviews/received_<id>.md`），并说明这期间 `stage-peer-reviewer` 可以先模拟一个评审组。紧接着的解析按评审文件并行分派（原则 7）。
 
 ### Step 2：把评审解析成意见点
 
@@ -59,7 +59,7 @@ description: >-
 
 ### Step 6：汇报与提交
 
-摘要 ≤300 词：按处置分类的意见计数、开出了多少承诺、多少主张被弱化、度量出的长度对比 `response_limit`。路由：承诺的实验在上游 STAR 里跑，然后由 `/skill:stage-evid-curator` 重新导入；承诺的修改 → `/skill:stage-sect-drafter` / `/skill:stage-tabs-builder`；一眼看清承诺状态 → `/skill:stage-flow-status`；读这些框的 camera-ready 关口 → `/skill:stage-subm-packer`。一个会话一次提交（规约 §1），标题 `stage-resp-writer: <cycle> response <date>`。
+摘要 ≤300 词：按处置分类的意见计数、开出了多少承诺、多少主张被弱化、度量出的长度对比 `response_limit`。路由：承诺的实验在上游 STAR 里跑，然后由 `stage-evid-curator` 重新导入；承诺的修改 → `stage-sect-drafter` / `stage-tabs-builder`；一眼看清承诺状态 → `stage-flow-status`；读这些框的 camera-ready 关口 → `stage-subm-packer`。一个会话一次提交（规约 §1），标题 `stage-resp-writer: <cycle> response <date>`。
 
 ## 输出
 
@@ -80,7 +80,7 @@ sources: [reviews/received_R2.md, reviews/SIM_REVIEW_<date>.md]
 
 ```markdown
 # Promises — <cycle>
-- [ ] R2.W2: add ablation on X — run upstream, then /skill:stage-evid-curator + /skill:stage-tabs-builder
+- [ ] R2.W2: add ablation on X — run upstream, then stage-evid-curator + stage-tabs-builder
 ```
 
 在聊天里：Step 6 的摘要。评审文件是只读输入，手稿保持不动——每一条许下的改动都是一个指向"将会做出它的那个 skill"的复选框。

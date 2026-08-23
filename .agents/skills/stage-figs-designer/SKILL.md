@@ -1,7 +1,7 @@
 ---
 name: stage-figs-designer
 description: >-
-  Owns the manuscript's figure inventory and builds one figure per run. In the Codex harness, a
+  Owns the manuscript's figure inventory and builds one figure per run. When the harness provides the local figure pipeline, a
   locally built figure may use image_gen for illustrative raster assets, but all labels, data marks,
   and claim-bearing text stay editable in a one-slide manus/figs/srcs/SLUG.pptx, and the final
   manus/figs/SLUG.pdf is rendered from that PPTX. Every data series and numeric or comparative
@@ -9,7 +9,7 @@ description: >-
   in the PPTX notes; generated pixels never count as evidence, and missing values become \todo rather
   than plausible artwork. Imported artwork may instead trace to mates/MANIFEST.md. No argument audits
   the inventory; `plan` revises it; a figure argument builds or revises only that figure. Use when the
-  user invokes $stage-figs-designer, when a run names it next, or when asked to plan, sketch, render,
+  user invokes stage-figs-designer, when a run names it next, or when asked to plan, sketch, render,
   or fix a figure, teaser, editable PPTX source, Image Gen asset, or the figure inventory.
 ---
 
@@ -17,7 +17,7 @@ description: >-
 
 **Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this `SKILL.md` stays authoritative.
 
-Invocation: `$stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no argument audits the Figures table in `notes/outline.md` against disk and proposes one next action; `plan` creates or revises the Figures table from the story and section briefs; `teaser` resolves to the teaser and runs its checklist; anything else names one figure, resolved by outline ID (`F1`), file slug, or purpose/section text against `notes/outline.md` (conventions §5 — ambiguity is asked about, never guessed). Build work is one figure per invocation. There is no separate description slot here: free text is already the figure's own description — that is how a figure resolves by purpose or section text, and how one with no Figures row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the figure is for; it never supplies a plotted number, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}` in the caption. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
+Invocation: `stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no argument audits the Figures table in `notes/outline.md` against disk and proposes one next action; `plan` creates or revises the Figures table from the story and section briefs; `teaser` resolves to the teaser and runs its checklist; anything else names one figure, resolved by outline ID (`F1`), file slug, or purpose/section text against `notes/outline.md` (conventions §5 — ambiguity is asked about, never guessed). Build work is one figure per invocation. There is no separate description slot here: free text is already the figure's own description — that is how a figure resolves by purpose or section text, and how one with no Figures row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the figure is for; it never supplies a plotted number, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}` in the caption. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline every STAGE skill loads: read the whole file at the start of every run — there is no section-selective loading. It binds this skill hardest at §5 (resolving which figure is meant), §8 (the output table and exact staleness), §9 (the fabrication boundary — figures state claims too), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
 
@@ -25,27 +25,27 @@ Invocation: `$stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no
 
 ## Role
 
-You are the family's art director. `$stage-sect-drafter` argues in prose and `$stage-tabs-builder` in tables; you make the visual argument — the teaser that carries page 1, the method figure that saves prose, the results view that makes a verified pattern visible. You own the Figures table in `notes/outline.md`: a figure earns one purpose row before it earns pixels, and a figure whose purpose a planned table already serves is proposed for retirement.
+You are the family's art director. `stage-sect-drafter` argues in prose and `stage-tabs-builder` in tables; you make the visual argument — the teaser that carries page 1, the method figure that saves prose, the results view that makes a verified pattern visible. You own the Figures table in `notes/outline.md`: a figure earns one purpose row before it earns pixels, and a figure whose purpose a planned table already serves is proposed for retirement.
 
-In Codex, make the editable delivery a one-slide PowerPoint source. Use Image Gen only where a generated illustrative layer materially improves the visual; keep the scientific structure, labels, data, and claims editable and sourced outside that raster layer. Never hand-type data into artwork, write section prose, place `\includegraphics` into `manus/secs/`, or write `mates/` or `mates/MANIFEST.md` — imported evidence and artwork are registered by `$stage-evid-curator`.
+When that local figure pipeline is available, make the editable delivery a one-slide PowerPoint source. Use Image Gen only where a generated illustrative layer materially improves the visual; keep the scientific structure, labels, data, and claims editable and sourced outside that raster layer. Never hand-type data into artwork, write section prose, place `\includegraphics` into `manus/secs/`, or write `mates/` or `mates/MANIFEST.md` — imported evidence and artwork are registered by `stage-evid-curator`.
 
 ## Core Principles
 
 1. **A purpose row precedes pixels.** The Figures table (`| ID | File | Purpose | Section | Source | Status |`, Status `planned | sketch | draft | final`; conventions §8) is the inventory this skill owns. No figure is built without a row, and a Purpose that cannot justify its page cost in one clause is shown to the user before retirement (§7).
-2. **The local source of truth is PPTX.** Every figure Codex creates or substantively revises has a one-slide `manus/figs/srcs/<slug>.pptx`; its row's Source names that file, and `manus/figs/<slug>.pdf` is exported from it. Preserve legacy TikZ, Python, and Draw.io files during audits, but do not create a new legacy-only source. Artwork produced outside the repository may instead use the existing `mates/MANIFEST.md` origin after `$stage-evid-curator` registers it. A PDF with neither origin is an orphan.
+2. **The local source of truth is PPTX.** Every figure created or substantively revised with that pipeline has a one-slide `manus/figs/srcs/<slug>.pptx`; its row's Source names that file, and `manus/figs/<slug>.pdf` is exported from it. Preserve legacy TikZ, Python, and Draw.io files during audits, but do not create a new legacy-only source. Artwork produced outside the repository may instead use the existing `mates/MANIFEST.md` origin after `stage-evid-curator` registers it. A PDF with neither origin is an orphan.
 3. **Generated pixels are illustration, never evidence.** Use `image_gen` for conceptual objects, textures, environments, or a self-contained scientific illustration that would be poor as native shapes. Never generate plots, benchmark samples, qualitative model outputs, paper facsimiles, logos, labels, numbers, or anything the figure asks a reviewer to treat as observed. Put all text, arrows, axes, markers, callouts, and data in editable PowerPoint objects. Under `ANON=true`, prompts omit the paper title, author identity, repository paths, unreleased values, and verbatim manuscript text; if the visual cannot be prompted generically, build it natively instead.
-4. **Plotted numbers remain traced (§9a).** Before composing, create `manus/figs/srcs/<slug>.sources.md`. Give every series and every numeric or comparative caption claim its own line containing `% src: mates/<...>#<anchor>`; no blanket source line covers several series. Mirror the same element-to-anchor mapping in a `[Sources]` block in the PPTX speaker notes. A value absent from fingerprinted evidence is omitted and handed to `$stage-sect-drafter` as `\todo{...}` caption text; no remembered point, interpolation, or plausible curve is allowed.
+4. **Plotted numbers remain traced (§9a).** Before composing, create `manus/figs/srcs/<slug>.sources.md`. Give every series and every numeric or comparative caption claim its own line containing `% src: mates/<...>#<anchor>`; no blanket source line covers several series. Mirror the same element-to-anchor mapping in a `[Sources]` block in the PPTX speaker notes. A value absent from fingerprinted evidence is omitted and handed to `stage-sect-drafter` as `\todo{...}` caption text; no remembered point, interpolation, or plausible curve is allowed.
 5. **Image Gen assets remain reproducible and bounded.** Store each accepted output under `manus/figs/srcs/<slug>.assets/`; record its exact prompt, intended crop, and `role: illustrative-only` in `<slug>.sources.md`, then inspect it before embedding. The asset file and prompt are supporting material; the PPTX remains the editable source and embeds the accepted pixels. One figure per run bounds calls and review.
 6. **The render is exact, not mtime-based.** After the PPTX exports to PDF, write `manus/figs/srcs/<slug>.render.yml` with `source_sha256`, `output_sha256`, `renderer`, and the real `rendered` date. The no-argument audit compares current hashes byte-for-byte. A changed PPTX with an old PDF is stale even when both files exist.
 7. **The teaser answers for the paper.** It gets the dedicated checklist in Step 6, and its row never reaches `final` while an item fails.
 8. **Legible before beautiful.** Size the slide to the intended figure aspect ratio, not a default deck; text stays readable at final print width, meaning survives grayscale, symbols match `notes/notation.md`, and `ANON=true` permits no author names, lab marks, or repository URLs inside artwork.
-9. **Fan out per figure (§6).** A no-argument audit with more than 6 Figures rows dispatches one `spawn_agent` per figure; each reads only that row and its named files, then returns the origin verdict, source-map verdict, render-hash verdict, and nothing else. A run that builds several figures splits the same way, but this skill normally refuses the widened scope because one invocation owns one figure. The main agent alone writes `notes/outline.md`, renders and visually checks the integrated figure, runs repository gates, talks to the user, and offers the commit.
+9. **Fan out per figure (§6).** A no-argument audit with more than 6 Figures rows dispatches one one read-only sub-agent per figure; each reads only that row and its named files, then returns the origin verdict, source-map verdict, render-hash verdict, and nothing else. A run that builds several figures splits the same way, but this skill normally refuses the widened scope because one invocation owns one figure. The main agent alone writes `notes/outline.md`, renders and visually checks the integrated figure, runs repository gates, talks to the user, and offers the commit.
 
 ## Workflow
 
 ### Step 0: Load
 
-Read the conventions (whole file), then `notes/outline.md`, `notes/story.md`, `notes/notation.md`, `notes/claims.md`, and `mates/MANIFEST.md`; list `manus/figs/` and `manus/figs/srcs/`. Resolve `LATEX_ENGINE`, `ANON`, `STAGE_LANG`, and `INVOLVE` from `.env`. No `notes/outline.md` → say so and route to `$stage-outl-planner`; the Figures table lives there, so stop.
+Read the conventions (whole file), then `notes/outline.md`, `notes/story.md`, `notes/notation.md`, `notes/claims.md`, and `mates/MANIFEST.md`; list `manus/figs/` and `manus/figs/srcs/`. Resolve `LATEX_ENGINE`, `ANON`, `STAGE_LANG`, and `INVOLVE` from `.env`. No `notes/outline.md` → say so and route to `stage-outl-planner`; the Figures table lives there, so stop.
 
 For a figure build or revision, also load the installed `Presentations` skill and its required PowerPoint style/API instructions, then call the workspace dependency loader. Treat the paper's figure brief as explicit custom visual direction: do not apply a generic slide-deck template or expose slide-planning language in the figure.
 
@@ -54,7 +54,7 @@ For a figure build or revision, also load the installed `Presentations` skill an
 First match wins: `plan` → Step 2; `teaser` → the teaser, Steps 3–6; a figure token → that figure (§5 matching; ambiguity → ask, §7), Steps 3–5; no argument → audit:
 
 1. Resolve every `manus/figs/*.pdf` to either a local editable source or a `mates/MANIFEST.md` entry; headline every orphan.
-2. For a Codex-built local figure, require `<slug>.pptx`, `<slug>.sources.md`, and `<slug>.render.yml`; compare the recorded SHA-256 values to the current PPTX and PDF rather than mtimes.
+2. For a figure built with that local pipeline, require `<slug>.pptx`, `<slug>.sources.md`, and `<slug>.render.yml`; compare the recorded SHA-256 values to the current PPTX and PDF rather than mtimes.
 3. Check every Figures row against disk: File exists or Status is `planned`; Source resolves; a `mates/` Source still has its MANIFEST entry; a local source map has one `% src:` entry per data series and claim-bearing caption sentence.
 4. Treat older TikZ, Python, or Draw.io sources as valid legacy origins, but propose the PPTX path when that figure next needs substantive revision. Do not rewrite them during an audit.
 5. Scan drafted sections for `\includegraphics` files no row plans; propose a row rather than adopting it silently.
@@ -68,7 +68,7 @@ Derive rows from `## Pitch` and `## Contributions` in `notes/story.md` and the s
 
 1. Confirm the figure's row exists; if absent, draft one under Step 2's rules, show it, and obtain the required confirmation before writing it.
 2. Fix the intended manuscript width and aspect ratio; sketch the hierarchy and identify which elements carry data or claims.
-3. Resolve each data-bearing element through `notes/claims.md`, `mates/MANIFEST.md`, and the evidence file opened this run. Write `<slug>.sources.md` before the PPTX, one element and one `% src:` anchor per line. Missing evidence → route to `$stage-evid-curator`, keep Status `sketch`, and do not draw the missing element.
+3. Resolve each data-bearing element through `notes/claims.md`, `mates/MANIFEST.md`, and the evidence file opened this run. Write `<slug>.sources.md` before the PPTX, one element and one `% src:` anchor per line. Missing evidence → route to `stage-evid-curator`, keep Status `sketch`, and do not draw the missing element.
 4. Decide whether Image Gen materially improves a strictly illustrative layer. If yes, state that the skill is generating an asset, plan its crop and negative space, prompt for no text, labels, numbers, logos, or watermarks, call `image_gen`, inspect the output with `view_image`, and retain only an accepted output plus its exact prompt under `<slug>.assets/`. If no, compose the figure entirely with editable PowerPoint objects.
 
 ### Step 4: Compose and inspect the editable PPTX
@@ -83,7 +83,7 @@ Resolve `soffice` through the bundled workspace dependencies; never hardcode a m
 
 After visual QA, compute SHA-256 over the final PPTX and PDF and write `<slug>.render.yml` with both hashes, the renderer name/version, and `date +%Y-%m-%d`; never use mtime as freshness evidence. Re-read `<slug>.sources.md` against the PPTX notes and visible elements. Then run `bash execs/run.sh` and `bash execs/scpts/lint.sh`, because a changed included figure can move the manuscript's page count or expose a todo/reference gate. A missing renderer or QA tool is a degraded check: keep Status short of `final`, name the exact missing command, and do not replace the PPTX→PDF chain with a different undocumented export.
 
-Report `\includegraphics{figs/<slug>}` for `$stage-sect-drafter`; placement and the LaTeX caption are the drafter's to write.
+Report `\includegraphics{figs/<slug>}` for `stage-sect-drafter`; placement and the LaTeX caption are the drafter's to write.
 
 ### Step 6: Teaser checklist (`teaser` runs)
 
@@ -108,7 +108,7 @@ Fails become the figure's todo list; the teaser row stays short of `final` while
 
 ## Output
 
-- `manus/figs/srcs/<slug>.pptx` — the editable one-slide source for every locally built or substantively revised Codex figure.
+- `manus/figs/srcs/<slug>.pptx` — the editable one-slide source for every locally built or substantively revised pipeline-built figure.
 - `manus/figs/srcs/<slug>.sources.md` — the grep-readable element map: one `% src:` anchor per series or claim, plus exact Image Gen prompts marked `role: illustrative-only`.
 - `manus/figs/srcs/<slug>.assets/` — accepted generated raster assets used by the PPTX; absent when none are needed.
 - `manus/figs/srcs/<slug>.render.yml` — exact PPTX/PDF hashes, renderer identity, and real render date.

@@ -8,7 +8,7 @@ model_trail:                    # append-only: one entry per write session, neve
 
 # Reference Index — <topic> (<YYYY-MM-DD>)
 
-<!-- Written by $stage-refs-curator. This file is the audit trail for manus/bibs/reference.bib:
+<!-- Written by stage-refs-curator. This file is the audit trail for manus/bibs/reference.bib:
      every entry's origin is recorded here, so any field in the bib can be re-checked against the
      record it came from. An entry with no row in section 4 is not allowed to exist. -->
 
@@ -63,7 +63,7 @@ model_trail:                    # append-only: one entry per write session, neve
      with their fetch dates, then the weighted total. `*` marks a partial total (a component
      unfetched, weights renormalized); `new` marks papers ≤18 months old. Stars only for a repo
      the paper's own page names — an unofficial repo is noted here, never scored. Metrics drift:
-     the dates say how fresh, and $stage-refs-curator score rebuilds this table. -->
+     the dates say how fresh, and stage-refs-curator score rebuilds this table. -->
 
 | Citekey | Cites/yr (fetched) | Venue tier | Stars (repo, fetched) | Score |
 | --- | --- | --- | --- | --- |
@@ -89,8 +89,8 @@ model_trail:                    # append-only: one entry per write session, neve
      scheme did not touch), and every candidate a discover run surfaced that nobody took in —
      the query that found it and why it was passed over, so the next run proposes something new
      instead of the same list. Routing: verifying manuscript assertions against these notes →
-     $stage-cite-auditor; drafting Related Work from the clusters → $stage-sect-drafter; one more
-     paper later → $stage-refs-curator <arxiv-id>; searching for work nobody has named →
-     $stage-refs-curator discover; re-checking the whole bib →
-     $stage-refs-curator verify; refreshing drifted citation and star metrics →
-     $stage-refs-curator score. -->
+     stage-cite-auditor; drafting Related Work from the clusters → stage-sect-drafter; one more
+     paper later → stage-refs-curator <arxiv-id>; searching for work nobody has named →
+     stage-refs-curator discover; re-checking the whole bib →
+     stage-refs-curator verify; refreshing drifted citation and star metrics →
+     stage-refs-curator score. -->

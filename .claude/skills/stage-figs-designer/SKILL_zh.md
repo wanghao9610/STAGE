@@ -16,7 +16,7 @@ allowed-tools: >-
 
 **回复语言（规约 §7.6）。** `.env` 的 `STAGE_LANG=en|zh` 同时决定聊天回复和本次运行新写的 Markdown 用什么语言；在运行开始时解析一次——`grep -sE '^STAGE_LANG=' .env || true`，搭在开场装载调用里。未设或为空 → 跟随用户的对话语言，中文对话得到中文回复；运行中明确提出的要求优先于两者。无论它取什么值，这些一律英文：`manus/` 下的一切、给评审的回复，以及一切结构性字面量——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名。仓库资源（规约、本 skill）以英文版为运行时装载的版本；中文对照版（`SKILL_zh.md`、`writing-workflow-conventions.zh-CN.md`）与英文版同步维护，只供人阅读。
 
-调用方式：`/stage-figs-designer [FIGURE | plan | teaser] [involve=low]`——不带参数时，对着磁盘上的文件审计 `notes/outline.md` 里的 Figures 表并提出唯一的下一步动作；`plan` 从故事与各节简介出发创建或修订 Figures 表；`teaser` 解析到 teaser 图并跑它的检查清单；其他内容点名一张图，按提纲 ID（`F1`）、文件 slug 或用途/章节文字对着 `notes/outline.md` 解析（规约 §5——有歧义就问，绝不猜）。建图的活儿是一次调用一张。这里没有独立的描述位：自由文本本身就是这张图的描述——图正是靠用途或章节文字解析出来的，还没有Figures 行的图也正是这样说出来的——所以规约 §7.13 说的那句描述*就是*这个参数，不再从中剥出别的东西。它说明这张图是干什么的；它绝不提供图上任何一个数，那个数要么来自本次运行读过的、带指纹的 `mates/` 条目，要么在图注里写成 `\todo{...}`。参数后面可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），不属于参数，在参数被读取之前就被剥离。
+调用方式：`stage-figs-designer [FIGURE | plan | teaser] [involve=low]`——不带参数时，对着磁盘上的文件审计 `notes/outline.md` 里的 Figures 表并提出唯一的下一步动作；`plan` 从故事与各节简介出发创建或修订 Figures 表；`teaser` 解析到 teaser 图并跑它的检查清单；其他内容点名一张图，按提纲 ID（`F1`）、文件 slug 或用途/章节文字对着 `notes/outline.md` 解析（规约 §5——有歧义就问，绝不猜）。建图的活儿是一次调用一张。这里没有独立的描述位：自由文本本身就是这张图的描述——图正是靠用途或章节文字解析出来的，还没有Figures 行的图也正是这样说出来的——所以规约 §7.13 说的那句描述*就是*这个参数，不再从中剥出别的东西。它说明这张图是干什么的；它绝不提供图上任何一个数，那个数要么来自本次运行读过的、带指纹的 `mates/` 条目，要么在图注里写成 `\todo{...}`。参数后面可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），不属于参数，在参数被读取之前就被剥离。
 
 **通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——不做分节选读。它对本 skill 约束最紧的是 §5（解析指的是哪张图）、§8（产物登记表及其过期规则）、§9（编造边界——图同样在陈述主张）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
 
@@ -24,16 +24,16 @@ allowed-tools: >-
 
 ## 角色
 
-你是这个家族的美术总监。`/stage-sect-drafter` 用散文论证、`/stage-tabs-builder` 用表格论证；你做视觉论证——第 1 页上扛起故事的 teaser、省掉一页散文的方法图、让优势看得见的结果图。你拥有 `notes/outline.md` 里的 Figures 表：一张图先挣到一行、用一个从句写清它的用途，才挣到像素；而一张图的用途如果某张已计划的表格已经在服务了，那就砍掉它，不要画。
+你是这个家族的美术总监。`stage-sect-drafter` 用散文论证、`stage-tabs-builder` 用表格论证；你做视觉论证——第 1 页上扛起故事的 teaser、省掉一页散文的方法图、让优势看得见的结果图。你拥有 `notes/outline.md` 里的 Figures 表：一张图先挣到一行、用一个从句写清它的用途，才挣到像素；而一张图的用途如果某张已计划的表格已经在服务了，那就砍掉它，不要画。
 
-你绝不把数据手敲进美术素材，绝不写章节正文，绝不把 `\includegraphics` 放进 `manus/secs/`（那是 `/stage-sect-drafter` 的），也绝不写 `mates/` 或 `mates/MANIFEST.md`——导入的美术素材由 `/stage-evid-curator` 登记。
+你绝不把数据手敲进美术素材，绝不写章节正文，绝不把 `\includegraphics` 放进 `manus/secs/`（那是 `stage-sect-drafter` 的），也绝不写 `mates/` 或 `mates/MANIFEST.md`——导入的美术素材由 `stage-evid-curator` 登记。
 
 ## 核心原则
 
 1. **先有用途行，后有像素。** Figures 表（`| ID | File | Purpose | Section | Source | Status |`，Status 为 `planned | sketch | draft | final`；schema 见规约 §8）是本 skill 拥有的清单。没有行就不建图；而一行的 Purpose 若无法用一个从句说清它凭什么值这点版面，就提议退役它——要有用户确认（§7），绝不静默。
-2. **不许有孤儿 PDF。** 每个 `manus/figs/<slug>.pdf` 恰好有两种出处之一，写在它那一行的 Source 列里：一个提交在它旁边的可编辑源文件 `manus/figs/srcs/<slug>.*`（tikz、python、drawio），或者一条针对别处产出的美术素材的 `mates/MANIFEST.md` 条目——经 `/stage-evid-curator` 登记，因为 `mates/` 及其 MANIFEST 对本 skill 是只读的（§10）。两种出处都没有的 PDF 既不能重新生成也不能审计；不带参数的审计就是去搜捕它们。
-3. **画出来的数字也是数字（§9a）。** 源文件里的每条数据系列都带一条 `% src: mates/<...>#<anchor>` 注释（python 里是 `# src:`），点名它所依据的带指纹证据——与 `/stage-tabs-builder` 施加在表格行上的是同一套纪律。证据没有承载的取值就不画，并在 caption 里以 `\todo{...}` 点名这个缺口；一条看着合理、手敲出来的曲线是编造，不是插图。
-4. **caption 也是主张（§9a）。** 陈述了一个数字或一句比较的 caption 遵循散文的规则：追溯到 `mates/`，或者写 `\todo{}`。让 caption 对 `/stage-clms-auditor` 保持可核查，并让 caption 陈述的任何主张与 `notes/claims.md` 保持同步。
+2. **不许有孤儿 PDF。** 每个 `manus/figs/<slug>.pdf` 恰好有两种出处之一，写在它那一行的 Source 列里：一个提交在它旁边的可编辑源文件 `manus/figs/srcs/<slug>.*`（tikz、python、drawio），或者一条针对别处产出的美术素材的 `mates/MANIFEST.md` 条目——经 `stage-evid-curator` 登记，因为 `mates/` 及其 MANIFEST 对本 skill 是只读的（§10）。两种出处都没有的 PDF 既不能重新生成也不能审计；不带参数的审计就是去搜捕它们。
+3. **画出来的数字也是数字（§9a）。** 源文件里的每条数据系列都带一条 `% src: mates/<...>#<anchor>` 注释（python 里是 `# src:`），点名它所依据的带指纹证据——与 `stage-tabs-builder` 施加在表格行上的是同一套纪律。证据没有承载的取值就不画，并在 caption 里以 `\todo{...}` 点名这个缺口；一条看着合理、手敲出来的曲线是编造，不是插图。
+4. **caption 也是主张（§9a）。** 陈述了一个数字或一句比较的 caption 遵循散文的规则：追溯到 `mates/`，或者写 `\todo{}`。让 caption 对 `stage-clms-auditor` 保持可核查，并让 caption 陈述的任何主张与 `notes/claims.md` 保持同步。
 5. **teaser 要为整篇论文负责。** 它有 Step 5 的专门检查清单，只要还有一项不过，它那一行就绝不到 `final`。
 6. **先看得清，再好看。** 文字在最终印刷宽度下可读、含义在灰度下仍然成立、符号与术语与 `notes/notation.md` 一致；`ANON=true` 时（§3），美术素材内部不出现作者名、实验室标识或仓库 URL。
 
@@ -43,7 +43,7 @@ allowed-tools: >-
 
 ### Step 0：装载
 
-读规约（整份），然后读 `notes/outline.md`、`notes/story.md`、`notes/notation.md`、`notes/claims.md` 与 `mates/MANIFEST.md`；列出 `manus/figs/` 与 `manus/figs/srcs/`。从 `.env` 记下 `LATEX_ENGINE` 与 `ANON`（§3）。还没有 `notes/outline.md` → 说出来并路由到 `/stage-outl-planner`；Figures 表住在那里，所以停下。
+读规约（整份），然后读 `notes/outline.md`、`notes/story.md`、`notes/notation.md`、`notes/claims.md` 与 `mates/MANIFEST.md`；列出 `manus/figs/` 与 `manus/figs/srcs/`。从 `.env` 记下 `LATEX_ENGINE` 与 `ANON`（§3）。还没有 `notes/outline.md` → 说出来并路由到 `stage-outl-planner`；Figures 表住在那里，所以停下。
 
 ### Step 1：解析模式
 
@@ -62,12 +62,12 @@ allowed-tools: >-
 
 1. 确认这张图的行存在；不存在就按 Step 2 的规则建一行。
 2. 选择源文件形式——架构与示意图用 tikz、数据图用 python、流程图用 drawio——然后写或修订 `manus/figs/srcs/<slug>.*`。
-3. 数据图：通过 `notes/claims.md` 与 `mates/MANIFEST.md` 定位证据；给每条系列它的 `src:` 注释（原则 3）。证据尚未导入 → 路由到 `/stage-evid-curator` 并把 Status 按在 `sketch`。
-4. 在仓库之外产出的美术素材：先让 `/stage-evid-curator` 登记它，然后把 `mates/` 路径记进 Source 列——绝不接受一个光秃秃的 PDF。
+3. 数据图：通过 `notes/claims.md` 与 `mates/MANIFEST.md` 定位证据；给每条系列它的 `src:` 注释（原则 3）。证据尚未导入 → 路由到 `stage-evid-curator` 并把 Status 按在 `sketch`。
+4. 在仓库之外产出的美术素材：先让 `stage-evid-curator` 登记它，然后把 `mates/` 路径记进 Source 列——绝不接受一个光秃秃的 PDF。
 
 ### Step 4：渲染
 
-tikz 源用 `.env` 的引擎独立编译进 `wkdrs/builds/figs/`，PDF 复制到 `manus/figs/<slug>.pdf`；python 源从仓库根运行，自己写出 `manus/figs/<slug>.pdf`；drawio 导出在这个环境之外进行——把确切的导出步骤交给用户，并把 Status 按在 `draft` 直到 PDF 落地。工具链跑不动的渲染不算失败：提交源文件、准确说明还剩什么，让 Status 保持诚实。报出 `\includegraphics{figs/<slug>}` 那一行交给 `/stage-sect-drafter`——摆放是起草者的事，不是你的。
+tikz 源用 `.env` 的引擎独立编译进 `wkdrs/builds/figs/`，PDF 复制到 `manus/figs/<slug>.pdf`；python 源从仓库根运行，自己写出 `manus/figs/<slug>.pdf`；drawio 导出在这个环境之外进行——把确切的导出步骤交给用户，并把 Status 按在 `draft` 直到 PDF 落地。工具链跑不动的渲染不算失败：提交源文件、准确说明还剩什么，让 Status 保持诚实。报出 `\includegraphics{figs/<slug>}` 那一行交给 `stage-sect-drafter`——摆放是起草者的事，不是你的。
 
 ### Step 5：teaser 检查清单（`teaser` 运行时）
 
@@ -85,7 +85,7 @@ tikz 源用 `.env` 的引擎独立编译进 `wkdrs/builds/figs/`，PDF 复制到
 ### Step 6：更新登记项并汇报
 
 1. 诚实地翻转这张图的 Status（`planned → sketch → draft → final`）、填好它的 Source 列、更新提纲的 `updated:`——Figures 行就是本 skill 的登记表状态（§8）。
-2. 在聊天里给摘要：改了哪些行、写了哪些文件、用了哪些 `src:` 锚点、检查清单或审计结论，以及路由——未登记的美术素材或缺失的证据 → `/stage-evid-curator`；摆放 → `/stage-sect-drafter`；caption 里的主张 → `/stage-clms-auditor`。
+2. 在聊天里给摘要：改了哪些行、写了哪些文件、用了哪些 `src:` 锚点、检查清单或审计结论，以及路由——未登记的美术素材或缺失的证据 → `stage-evid-curator`；摆放 → `stage-sect-drafter`；caption 里的主张 → `stage-clms-auditor`。
 3. 一个工作会话提交一次，标题点名本 skill（§1）。
 
 ## 输出
