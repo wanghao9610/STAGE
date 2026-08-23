@@ -1,0 +1,10 @@
+{
+  "version": "2",
+  "plugins": [
+    {
+      "id": "stage",
+      "displayName": "STAGE",
+      "source": "./.kimi-code/plugins/stage"
+    }
+  ]
+}
