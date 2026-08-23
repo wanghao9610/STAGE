@@ -1,0 +1,20 @@
+{
+  "name": "stage",
+  "version": "0.1.0",
+  "description": "Route STAGE requests to the project's academic-writing workflow skills.",
+  "author": {
+    "name": "STAGE"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "STAGE",
+    "shortDescription": "Route a request to one STAGE writing workflow.",
+    "longDescription": "Adds the $stage router for choosing and running one STAGE academic-writing workflow skill in the current project.",
+    "developerName": "STAGE",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Use $stage to show the current paper status."
+    ]
+  }
+}

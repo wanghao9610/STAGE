@@ -244,6 +244,38 @@ done <<'EOF'
 EOF
 (( router_errors == 0 )) && note "one bilingual neutral roster drives four native command entry points"
 
+# 4b. Codex gets the generic router through one plugin owned entirely by
+#     .codex. .agents exposes only the marketplace file the host discovers;
+#     linking the directory would leak every Codex-private plugin into a shared
+#     namespace and turn future harness support there into a collision.
+section "Codex STAGE plugin layout"
+plugin_errors=0
+MARKETPLACE=".codex/plugins/marketplace.json"
+PLUGIN_ROOT=".codex/plugins/stage"
+DISCOVERY=".agents/plugins/marketplace.json"
+if [[ ! -L "${DISCOVERY}" ]]; then
+    fail "${DISCOVERY} is not a file symlink"
+    plugin_errors=1
+elif [[ "$(readlink "${DISCOVERY}")" != "../../.codex/plugins/marketplace.json" ]]; then
+    fail "${DISCOVERY} does not point to ../../.codex/plugins/marketplace.json"
+    plugin_errors=1
+elif ! cmp -s "${DISCOVERY}" "${MARKETPLACE}"; then
+    fail "${DISCOVERY} does not resolve to ${MARKETPLACE}"
+    plugin_errors=1
+fi
+if ! python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); p=json.load(open(sys.argv[2])); e=m["plugins"]; assert m["name"] == "stage" and len(e) == 1 and e[0]["name"] == "stage" and e[0]["source"] == {"source": "local", "path": "./.codex/plugins/stage"}; assert e[0]["policy"] == {"installation": "AVAILABLE", "authentication": "ON_INSTALL"} and e[0]["category"] == "Productivity"; assert p["name"] == "stage" and p["skills"] == "./skills/"' "${MARKETPLACE}" "${PLUGIN_ROOT}/.codex-plugin/plugin.json"; then
+    fail "Codex STAGE plugin or marketplace metadata is invalid"
+    plugin_errors=1
+fi
+if [[ ! -f "${PLUGIN_ROOT}/skills/stage/SKILL.md" ]] || \
+   ! frontmatter_has_line "${PLUGIN_ROOT}/skills/stage/SKILL.md" "name: stage" || \
+   ! grep -qF 'Read `.agents/commands/stage.md`' "${PLUGIN_ROOT}/skills/stage/SKILL.md" || \
+   ! grep -qF 'allow_implicit_invocation: false' "${PLUGIN_ROOT}/skills/stage/agents/openai.yaml"; then
+    fail "${PLUGIN_ROOT}/skills/stage is not the explicit-only wrapper around the shared router"
+    plugin_errors=1
+fi
+(( plugin_errors == 0 )) && note "Codex owns one stage plugin; .agents exposes only its marketplace file"
+
 # 5. Bilingual twins: every skill .md has its _zh.md counterpart and vice versa.
 section "Bilingual twins in skill trees"
 twin_errors=0

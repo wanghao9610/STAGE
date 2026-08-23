@@ -2,8 +2,9 @@
 set -euo pipefail
 
 # execs/update.sh — sync STAGE-managed content from the upstream template (the
-# seven skill trees, their hook and capability trees, docs/mds/stage-workflow/,
-# the shared agent instructions in both editions, and every script under execs/
+# seven skill trees, the Codex $stage plugin, their hook and capability trees,
+# docs/mds/stage-workflow/, the shared agent instructions in both editions, and
+# every script under execs/
 # — both entrypoints, this one included, and the three utilities in execs/scpts/),
 # or install the STAGE skeleton into an existing paper repo with --adopt.
 
@@ -168,14 +169,36 @@ fail() {
     exit 1
 }
 
+# Keep Codex's repo marketplace at the path its host discovers while leaving
+# the canonical file under .codex. Filesystems that cannot create symlinks get
+# a real copy so the plugin remains usable.
+link_codex_marketplace() {
+    local dst="${ROOT_DIR}/.agents/plugins/marketplace.json"
+    local src="${ROOT_DIR}/.codex/plugins/marketplace.json"
+
+    [[ -f "${src}" ]] || fail "Missing Codex marketplace: .codex/plugins/marketplace.json."
+    mkdir -p "$(dirname -- "${dst}")"
+    if [[ -L "${dst}" ]] && [[ "$(readlink "${dst}")" == "../../.codex/plugins/marketplace.json" ]]; then
+        return 0
+    fi
+    if [[ -e "${dst}" || -L "${dst}" ]]; then
+        rm -f -- "${dst}"
+    fi
+    if ! ln -s "../../.codex/plugins/marketplace.json" "${dst}" 2>/dev/null; then
+        cp -p "${src}" "${dst}"
+        log "NOTE: symlinks are unavailable; installed .agents/plugins/marketplace.json as a real file."
+    fi
+}
+
 # Which harness owns a path, or empty when the path belongs to the shared
-# skeleton and every run covers it. .agents is shared on purpose: AGENTS.md
-# convention readers use it directly, while .codex holds Codex-only hooks and
-# per-skill manifests. .cursorignore is Cursor's one path outside .cursor/.
+# skeleton and every run covers it. .agents is shared on purpose, except for
+# Codex's single marketplace discovery file: AGENTS.md convention readers use
+# the rest directly, while .codex holds Codex-only hooks, per-skill manifests,
+# and plugins. .cursorignore is Cursor's one path outside .cursor/.
 path_harness() { # $1 = path relative to the project root
     case "$1" in
+        .agents/plugins/marketplace.json|.codex/*) printf 'codex' ;;
         .agents/*)               printf '' ;;
-        .codex/*)                printf 'codex' ;;
         .claude/*)               printf 'claude' ;;
         .cursor/*|.cursorignore) printf 'cursor' ;;
         .dsh/*)                  printf 'dsh' ;;
@@ -289,8 +312,9 @@ Usage: bash execs/update.sh [ref] [--harnesses LIST] [--skill NAME] [--force]
 Overwrite the STAGE-managed content — the shared agent instructions (AGENTS.md,
 AGENTS.zh-CN.md, and the CLAUDE.zh-CN.md pointer),
 the shared skill store plus six named harness skill trees
-(.agents, .claude, .cursor, .dsh, .kimi-code, .pi, .qwen), their hook, command,
-prompt, agent, extension, and Codex manifest paths, docs/mds/stage-workflow/,
+(.agents, .claude, .cursor, .dsh, .kimi-code, .pi, .qwen), the Codex $stage
+plugin, their hook, command, prompt, agent, extension, and Codex manifest paths,
+docs/mds/stage-workflow/,
 and every script under execs/ — the two entrypoints, run.sh and this one, and
 the three utilities in execs/scpts/:
 import.sh, lint.sh, fmt.sh — with files from upstream.
@@ -323,6 +347,8 @@ Without the flag, the list comes from STAGE_HARNESSES (environment first, then
 .env), then defaults to all. Shared paths — .agents/skills, .agents/commands,
 the agent instructions and their Chinese reading editions, workflow documentation,
 and every script under execs/ — are updated for every selection.
+The $stage plugin lives under .codex/plugins and its one discovery link under
+.agents/plugins is updated only when codex is selected.
 
 --diff previews an update without changing anything: it lists upstream files
 that are new or differ from the local copies, harness configuration that
@@ -485,6 +511,9 @@ if [[ "${ADOPT}" == true ]]; then
         # Shared roots first; they are installed for every harness selection.
         ".agents/skills"
         "${CODEX_MANIFEST_ROOT}"
+        # The Codex-only $stage router plugin. Its .agents discovery entry is a
+        # single file in ADOPT_FILES, not a link over the whole directory.
+        ".codex/plugins"
         "${SKILL_ROOTS[@]:1}"
         "${HOOK_TREES[@]}"
         "${EXTENSION_TREES[@]}"
@@ -494,6 +523,7 @@ if [[ "${ADOPT}" == true ]]; then
     )
     ADOPT_FILES=(
         "${AGENT_DOCS[@]}"
+        ".agents/plugins/marketplace.json"
         "${HARNESS_FILES[@]}"
         "${EXTENSION_FILES[@]}"
         "${HOOK_FILES[@]}"
@@ -576,6 +606,10 @@ else
         "${AGENT_DOCS[@]}"
         "${AGENT_RULES_TREE}"
         "${CODEX_MANIFEST_ROOT}"
+        # Codex's $stage plugin stays private to its tree. Only the marketplace
+        # file is exposed through the exact .agents path the host discovers.
+        ".codex/plugins"
+        ".agents/plugins/marketplace.json"
         "${SKILL_ROOTS[@]}"
         "${HOOK_TREES[@]}"
         "${EXTENSION_TREES[@]}"
@@ -593,6 +627,7 @@ else
         # installed into the target repository.
         ".agents/skills"
         ".agents/commands"
+        ".agents/plugins"
         ".codex/skills"
         "${DOCS_TREE}"
         "execs"
@@ -761,7 +796,15 @@ if [[ "${ADOPT}" == false ]]; then
     # running, so it is filtered out here and renamed into position below.
     TAR_PATHS=()
     for path in "${SYNCED[@]}"; do
-        [[ "${path}" == "${SELF_PATH}" ]] || TAR_PATHS+=("${path}")
+        if [[ "${path}" == "${SELF_PATH}" ]]; then
+            continue
+        elif [[ "${path}" == ".agents/plugins/marketplace.json" ]]; then
+            # tar -h intentionally dereferences shared skill links, but this
+            # link must remain the one narrow .agents discovery entry.
+            continue
+        else
+            TAR_PATHS+=("${path}")
+        fi
     done
 
     if (( ${#TAR_PATHS[@]} > 0 )); then
@@ -774,6 +817,10 @@ if [[ "${ADOPT}" == false ]]; then
         fi
         tar -C "${SOURCE_DIR}" "${TAR_CREATE_ARGS[@]}" -f "${ARCHIVE_FILE}" "${TAR_PATHS[@]}"
         tar -C "${ROOT_DIR}" -xf "${ARCHIVE_FILE}"
+    fi
+
+    if [[ -z "${SKILL_NAME}" ]] && is_selected codex; then
+        link_codex_marketplace
     fi
 
     # Self-update by rename. `mv` within the same directory is rename(2): the
@@ -832,6 +879,12 @@ install_file() {
     if [[ -e "${dst}" || -L "${dst}" ]]; then
         printf '  kept    %s (already present)\n' "${rel}"
         skipped=$(( skipped + 1 ))
+        return 0
+    fi
+    if [[ "${rel}" == ".agents/plugins/marketplace.json" ]]; then
+        link_codex_marketplace
+        printf '  added   %s -> %s\n' "${rel}" "../../.codex/plugins/marketplace.json"
+        installed=$(( installed + 1 ))
         return 0
     fi
     mkdir -p "$(dirname -- "${dst}")"

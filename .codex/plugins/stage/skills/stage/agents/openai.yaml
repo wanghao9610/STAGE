@@ -1,0 +1,6 @@
+interface:
+  display_name: "STAGE"
+  short_description: "Route a request to one STAGE writing workflow"
+  default_prompt: "Use $stage to choose and run the right STAGE writing workflow."
+policy:
+  allow_implicit_invocation: false

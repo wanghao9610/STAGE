@@ -1,0 +1,20 @@
+{
+  "name": "stage",
+  "interface": {
+    "displayName": "STAGE"
+  },
+  "plugins": [
+    {
+      "name": "stage",
+      "source": {
+        "source": "local",
+        "path": "./.codex/plugins/stage"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
