@@ -1,0 +1,9 @@
+# STAGE's /stage command bundle patch. Applied when this package is a profile
+# bundle: one row inserting the host-only command plugin that registers the
+# `/stage` slash command. The plugin is a zero-dependency shim — the routing
+# logic lives in <project>/.agents/commands/stage.md and the skills it routes
+# to live in <project>/.dsh/skills/, both discovered relative to the project
+# dsh is launched in.
+- insert:
+    - id: stage
+      name: 'stage'

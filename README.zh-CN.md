@@ -110,9 +110,10 @@ STAGE/
 │   ├── rules/              # 常驻规则：AGENTS.md 正文 + skill 目录归属
 │   ├── hooks/              # 钩子，注册在 hooks.json 里
 │   └── hooks.json
-├── .dsh/                   # DSH 原生 skill 与钩子桥接注册
+├── .dsh/                   # DSH 原生 skill、钩子与 /stage 命令 bundle
 ├── .kimi-code/
 │   ├── skills/             # Kimi Code 使用的写作工作流 skill
+│   ├── plugins/            # 用户安装的 /stage 分流插件与 marketplace
 │   ├── hooks/              # 钩子 + install.sh（Kimi 只认全局注册）
 │   └── hooks.example.toml  # install.sh 替你写进配置的那段注册片段
 ├── .pi/                    # Pi 原生 skill、prompt、agent 与能力扩展
@@ -305,7 +306,9 @@ STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事�
 | Pi | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Qwen Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 
-Codex 还把共享分流器打包成仓库内的 `stage` 插件。在仓库根目录注册并安装一次，然后新开会话：
+Claude Code、Cursor、Pi 与 Qwen Code 直接从项目文件提供 `/stage [你想做什么]`。命令把请求交给 `.agents/commands/stage.md`；空请求选择 `stage-flow-status`，匹配到六个只能显式调用的 skill 之一时，则返回准确的 `/stage-<name> <argument>` 命令并等待。
+
+Codex 把共享分流器打包成仓库内的 `stage` 插件。在仓库根目录注册并安装一次，然后新开会话：
 
 ```bash
 codex plugin marketplace add .
@@ -314,7 +317,23 @@ codex plugin add stage@stage
 
 不带参数的 `$stage` 显示当前论文状态，也可以传入描述，例如 `$stage 审计实验章节中的每个数字`。插件读取的仍是其他宿主 `/stage` 薄包装共用的 `.agents/commands/stage.md` 名册，不会再维护第二份分流表。
 
-Claude Code、Cursor、Pi 与 Qwen Code 还提供 `/stage [你想做什么]`。它把请求交给 `.agents/commands/stage.md` 中的共用路由器；空请求选择 `stage-flow-status`。若匹配到六个只能显式调用的 skill 之一，路由器会给出准确的 `/stage-<name> <argument>` 命令并等待，而不会自行启动。
+Kimi Code 把同一个分流器作为用户级插件打包在 `.kimi-code/plugins/stage/`。请从仓库根目录启动 Kimi Code，在输入框依次运行下面两条命令；也可以用 `/new` 代替 `/reload`：
+
+```text
+/plugins install ./.kimi-code/plugins/stage
+/reload
+```
+
+不带参数的 `/stage` 显示当前论文状态，也可以传入描述；`/skill:stage` 是同一个外部 skill 的完整写法。Kimi 会把本地插件复制进用户级托管目录，所以 STAGE 更新了该插件后，需要重新执行安装命令。
+
+DSH 把同一个分流器放在 `.dsh/commands/stage/`；安装时要求 `PATH` 上有 `pnpm`。在仓库根目录为每个将运行 STAGE 的 profile 安装一次，检查组合后的配置，再重启该 profile：
+
+```bash
+dsh plugin --profile YOUR_PROFILE add ./.dsh/commands/stage
+dsh --profile YOUR_PROFILE --dump-config
+```
+
+不带参数的 `/stage` 显示当前论文状态，也可以传入描述，例如 `/stage 审计实验章节中的每个数字`。命令会从共享的 `.agents/commands/stage.md` 名册发起一个后续轮次，因此 DSH 与其他宿主始终从同一来源分流。
 
 六个 skill（下表以 † 标注）仅限显式调用（slash-only）：接入、故事、提纲、回复、投稿与海报选择。六套具名 harness 的 manifest 使用 `disable-model-invocation: true`；Codex 在 `.codex/skills/` 中使用 `allow_implicit_invocation: false`，再链接到共用根。CI 会把七套实现都与[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md) 核对。
 
@@ -398,6 +417,17 @@ Claude Code、Cursor、Pi 与 Qwen Code 还提供 `/stage [你想做什么]`。�
 
 编造红线（规范 §9）把环闭上：`manus/` 里的每一个数字，要么可追溯到一条带指纹的 `mates/` 记录，要么写成 `\todo{...}`——没有第三种状态；关于被引论文的每个断言都必须能对上一份阅读笔记；venue 规则只以用户确认的事实录入；任何 skill 都不得"为了帮忙"而放松这些规则。
 
+## 项目记忆
+
+一次会话学到、又没有任何仓库文件认领的事实——某种构建引擎只在这台机器上能工作、你的某项长期偏好、模拟评审已经否决过的一种论述方式——记在论文的 `.stage/memory/`，而不是你当时在用的那个工具里。一事一文件，每条在 `.stage/memory/MEMORY.md` 里占一行；会话钩子会在每个受支持宿主的会话开头把这份索引交给 agent。
+
+记忆分四类：`env`（通常从失败中得知的机器或 TeX 工具链事实）、`pref`（你希望怎样写作）、`insight`（产生它的那次运行结束后仍然有效的判断）和 `deadend`（已经尝试、否决、不值得重试的路径——跨投稿周期尤其重要）。两条规则防止记忆库变成仓库事实的第二份漂移副本：
+
+- **只有当没有任何文件已经认领这条事实时，才把它记进记忆。** 数字属于带指纹的 `mates/` 条目，论断属于 `notes/claims.md`，页数限制属于对应周期的 `venue.yml`，论文内容属于 `notes/refs/`，承诺属于 `tasks/`。记忆只装剩余信息。
+- **记忆永远不是来源。** 它不能支撑 `manus/` 里的数字、venue 规则或关于被引工作的断言；记忆记得某个值，并不会放松禁止编造的边界。记忆与仓库文件冲突时，以文件为准。
+
+只在本机成立的事实放进 `.stage/memory/local/`，git 像忽略 `.env` 一样忽略它；`env` 条目超过 180 天未重新确认时，会在会话里标为过期。任何内容都先由 agent 提议、再由你决定是否记录；`.env` 设为 `INVOLVE=low` 时改为先记下再说明。文件格式、钩子解析的索引行以及记忆如何退场，见[项目记忆](docs/mds/stage-workflow/memory_spec.zh-CN.md)。
+
 ## 更新 STAGE 的 skill 与工作流文档
 
 基于 STAGE 创建论文后，可以只同步 STAGE 后续发布的 skill 与写作工作流文档，而不改动你的稿件、证据、笔记或 Git remote：
@@ -411,6 +441,7 @@ bash execs/update.sh
 - `AGENTS.md`、`AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md` 始终更新，选择 Cursor 时再更新 `.cursor/rules/`——它们分别是共享 agent 指令、供人阅读的中文版本，以及 Cursor 的运行时镜像；所选路径中的本地改动会被替换，而包含 Cursor 的运行会让两份运行时副本一起移动
 - `.agents/skills/` 与 `.agents/commands/` 优先，随后是 `.claude/skills/`、`.cursor/skills/`、`.dsh/skills/`、`.kimi-code/skills/`、`.pi/skills/` 与 `.qwen/skills/`——共用技能根和路由器，加六套原生技能树；安装进论文实例时会解引用链接
 - `.codex/plugins/`——Codex 专属的 `$stage` 分流插件与 marketplace 实体；`.agents/plugins/marketplace.json` 只是一条指向该 marketplace 的文件链接，绝不链接整个目录
+- `.dsh/commands/` 与 `.kimi-code/plugins/`——DSH 和 Kimi 的 `/stage` 分流包，各自只在选中对应宿主时更新
 - 对应的钩子、command、prompt、agent 与 extension 目录，以及保存 Codex 逐 skill UI manifest 的 `.codex/skills/`；`.stage/memory/` 下的记忆库属于论文自己，从不同步
 - `docs/mds/stage-workflow/`——工作流规约、skill 指南、记忆规范与模型 id 规范，中英两版
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
@@ -427,10 +458,18 @@ harness 配置——`.cursorignore`、`.claude/settings.json`、`.codex/hooks.js
 curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update.sh -o execs/update.sh
 ```
 
-命令的通用形式为 `bash execs/update.sh [--diff] [ref] [--harnesses LIST] [--skill NAME] [--force] [--adopt]`：
+命令的两种通用形式为 `bash execs/update.sh [--diff] [ref] [--harnesses LIST] [--skill NAME] [--force]` 与 `bash execs/update.sh [ref] [--harnesses LIST] --adopt`：
+
+```bash
+bash execs/update.sh --diff
+bash execs/update.sh TAG_OR_BRANCH
+bash execs/update.sh --harnesses claude
+bash execs/update.sh --skill stage-flow-status
+```
 
 - `--diff` 在不改动任何文件的情况下预览更新，有可更新内容时以 `2` 退出，完全一致时以 `0` 退出，出错时以 `1` 退出——脚本因此能区分“有更新”与“检查本身失败”。有差异的 harness 配置只列为保留、不计入数量，除非 `--force` 把它重新纳入范围。
 - `ref` 把更新固定到某个 tag 或分支。
+- 如果固定的 ref 早于 `.dsh/commands/` 或 `.kimi-code/plugins/`，普通更新与 `--adopt` 都会报告并跳过这个尚不存在的可选包；缺少其他必需路径仍会中止。
 - `--harnesses LIST` 以逗号分隔的 harness 名称、`all` 或 `none` 覆盖本次运行的 `STAGE_HARNESSES`。未选中的树不在写入范围，也不纳入未提交改动检查。
 - `--skill NAME` 只更新共用根与所选 harness 树中的这个 skill，不动 agent 指令、工作流文档和入口脚本。名称无效、或上游所选技能树缺少它，命令会停止且不覆盖任何文件。
 - `--force` 更新同样这批路径，但解除两处拦截：这些路径下的未提交改动直接被覆盖而不再中止命令，harness 配置也改为覆盖而不再保留。它不扩大范围——上游没有的文件依旧原样保留，你自己放在这些目录下的 skill 和文档不会丢。
@@ -440,7 +479,7 @@ curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update
 
 上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。为避免误删自定义内容，上游已删除的文件不会在本地自动删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
-如果你改的是 STAGE 本身而不是某篇论文：先用 `bash .github/scripts/port.sh --write` 从作者维护的 Claude 版本生成其余六套，再运行 `bash .github/scripts/check_consistency.sh`。后者核对七套 skill 集合、共用链接、slash-only 守卫、调用 token、原生工具词汇、Cursor 规则镜像、description 长度、开场装载与规约引用。两者都只属于上游维护工具，`.github/` 不会同步进论文仓库。
+如果你改的是 STAGE 本身而不是某篇论文：修改作者维护的 Claude 版本后，先用 `bash .github/scripts/port.sh --write` 重新生成其余目录，再用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七套目录的语义约束。后两项检查都在 CI 中运行；这些命令只属于上游维护工具，`.github/` 不会同步进论文仓库。
 
 ## 项目约定
 
@@ -465,7 +504,7 @@ curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update
 - venue 官方模板包整包解压到 `cycls/<cycle>/template/`，不要放进 `manus/`——那是 `lint.sh` 扫描的目录树，模板包自带的示例 `.tex` 会污染 `\todo` 计数和身份扫描。
 - 更新 `LICENSE` 中的年份和版权所有者。
 - 替换 `docs/htmls/stage.html`、`docs/htmls/stage_zh.html` 与 `docs/srcs/`——它们是 STAGE 自己的落地页和图片，不属于你的论文。`docs/index.html` 和 `docs/index_zh.html` 是把这两个页面挂到站点根目录的软链接。两个页面之间的中英切换用的是绝对链接（`/STAGE/index_zh.html`），要把其中的 `/STAGE` 前缀改成你自己的仓库名，否则语言切换会失效。`docs/mds/stage-workflow/` 保持不动，`execs/update.sh` 会负责更新它。
-- 删掉用不到的 harness 目录。模板仓库中的六套具名技能树会把共用文件链接到 `.agents/skills/`，所以手工只复制一棵树时必须解引用；`execs/update.sh` 会自动安装为自包含的实体文件。
+- 安装进论文实例后，每个所选宿主都是自包含的。直接检出模板时，具名目录可能把共用文件链接到 `.agents/skills/`，所以删除共享根目录前要先把准备保留的目录实体化；使用 Codex 时必须同时保留 `.agents/`，每个宿主自己的钩子和配置文件也要随它的 skill 一起保留。`execs/update.sh` 安装时会自动写成实体文件。
 
 骨架本身可独立使用：目录布局、`.env`、`execs/run.sh` 与 `execs/scpts/lint.sh` 在完全不装任何 skill 的情况下也能工作，因此删掉全部工具目录同样是受支持的用法。一篇论文一个仓库——第二篇论文是模板的第二个实例，而不是这里的第二棵目录树。
 

@@ -242,9 +242,91 @@ done <<'EOF'
 .pi/prompts/stage.md|[$@]
 .qwen/commands/stage.md|[{{args}}]
 EOF
-(( router_errors == 0 )) && note "one bilingual neutral roster drives four native command entry points"
+for wrapper in \
+    .claude/commands/stage.zh-CN.md \
+    .cursor/commands/stage.zh-CN.md \
+    .pi/prompts/stage.zh-CN.md \
+    .qwen/commands/stage.zh-CN.md; do
+    if [[ ! -f "${wrapper}" ]]; then
+        fail "missing Chinese request-router entry point: ${wrapper}"
+        router_errors=1
+    elif ! grep -qF '.agents/commands/stage.md' "${wrapper}"; then
+        fail "${wrapper} does not delegate to the shared router"
+        router_errors=1
+    fi
+done
+(( router_errors == 0 )) && note "one bilingual neutral roster drives four file-based native command entry points"
 
-# 4b. Codex gets the generic router through one plugin owned entirely by
+# 4b. Kimi exposes /stage as an explicit-only plugin skill. The plugin owns
+#     only the native invocation adapter; the roster remains under .agents.
+section "Kimi STAGE command plugin layout"
+kimi_plugin_errors=0
+KIMI_MARKETPLACE=".kimi-code/plugins/marketplace.json"
+KIMI_PLUGIN_ROOT=".kimi-code/plugins/stage"
+if ! python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); p=json.load(open(sys.argv[2])); e=m["plugins"]; assert m["version"] == "2" and len(e) == 1 and e[0] == {"id": "stage", "displayName": "STAGE", "source": "./.kimi-code/plugins/stage"}; assert p["name"] == "stage" and p["skills"] == "./skills/"' "${KIMI_MARKETPLACE}" "${KIMI_PLUGIN_ROOT}/.kimi-plugin/plugin.json"; then
+    fail "Kimi STAGE plugin or marketplace metadata is invalid"
+    kimi_plugin_errors=1
+fi
+KIMI_ROUTER_SKILL="${KIMI_PLUGIN_ROOT}/skills/stage/SKILL.md"
+if [[ ! -f "${KIMI_ROUTER_SKILL}" ]] || \
+   ! frontmatter_has_line "${KIMI_ROUTER_SKILL}" "name: stage" || \
+   ! frontmatter_has_line "${KIMI_ROUTER_SKILL}" "disableModelInvocation: true" || \
+   ! grep -qF 'Read `.agents/commands/stage.md`' "${KIMI_ROUTER_SKILL}" || \
+   ! grep -qF '/skill:stage-<name> <argument>' "${KIMI_ROUTER_SKILL}"; then
+    fail "${KIMI_ROUTER_SKILL} is not the explicit-only Kimi adapter around the shared router"
+    kimi_plugin_errors=1
+elif grep -qE '^\| `stage-[a-z-]+`' "${KIMI_ROUTER_SKILL}"; then
+    fail "${KIMI_ROUTER_SKILL} duplicates the roster owned by ${ROUTER}"
+    kimi_plugin_errors=1
+fi
+KIMI_ROUTER_SKILL_ZH="${KIMI_PLUGIN_ROOT}/skills/stage/SKILL_zh.md"
+if [[ ! -f "${KIMI_ROUTER_SKILL_ZH}" ]] || \
+   ! frontmatter_has_line "${KIMI_ROUTER_SKILL_ZH}" "name: stage" || \
+   ! frontmatter_has_line "${KIMI_ROUTER_SKILL_ZH}" "disableModelInvocation: true" || \
+   ! grep -qF '.agents/commands/stage.md' "${KIMI_ROUTER_SKILL_ZH}"; then
+    fail "${KIMI_ROUTER_SKILL_ZH} is not the Chinese explicit-only Kimi adapter"
+    kimi_plugin_errors=1
+fi
+for skill_file in "${KIMI_ROUTER_SKILL}" "${KIMI_ROUTER_SKILL_ZH}"; do
+    if ! grep -qF 'STAGE_LANG=zh' "${skill_file}" || \
+       ! grep -qF '.agents/commands/stage.zh-CN.md' "${skill_file}"; then
+        fail "${skill_file} does not apply STAGE's Chinese router wording"
+        kimi_plugin_errors=1
+    fi
+done
+(( kimi_plugin_errors == 0 )) && note "Kimi owns one explicit-only /stage adapter around the shared router"
+
+# 4c. DSH exposes /stage through a zero-dependency Cordis bundle. Its handler
+#     injects the request into a follow-up turn that reads the shared router;
+#     neither the package patch nor the JavaScript may carry a second roster.
+section "DSH STAGE command bundle layout"
+dsh_command_errors=0
+DSH_COMMAND_ROOT=".dsh/commands/stage"
+if ! python3 -c 'import json,sys; p=json.load(open(sys.argv[1])); assert p["name"] == "stage" and p["private"] is True and p["type"] == "module" and p["main"] == "lib/index.js" and p["dsh"]["bundle"]["patch"] == "./cordis.patch.yml"' "${DSH_COMMAND_ROOT}/package.json"; then
+    fail "${DSH_COMMAND_ROOT}/package.json is not a DSH command bundle"
+    dsh_command_errors=1
+fi
+if ! grep -qE '^[[:space:]]*- id: stage[[:space:]]*$' "${DSH_COMMAND_ROOT}/cordis.patch.yml" || \
+   ! grep -qE "^[[:space:]]*name: 'stage'[[:space:]]*$" "${DSH_COMMAND_ROOT}/cordis.patch.yml"; then
+    fail "${DSH_COMMAND_ROOT}/cordis.patch.yml does not insert the stage command plugin"
+    dsh_command_errors=1
+fi
+DSH_COMMAND_IMPL="${DSH_COMMAND_ROOT}/lib/index.js"
+if ! node --check "${DSH_COMMAND_IMPL}" >/dev/null 2>&1 || \
+   ! grep -qF 'const name = "stage";' "${DSH_COMMAND_IMPL}" || \
+   ! grep -qF 'ctx.commands.register({' "${DSH_COMMAND_IMPL}" || \
+   ! grep -qF 'recordInput: false' "${DSH_COMMAND_IMPL}" || \
+   ! grep -qF 'Read `.agents/commands/stage.md`' "${DSH_COMMAND_IMPL}" || \
+   ! grep -qF 'select `stage-flow-status`' "${DSH_COMMAND_IMPL}"; then
+    fail "${DSH_COMMAND_IMPL} is not the thin DSH adapter around the shared router"
+    dsh_command_errors=1
+elif grep -qE '^\| `stage-[a-z-]+`' "${DSH_COMMAND_IMPL}"; then
+    fail "${DSH_COMMAND_IMPL} duplicates the roster owned by ${ROUTER}"
+    dsh_command_errors=1
+fi
+(( dsh_command_errors == 0 )) && note "DSH owns one zero-dependency /stage adapter around the shared router"
+
+# 4d. Codex gets the generic router through one plugin owned entirely by
 #     .codex. .agents exposes only the marketplace file the host discovers;
 #     linking the directory would leak every Codex-private plugin into a shared
 #     namespace and turn future harness support there into a collision.
@@ -274,7 +356,73 @@ if [[ ! -f "${PLUGIN_ROOT}/skills/stage/SKILL.md" ]] || \
     fail "${PLUGIN_ROOT}/skills/stage is not the explicit-only wrapper around the shared router"
     plugin_errors=1
 fi
+if [[ ! -f "${PLUGIN_ROOT}/skills/stage/SKILL_zh.md" ]] || \
+   ! frontmatter_has_line "${PLUGIN_ROOT}/skills/stage/SKILL_zh.md" "name: stage" || \
+   ! grep -qF '.agents/commands/stage.md' "${PLUGIN_ROOT}/skills/stage/SKILL_zh.md"; then
+    fail "${PLUGIN_ROOT}/skills/stage lacks its Chinese wrapper around the shared router"
+    plugin_errors=1
+fi
+for skill_file in "${PLUGIN_ROOT}/skills/stage/SKILL.md" "${PLUGIN_ROOT}/skills/stage/SKILL_zh.md"; do
+    if ! grep -qF 'STAGE_LANG=zh' "${skill_file}" || \
+       ! grep -qF '.agents/commands/stage.zh-CN.md' "${skill_file}"; then
+        fail "${skill_file} does not apply STAGE's Chinese router wording"
+        plugin_errors=1
+    fi
+done
 (( plugin_errors == 0 )) && note "Codex owns one stage plugin; .agents exposes only its marketplace file"
+
+# 4e. All three package-based routers move through adopt and full updates, old
+#      refs may omit the later Kimi/DSH packages, and both README editions give
+#      the same host setup commands.
+section "Router deployment and documentation"
+deployment_errors=0
+for router_tree in ".codex/plugins" ".dsh/commands" ".kimi-code/plugins"; do
+    if [[ "$(grep -Fxc "        \"${router_tree}\"" execs/update.sh)" -ne 2 ]]; then
+        fail "execs/update.sh must carry ${router_tree} in both adopt and full-update paths"
+        deployment_errors=1
+    fi
+done
+for optional_tree in ".dsh/commands" ".kimi-code/plugins"; do
+    if ! grep -qF "\"${optional_tree}\")" execs/update.sh; then
+        fail "execs/update.sh does not allow an older ref to omit ${optional_tree}"
+        deployment_errors=1
+    fi
+done
+if ! grep -qF 'if is_optional_path "${tree}"; then' execs/update.sh; then
+    fail "execs/update.sh --adopt does not skip router packages absent from an older ref"
+    deployment_errors=1
+fi
+for readme in README.md README.zh-CN.md; do
+    for command in \
+        'codex plugin marketplace add .' \
+        'codex plugin add stage@stage' \
+        '/plugins install ./.kimi-code/plugins/stage' \
+        '/reload' \
+        'dsh plugin --profile YOUR_PROFILE add ./.dsh/commands/stage' \
+        'dsh --profile YOUR_PROFILE --dump-config'; do
+        if ! grep -qF "${command}" "${readme}"; then
+            fail "${readme} omits router setup step: ${command}"
+            deployment_errors=1
+        fi
+    done
+    for shared_topic in \
+        'STAGE_LANG' \
+        'STAGE_HARNESSES' \
+        'INVOLVE=low' \
+        '.stage/memory/MEMORY.md' \
+        'bash execs/update.sh --diff' \
+        'bash execs/update.sh TAG_OR_BRANCH' \
+        'bash execs/update.sh --harnesses claude' \
+        'bash execs/update.sh --skill stage-flow-status' \
+        '--adopt' \
+        '--force'; do
+        if ! grep -qF -- "${shared_topic}" "${readme}"; then
+            fail "${readme} omits shared setup or update topic: ${shared_topic}"
+            deployment_errors=1
+        fi
+    done
+done
+(( deployment_errors == 0 )) && note "all router packages update by harness, tolerate older refs, and share one setup template"
 
 # 5. Bilingual twins: every skill .md has its _zh.md counterpart and vice versa.
 section "Bilingual twins in skill trees"

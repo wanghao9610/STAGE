@@ -2,7 +2,8 @@
 set -euo pipefail
 
 # execs/update.sh — sync STAGE-managed content from the upstream template (the
-# seven skill trees, the Codex $stage plugin, their hook and capability trees,
+# seven skill trees, the Codex $stage plugin, the Kimi and DSH /stage router
+# entries, their hook and capability trees,
 # docs/mds/stage-workflow/, the shared agent instructions in both editions, and
 # every script under execs/
 # — both entrypoints, this one included, and the three utilities in execs/scpts/),
@@ -56,8 +57,8 @@ HOOK_TREES=(
 
 # Pi supplies the capabilities its core does not ship. The neutral request
 # router lives once under .agents/commands; four harnesses expose thin native
-# entry points that pass their argument syntax into it. These are STAGE-owned
-# and overwritten on update like the skills.
+# file entry points, while Kimi and DSH own package-based adapters. These are
+# STAGE-owned and overwritten on update like the skills.
 EXTENSION_TREES=(
     ".pi/agents"
     ".pi/extensions/stage-plan-mode"
@@ -111,12 +112,15 @@ SYNC_FILES=(
 # Synced paths a ref is allowed not to have. Each arrived later than the tree it
 # sits in, so pinning an older ref is a legitimate reason for it to be missing,
 # and that is a skipped line rather than a stopped update: the session hooks,
-# which arrived after the skills, and fmt.sh, which arrived after the other two
-# utilities. Anything else missing is a broken ref and still fatal.
+# which arrived after the skills; fmt.sh, which arrived after the other two
+# utilities; and the Kimi and DSH /stage router entries, which arrived after
+# their harness trees. Anything else missing is a broken ref and still fatal.
 is_optional_path() {
     case "$1" in
         .*/hooks*)            return 0 ;;
         "execs/scpts/fmt.sh") return 0 ;;
+        ".dsh/commands")      return 0 ;;
+        ".kimi-code/plugins") return 0 ;;
     esac
     return 1
 }
@@ -347,8 +351,9 @@ Without the flag, the list comes from STAGE_HARNESSES (environment first, then
 .env), then defaults to all. Shared paths — .agents/skills, .agents/commands,
 the agent instructions and their Chinese reading editions, workflow documentation,
 and every script under execs/ — are updated for every selection.
-The $stage plugin lives under .codex/plugins and its one discovery link under
-.agents/plugins is updated only when codex is selected.
+The generic router packages live under .codex/plugins, .dsh/commands and
+.kimi-code/plugins; each is updated only when its harness is selected. Codex's
+one discovery link under .agents/plugins follows the same selection.
 
 --diff previews an update without changing anything: it lists upstream files
 that are new or differ from the local copies, harness configuration that
@@ -514,6 +519,9 @@ if [[ "${ADOPT}" == true ]]; then
         # The Codex-only $stage router plugin. Its .agents discovery entry is a
         # single file in ADOPT_FILES, not a link over the whole directory.
         ".codex/plugins"
+        # Kimi and DSH own package-based adapters for the generic /stage entry.
+        ".dsh/commands"
+        ".kimi-code/plugins"
         "${SKILL_ROOTS[@]:1}"
         "${HOOK_TREES[@]}"
         "${EXTENSION_TREES[@]}"
@@ -610,6 +618,10 @@ else
         # file is exposed through the exact .agents path the host discovers.
         ".codex/plugins"
         ".agents/plugins/marketplace.json"
+        # Kimi's /stage skill plugin and DSH's /stage command bundle stay private
+        # to their own trees and are installed into each host separately.
+        ".dsh/commands"
+        ".kimi-code/plugins"
         "${SKILL_ROOTS[@]}"
         "${HOOK_TREES[@]}"
         "${EXTENSION_TREES[@]}"
@@ -894,7 +906,13 @@ install_file() {
 }
 
 for tree in "${ADOPT_TREES[@]}"; do
-    [[ -d "${SOURCE_DIR}/${tree}" ]] || fail "Upstream ref is missing ${tree}."
+    if [[ ! -d "${SOURCE_DIR}/${tree}" ]]; then
+        if is_optional_path "${tree}"; then
+            log "Skipping ${tree}: not present in ref '${STAGE_REF}'."
+            continue
+        fi
+        fail "Upstream ref is missing ${tree}."
+    fi
     while IFS= read -r rel; do
         install_file "${rel}"
     done < <(cd "${SOURCE_DIR}" && find -L "${tree}" -type f | sort)

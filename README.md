@@ -110,9 +110,10 @@ STAGE/
 │   ├── rules/              # Always-on rules: AGENTS.md body + skill-root ownership
 │   ├── hooks/              # Hooks, registered in hooks.json
 │   └── hooks.json
-├── .dsh/                   # DSH-native skills and hook-bridge registration
+├── .dsh/                   # DSH-native skills, hooks, and the /stage command bundle
 ├── .kimi-code/
 │   ├── skills/             # Writing workflow skills for Kimi Code
+│   ├── plugins/            # User-installed /stage router plugin and marketplace
 │   ├── hooks/              # Hooks + install.sh (Kimi registers globally)
 │   └── hooks.example.toml  # The registration snippet install.sh writes for you
 ├── .pi/                    # Pi-native skills, prompts, agents, and capability extensions
@@ -305,7 +306,9 @@ STAGE includes sixteen complementary skills that turn imported evidence and a st
 | Pi | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Qwen Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 
-Codex also packages the shared router as the repo-local `stage` plugin. Register and install it once from the repository root, then start a new session:
+Claude Code, Cursor, Pi, and Qwen Code expose `/stage [what you want to do]` directly from project files. The command sends the request through `.agents/commands/stage.md`; an empty request selects `stage-flow-status`, and a match to one of the six explicit-only skills returns the exact `/stage-<name> <argument>` command and waits.
+
+Codex packages the shared router as the repo-local `stage` plugin. Register and install it once from the repository root, then start a new session:
 
 ```bash
 codex plugin marketplace add .
@@ -314,7 +317,23 @@ codex plugin add stage@stage
 
 Use `$stage` with no argument for the current paper status, or pass a request such as `$stage audit every number in the experiments section`. The plugin reads the same `.agents/commands/stage.md` roster as the other harnesses' `/stage` wrappers; it adds no second copy of that routing table.
 
-Claude Code, Cursor, Pi, and Qwen Code also expose `/stage [what you want to do]`. It sends the request through the shared router in `.agents/commands/stage.md`; an empty request selects `stage-flow-status`. When the match is one of the six explicit-only skills, the router gives the exact `/stage-<name> <argument>` command and waits instead of starting it.
+Kimi Code packages the same router as a user-installed plugin under `.kimi-code/plugins/stage/`. Start Kimi Code from the repository root and run these commands in its prompt; `/new` may replace `/reload`:
+
+```text
+/plugins install ./.kimi-code/plugins/stage
+/reload
+```
+
+Use `/stage` with no argument for the current paper status, or pass a described task; `/skill:stage` is the explicit spelling of the same external skill. Kimi copies a local plugin into its user-level managed directory, so repeat the install command after STAGE updates this plugin.
+
+DSH packages the same router under `.dsh/commands/stage/`; installation requires `pnpm` on `PATH`. From the repository root, install it once into every profile that will run STAGE, inspect the composed configuration, then restart that profile:
+
+```bash
+dsh plugin --profile YOUR_PROFILE add ./.dsh/commands/stage
+dsh --profile YOUR_PROFILE --dump-config
+```
+
+Use `/stage` with no argument for the current paper status, or pass a request such as `/stage audit every number in the experiments section`. The command starts one follow-up turn against the shared `.agents/commands/stage.md` roster, so DSH and the other harnesses route from the same source.
 
 Six skills (marked † below) are slash-only: adoption, story, outline, response, submission, and poster selection. Named harness manifests use `disable-model-invocation: true`; Codex uses `allow_implicit_invocation: false` in `.codex/skills/`, linked into the shared root. CI checks all seven against [conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
@@ -422,7 +441,8 @@ By default, the command updates these paths from STAGE's `main` branch:
 - `AGENTS.md`, `AGENTS.zh-CN.md`, and `CLAUDE.zh-CN.md` always, and `.cursor/rules/` when Cursor is selected — the shared agent instructions, their Chinese reading editions, and Cursor's mirrored runtime copy; your own edits to selected paths are replaced, and a run that includes Cursor moves the runtime copies together
 - `.agents/skills/` and `.agents/commands/` first, then `.claude/skills/`, `.cursor/skills/`, `.dsh/skills/`, `.kimi-code/skills/`, `.pi/skills/`, and `.qwen/skills/` — the shared store and router plus every native harness copy; links are dereferenced when installed into a paper instance
 - `.codex/plugins/` — the Codex-only `$stage` router plugin and canonical marketplace; `.agents/plugins/marketplace.json` is only a file link to that marketplace, never a link over the directory
-- the corresponding hook, command, prompt, agent, and extension trees, plus `.codex/skills/` for Codex's per-skill UI manifests
+- `.dsh/commands/` and `.kimi-code/plugins/` — the DSH and Kimi `/stage` router packages, updated only when their respective harness is selected
+- the corresponding hook, command, prompt, agent, and extension trees, plus `.codex/skills/` for Codex's per-skill UI manifests; the paper-owned memory store under `.stage/memory/` is never synced
 - `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, the memory spec, and the model-id spec, in both editions
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
 - `execs/scpts/import.sh`, `execs/scpts/lint.sh`, `execs/scpts/fmt.sh` — the utilities, for the same reason: sixteen skills call `import.sh --diff` and five call `lint.sh --no-build`, and a caller reading an exit code means the one its own version documents. A ref older than a utility simply skips it with a printed line
@@ -432,18 +452,26 @@ The repository it pulls from is `STAGE_REPOSITORY`, resolved in that order: the 
 
 Which harness trees it touches is `STAGE_HARNESSES`, resolved from the environment, then `.env`, then `all`. Set `STAGE_HARNESSES=codex` to keep only Codex's `.codex/` tree current, or use any comma-separated set of `claude`, `codex`, `cursor`, `dsh`, `kimi`, `pi`, and `qwen`; `none` updates only the shared skeleton. A tree left out is not installed, updated, or deleted. The shared `.agents/skills/` and `.agents/commands/`, agent instructions in both editions, workflow docs, and `execs/` scripts remain in every run.
 
-Harness configuration — `.cursorignore`, `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.pi/settings.json`, and `.qwen/settings.json` — is installed only when missing and otherwise kept unless `--force` is supplied.
+Harness configuration — `.cursorignore`, `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.pi/settings.json`, and `.qwen/settings.json` — is installed only when missing and otherwise kept unless `--force` is supplied. The command reports a kept file that differs from upstream and names any STAGE hook absent from a kept registration.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update.sh -o execs/update.sh
 ```
 
-The general form is `bash execs/update.sh [--diff] [ref] [--harnesses LIST] [--skill NAME] [--force] [--adopt]`:
+The general forms are `bash execs/update.sh [--diff] [ref] [--harnesses LIST] [--skill NAME] [--force]` and `bash execs/update.sh [ref] [--harnesses LIST] --adopt`:
+
+```bash
+bash execs/update.sh --diff
+bash execs/update.sh TAG_OR_BRANCH
+bash execs/update.sh --harnesses claude
+bash execs/update.sh --skill stage-flow-status
+```
 
 - `--diff` previews an update without changing a file, and exits `2` when one is available, `0` when everything already matches, `1` on error — so a script can tell an available update from a failed check. Harness configuration that differs is listed as kept rather than counted, unless `--force` puts it back in scope.
 - A `ref` pins the update to a tag or branch.
+- When a pinned ref predates `.dsh/commands/` or `.kimi-code/plugins/`, both a normal update and `--adopt` report the absent optional package and continue; a missing required path still stops the run.
 - `--harnesses LIST` overrides `STAGE_HARNESSES` for one run with comma-separated harness names, `all`, or `none`. Unselected trees are outside both the write set and the uncommitted-change check.
-- `--skill NAME` updates that one skill across the shared root and the selected harness trees, and leaves the agent instructions, workflow docs, and entrypoints alone.
+- `--skill NAME` updates that one skill across the shared root and the selected harness trees, and leaves the agent instructions, workflow docs, and entrypoints alone. An invalid name, or one absent from an upstream skill tree in scope, stops the command before it overwrites anything.
 - `--force` updates the same paths with both refusals lifted: uncommitted changes under them are overwritten instead of stopping the command, and the harness configuration is overwritten instead of kept. It widens nothing — a file upstream does not have is still left alone, so your own skills and documents under those directories stay.
 - `--adopt` installs the skeleton into a paper repository that already exists, copying only what is absent (see [step 1b](#1b-or-adopt-a-paper-repo-that-already-exists)); `--harnesses` limits which native trees are installed. It cannot be combined with `--force`: never touching an existing file is the whole contract.
 
@@ -451,7 +479,7 @@ The general form is `bash execs/update.sh [--diff] [ref] [--harnesses LIST] [--s
 
 Files at matching paths are overwritten and new upstream files are added. Project-specific files that exist only in the updated directories are preserved. To avoid deleting custom content, files removed upstream are not removed locally. The update does not modify other directories, the current branch, Git remotes, or the staging area — the manuscript, `mates/`, `notes/`, and `cycls/` are never in scope. Commit current work before updating, then review and commit the result with `git status` and `git diff`.
 
-Working on STAGE itself rather than on a paper? Run `bash .github/scripts/port.sh` to prove every generated harness matches the Claude-authored source and the shared-link topology, then `bash .github/scripts/check_consistency.sh` for the seven-tree semantic invariants. Both run in CI.
+Working on STAGE itself rather than on a paper? After editing the Claude-authored source, run `bash .github/scripts/port.sh --write` to regenerate the other trees, `bash .github/scripts/port.sh` to prove every generated harness and shared link still matches, then `bash .github/scripts/check_consistency.sh` for the seven-tree semantic invariants. The two checks run in CI.
 
 ## Project conventions
 
