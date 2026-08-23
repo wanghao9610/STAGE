@@ -91,8 +91,9 @@ STAGE/
 │   └── settings.json       # Registers all four hooks
 ├── .agents/
 │   ├── skills/             # Tool-neutral shared skill store; the only target of skill links
-│   └── commands/           # Shared /stage router and its zh-CN reading edition
-├── .codex/                 # Codex hooks, config, and per-skill agents/openai.yaml manifests
+│   ├── commands/           # Shared /stage router and its zh-CN reading edition
+│   └── plugins/            # Codex marketplace discovery: one file link into .codex/plugins/
+├── .codex/                 # Codex hooks, per-skill manifests, and the $stage router plugin
 ├── .cursor/
 │   ├── skills/             # Writing workflow skills for Cursor
 │   ├── rules/              # Always-on rules: AGENTS.md body + skill-root ownership
@@ -293,6 +294,15 @@ STAGE includes sixteen complementary skills that turn imported evidence and a st
 | Pi | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Qwen Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 
+Codex also packages the shared router as the repo-local `stage` plugin. Register and install it once from the repository root, then start a new session:
+
+```bash
+codex plugin marketplace add .
+codex plugin add stage@stage
+```
+
+Use `$stage` with no argument for the current paper status, or pass a request such as `$stage audit every number in the experiments section`. The plugin reads the same `.agents/commands/stage.md` roster as the other harnesses' `/stage` wrappers; it adds no second copy of that routing table.
+
 Claude Code, Cursor, Pi, and Qwen Code also expose `/stage [what you want to do]`. It sends the request through the shared router in `.agents/commands/stage.md`; an empty request selects `stage-flow-status`. When the match is one of the six explicit-only skills, the router gives the exact `/stage-<name> <argument>` command and waits instead of starting it.
 
 Six skills (marked † below) are slash-only: adoption, story, outline, response, submission, and poster selection. Named harness manifests use `disable-model-invocation: true`; Codex uses `allow_implicit_invocation: false` in `.codex/skills/`, linked into the shared root. CI checks all seven against [conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md).
@@ -400,6 +410,7 @@ By default, the command updates these paths from STAGE's `main` branch:
 
 - `AGENTS.md`, `AGENTS.zh-CN.md`, and `CLAUDE.zh-CN.md` always, and `.cursor/rules/` when Cursor is selected — the shared agent instructions, their Chinese reading editions, and Cursor's mirrored runtime copy; your own edits to selected paths are replaced, and a run that includes Cursor moves the runtime copies together
 - `.agents/skills/` and `.agents/commands/` first, then `.claude/skills/`, `.cursor/skills/`, `.dsh/skills/`, `.kimi-code/skills/`, `.pi/skills/`, and `.qwen/skills/` — the shared store and router plus every native harness copy; links are dereferenced when installed into a paper instance
+- `.codex/plugins/` — the Codex-only `$stage` router plugin and canonical marketplace; `.agents/plugins/marketplace.json` is only a file link to that marketplace, never a link over the directory
 - the corresponding hook, command, prompt, agent, and extension trees, plus `.codex/skills/` for Codex's per-skill UI manifests
 - `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, the memory spec, and the model-id spec, in both editions
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step

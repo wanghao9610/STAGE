@@ -87,12 +87,13 @@ STAGE/
 ├── .stage/memory/          # 项目记忆：早先会话学到的东西（local/ 被 git 忽略）
 ├── .agents/
 │   ├── skills/             # 工具无关的共用 skill；其他技能树链接到这里
-│   └── commands/           # 共用 /stage 路由器及其 zh-CN 阅读版
+│   ├── commands/           # 共用 /stage 路由器及其 zh-CN 阅读版
+│   └── plugins/            # Codex marketplace 发现入口：仅一个指向 .codex/plugins/ 的文件链接
 ├── .claude/
 │   ├── skills/             # Claude Code 使用的写作工作流 skill
 │   ├── hooks/              # 钩子：项目记忆索引、本次会话的模型 id、参与度放行、提交守卫
 │   └── settings.json       # 注册这四个钩子
-├── .codex/                 # Codex 的钩子、配置与逐 skill 的 agents/openai.yaml manifest
+├── .codex/                 # Codex 的钩子、逐 skill manifest 与 $stage 分流插件
 ├── .cursor/
 │   ├── skills/             # Cursor 使用的写作工作流 skill
 │   ├── rules/              # 常驻规则：AGENTS.md 正文 + skill 目录归属
@@ -293,6 +294,15 @@ STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事�
 | Pi | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Qwen Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 
+Codex 还把共享分流器打包成仓库内的 `stage` 插件。在仓库根目录注册并安装一次，然后新开会话：
+
+```bash
+codex plugin marketplace add .
+codex plugin add stage@stage
+```
+
+不带参数的 `$stage` 显示当前论文状态，也可以传入描述，例如 `$stage 审计实验章节中的每个数字`。插件读取的仍是其他宿主 `/stage` 薄包装共用的 `.agents/commands/stage.md` 名册，不会再维护第二份分流表。
+
 Claude Code、Cursor、Pi 与 Qwen Code 还提供 `/stage [你想做什么]`。它把请求交给 `.agents/commands/stage.md` 中的共用路由器；空请求选择 `stage-flow-status`。若匹配到六个只能显式调用的 skill 之一，路由器会给出准确的 `/stage-<name> <argument>` 命令并等待，而不会自行启动。
 
 六个 skill（下表以 † 标注）仅限显式调用（slash-only）：接入、故事、提纲、回复、投稿与海报选择。六套具名 harness 的 manifest 使用 `disable-model-invocation: true`；Codex 在 `.codex/skills/` 中使用 `allow_implicit_invocation: false`，再链接到共用根。CI 会把七套实现都与[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md) 核对。
@@ -389,6 +399,7 @@ bash execs/update.sh
 
 - `AGENTS.md`、`AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md` 始终更新，选择 Cursor 时再更新 `.cursor/rules/`——它们分别是共享 agent 指令、供人阅读的中文版本，以及 Cursor 的运行时镜像；所选路径中的本地改动会被替换，而包含 Cursor 的运行会让两份运行时副本一起移动
 - `.agents/skills/` 与 `.agents/commands/` 优先，随后是 `.claude/skills/`、`.cursor/skills/`、`.dsh/skills/`、`.kimi-code/skills/`、`.pi/skills/` 与 `.qwen/skills/`——共用技能根和路由器，加六套原生技能树；安装进论文实例时会解引用链接
+- `.codex/plugins/`——Codex 专属的 `$stage` 分流插件与 marketplace 实体；`.agents/plugins/marketplace.json` 只是一条指向该 marketplace 的文件链接，绝不链接整个目录
 - 对应的钩子、command、prompt、agent 与 extension 目录，以及保存 Codex 逐 skill UI manifest 的 `.codex/skills/`；`.stage/memory/` 下的记忆库属于论文自己，从不同步
 - `docs/mds/stage-workflow/`——工作流规约、skill 指南、记忆规范与模型 id 规范，中英两版
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
