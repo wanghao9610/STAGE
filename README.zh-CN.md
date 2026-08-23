@@ -17,6 +17,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 ## 目录
 
 - [目录](#目录)
+- [STAR · STAGE · STORY](#star--stage--story)
 - [STAGE 提供什么](#stage-提供什么)
 - [项目结构](#项目结构)
 - [论文模板](#论文模板)
@@ -37,6 +38,16 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - [将 STAGE 用于新论文](#将-stage-用于新论文)
 - [引用](#引用)
 - [许可证](#许可证)
+
+## STAR · STAGE · STORY
+
+三个项目覆盖研究者工作的不同尺度。它们可以各自独立使用，也可以通过带指纹的证据彼此衔接。
+
+| 项目 | 范围 | 链接 |
+| --- | --- | --- |
+| **STAR** — Systematic Toolchain for AI Research | 推进一个研究项目：从想法出发，经可复现实验，产出可直接用于论文的证据。 | [官网](https://wanghao9610.github.io/STAR/) · [GitHub](https://github.com/wanghao9610/STAR) |
+| **STAGE** — Systematic Toolchain for Authoring, Guiding, and Editing | 把一项研究贡献写成可追溯的论文，贯穿评审、回复与投稿打包。 | **当前项目** · [官网](https://wanghao9610.github.io/STAGE/) · [GitHub](https://github.com/wanghao9610/STAGE) |
+| **STORY** — Systematic Toolchain for Organizing Research over Years | 把研究生阶段的研究组织成可答辩、可归档的硕士或博士学位论文。 | [官网](https://wanghao9610.github.io/STORY/) · [GitHub](https://github.com/wanghao9610/STORY) |
 
 ## STAGE 提供什么
 

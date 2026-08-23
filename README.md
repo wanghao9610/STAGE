@@ -17,6 +17,7 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 ## Contents
 
 - [Contents](#contents)
+- [STAR · STAGE · STORY](#star--stage--story)
 - [What STAGE provides](#what-stage-provides)
 - [Project structure](#project-structure)
 - [Manuscript template](#manuscript-template)
@@ -37,6 +38,16 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
 - [Adapting STAGE to a new paper](#adapting-stage-to-a-new-paper)
 - [Citation](#citation)
 - [License](#license)
+
+## STAR · STAGE · STORY
+
+The three projects cover successive scales of a researcher's work. Use any one independently, or connect them through fingerprinted evidence.
+
+| Project | Scope | Links |
+| --- | --- | --- |
+| **STAR** — Systematic Toolchain for AI Research | Runs one research project from idea through reproducible experiments and paper-ready evidence. | [Website](https://wanghao9610.github.io/STAR/) · [GitHub](https://github.com/wanghao9610/STAR) |
+| **STAGE** — Systematic Toolchain for Authoring, Guiding, and Editing | Turns one research contribution into a traceable paper, review cycle, and submission package. | **Current project** · [Website](https://wanghao9610.github.io/STAGE/) · [GitHub](https://github.com/wanghao9610/STAGE) |
+| **STORY** — Systematic Toolchain for Organizing Research over Years | Shapes graduate research into a defensible master's thesis or doctoral dissertation, defense, and deposit. | [Website](https://wanghao9610.github.io/STORY/) · [GitHub](https://github.com/wanghao9610/STORY) |
 
 ## What STAGE provides
 
