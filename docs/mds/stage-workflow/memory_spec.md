@@ -62,7 +62,7 @@ source: wkdrs/builds/main.log
 | `source` | the artifact the fact came out of, or `conversation` |
 | `supersedes` | optional: the slug this memory replaces |
 
-The body opens with one sentence stating the fact, then carries only what a reader needs in order to act on it. A memory carries no history of its own, and no `model_trail`: a re-verification rewrites `verified` and `model_id` rather than appending, and what the file used to say is in git. Conventions §8 asks for a trail where several sessions each write a different part of one artifact, which is not what happens to a file this small.
+The body opens with one sentence stating the fact, then carries only what a reader needs to act on it. A memory carries no history of its own, and no `model_trail`: a re-verification rewrites `verified` and `model_id` rather than appending, and what the file used to say is in git. Conventions §8 asks for a trail where several sessions each write a different part of one artifact, which is not what happens to a file this small.
 
 **The language rule applies to the body only.** `STAGE_LANG` governs what a run writes (conventions §7.6), so a Chinese session records a Chinese body — and every frontmatter key, every value in the table above, and the `<type>` token in the index line stay English, because the hooks and this spec match them byte-exactly.
 

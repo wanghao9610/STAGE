@@ -110,7 +110,7 @@ It is also where the paper's voice is written down. `style` mode records the aut
 
 ### stage-clms-auditor
 
-The mechanical heart of STAGE. It extracts every number from `manus/tabs/` and `manus/secs/`, traces each through `% src:` comments and ledger evidence links to a fingerprinted `mates/` entry, and issues a verdict per number: matched, mismatched, or unsourced. It flips ledger statuses accordingly (`verified` / `unsourced`), checks evidence staleness with `import.sh --diff`, writes `wkdrs/reports/CLAIMS_<date>.md`, and opens a `tasks/` item per failure. Run it whenever numbers moved — it is cheap, and it is the reason the final paper's numbers can be trusted.
+The numbers audit. It extracts every number from `manus/tabs/` and `manus/secs/`, traces each through `% src:` comments and ledger evidence links to a fingerprinted `mates/` entry, and issues a verdict per number: matched, mismatched, or unsourced. It flips ledger statuses accordingly (`verified` / `unsourced`), checks evidence staleness with `import.sh --diff`, writes `wkdrs/reports/CLAIMS_<date>.md`, and opens a `tasks/` item per failure. Run it whenever numbers moved — it is cheap, and it is the reason the final paper's numbers can be trusted.
 
 ### stage-cite-auditor
 

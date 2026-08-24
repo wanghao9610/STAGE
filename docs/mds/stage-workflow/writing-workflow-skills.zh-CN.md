@@ -112,7 +112,7 @@ Slash-only。把定稿的故事变成论文的骨架：`notes/outline.md`，其�
 
 ### stage-clms-auditor
 
-STAGE 的机械心脏。它从 `manus/tabs/` 与 `manus/secs/` 里抽出每个数字，顺着 `% src:` 注释与记录表证据链接把每个数字追到一条带指纹的 `mates/` 条目，并为每个数字给出判定：matched、mismatched 或 unsourced。它据此翻转记录表状态（`verified` / `unsourced`），用 `import.sh --diff` 检查证据过期，写 `wkdrs/reports/CLAIMS_<date>.md`，并为每次失败开一条 `tasks/` 条目。数字动过就跑它——它很便宜，而且它就是最终论文的数字之所以可信的原因。
+数字审计。它从 `manus/tabs/` 与 `manus/secs/` 里抽出每个数字，顺着 `% src:` 注释与记录表证据链接把每个数字追到一条带指纹的 `mates/` 条目，并为每个数字给出判定：matched、mismatched 或 unsourced。它据此翻转记录表状态（`verified` / `unsourced`），用 `import.sh --diff` 检查证据过期，写 `wkdrs/reports/CLAIMS_<date>.md`，并为每次失败开一条 `tasks/` 条目。数字动过就跑它——它很便宜，而且它就是最终论文的数字之所以可信的原因。
 
 ### stage-cite-auditor
 

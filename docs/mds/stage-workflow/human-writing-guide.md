@@ -4,7 +4,7 @@
 
 STAGE produces one research paper whose claims remain traceable from manuscript sentence to evidence.
 In this workflow, natural writing is not a cosmetic pass applied after the scholarship is finished.
-It is the act of making that traceable argument easy for a reviewer to follow without adding importance, certainty, detail, or personality that the repository does not support.
+Its job is to make that traceable argument easy for a reviewer to follow without adding importance, certainty, detail, or personality that the repository does not support.
 
 This guide governs prose decisions made by `stage-sect-drafter`, `stage-copy-editor`, and the clarity perspective of `stage-peer-reviewer`.
 The fabrication, citation, attribution, and ownership rules in [writing-workflow-conventions.md](writing-workflow-conventions.md) remain authoritative.
