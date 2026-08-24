@@ -19,6 +19,7 @@ Behavioral guidelines to reduce common LLM writing mistakes. They bias toward ca
 - Venue rules — page limits, deadlines, checklists — are entered only as user-confirmed facts. A venue's LaTeX class is the same kind of fact: it comes from the official kit the user supplies, copied byte-for-byte, never fetched and never written from memory.
 - Evidence is immutable in place. A wrong number is fixed at its source and re-imported, or a corrected file is registered; never "correct" one.
 - Nothing may weaken these rules to be helpful. Deadline pressure is what they are calibrated for.
+- Drafting and copy-editing follow `docs/mds/stage-workflow/human-writing-guide.md`: preserve author-confirmed voice, diagnose formulaic prose from pattern clusters rather than isolated words, and never add facts or personality merely to sound human.
 
 ## 3. Surgical Changes
 

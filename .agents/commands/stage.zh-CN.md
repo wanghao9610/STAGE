@@ -14,7 +14,7 @@
 | `stage-tabs-builder` | | 构建一张可追溯证据的表格 |
 | `stage-figs-designer` | | 规划、构建或审计一张图 |
 | `stage-refs-curator` | | 整理参考文献记录与阅读笔记 |
-| `stage-copy-editor` | | 在不改变论断的前提下润色文字 |
+| `stage-copy-editor` | | 在不改变论断或证据的前提下恢复自然的学术表达 |
 | `stage-clms-auditor` | | 追溯手稿中的每个数字 |
 | `stage-cite-auditor` | | 核验每条引用断言 |
 | `stage-peer-reviewer` | | 模拟五种视角的评审 |

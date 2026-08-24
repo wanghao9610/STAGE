@@ -1,6 +1,6 @@
 interface:
   display_name: "Copy Editor"
-  short_description: "Polish prose without changing meaning, numbers, or citations"
-  default_prompt: "Use $stage-copy-editor to polish this section's prose without touching any fact or number."
+  short_description: "Restore natural scholarly prose while preserving every claim and source"
+  default_prompt: "Use $stage-copy-editor to reduce formulaic phrasing and restore the author's scholarly voice without changing facts, numbers, citations, attribution, or claim strength."
 policy:
   allow_implicit_invocation: true

@@ -60,6 +60,10 @@ Question bank:
 - Do the abstract and intro promise exactly what the paper delivers — no more, no less? Flag overclaiming language ("first", "solve", "significantly") not backed by the evidence.
 - Is terminology consistent, and is each term defined before use?
 - Is the structure proportionate — related work where the venue expects it, appendix carrying overflow rather than essentials?
+- Do sections repeatedly use the same formulaic openings, transitions, three-part structures, or generic conclusions? Judge clusters and their effect on comprehension, not isolated words.
+- Does promotional significance language outrun the ledger-backed contribution, does vague attribution hide a missing source, or does synonym rotation make technical terms less precise?
+- Do the conclusion and outlook answer the paper's research question with supported limits, or end in generic impact and future-work language?
+- Is there chatbot residue such as a conversational preamble, approval, apology, or invitation to continue? Report the text as a production defect, never as proof of AI authorship.
 - Language quality: list grammar and typo issues that impede understanding (as minors, batched, with anchors).
 
 Severity guide: a method section a competent reader cannot reconstruct — major (and feeds the soundness perspective's underspecification finding). Everything else here is minor; clarity alone never sinks a paper below the rubric's clarity floor, and never rescues one either.

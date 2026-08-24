@@ -50,8 +50,9 @@ never have: `stage-resp-writer` reads that directory as reviews of *this* paper 
 draft a rebuttal to somebody else's.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
-every STAGE skill shares — read the whole file at the start of every run; there is no
-section-selective loading. The sections that bind this skill hardest: §2 the STOP line, §5
+every STAGE skill shares, and `docs/mds/stage-workflow/human-writing-guide.md` defines the
+evidence-bound natural-writing criteria used by the clarity perspective — read both whole files
+at the start of every run; there is no section-selective loading. The sections that bind this skill hardest: §2 the STOP line, §5
 cycle resolution, §6 delegation (the panel is this workflow's largest sanctioned fan-out, and
 §6.9 is what lets a panelist run its own searches, and what that costs), §8 the output table, §9 the fabrication
 boundary — §9b's review-side extension is this skill's charter.
@@ -153,7 +154,7 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
 
 ### Step 1: Load and resolve
 
-Read the conventions whole, then `notes/story.md` (active cycle), `cycls/<cycle>/venue.yml`
+Read the conventions and human-writing guide whole, in separate file reads, then `notes/story.md` (active cycle), `cycls/<cycle>/venue.yml`
 (`scale:`, `anonymized:`, the venue's form), `notes/claims.md`, and this skill's `references/`
 per the list above. Resolve the mode (default `panel`) and the involve level once (§7.7).
 Missing story, ledger, or venue profile → stop and route to `stage-stry-coach`. A manuscript

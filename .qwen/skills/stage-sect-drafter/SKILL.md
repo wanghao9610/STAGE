@@ -20,6 +20,8 @@ Invocation: `stage-sect-drafter SECTION [DESCRIPTION] [involve=low]` — `SECTIO
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own `read_file` call, never `cat`-ed into a `run_shell_command` command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §5 (section and cycle resolution), §8 (the output table and its staleness rule), and §9 (the fabrication boundary). This file states what is specific to this skill and wins wherever it is stricter.
 
+**Human-writing guide.** Also read `docs/mds/stage-workflow/human-writing-guide.md` whole, through its own file read call, at the start of every run. It defines the evidence-bound natural-writing pass used here; this skill's stricter evidence and ledger rules still win.
+
 **Reusing an earlier load.** A second STAGE skill in the same conversation does not pay for this twice: skip the re-read only when the same file's text is still verbatim visible in this conversation. A summary that survived a context compaction and a memory of having read it do not count. When in doubt, read it again — a wasted read costs one message, a wrong assumption costs the run.
 
 ## Role
@@ -38,7 +40,7 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 4. **Notation is law.** Use the symbols, terminology canon, and abbreviations of `notes/notation.md`; expand each abbreviation at its first use. A new symbol or abbreviation is appended to `notation.md` in the same run; a collision — same symbol, new meaning — is asked about, never silently forked.
 5. **Output-table updates are part of the draft (§8).** Writing states claims, and `notes/claims.md` is where that fact lives (core principle B): a run that does not flip its ledger rows, notation appends, and outline row is unfinished, whatever the prose looks like.
 6. **Evidence is read-only and freshness-checked.** To fix a wrong number, fix it upstream and re-import — never edit `mates/`, never "correct" it in prose. Staleness is exact stamp comparison via `execs/scpts/import.sh --diff`, never mtime (§8).
-7. **Write in the author's voice where one is on file.** `notes/style.md` (§8.11) is the style profile — sentence length, voice, hedging, enumeration form, and the words this paper does not use — and a draft follows it. It outranks nothing: §9 first, then the notation canon (Principle 4), then the venue's format, then the profile. So no dial licenses a number (Principle 1) or a claim the evidence cannot carry (Principle 3), and `hedging: minimal` tightens wording without ever removing a qualifier the evidence requires — a claim's strength is the ledger's, not a preference's. No profile means draft as this skill always has; never invent one, and never write the file — it belongs to `stage-copy-editor style`.
+7. **Write in the author's voice where one is on file.** `notes/style.md` (§8.11) is the style profile — sentence length and rhythm, voice, transitions, hedging, enumeration form, and the words this paper does not use — and a draft follows it. It outranks nothing: §9 first, then the notation canon (Principle 4), then the venue's format, then the profile. So no dial licenses a number (Principle 1) or a claim the evidence cannot carry (Principle 3), and `hedging: minimal` tightens wording without ever removing a qualifier the evidence requires — a claim's strength is the ledger's, not a preference's. No profile means use a restrained, direct scholarly default: lead with the concrete claim, use stable technical terms, and let sentence length vary only with the argument. Never invent a profile, and never write the file — it belongs to `stage-copy-editor style`.
 
 8. **Fan out the evidence read, never the section (§6).** One section per invocation is the roster's rule (§11.3) and it does not bend — but Step 2 opens every `mates/` entry the brief names, and more than 6 of them → one delegate per entry, each returning the values its own file carries at their anchors, the anchor text quoted, and nothing else. The prose is written here from those returns: a section is one argument, and an argument split across contexts reads like one. Every number those returns carry still enters under Principle 1 — the `% src:` anchor of the entry that was opened, or a `\todo{}` — whoever opened it (§6.4). Step 6's build and lint are the gate and run here (§6.3).
 
@@ -47,7 +49,8 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 ### Step 0: Load
 
 1. Read the conventions file (whole file, own `read_file` call), then `notes/story.md` (pitch, active `cycle:`), `notes/outline.md`, `notes/claims.md`, `notes/notation.md`, and `notes/style.md` when it exists (Principle 7).
-2. Missing story or outline means the pipeline is not ready for drafting: stop and route to `stage-stry-coach` or `stage-outl-planner` rather than improvising a structure.
+2. Read the human-writing guide whole, in its own file read call.
+3. Missing story or outline means the pipeline is not ready for drafting: stop and route to `stage-stry-coach` or `stage-outl-planner` rather than improvising a structure.
 
 ### Step 1: Resolve the section
 
@@ -74,6 +77,8 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 4. Every `\cite` key must resolve in `manus/bibs/reference.bib`; a work worth citing but not yet in the bib is flagged and routed to `stage-refs-curator` — never invent a key, never paste a bib entry from memory (§9b).
 5. When `.env` sets `ANON=true` (§3), draft anonymized: third-person self-reference, no acknowledgments, no identifying URLs — `execs/scpts/lint.sh` hunts what slips through.
 6. Revising: keep what holds, change what the argument needs, and never silently drop a stated claim — dropping one is a ledger status change (`dropped`) the user confirms first.
+7. Build each paragraph around one job: concrete claim, evidence or reasoning, then its relation to the section's question. Do not open with significance language that the paragraph has not earned, rotate synonyms for a fixed technical term, or append a generic importance sentence after the evidence ends.
+8. Before leaving the section, run the guide's paragraph-level review. Diagnose clusters and rhetorical function, not isolated words; rewrite the paragraph around its main claim instead of performing phrase-by-phrase substitutions. Compare the result against the pre-edit inventory of numbers, citation and reference keys, `% src:` anchors, `\todo{}` markers, claim strength, attribution, and required qualifiers. Restore the original or report the issue wherever that protected content cannot be shown unchanged.
 
 ### Step 5: Update the registries
 
@@ -83,7 +88,7 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 
 ### Step 6: Check, report, commit
 
-1. Offer an `execs/run.sh` build — a draft must not break compilation. Grep the section for `\todo{` and report the count with each todo's text; `execs/scpts/lint.sh` will hold the manuscript at the gate while any remain.
+1. Offer an `execs/run.sh` build — a draft must not break compilation. Grep the section for `\todo{` and report the count with each todo's text; run `execs/scpts/lint.sh` after a successful build. Its prose-pattern findings are advisory review prompts, while evidence, reference, anonymity, and `\todo` failures keep their existing force.
 2. Report: mode (draft/revise), claims stated with their new statuses, todos left, symbols added, evidence files read with stamps, staleness warnings, and the section's rough length against its page budget (per-section word counts come from `lint.sh` when `texcount` exists).
 3. Recommend the next step: `stage-tabs-builder` for tables this section references, `stage-clms-auditor` before anything ships, `stage-copy-editor` once content settles.
 4. Commit per §1: one commit for the working session — section, ledger, notation, outline together — subject naming the skill (`stage-sect-drafter: draft 3_method`). Never commit `wkdrs/`.

@@ -17,14 +17,16 @@
 | Dial | Settings | 管什么 | 怎么量 |
 |---|---|---|---|
 | `sentence length` | `short` \| `medium` \| `long` | 每句词数的中位数——`short` ≤ 22，`medium` 23–30，`long` > 30 | 散文行的词数中位数 |
+| `sentence rhythm` | `varied` \| `steady` | 句长是否随论证功能变化，或有意保持平稳 | 判断——只报告，不量化 |
 | `voice` | `active, first-person plural` \| `active, impersonal` \| `mixed` | 论文说"we"还是"this paper" | 每 100 句 we/our/us 出现率——只量人称；主动/被动靠判断 |
 | `paragraph opener` | `claim-first` \| `context-first` | 一段的第一句是给出论点还是先铺垫 | 判断——只报告，不量化 |
+| `transitions` | `implicit` \| `explicit` \| `mixed` | 逻辑关系由段落顺序承载，还是由连接短语明说 | 判断——只报告，不量化 |
 | `hedging` | `minimal` \| `standard` \| `cautious` | 一个结果周围裹多少限定 | 每 100 句里含限定词的句数 |
 | `enumeration` | `\parahead runs` \| `itemize lists` \| `mixed` | 一串要点用什么形式排 | `\begin{itemize}` 与 `\begin{enumerate}` 的数量对 `\parahead` 的数量 |
 | `tense` | `present for method, past for experiments` \| `present throughout` | 跨章节的时态约定 | 判断——只报告，不量化 |
 | `math density` | `sparse` \| `standard` \| `heavy` | 论证有多少跑在记号里而不是散文里 | 每页的行间公式环境数 |
 
-有两个档位被刻意标成*判断*。把它们当成量出来的数报告，就是把一项从没跑过的检查报成跑过了（规约 §7.4）；一遍打磨只说它看见了什么、改了几处，不多说。
+有四个档位被刻意标成*判断*。把它们当成量出来的数报告，就是把一项从没跑过的检查报成跑过了（规约 §7.4）；一遍打磨只说它看见了什么、改了几处，不多说。
 
 `hedging: minimal` 是唯一一个有杀伤半径的档位，所以它的边界写进了文件本身：它管的是填充——"we believe"、"it seems that"、"somewhat"、"arguably"——绝不管证据所要求的限定语。证据只覆盖 ADE20K 时写"improves on ADE20K"是最小限定；写"improves across benchmarks"是改了主张，那归 `stage-sect-drafter` 和记录表，不归这里。
 
@@ -32,9 +34,9 @@
 
 一次运行选一条——调用时带的 token（`style preset:<name>`、`style sample=<path>`）直接选定——`source:` 记的就是用了哪条。修订性的运行从盘上的档案出发，只改被要求改的部分。
 
-**1. `interview`。** 一个档位问一个问题，标出推荐项、陈述后果（规约 §7.3）——绝不七个一起问。从 venue 起手：一篇 8 页的会议论文和一篇期刊投稿想要的 `sentence length` 与 `math density` 默认值不一样，而该周期的 `venue.yml` 本来就已经装载了。作者在乎的档位定下来就停止提问，其余取下面预设的默认值并记录在案（规约 §7.8）。
+**1. `interview`。** 一个档位问一个问题，标出推荐项、陈述后果（规约 §7.3）——绝不九个一起问。从 venue 起手：一篇 8 页的会议论文和一篇期刊投稿想要的 `sentence length` 与 `math density` 默认值不一样，而该周期的 `venue.yml` 本来就已经装载了。作者在乎的档位定下来就停止提问，其余取下面预设的默认值并记录在案（规约 §7.8）。
 
-**2. `sample`。** 作者指定 1–3 段——他们自己早先的论文、一篇他们欣赏的论文、他们为这篇写的一段。用下面的量法量这些样例，提出这些测量所蕴含的档位表，把数字和表一起摆出来，然后问。作者说得出"就照这个"却懒得回答七个问题时，这一条最值得优先。
+**2. `sample`。** 作者指定 1–3 段——他们自己早先的论文、一篇他们欣赏的论文、他们为这篇写的一段。用下面的量法量这些样例，提出这些测量所蕴含的档位表，把数字和表一起摆出来，然后问。作者说得出"就照这个"却懒得回答九个问题时，这一条最值得优先。
 
 **样例给什么，绝不给什么。** 它给的是档位设定、一种句式模式所蕴含的 `Prefer / Avoid` 行，别的都不给。措辞不从样例跨进 `manus/`——一个短语不行，一个原样搬过来的句式框架也不行。这对作者自己早先的论文同样适用：查重不问源文是谁写的。不是作者自己写的样例，存指针加短摘录，绝不存整段——仓库可能公开，档案要留的是档位，不是原文。每份样例连同出处存进 `## Samples`，并用一行说清该从中取走什么，好让之后的运行不必重读源文就能重新推出档位。
 
@@ -50,7 +52,7 @@ updated: YYYY-MM-DD
 source: sample
 model_id: <verbatim from the runtime>
 model_trail:
-  - { date: YYYY-MM-DD, model: <id>, skill: stage-copy-editor, scope: initial profile — 7 dials, 4 never rows }
+  - { date: YYYY-MM-DD, model: <id>, skill: stage-copy-editor, scope: initial profile — 9 dials, 4 never rows }
 ---
 # Style profile
 
@@ -59,8 +61,10 @@ model_trail:
 | Dial | Setting | Notes |
 |---|---|---|
 | sentence length | short | derived from the sample: median 19 words |
+| sentence rhythm | varied | longer sentences carry qualifications; short sentences state conclusions |
 | voice | active, first-person plural | ANON=true keeps self-reference third-person (conventions §3.4) |
 | paragraph opener | claim-first | |
+| transitions | implicit | use an explicit connective only when paragraph order does not show the relation |
 | hedging | minimal | never below what the evidence requires |
 | enumeration | \parahead runs | itemize only in the checklist appendix |
 | tense | present for method, past for experiments | |
@@ -139,11 +143,11 @@ grep -niFf wkdrs/reports/.never.txt manus/secs/*.tex
 
 只是起手点，不是家法。每个都是一整套档位；作者在任何东西被写入之前先改行。
 
-**`preset:terse`** —— 8 页视觉会议的默认。`sentence length: short`、`voice: active, first-person plural`、`paragraph opener: claim-first`、`hedging: minimal`、`enumeration: \parahead runs`、`tense: present for method, past for experiments`、`math density: standard`。Never："novel"、"in this paper we propose"、"it is worth noting that"。
+**`preset:terse`** —— 8 页视觉会议的默认。`sentence length: short`、`sentence rhythm: varied`、`voice: active, first-person plural`、`paragraph opener: claim-first`、`transitions: implicit`、`hedging: minimal`、`enumeration: \parahead runs`、`tense: present for method, past for experiments`、`math density: standard`。Never："novel"、"in this paper we propose"、"it is worth noting that"。
 
-**`preset:expository`** —— 给贡献是一个想法而不是一张表的论文。`sentence length: medium`、`voice: active, first-person plural`、`paragraph opener: context-first`、`hedging: standard`、`enumeration: mixed`、`tense: present throughout`、`math density: standard`。
+**`preset:expository`** —— 给贡献是一个想法而不是一张表的论文。`sentence length: medium`、`sentence rhythm: varied`、`voice: active, first-person plural`、`paragraph opener: context-first`、`transitions: mixed`、`hedging: standard`、`enumeration: mixed`、`tense: present throughout`、`math density: standard`。
 
-**`preset:journal`** —— 给篇幅更长、没有页数压力的投稿。`sentence length: medium`、`voice: active, impersonal`、`paragraph opener: claim-first`、`hedging: cautious`、`enumeration: itemize lists`、`tense: present for method, past for experiments`、`math density: heavy`。
+**`preset:journal`** —— 给篇幅更长、没有页数压力的投稿。`sentence length: medium`、`sentence rhythm: steady`、`voice: active, impersonal`、`paragraph opener: claim-first`、`transitions: explicit`、`hedging: cautious`、`enumeration: itemize lists`、`tense: present for method, past for experiments`、`math density: heavy`。
 
 ## 什么绝不进这份档案
 

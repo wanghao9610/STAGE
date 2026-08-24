@@ -12,7 +12,7 @@ Use the roster below to route a paper-writing request to exactly one workflow sk
 | `stage-tabs-builder` | | Build one evidence-traced table |
 | `stage-figs-designer` | | Plan, build, or audit one figure |
 | `stage-refs-curator` | | Curate bibliography records and reading notes |
-| `stage-copy-editor` | | Polish prose without changing claims |
+| `stage-copy-editor` | | Restore natural scholarly prose without changing claims or evidence |
 | `stage-clms-auditor` | | Trace every manuscript number |
 | `stage-cite-auditor` | | Verify every citation assertion |
 | `stage-peer-reviewer` | | Simulate a five-perspective review |

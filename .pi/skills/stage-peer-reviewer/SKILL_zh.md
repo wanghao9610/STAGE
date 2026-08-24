@@ -19,7 +19,7 @@ description: >-
 **默认保密：** 一篇交到审稿人手上的论文，在用户说它已公开之前就是在审中，所以引用完整性约定的保密模式默认开启，除非用户说了。
 **换一个去处：** 报告是 `wkdrs/reports/extern_<slug>_<date>/` 里的 `REFEREE_<date>.md`，或者 `out=<path>` 指定的那个路径——`<slug>` 取评审对象的文件名主干转小写，每一段非字母数字换成 `-`。`manus/`、`notes/`、`cycls/`、`mates/`、`tasks/` 下的任何东西都不为它读取、创建或编辑；而把一份外部评审写进 `cycls/<cycle>/reviews/`，是这条路唯一不许犯的错：`stage-resp-writer` 把那个目录读成*本篇*收到的评审，会去给别人的论文起草反驳。
 
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线——每次运行开始时整份读完；不做分节选读。对本 skill 约束最紧的几节：§2 红线、§5 周期解析、§6 委派（这个评审组是本工作流最大的一次被批准的 fan-out，而 §6.9 正是评审员可以自己跑检索的依据，也写明了代价）、§8 产物登记表、§9 编造边界——§9b 在评审侧的延伸就是本 skill 的授权书。
+**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线，`docs/mds/stage-workflow/human-writing-guide.md`（中文对照：`human-writing-guide.zh-CN.md`）定义清晰度视角使用的、受证据约束的自然写作标准——每次运行开始时整份读完两份文件；不做分节选读。对本 skill 约束最紧的几节：§2 红线、§5 周期解析、§6 委派（这个评审组是本工作流最大的一次被批准的 fan-out，而 §6.9 正是评审员可以自己跑检索的依据，也写明了代价）、§8 产物登记表、§9 编造边界——§9b 在评审侧的延伸就是本 skill 的授权书。
 本文件只写本 skill 特有的部分，更严处以本文件为准。
 
 **复用上一次装载。** 只有当规约文件的正文此刻仍能在本轮对话中逐字看到时，才跳过重读。上下文压缩后幸存下来的摘要不算，"记得自己读过"也不算——拿不准就重读一遍。
@@ -44,7 +44,7 @@ description: >-
 
 ### Step 1：装载与解析
 
-整份读完规约，然后读 `notes/story.md`（当前周期）、`cycls/<cycle>/venue.yml`（`scale:`、`anonymized:`、venue 的表格形式）、`notes/claims.md`，以及按上面清单读本 skill 的 `references/`。解析模式（默认 `panel`）与参与度档位各一次（§7.7）。缺 story、缺记录表或缺 venue 档案 → 停下并路由到 `stage-stry-coach`。手稿还停在骨架 → 停下并路由到 `stage-sect-drafter`；评一堆空章节只是噪声。带 `extern=` 时这些一样都不解析、一样都不读：改为打开评审对象、确认它读得开，并把 venue 与刻度问清楚。打不开的评审对象要如实汇报，绝不靠文件名来评。
+分别整份读完规约与自然写作指南，然后读 `notes/story.md`（当前周期）、`cycls/<cycle>/venue.yml`（`scale:`、`anonymized:`、venue 的表格形式）、`notes/claims.md`，以及按上面清单读本 skill 的 `references/`。解析模式（默认 `panel`）与参与度档位各一次（§7.7）。缺 story、缺记录表或缺 venue 档案 → 停下并路由到 `stage-stry-coach`。手稿还停在骨架 → 停下并路由到 `stage-sect-drafter`；评一堆空章节只是噪声。带 `extern=` 时这些一样都不解析、一样都不读：改为打开评审对象、确认它读得开，并把 venue 与刻度问清楚。打不开的评审对象要如实汇报，绝不靠文件名来评。
 
 ### Step 2：构建
 

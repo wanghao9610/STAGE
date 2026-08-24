@@ -34,7 +34,8 @@ this run's involve level (conventions §7.7), is part of neither the argument no
 and is stripped before either is read.
 
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
-every STAGE skill shares — read the whole file at the start of every run (there is no
+every STAGE skill shares, and `docs/mds/stage-workflow/human-writing-guide.md` defines the
+evidence-bound natural-writing pass — read both whole files at the start of every run (there is no
 section-selective loading). The sections that bind this skill hardest: §5 section resolution, §9
 the fabrication boundary (numbers are not prose), §1 git, §7 dialogue. This file states what is
 specific to this skill and wins wherever it is stricter.
@@ -83,7 +84,7 @@ from the same ones instead of each session inventing a voice.
    issue with ten locations. Durable outcomes are the polished text and the `tasks/` backlog; the
    dated report is ephemeral (conventions §10: `wkdrs/` is never committed).
 7. **The style profile is the author's, and it outranks nothing.** `notes/style.md` (conventions
-   §8.11) fixes voice, sentence length, hedging, enumeration form, and the words this paper does
+   §8.11) fixes voice, sentence length and rhythm, transitions, hedging, enumeration form, and the words this paper does
    not use; apply it to every edit you make. Its precedence is fixed and this skill is where it
    binds: §9 first, then the notation canon, then the venue's format, then the profile. So no
    dial licenses a number, a citation key, or a `\todo` (Principle 1), no dial overrides the
@@ -92,7 +93,15 @@ from the same ones instead of each session inventing a voice.
    profile on disk means write exactly as this skill always has; never invent one mid-polish, and
    never widen one because a sentence would read better outside it.
 
-8. **Fan out per section file (§6).** A whole-manuscript run polishes files that do not touch each
+8. **Naturalness is a paragraph-level, evidence-preserving edit.** Treat the guide's patterns as
+   diagnostic signals, not forbidden-word rules. First freeze numbers, keys, anchors, `\todo{}`
+   markers, attribution, claim strength, and required qualifiers; then diagnose clusters and the
+   rhetorical job they perform. Rewrite the paragraph around its main claim, preserving deliberate
+   parallelism, technical language, and uncertainty that the evidence requires. A rewrite that
+   cannot pass the protected-content comparison is reported and left unapplied. Never claim that
+   this pass proves authorship or defeats an AI detector.
+
+9. **Fan out per section file (§6).** A whole-manuscript run polishes files that do not touch each
    other: one delegate per in-scope `manus/secs/<n>_<slug>.tex`, each owning that file alone for
    the length of the fan-out (§6.2) and editing it in place under Principles 1–4 — no number
    changed, no citation key touched, no `\todo` moved, the canon in `notes/notation.md` enforced,
@@ -103,7 +112,7 @@ from the same ones instead of each session inventing a voice.
 
 ## Workflow
 
-1. **Load.** Read the conventions file whole; then `notes/notation.md`, `notes/outline.md`
+1. **Load.** Read the conventions and human-writing guide whole, in separate file reads; then `notes/notation.md`, `notes/outline.md`
    (section rows and budgets), and `notes/claims.md` (know which sentences carry claims), plus
    `notes/style.md` when it exists (Principle 7). Real date from the system clock (conventions §4).
 2. **Resolve scope (conventions §5).** The literal `style` → the profile branch below, and
@@ -121,24 +130,38 @@ from the same ones instead of each session inventing a voice.
    that finds a profile on disk starts from it: show the current tables, change only what the
    user asks, append the trail entry — never re-derive unasked. Then stop: a profile run edits no prose, runs no build, files no report, and its
    closing line is `stage-copy-editor <section>` — the run that puts the dials to work.
-3. **Read whole first.** Read each in-scope `manus/secs/<n>_<slug>.tex` end to end before
-   editing: note flow breaks, canon violations, over-budget signs, and anything that smells like
-   a meaning problem (route it; do not fix it).
-4. **Edit in place.** Sentence by sentence through the section, then its table and figure
+3. **Read whole first and freeze protected content.** Read each in-scope
+   `manus/secs/<n>_<slug>.tex` end to end before editing: note flow breaks, canon violations,
+   over-budget signs, repeated openings or endings, and anything that smells like a meaning problem
+   (route it; do not fix it). Record the exact numbers, math, citation/reference/label keys, `% src:`
+   anchors, `\todo{}` markers, claim strength, attribution, and evidence-required qualifiers that the
+   pass may not change.
+4. **Diagnose and edit in place.** Inspect paragraphs for clusters from the human-writing guide:
+   inflated significance, vague attribution, shallow analysis tails, formulaic contrast,
+   over-signposting, forced symmetry or triads, terminology drift, uniform rhythm, generic outlooks,
+   manufactured depth, and chatbot residue. Identify what the cluster is doing before rewriting the
+   paragraph around its main claim; do not replace words mechanically. Then edit table and figure
    captions (`manus/tabs/` caption prose only — data cells and `% src:` lines are untouchable).
-   Apply Principles 1–3 and 7; keep a per-section count of edits by kind.
+   Apply Principles 1–3, 7, and 8; keep a per-section count of edits by kind and of advisory patterns
+   reviewed.
 5. **Trim to budget.** Compare each section against its outline budget — page estimate from the
    latest build in `wkdrs/builds/` when one exists, else word count as a proxy. Tighten where
    prose alone closes the gap; record the remainder as a routed finding (Principle 4).
 6. **Verify the build.** Run `execs/run.sh` (Bash). On failure, bisect the session's edits,
    revert the breaker, rebuild — only a compiling manuscript leaves this skill.
-7. **Report.** Write `wkdrs/reports/POLISH_<date>.md` (`mkdir -p` first) per Output. Append one
+7. **Verify conservation and review warnings.** Compare the edited scope with the Step 3 inventory;
+   any changed protected item is restored before the pass continues. Re-read paragraph openings,
+   sentence-length variation, transitions, and paragraph endings against `notes/style.md` when it
+   exists, or a restrained, direct scholarly default when it does not. Run `execs/scpts/lint.sh`;
+   prose-pattern warnings are advisory and enter the report, but they authorize neither a blind
+   rewrite nor a change to the lint gate's hard-failure rules.
+8. **Report.** Write `wkdrs/reports/POLISH_<date>.md` (`mkdir -p` first) per Output. Append one
    `- [ ]` item per systematic or routed finding to `tasks/polish_followups.md` under a
    `## <date>` heading — location(s), issue, route; a re-run checks off items the new pass shows
    resolved.
-8. **Digest in chat.** ≤300 words: sections polished, edit counts by kind, canon violations
+9. **Digest in chat.** ≤300 words: sections polished, edit counts by kind, canon violations
    fixed, budget state per section, findings routed, report path.
-9. **Commit (conventions §1).** One commit for the session — the edited `manus/` files and
+10. **Commit (conventions §1).** One commit for the session — the edited `manus/` files and
    `tasks/polish_followups.md`, or `notes/style.md` alone after a profile run — subject naming
    this skill. `wkdrs/` is never committed.
 
@@ -148,7 +171,9 @@ from the same ones instead of each session inventing a voice.
   in every number, key, label, `% src:` comment, and `\todo`.
 - `wkdrs/reports/POLISH_<date>.md` — output-table row: Audit reports, producer `stage-copy-editor`,
   ephemeral, date in filename. Frontmatter `date:`, `scope:`; sections `## Edits` (per-section
-  counts by kind), `## Systematic issues` (numbered; locations and route each), `## Canon`
+  counts by kind), `## Systematic issues` (numbered; locations and route each), `## Naturalness`
+  (pattern clusters reviewed, material rewrites made, lint warnings remaining, and any issue left
+  unchanged because conservation could not be proved), `## Canon`
   (violations fixed; unknown terms flagged), `## Style` (one line per dial in `notes/style.md`:
   what the polished text now measures against it, and every dial this pass could not reach, said
   plainly — a dial is measured and reported, never turned into a gate), `## Budget` (per-section

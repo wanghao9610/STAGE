@@ -15,14 +15,16 @@ Closed list. A `Setting` cell holds one of the literals below and nothing else; 
 | Dial | Settings | What it governs | Measured by |
 |---|---|---|---|
 | `sentence length` | `short` \| `medium` \| `long` | the median words per sentence — `short` ≤ 22, `medium` 23–30, `long` > 30 | median word count per prose line |
+| `sentence rhythm` | `varied` \| `steady` | whether sentence length changes with argumentative function or stays deliberately even | judgment — reported, not measured |
 | `voice` | `active, first-person plural` \| `active, impersonal` \| `mixed` | whether the paper says "we" or "this paper" | we/our/us rate per 100 sentences — person only; activeness is judged |
 | `paragraph opener` | `claim-first` \| `context-first` | whether a paragraph's first sentence states its point or sets it up | judgment — reported, not measured |
+| `transitions` | `implicit` \| `explicit` \| `mixed` | whether logical relations are carried by paragraph order or connective phrases | judgment — reported, not measured |
 | `hedging` | `minimal` \| `standard` \| `cautious` | how much qualification sits around a stated result | hedge-word rate per 100 sentences |
 | `enumeration` | `\parahead runs` \| `itemize lists` \| `mixed` | how a series of points is laid out | `\begin{itemize}` and `\begin{enumerate}` count vs `\parahead` count |
 | `tense` | `present for method, past for experiments` \| `present throughout` | the tense contract across sections | judgment — reported, not measured |
 | `math density` | `sparse` \| `standard` \| `heavy` | how much of the argument runs through notation rather than prose | display-math environments per page |
 
-Two dials are marked *judgment* on purpose. Reporting them as a measurement would be reporting a check that never ran (conventions §7.4); a pass states what it saw and how many places it changed, and nothing more.
+Four dials are marked *judgment* on purpose. Reporting them as a measurement would be reporting a check that never ran (conventions §7.4); a pass states what it saw and how many places it changed, and nothing more.
 
 `hedging: minimal` is the dial with a blast radius, so it is the one whose limit is written into the file itself: it governs padding — "we believe", "it seems that", "somewhat", "arguably" — and never a qualifier the evidence requires. "improves on ADE20K" where evidence covers ADE20K alone is minimal hedging; "improves across benchmarks" is a claim change, and it belongs to `stage-sect-drafter` and the ledger, not here.
 
@@ -30,9 +32,9 @@ Two dials are marked *judgment* on purpose. Reporting them as a measurement woul
 
 Pick one per run — an invocation token (`style preset:<name>`, `style sample=<path>`) picks it directly — and `source:` records which was used. A revision run starts from the profile on disk and changes only what was asked.
 
-**1. `interview`.** Ask the dials in one question each, recommendation marked, consequence stated (conventions §7.3) — and never all seven at once. Start from the venue: an 8-page vision paper and a journal submission want different `sentence length` and `math density` defaults, and the cycle's `venue.yml` is already loaded. Stop asking once the author has settled the dials they care about; the rest take the preset defaults below and are logged as such (conventions §7.8).
+**1. `interview`.** Ask the dials in one question each, recommendation marked, consequence stated (conventions §7.3) — and never all nine at once. Start from the venue: an 8-page vision paper and a journal submission want different `sentence length` and `math density` defaults, and the cycle's `venue.yml` is already loaded. Stop asking once the author has settled the dials they care about; the rest take the preset defaults below and are logged as such (conventions §7.8).
 
-**2. `sample`.** The author points at 1–3 paragraphs — their own earlier paper, a paper they admire, a paragraph they wrote for this one. Measure the sample with the recipes below, propose the dial table those measurements imply, show both the numbers and the table, and ask. This is the mode worth preferring when the author can say "like this" faster than they can answer seven questions.
+**2. `sample`.** The author points at 1–3 paragraphs — their own earlier paper, a paper they admire, a paragraph they wrote for this one. Measure the sample with the recipes below, propose the dial table those measurements imply, show both the numbers and the table, and ask. This is the mode worth preferring when the author can say "like this" faster than they can answer nine questions.
 
 **What a sample gives, and what it never gives.** It gives dial settings, the two-column `Prefer / Avoid` rows a construction pattern implies, and nothing else. Wording does not cross from a sample into `manus/` — not a phrase, not a sentence frame carried over intact. This holds for the author's own earlier papers too: a similarity check does not ask who wrote the source. A sample the author did not write is stored as a pointer plus a short excerpt, never the whole paragraph — the repository may go public, and the dials, not the text, are what the profile keeps. Store each sample under `## Samples` with its attribution and one line naming what to take from it, so a later run can re-derive the dials without re-reading the source.
 
@@ -48,7 +50,7 @@ updated: YYYY-MM-DD
 source: sample
 model_id: <verbatim from the runtime>
 model_trail:
-  - { date: YYYY-MM-DD, model: <id>, skill: stage-copy-editor, scope: initial profile — 7 dials, 4 never rows }
+  - { date: YYYY-MM-DD, model: <id>, skill: stage-copy-editor, scope: initial profile — 9 dials, 4 never rows }
 ---
 # Style profile
 
@@ -57,8 +59,10 @@ model_trail:
 | Dial | Setting | Notes |
 |---|---|---|
 | sentence length | short | derived from the sample: median 19 words |
+| sentence rhythm | varied | longer sentences carry qualifications; short sentences state conclusions |
 | voice | active, first-person plural | ANON=true keeps self-reference third-person (conventions §3.4) |
 | paragraph opener | claim-first | |
+| transitions | implicit | use an explicit connective only when paragraph order does not show the relation |
 | hedging | minimal | never below what the evidence requires |
 | enumeration | \parahead runs | itemize only in the checklist appendix |
 | tense | present for method, past for experiments | |
@@ -137,11 +141,11 @@ Two limits, stated because a report that hides them overstates what it checked. 
 
 Starting points, not house style. Each is a full dial set; the author edits rows before anything is written.
 
-**`preset:terse`** — the 8-page vision-conference default. `sentence length: short`, `voice: active, first-person plural`, `paragraph opener: claim-first`, `hedging: minimal`, `enumeration: \parahead runs`, `tense: present for method, past for experiments`, `math density: standard`. Never: "novel", "in this paper we propose", "it is worth noting that".
+**`preset:terse`** — the 8-page vision-conference default. `sentence length: short`, `sentence rhythm: varied`, `voice: active, first-person plural`, `paragraph opener: claim-first`, `transitions: implicit`, `hedging: minimal`, `enumeration: \parahead runs`, `tense: present for method, past for experiments`, `math density: standard`. Never: "novel", "in this paper we propose", "it is worth noting that".
 
-**`preset:expository`** — for a paper whose contribution is an idea rather than a table. `sentence length: medium`, `voice: active, first-person plural`, `paragraph opener: context-first`, `hedging: standard`, `enumeration: mixed`, `tense: present throughout`, `math density: standard`.
+**`preset:expository`** — for a paper whose contribution is an idea rather than a table. `sentence length: medium`, `sentence rhythm: varied`, `voice: active, first-person plural`, `paragraph opener: context-first`, `transitions: mixed`, `hedging: standard`, `enumeration: mixed`, `tense: present throughout`, `math density: standard`.
 
-**`preset:journal`** — for a longer, no-page-pressure submission. `sentence length: medium`, `voice: active, impersonal`, `paragraph opener: claim-first`, `hedging: cautious`, `enumeration: itemize lists`, `tense: present for method, past for experiments`, `math density: heavy`.
+**`preset:journal`** — for a longer, no-page-pressure submission. `sentence length: medium`, `sentence rhythm: steady`, `voice: active, impersonal`, `paragraph opener: claim-first`, `transitions: explicit`, `hedging: cautious`, `enumeration: itemize lists`, `tense: present for method, past for experiments`, `math density: heavy`.
 
 ## What never enters the profile
 
