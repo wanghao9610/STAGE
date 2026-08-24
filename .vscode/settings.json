@@ -35,7 +35,8 @@
     // opened at the repo root. A workspace-relative "manus/main.tex" matches
     // nothing in that case and the extension refuses to build.
     "latex-workshop.latex.search.rootFiles.include": [
-        "**/main.tex"
+        "**/main.tex",
+        "**/main-zh.tex"
     ],
     "latex-workshop.hover.preview.mathjax.extensions": [
         "boldsymbol"
@@ -71,6 +72,8 @@
     // when -g points into a directory that does not exist yet — which surfaces
     // as a "Formatting failed" popup on the first save, before any build.
     "latex-workshop.formatting.latexindent.args": [
+        "-c",
+        "%TMPDIR%/",
         "-g",
         "%TMPDIR%/indent.log",
         "%TMPFILE%",
@@ -78,15 +81,29 @@
     ],
     // PdfLaTeX first, because "first" is the recipe LaTeX Workshop builds with
     // when latex-workshop.latex.recipe.default is unset — which matches .env's
-    // LATEX_ENGINE=pdflatex and execs/run.sh, the repo's only sanctioned build.
-    // No XeLaTeX recipe: manus/stys/arxiv.cls disables sans f-ligatures through
-    // microtype's \DisableLigatures, which needs pdftex, so xelatex stops there
-    // with an error and produces nothing. LuaLaTeX does build and is kept.
+    // LATEX_ENGINE=pdflatex and execs/run.sh for manus/main.tex.
+    // main-zh.tex selects XeLaTeX via % !LW recipe / % !TeX program. Magic
+    // comments otherwise spawn xelatex with no -output-directory, so logs land
+    // in manus/ instead of wkdrs/builds. magic.args and the XeLaTeX recipe both
+    // pass the configured outDir; LuaLaTeX remains available.
+    "latex-workshop.latex.magic.args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-output-directory=%OUTDIR%",
+        "%DOC%"
+    ],
     "latex-workshop.latex.recipes": [
         {
             "name": "PdfLaTeX",
             "tools": [
                 "pdflatexmk"
+            ]
+        },
+        {
+            "name": "XeLaTeX",
+            "tools": [
+                "xelatexmk"
             ]
         },
         {
@@ -103,6 +120,23 @@
             "args": [
                 "-synctex=1",
                 "-pdf",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-cd",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ],
+            "env": {
+                "TEXINPUTS": "%DIR%/stys:",
+                "BSTINPUTS": "%DIR%/stys:"
+            }
+        },
+        {
+            "name": "xelatexmk",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-xelatex",
                 "-interaction=nonstopmode",
                 "-file-line-error",
                 "-cd",
