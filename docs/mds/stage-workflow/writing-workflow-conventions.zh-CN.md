@@ -124,6 +124,7 @@ STAGE_LANG=
 5. **没有任何 skill 安装东西。** 缺失的工具——latexmk、pdfinfo、texcount、bib 解析器——意味着一次**降级检查**：能跑的照跑，在报告里点名缺口，并把安装命令交给用户（§2 禁止代跑）。
 6. **shell 是无状态的。** `run.sh` 从自身路径定位仓库根，在任何位置都能工作；skill 用绝对路径解析，绝不依赖此前的 `cd`。
 7. **手稿一句一行。** LaTeX 把一个换行折成一个空格，所以句子在哪里断开对 PDF 毫无代价，换来的却是逐句的 diff、逐句的 blame，以及——这套工作流真正在意的那一点——`% src:` 注释与它领起的那一句固定成两行（§9a）。往 `manus/` 里写东西的 skill 让每句另起一行，绝不按列宽折行。`bash execs/scpts/fmt.sh` 把已有文件改成这个样子，`--check` 只报告偏离；`lint.sh` 把它记为**警告，绝不是硬失败**——一行在哪里断开，动不了页数、动不了引用、动不了 todo 计数，所以它不该拦住投稿。规则本身写在仓库根的 `.latexindent.yaml` 里，脚本与编辑器读的是同一份；两棵树被豁免，因为那些字节是别人的：`manus/stys/`，以及 `cycls/*/template/` 下的任何官方包（§10.4）。**会改变排版结果的重写一律拒绝，文件原样留着。** 工具的断句并不完美——大写字母前的小写缩写（`std.`、`et al.`）会被读成句末——所以每次重写都与原文比对一次，比对前把每段连续空白折成一个空格，这正是 TeX 自己的做法；没通过比对的文件只被报出来，绝不写入。修法在正文里（`et al.\ `、`Fig.~\ref{...}`），绝不是放松规则。
+**自然表达仍受证据约束。** 手稿正文应保持作者的学术声音，不得用公式化语言夸大论断、隐藏来源或制造虚假的重要性。起草和润色工作流遵循[学术自然写作指南](human-writing-guide.zh-CN.md)：有样本时使用经作者确认的样本；按模式组合进行复核，不机械禁用单个词或句式；必要时在段落尺度重写。风格编辑不得改变事实、数字、引用、来源锚点、论断强度、技术区别、不确定性边界或贡献归属，也不得在没有作者与证据支持时增加个性或具体细节。`bash execs/scpts/lint.sh` 把高置信度聊天机器人残留和集中出现的公式化表达报告为建议性警告。这些警告只用于定位需要人工复核的段落；它们不能证明文本由 AI 生成，也不会单独阻塞投稿。
 
 ## 4. 真实日期
 
@@ -337,11 +338,14 @@ frontmatter：`cycle:`、`date:`、`frozen:`（tag 名）、`package:`（`wkdrs/
 ## Dials
 | Dial | Setting | Notes |
 | sentence length | short — median ≤ 22 words | |
+| sentence rhythm | varied | 较长句承载限定，短句陈述结论 |
 | voice | active, first-person plural | ANON=true 时自指仍用第三人称（§3.4） |
 | paragraph opener | claim-first | |
+| transitions | implicit | 只有段落顺序无法表达关系时才用显式连接语 |
 | hedging | minimal | 绝不低于证据所要求的——见"优先级" |
 | enumeration | \parahead runs, not itemize | |
 | tense | present for method, past for experiments | |
+| math density | standard | |
 
 ## Prefer / Avoid          | Prefer | Avoid | Why |          —— 管句式，不管单个词
 ## Never                   | Never | Use instead |          —— 这篇论文不用的词和口头禅
@@ -453,7 +457,7 @@ skill 写出的东西各自落在哪里。每个去处是排他的——一个�
    `\documentclass{stys/stage}`：没有就地替换，也没有第二份事实来源。
 5. **七种 harness 共用一份中立 skill 存储。** 同样的十六个 skill 发布在 `.agents/skills/`、`.claude/skills/`、
    `.cursor/skills/`、`.dsh/skills/`、`.kimi-code/skills/`、`.pi/skills/` 与 `.qwen/skills/`。
-   `.agents/skills/` 是 `AGENTS.md` 约定要求的工具中立根，也是共用 skill 文件唯一的存放位置；命名 harness 树里每份逐字节一致的文件都链接到这里。
+   `.agents/skills/` 是 `AGENTS.md` 约定要求的工具中立作者源，也是共用 skill 文件唯一的存放位置；六套具名 harness 技能树由它生成，仅属于某个 harness 的行为放在显式适配层里。命名 harness 树里每份逐字节一致的文件都链接到这里。
    harness 专属清单仍是实文件，写本 harness 自己的调用方式与工具名。有本 harness 的原生副本就装载它；没有时，中立副本只写角色、不写别家的工具名，也可安全使用。
    Codex 的逐 skill 界面清单放在 `.codex/skills/`，再链接进 Codex 扫描的 `.agents/skills/` 路径。完整的 `/stage` 请求路由器只放在
    `.agents/commands/stage.md`，供人阅读的 `.agents/commands/stage.zh-CN.md` 放在它旁边；Claude、Cursor、Pi 与 Qwen 只保留一层原生入口，把各自的参数语法传给共用路由器，再选择本 harness 的技能树。

@@ -122,6 +122,7 @@ Five of them are read by the entrypoint scripts. `STAGE_LANG` and `INVOLVE` are 
 5. **No skill installs anything.** A tool that is absent — latexmk, pdfinfo, texcount, a bib parser — is a **degraded check**: run what can run, name the gap in the report, and give the user the install command (§2 bars running it).
 6. **The shell is stateless.** `run.sh` locates the repository root from its own path and works from anywhere; skills resolve paths absolutely and never depend on a prior `cd`.
 7. **The manuscript reads one sentence per line.** LaTeX collapses a newline to a space, so where a sentence breaks costs the PDF nothing and buys a per-sentence diff, a per-sentence blame, and — the reason this workflow cares — a fixed two-line shape for a `% src:` comment and the sentence it heads (§9a). A skill writing under `manus/` starts each sentence on its own line and never wraps at a column. `bash execs/scpts/fmt.sh` makes an existing file match and `--check` reports drift; `lint.sh` carries that as a **warning, never a hard failure** — where a line breaks cannot move a page, a reference, or a todo count, so it must not block a submission. The rule itself lives in `.latexindent.yaml` at the repository root, which the script and the editor both read, and two trees are exempt because their bytes are somebody else's: `manus/stys/` and any kit under `cycls/*/template/` (§10.4). **A rewrite that would change the typeset text is refused and the file left alone.** The tool's sentence detector is not perfect — a lowercase abbreviation before a capital (`std.`, `et al.`) can be read as a sentence end — so every rewrite is compared against the original with each whitespace run collapsed to one space, which is exactly what TeX does; a file that fails that comparison is reported, never written. The fix is in the prose (`et al.\ `, `Fig.~\ref{...}`), never a loosened rule.
+**Human writing is evidence-bound.** Manuscript prose preserves the author's scholarly voice without using formulaic language to inflate a claim, hide a source, or simulate significance. Drafting and copy-editing follow the [human-writing guide](human-writing-guide.md): use author-confirmed samples where available, review patterns in clusters rather than banning isolated words or constructions, and rewrite at paragraph scale when needed. A style edit never changes a fact, number, citation, source anchor, claim strength, technical distinction, uncertainty boundary, or contribution attribution. It never adds personality or concrete detail without authorial and evidential support. `bash execs/scpts/lint.sh` reports high-confidence chatbot residue and clustered formulaic prose as advisory warnings. These warnings identify passages for human review; they neither establish that AI produced the text nor block submission by themselves.
 
 ## 4. Real dates
 
@@ -335,11 +336,14 @@ The author's prose preferences, written down once so every run that touches a se
 ## Dials
 | Dial | Setting | Notes |
 | sentence length | short — median ≤ 22 words | |
+| sentence rhythm | varied | longer sentences carry qualifications; short sentences state conclusions |
 | voice | active, first-person plural | ANON=true keeps self-reference third-person (§3.4) |
 | paragraph opener | claim-first | |
+| transitions | implicit | use an explicit connective only when paragraph order does not show the relation |
 | hedging | minimal | never below what the evidence requires — see Precedence |
 | enumeration | \parahead runs, not itemize | |
 | tense | present for method, past for experiments | |
+| math density | standard | |
 
 ## Prefer / Avoid          | Prefer | Avoid | Why |          — constructions, not single words
 ## Never                   | Never | Use instead |          — the words and tics this paper does not use
@@ -458,8 +462,9 @@ Rules the table alone does not carry:
    in-place swap and no second source of truth.
 5. **Seven harnesses share one neutral skill store.** The same sixteen skills ship in `.agents/skills/`,
    `.claude/skills/`, `.cursor/skills/`, `.dsh/skills/`, `.kimi-code/skills/`, `.pi/skills/`, and
-   `.qwen/skills/`. `.agents/skills/` is the tool-neutral root required by the `AGENTS.md` convention
-   and the only path shared skill files are stored under; every byte-identical file in a named harness tree
+   `.qwen/skills/`. `.agents/skills/` is the authored, tool-neutral source required by the `AGENTS.md` convention
+   and the only path shared skill files are stored under; the six named harness trees are generated from it,
+   with harness-only behavior held in explicit adapters. Every byte-identical file in a named harness tree
    links there. Harness-specific manifests remain real files and name that harness's invocation and
    tools. Load your harness's native copy when one exists; otherwise the neutral copy is safe because it
    names roles rather than another harness's tools. Codex's per-skill UI manifests live under

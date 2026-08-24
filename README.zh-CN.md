@@ -55,14 +55,14 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - **只读的证据层**：STAR 产物（或人工登记的文件）被快照进 `mates/`，每个文件带一枚指纹，记录在 `mates/MANIFEST.md`。证据单向流动——要改一个数字，去上游改好再重新导入；绝不直接编辑 `mates/`。
 - **作为枢纽的论断记录表**：`notes/claims.md` 把每条论断的陈述位置 ⇄ 证据 ⇄ 状态连在一起。写作提出论断，审计验证论断，回复捍卫论断。
 - **统一的构建入口**：`execs/run.sh` 用 latexmk 把 `manus/main.tex` 编译到树外的 `wkdrs/builds/`，并打印 PDF 路径和页数。
-- **确定性检查放在脚本里，判断放在 skill 里**：`execs/scpts/lint.sh` 机械地抓未定义引用、`\todo` 标记、超页和匿名泄漏；十六个 skill 处理一切需要判断的事。
+- **确定性检查放在脚本里，判断放在 skill 里**：`execs/scpts/lint.sh` 机械地抓未定义引用、`\todo` 标记、超页和匿名泄漏；它还会对高置信度聊天机器人残留和集中出现的公式化表达给出建议性警告。这些警告只请求人工复核，不判断作者身份，也不会单独阻塞投稿。
 - **完整的写作生命周期**：十六个相互配合的 skill，按运行顺序依次是——接线仓库、整理证据、打磨故事、规划提纲、逐节起草、由证据生成表格、设计图、维护参考文献、润色文字、审计每个数字、审计每条引用、模拟评审、撰写回复、打包投稿、做海报、汇报状态。
 - **投稿周期即数据**：每次投稿尝试都住在 `cycls/<venue>_<year>/` 里：经用户确认的 `venue.yml` 档案、真实与模拟评审、回复，以及冻结的投稿记录。
 - **一套工作流，七套 harness**：同样的十六个 skill 供 Claude Code、Codex、Cursor、DSH、Kimi Code、Pi 和 Qwen Code 使用。工具无关的 skill 文件只在 `.agents/skills/` 保存一份，完整的 `/stage` 请求路由器只在 `.agents/commands/` 保存一份；各原生树只保留 harness 专属措辞和参数适配层。
 - **属于论文自己的记忆**：一次会话学到、而仓库里没有任何文件认领的东西——某个 TeX 工具链的坑、你的一项长期偏好、一个试过又被否掉的框架——记在 `.stage/memory/` 下，并由一个钩子在下一次会话开头摆到 agent 面前；不管你用哪个工具驱动 STAGE 都一样。
 - **供人阅读的中文镜像**：每个 `SKILL.md` 旁边一份 `SKILL_zh.md`、peer-reviewer 的 references 旁边一份 `*_zh.md`、共享请求路由器旁边一份 `stage.zh-CN.md`、工作流文档旁边一份 `*.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
 
-每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.md)中。
+每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.zh-CN.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)中，守住证据边界的文字处理流程见[学术自然写作指南](docs/mds/stage-workflow/human-writing-guide.zh-CN.md)。
 
 ## 项目结构
 
@@ -267,7 +267,7 @@ bash execs/scpts/import.sh --diff   # 只读的过期检查报告；任何漂移
 
 ```bash
 bash execs/run.sh          # latexmk 树外构建 → wkdrs/builds/ + PDF 路径和页数
-bash execs/scpts/lint.sh   # 未定义引用、\todo 计数、页数上限、匿名泄漏
+bash execs/scpts/lint.sh   # 硬门禁 + 建议性的集中套话复核
 bash execs/scpts/fmt.sh    # 一句一行；--check 只报告偏离，不写入
 ```
 
@@ -351,7 +351,7 @@ dsh --profile YOUR_PROFILE --dump-config
 | `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<slug>.tex` |
 | `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<slug>.pdf` + 源文件 |
 | `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子，没有时用 `discover` 按主题检索并提议候选 | `manus/bibs/reference.bib`、`notes/refs/<ABBREV>.md`、`notes/refs/refs_index.md` |
-| `stage-copy-editor` | 对一个章节或全稿做润色：清晰、流畅、记号一致、按预算删减——绝不改技术含义和任何数字；`style` 模式改为把作者的行文档位记下来 | `manus/` 下被润色的正文、`wkdrs/reports/POLISH_<date>.md`、`notes/style.md` |
+| `stage-copy-editor` | 打磨一节或整篇手稿：清晰度、流畅度、自然的学术表达、记号一致性与篇幅收紧——段落级改写不改变技术含义、数字、引用、归属或主张强度；`style` 模式改为记录作者的散文档位 | `manus/` 中编辑后的散文、`wkdrs/reports/POLISH_<date>.md`、`notes/style.md` |
 | `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转记录表状态，检查证据过期 | `notes/claims.md` 的状态翻转、`wkdrs/reports/CLAIMS_<date>.md`、`tasks/` 条目 |
 | `stage-cite-auditor` | 每个 `\cite` key 都能解析；关于被引论文的每个断言都能对上一份阅读笔记——对不上的断言被标记，绝不悄悄改掉 | `wkdrs/reports/CITES_<date>.md`、`tasks/` 条目 |
 | `stage-peer-reviewer` | 模拟程序委员会：五视角评审团（新颖性与相关工作、技术正确性、实验严谨性、清晰度、魔鬼代言人），引用只认 whitelist/verified，按锚定评分带 + 封顶规则打分；`quick` 为单遍精简模式；绝不修改稿件 | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
@@ -378,7 +378,7 @@ dsh --profile YOUR_PROFILE --dump-config
 4. **搭论文骨架** —— `/stage-outl-planner`：带页数预算的章节表、图表计划、论断→章节分配写进 `notes/outline.md`；骨架 `.tex` 文件出现在 `manus/secs/` 下，`main.tex` 中对应的 `\input` 行被取消注释；`notes/notation.md` 被播种。
 5. **建参考文献基座** —— `/stage-refs-curator`：`notes/refs/` 里带可引用事实的阅读笔记、干净的 `reference.bib`、相关工作定位。
 6. **起草** —— `/stage-sect-drafter` 每次一个章节，依据简报、证据和论断；`/stage-tabs-builder` 从证据生成表格；`/stage-figs-designer` 把每张图从源文件做到渲染 PDF。记录表状态翻到 `drafted`。
-7. **润色** —— `/stage-copy-editor`：清晰、流畅、记号一致；含义和数字碰不得。想先定文风的话，`/stage-copy-editor style` 把它记成 `notes/style.md` 里可量的档位。
+7. **润色** —— `/stage-copy-editor`：清晰度、流畅度、自然的学术表达与记号一致性，含义、证据、数字、引用和归属不可触碰。它判断共同出现的模式并在段落尺度重写，不靠禁词表机械换词。需要时先用 `/stage-copy-editor style` 把论文文风记成 `notes/style.md` 里的可量档位。
 8. **审计** —— `/stage-clms-auditor` 把每个数字追溯到指纹；`/stage-cite-auditor` 核查每条引用和断言；每个失败都变成一条 `tasks/` 条目和一个记录表状态，而不是埋在报告里的一行。
 9. **评审与回复** —— `/stage-peer-reviewer` 召集五视角模拟评审团（或用 `quick` 单遍模式），把 meta-review 写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点记录表、一份不超 venue 限制的回复，以及 `tasks/` 里的承诺复选框。
 10. **打包冻结** —— `/stage-subm-packer`：build 和 lint 必须通过、走查检查单、依已注册的模板包把论文转成 venue 自己的版式、包放到 `wkdrs/builds/` 下、写出 `SUBMISSION_<date>.md`、打出标签 `freeze/<cycle>_<date>`。camera-ready 模式在 `tasks/<cycle>_promises.md` 还有未勾选项时拒绝打包。先跑 `/stage-subm-packer convert kit=<path>`，并按需要跑很多次——单独的转换跳过所有冻结关口，所以在论文还在压页数时照样能用。
@@ -413,7 +413,7 @@ dsh --profile YOUR_PROFILE --dump-config
 
 生命周期：`proposed`（故事提出）→ `drafted`（写进正文）→ `verified`（审计对上了证据）/ `unsourced`（写了但没有指纹——必须带 `\todo`）/ `weakened`（回复中让步）/ `dropped`（放弃）。故事播种论断，起草陈述论断，审计验证论断，回复捍卫论断：同一批行，一路走到投稿。
 
-**C. 确定性检查放在脚本里，判断放在 skill 里。** grep 能抓的——未定义引用、`\todo` 标记、页数上限、匿名泄漏、过期的 stamp——由 `lint.sh` 和 `import.sh --diff` 抓，并可作为投稿闸门。需要判断的——这条论断真的成立吗、这张表是不是说明这个点的最佳方式——住在 skill 里。
+**C. 确定性检查放在脚本里，判断放在 skill 里。** grep 能抓的——未定义引用、`\todo` 标记、页数上限、匿名泄漏、过期的 stamp——由 `lint.sh` 和 `import.sh --diff` 抓，并可作为投稿闸门。散文模式扫描在约束力上是明确的例外：它用确定性规则定位高置信度残留或集中信号，但只给建议性警告，必须由人判断。需要判断的——这条论断真的成立吗、这张表是不是说明这个点的最佳方式、一个段落在上下文里是否公式化——住在 skill 里。
 
 编造红线（规范 §9）把环闭上：`manus/` 里的每一个数字，要么可追溯到一条带指纹的 `mates/` 记录，要么写成 `\todo{...}`——没有第三种状态；关于被引论文的每个断言都必须能对上一份阅读笔记；venue 规则只以用户确认的事实录入；任何 skill 都不得"为了帮忙"而放松这些规则。
 
@@ -479,7 +479,7 @@ bash execs/update.sh --skill stage-flow-status
 
 上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。为避免误删自定义内容，上游已删除的文件不会在本地自动删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
-如果你改的是 STAGE 本身而不是某篇论文：修改作者维护的 Claude 版本后，先用 `bash .github/scripts/port.sh --write` 重新生成其余目录，再用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七套目录的语义约束。后两项检查都在 CI 中运行；这些命令只属于上游维护工具，`.github/` 不会同步进论文仓库。
+如果你改的是 STAGE 本身而不是某篇论文：只编辑 `.agents/skills/` 下工具中立的作者源，再用 `bash .github/scripts/port.sh --write` 重新生成六套 harness 技能树。仅属于某个 harness 的行为写进该树的 rules 或带锚点的 overrides。随后用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七个根目录的语义约束。后两项检查都在 CI 中运行；这些命令只属于上游维护工具，`.github/` 不会同步进论文仓库。
 
 ## 项目约定
 

@@ -1120,6 +1120,75 @@ for root in .claude/skills .cursor/skills .dsh/skills .kimi-code/skills .pi/skil
 done
 (( codex_fig_errors == 0 )) && note "the neutral root carries the optional pipeline; Codex UI links to it; named trees stay native"
 
+# 20. The advisory prose scan keeps the STORY-aligned thresholds: chatbot
+#     residue can stand alone, ordinary phrases require a multi-pattern cluster,
+#     comments and table data are outside the scan, and captions remain prose.
+section "Advisory prose lint"
+prose_lint_errors=0
+PROSE_TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stage-prose-lint.XXXXXX")"
+mkdir -p "${PROSE_TEST_DIR}/execs/scpts" "${PROSE_TEST_DIR}/manus/secs" \
+         "${PROSE_TEST_DIR}/manus/tabs" "${PROSE_TEST_DIR}/wkdrs/builds"
+cp execs/scpts/lint.sh "${PROSE_TEST_DIR}/execs/scpts/lint.sh"
+
+cat > "${PROSE_TEST_DIR}/execs/run.sh" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+: > "${PROSE_TEST_DIR}/wkdrs/builds/main.log"
+: > "${PROSE_TEST_DIR}/wkdrs/builds/main.pdf"
+
+cat > "${PROSE_TEST_DIR}/manus/secs/1_positive.tex" <<'EOF'
+This section delves into the evolving landscape and sets the stage for the method.
+
+值得注意的是，本节将深入探讨不断演变的格局，从而彰显该方法的重要性。
+EOF
+cat > "${PROSE_TEST_DIR}/manus/secs/2_chatbot.tex" <<'EOF'
+I hope this helps.
+EOF
+cat > "${PROSE_TEST_DIR}/manus/secs/3_single_signal.tex" <<'EOF'
+It is important to note that the optimizer uses momentum.
+EOF
+cat > "${PROSE_TEST_DIR}/manus/secs/4_safe.tex" <<'EOF'
+However, the samples were normalized before training, and the same term is used throughout.
+% I hope this helps. This section delves into an evolving landscape.
+EOF
+cat > "${PROSE_TEST_DIR}/manus/tabs/results.tex" <<'EOF'
+I hope this helps. This section delves into the evolving landscape.
+\caption{This table stands as a testament to the result. It is important to note that all rows use the same split.}
+EOF
+
+if PROSE_TEST_OUT="$(cd "${PROSE_TEST_DIR}" && bash execs/scpts/lint.sh 2>&1)"; then
+    for marker in \
+        'manus/secs/1_positive.tex:1: prose review (inflated-significance,stock-signposting)' \
+        'manus/secs/1_positive.tex:3: prose review (' \
+        'manus/secs/2_chatbot.tex:1: prose review (chatbot-residue)' \
+        'manus/tabs/results.tex:2: prose review (inflated-significance,stock-signposting)'; do
+        grep -qF -- "${marker}" <<< "${PROSE_TEST_OUT}" || {
+            fail "prose lint missed expected marker: ${marker}"
+            prose_lint_errors=1
+        }
+    done
+    for ignored in \
+        'manus/secs/3_single_signal.tex:1: prose review' \
+        'manus/secs/4_safe.tex:1: prose review' \
+        'manus/tabs/results.tex:1: prose review'; do
+        if grep -qF -- "${ignored}" <<< "${PROSE_TEST_OUT}"; then
+            fail "prose lint warned on protected or below-threshold text: ${ignored}"
+            prose_lint_errors=1
+        fi
+    done
+    grep -qF 'findings are advisory, not proof of AI authorship' <<< "${PROSE_TEST_OUT}" || {
+        fail "prose lint no longer states its advisory, non-authorship boundary"
+        prose_lint_errors=1
+    }
+else
+    fail "prose lint fixture exited non-zero"
+    printf '%s\n' "${PROSE_TEST_OUT}" | sed 's/^/      /'
+    prose_lint_errors=1
+fi
+rm -rf -- "${PROSE_TEST_DIR}"
+(( prose_lint_errors == 0 )) && note "chatbot, cluster, false-positive, comment, and caption fixtures pass"
+
 printf '\n'
 if (( FAILURES > 0 )); then
     printf '%d check(s) failed.\n' "${FAILURES}"
