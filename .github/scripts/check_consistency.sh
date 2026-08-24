@@ -40,7 +40,7 @@ frontmatter_has_line() { # $1 = file, $2 = exact line expected inside the leadin
 # 0. Generated trees and shared-link topology match their declared source.
 section "Generated harness trees"
 if bash .github/scripts/port.sh --check; then
-    note "all seven trees reproduce from .claude plus their port rules"
+    note "all six harness trees reproduce from the authored .agents source plus their adapters"
 else
     fail ".github/scripts/port.sh --check failed"
 fi
@@ -106,17 +106,16 @@ for root in "${SKILL_ROOTS[@]}"; do
 done
 (( name_errors == 0 )) && note "every manifest's name matches its directory"
 
-# 3. Per-skill file inventory is identical across the seven trees, apart from the
+# 3. Per-skill file inventory is identical across the seven roots, apart from the
 #    Codex-only agents/ manifest directory.
 section "File inventory parity (ignoring .agents agents/ manifests)"
 parity_errors=0
 while IFS= read -r skill; do
-    baseline="$(cd ".claude/skills/${skill}" && find -L . -type f | sort)"
-    for root in "${SKILL_ROOTS[@]}"; do
-        [[ "${root}" == ".claude/skills" ]] && continue
+    baseline="$(cd ".agents/skills/${skill}" && find -L . -type f ! -path './agents/*' | sort)"
+    for root in "${SKILL_ROOTS[@]:1}"; do
         listing="$(cd "${root}/${skill}" && find -L . -type f ! -path './agents/*' | sort)"
         if [[ "${listing}" != "${baseline}" ]]; then
-            fail "${root}/${skill} file set differs from .claude/skills/${skill}:"
+            fail "${root}/${skill} file set differs from .agents/skills/${skill}:"
             diff <(printf '%s\n' "${baseline}") <(printf '%s\n' "${listing}") | sed 's/^/      /'
             parity_errors=1
         fi
@@ -654,7 +653,7 @@ while IFS= read -r rel; do
 done < <(cd .claude/skills && find -L . -type f -name '*.md' | sed 's|^\./||' | sort)
 (( struct_errors == 0 )) && note "heading structure matches across all six named trees (${struct_files} files)"
 
-# 12. Top-level section parity between .agents and .claude manifests.
+# 12. Top-level section parity between the authored source and Claude manifests.
 #     A SKILL.md's ## sections are its shape, not its wording — Role, Core
 #     Principles, Workflow, State & File Rules, Dialogue Discipline — and those
 #     are shared. Manifests only, and the SET rather than the sequence, so
@@ -679,8 +678,8 @@ norm_sections() { # $1 = file; prints the file's normalized ## headings, sorted 
 section_errors=0
 while IFS= read -r skill; do
     for manifest in SKILL.md SKILL_zh.md; do
-        baseline=".claude/skills/${skill}/${manifest}"
-        other=".agents/skills/${skill}/${manifest}"
+        baseline=".agents/skills/${skill}/${manifest}"
+        other=".claude/skills/${skill}/${manifest}"
         [[ -f "${baseline}" && -f "${other}" ]] || continue   # checks 2 and 3 own missing files
         if ! diff -q <(norm_sections "${baseline}") <(norm_sections "${other}") > /dev/null; then
             fail "${other}: ## sections differ from ${baseline}:"
@@ -689,7 +688,7 @@ while IFS= read -r skill; do
         fi
     done
 done < <(printf '%s\n' "${SKILLS}")
-(( section_errors == 0 )) && note ".agents manifests carry the same ## sections as .claude"
+(( section_errors == 0 )) && note ".claude manifests carry the same ## sections as the authored .agents source"
 
 # 13. Opening-load invariants.
 #     Every run is supposed to start the same way: resolve STAGE_LANG from .env,
@@ -1047,14 +1046,14 @@ prov_marker() { # $1 = tree root; prints the skills whose manifests state it
         fi
     done < <(printf '%s\n' "${SKILLS}")
 }
-PROV_BASELINE="$(prov_marker .claude/skills)"
+PROV_BASELINE="$(prov_marker .agents/skills)"
 if [[ -z "${PROV_BASELINE}" ]]; then
-    fail ".claude/skills states model_trail in no manifest; conventions §8 asks every producer to"
+    fail ".agents/skills states model_trail in no manifest; conventions §8 asks every producer to"
     prov_errors=1
 fi
 for root in "${SKILL_ROOTS[@]:1}"; do
     if [[ "$(prov_marker "${root}")" != "${PROV_BASELINE}" ]]; then
-        fail "${root} states the provenance line in a different set of skills than .claude/skills:"
+        fail "${root} states the provenance line in a different set of skills than .agents/skills:"
         diff <(printf '%s\n' "${PROV_BASELINE}") <(prov_marker "${root}") | sed 's/^/      /'
         prov_errors=1
     fi
