@@ -1,170 +1,69 @@
-# Natural scholarly prose in STAGE
+# Clear writing in an evidence-bound paper
 
 **Language:** English | [简体中文](human-writing-guide.zh-CN.md)
 
-STAGE produces one research paper whose claims remain traceable from manuscript sentence to evidence.
-In this workflow, natural writing is not a cosmetic pass applied after the scholarship is finished.
-Its job is to make that traceable argument easy for a reviewer to follow without adding importance, certainty, detail, or personality that the repository does not support.
+This guide applies shared checks for formulaic writing to STAGE manuscript prose.
+The goal is clear, natural scholarship in the author's voice, not authorship detection or detector evasion.
+It governs `stage-sect-drafter`, `stage-copy-editor`, and the clarity review in `stage-peer-reviewer`; the [writing workflow conventions](writing-workflow-conventions.md) remain authoritative.
 
-This guide governs prose decisions made by `stage-sect-drafter`, `stage-copy-editor`, and the clarity perspective of `stage-peer-reviewer`.
-The fabrication, citation, attribution, and ownership rules in [writing-workflow-conventions.md](writing-workflow-conventions.md) remain authoritative.
+## 1. Preserve content and provenance
 
-## 1. Read the paper's records before judging its voice
+A style edit may reorganize prose, but it must not change what the paper can claim.
 
-Naturalness in STAGE is constrained by records, not by a generic style prompt.
-Before drafting or revising a passage, load the records that control it:
+- Read the controlling records first: `notes/story.md`, `notes/outline.md`, `notes/claims.md`, mapped `mates/` evidence, `notes/refs/`, `notes/notation.md`, `notes/style.md`, and the active venue and anonymity rules.
+  Report conflicts instead of resolving them in prose; evidence, citations, and the claim ledger outrank style.
+- Preserve numbers, math, citations, keys, labels, LaTeX, `% src:` comments, `\todo{}`, canonical terms, claim strength and scope, attribution, comparison sets, conditions, uncertainty, and required qualifiers.
+- Every number and assertion about cited work must retain its trace.
+  Missing support stays visible through `\todo{...}` or the owning workflow; never supply a plausible value, source, or fact.
+- If a revision would add, remove, move, weaken, or strengthen a claim, it is not style-only.
+  Route it through the owning workflow and update `notes/claims.md` in the same change.
 
-| Record | What it decides about the prose |
-|---|---|
-| `notes/story.md` | the paper's pitch, problem, key idea, and claimed contributions; prose may sharpen these but not broaden them |
-| `notes/claims.md` | the exact claim, its type, where it is stated, its evidence, and its current strength; this is the semantic boundary of a rewrite |
-| `mates/MANIFEST.md` and the mapped `mates/` file | whether a result is fingerprinted and what the evidence actually contains |
-| `notes/refs/<ABBREV>.md` | what the paper may say about a cited work; the `## Citable facts` section, not the bibliography entry alone, backs the sentence |
-| `notes/outline.md` | the job and page budget of each `manus/secs/<n>_<slug>.tex` file |
-| `notes/notation.md` | canonical terms, symbols, abbreviations, and first-use locations |
-| `notes/style.md`, when present | author-confirmed choices about voice and cadence; it supplies preferences, never facts or claims |
-| `cycls/<cycle>/venue.yml` and `.env` `ANON` | confirmed length and anonymity constraints |
+## 2. Match the writer and the paper
 
-If these records disagree, prose is not the place to reconcile them silently.
-Report the conflict to the workflow that owns the record.
+Follow an author-confirmed sample when one exists.
+Match its observable vocabulary, sentence movement, punctuation, transitions, qualification, first-person practice, and deliberate repetition without borrowing sentences or adding facts, opinions, humor, or disorder.
+Without a sample, use restrained, direct scholarly prose.
 
-## 2. The trace must survive the edit
+- Lead with the substantive point and prefer canonical terms and simple verbs.
+  Name the actor when agency affects interpretation.
+- Organize each paragraph around its mapped claim–support–inference sequence and the job assigned in `notes/outline.md`.
+- State results under their exact conditions, separate observation from inference, and keep limitations as visible as positive findings.
+- Keep manuscript prose in English, preserve anonymity, and use only the space the argument needs.
+- Let sentence length and paragraph shape follow the reasoning.
+  End on a supported result, limitation, or useful transition, not generic optimism.
+- Add personality only when the author-confirmed voice and scholarly context call for it.
+  Never manufacture a persona.
 
-STAGE has two different units: the **paragraph is the unit of composition**, while the **sentence is the unit of audit**.
-A paragraph may be reorganized to improve reasoning, but every resulting sentence must still preserve its place in the traceability chain.
+## 3. Review pattern clusters
 
-### Results and other external numbers
+Treat these as editing signals, not banned forms or evidence of AI authorship.
+Rewrite at paragraph scale when several signals accumulate, one template recurs, or a pattern introduces an unsupported claim.
 
-A number in prose must remain connected to its claim-ledger row, the row's evidence link, and a fingerprinted `mates/` entry.
-A `% src:` comment covers exactly the sentence it heads.
-Do not move a sourced sentence away from its comment, merge it with a sentence governed by another source, or split it without deciding which source covers each result.
+| Review for | Rewrite toward |
+| --- | --- |
+| Inflated significance, sales language, name-dropping, unsupported superlatives, or stock optimism | The exact result and only its supported consequence. |
+| Vague attribution, knowledge-limit disclaimers, or plausible guesses | A named, verified source and checkable proposition; otherwise an explicit gap or deletion. |
+| Shallow analytical tails, abstract action chains, hidden actors, or stacked qualifiers | A direct fact–inference link, a clear actor where needed, and only evidentially necessary qualification. |
+| Repeated “not X but Y,” forced triads or ranges, fake objections or alternatives, staged candor, slogans, or a claimed “deeper truth” | The real relation, constraint, or choice without drafting scaffolds. |
+| Stock signposting, repeated headings, filler, greetings, praise, apologies, previews, service offers, or generic endings | The content itself and only navigation the reader needs. |
+| Synonym cycling, stock diction, repeated openings, uniform cadence, dramatic fragments, excessive dashes, decorative emphasis, label-heavy lists, or emojis | Stable names and syntax, rhythm, or formatting that has a clear function. |
 
-If an edit exposes an unsupported number, retain or add `\todo{...}` and make the ledger debt visible through the owning workflow.
-Never improve specificity by supplying a remembered value.
+Do not ban a word, transition, passive construction, first person, long sentence, list, or dash in isolation.
+Keep a form when it carries a real relation, preserves technical meaning, or matches the author.
+Never rewrite quotations, titles, notation, data, or literal fields merely because they match a watched pattern.
+`lint.sh` labels configured instances such as `chatbot-residue`, `inflated-significance`, `vague-attribution`, `formulaic-contrast`, `stock-signposting`, `shallow-analysis`, `generic-outlook`, `manufactured-depth`, and `stock-diction`.
+Its warnings locate passages for review; a clean scan only means that no configured pattern fired.
+Do not assign a numerical “human score.”
 
-### Statements about cited work
+## 4. Rewrite and verify
 
-Keep a literature sentence no stronger or broader than the corresponding reading note.
-Grouped citations are not decorative: if a sentence attributes one property to three papers, each paper's note must support that property.
-Changing “uses” to “requires”, or “evaluates” to “demonstrates”, is a claim change even when the sentence sounds smoother.
+1. Resolve the section through `notes/outline.md` and state its job in terms of mapped claims.
+2. Read the controlling records and mark all protected literal and semantic content.
+3. Map the claim–support–inference sequence and diagnose patterns by paragraph.
+4. Rewrite the unit around its substantive point; do not patch watched words one by one.
+5. Compare the revision with the ledger, evidence, reading notes, notation, style profile, and original prose.
+   Restore every dropped qualifier, trace, or attribution, and remove every added or strengthened claim.
+6. Preserve one sentence per source line, then run `bash execs/run.sh` and `bash execs/scpts/lint.sh` after any `manus/` edit.
 
-### Claim strength and attribution
-
-Preserve whether a claim is `proposed`, `drafted`, `verified`, `unsourced`, `weakened`, or `dropped` in `notes/claims.md`.
-Do not turn an observed association into a causal result, a result under evaluated conditions into a universal conclusion, or a component contribution into a paper-level contribution.
-The actor also matters: keep separate what this paper establishes, what the evidence source reports, what prior work claims, and what remains the authors' interpretation.
-
-### Protected manuscript structure
-
-Treat citation keys, labels, references, equations, LaTeX commands, `\todo{}` markers, `% src:` comments, canonical terms, and venue-required wording as protected.
-Keep one sentence per source line so that a source comment and the sentence it governs retain a stable two-line shape.
-An edit may change punctuation or sentence boundaries only after rechecking that these structural relationships still hold.
-
-## 3. Write each paper component for its actual job
-
-Formulaic prose often appears when a passage performs a generic academic function instead of the function assigned to it by STAGE.
-Use the repository's structure to recover that function.
-
-| Passage | STAGE check | Revise toward |
-|---|---|---|
-| Abstract | pitch and contribution claim IDs in `notes/story.md`; verified scope in the ledger | problem, method distinction, supported result, and bounded contribution without ceremonial setup |
-| Introduction | section brief and contribution rows | the concrete gap and why the proposed idea addresses it; no unsupported “paradigm shift” framing |
-| Related work | reading notes and terminology canon | proposition–source–difference relationships; no anonymous “prior studies show” narration |
-| Method | notation, claim type, and section brief | actor, operation, inputs, outputs, and design reason; passive voice is fine when agency is immaterial |
-| Experiments | fingerprinted evidence and result claims | setup sufficient to interpret the result, the result itself, then only the inference the evidence supports |
-| Table or figure caption | the artifact's purpose in the outline and its source mapping | what is shown, how to read it, and the supported takeaway; never a second abstract |
-| Limitations | evaluated scope and weakened or unsourced claims | the exact boundary, its consequence, and what evidence would resolve it |
-| Conclusion | pitch, verified claims, and unresolved boundaries | the question answered by this paper; no generic promise that the field will continue to flourish |
-
-Page pressure does not authorize meaning loss.
-When trimming toward the active cycle's confirmed budget, remove repeated setup, duplicated interpretation, and empty signposting before qualifications, evidence, or technical distinctions.
-
-## 4. Diagnose failures in the argument, not forbidden words
-
-`lint.sh` uses category labels so it can point a human to likely review sites.
-The labels describe possible failures in a STAGE argument; they are not a blacklist and do not classify authorship.
-
-- `inflated-significance`: the prose claims importance beyond the mapped contribution or verified consequence.
-- `vague-attribution`: a source-bearing assertion has no identifiable paper, evidence producer, or authorial owner.
-- `shallow-analysis`: a result is followed by “highlighting”, “underscoring”, “从而彰显”, or a similar tail that skips the actual inference.
-- `formulaic-contrast`: “not only X but Y”, “不仅……而且……”, or a balanced triad stages a distinction that the method or claim ledger does not need.
-- `stock-signposting`: the prose announces a section or observation that the heading and paragraph order already make clear.
-- `generic-outlook`: a limitation or conclusion ends in optimism without naming an unresolved claim, missing evidence, or concrete research question.
-- `manufactured-depth`: a slogan, dramatic fragment, or “the real question is” construction supplies emphasis that the evidence has not earned.
-- `stock-diction`: several decorative abstractions accumulate where the canonical technical term would be more precise.
-- `chatbot-residue`: greetings, praise, apologies, knowledge-cutoff disclaimers, or invitations to continue have leaked into manuscript prose.
-
-One occurrence of *however*, an em dash, passive voice, a three-item list, a long sentence, or a formal term is not a defect.
-Keep any construction that performs a necessary comparison, marks a real inference, preserves conventional technical wording, or matches an author-confirmed sample.
-Except for clear chatbot residue, review a passage because several signals reinforce one another or because the same template recurs across sections.
-
-## 5. Use the author profile without manufacturing a persona
-
-`notes/style.md` is optional and `stage-copy-editor style` is its only writer.
-When it exists, use its samples to recover observable choices: sentence length and rhythm, voice, paragraph openers, transitions, hedging, enumeration, tense, math density, punctuation, and constructions the paper avoids.
-
-The precedence is fixed:
-
-1. evidence and citation boundaries;
-2. the claim ledger;
-3. `notes/notation.md` and venue rules;
-4. the style profile.
-
-A sample supplies settings, never reusable sentences.
-Do not infer a paper-wide persona from one paragraph, import the voice of a cited author, or add humor, emotion, autobiography, deliberate errors, or first-person commentary to appear less machine-like.
-When no profile exists, use a restrained scholarly default: concrete claim first, stable terminology, explicit agency where it affects interpretation, and sentence length driven by the reasoning.
-
-The profile binds prose under `manus/` only.
-It does not rewrite workflow records or override the venue-defined register of a response to reviewers.
-
-## 6. Rewrite with a protected-content comparison
-
-For a section draft or polish pass:
-
-1. Resolve the section through `notes/outline.md` and state the paragraph's job in terms of its assigned claims.
-2. Freeze literal invariants: numbers, math, keys, labels, references, `% src:` comments, `\todo{}` markers, and canonical terms.
-3. Freeze semantic invariants: claim strength, scope, attribution, comparison set, experimental condition, and evidence-required qualifiers.
-4. Identify the paragraph's current claim–support–inference sequence.
-5. Rewrite the paragraph around that sequence; do not replace watched words one by one.
-6. Compare the result against both inventories and the relevant ledger and reading-note rows.
-7. Restore one sentence per line, then build with `bash execs/run.sh` and inspect `bash execs/scpts/lint.sh`.
-
-Leave a passage unchanged and report it when natural wording would require any of the following:
-
-- evidence that has not been imported or fingerprinted;
-- a stronger or different ledger claim;
-- a fact absent from a cited work's reading note;
-- a new canonical term or a changed technical distinction;
-- removal of a qualifier needed to remain within the evaluated conditions.
-
-Those are research-record decisions, not copy edits.
-
-## 7. Separate the three workflow roles
-
-The same guide supports three different responsibilities:
-
-- `stage-sect-drafter` forms the first claim–support–inference structure from the section brief, mapped claims, and evidence.
-  It updates the section and its bookkeeping together; it never fills a gap with plausible prose.
-- `stage-copy-editor` is the only role that rewrites prose for naturalness.
-  It freezes protected content, edits at paragraph scale, checks the section budget, builds, and records anything it cannot safely change.
-- `stage-peer-reviewer` is read-only.
-  Its clarity perspective compares openings, contribution statements, related-work summaries, result interpretations, and conclusions across the paper, then anchors formulaic or promotional passages as review findings.
-
-The deterministic lint is narrower than these judgment passes.
-It scans section prose and table-caption prose, ignores LaTeX comments and structural commands, warns on standalone high-confidence chatbot residue or clustered ordinary patterns, and never blocks a submission solely for style.
-A clean lint result therefore means “no configured pattern fired”, not “the prose is natural”.
-
-## 8. Completion criteria
-
-A passage is ready when all of the following hold:
-
-- **traceability:** every external number and cited assertion still reaches its required STAGE record;
-- **claim fidelity:** no assertion became broader, stronger, more causal, or differently attributed;
-- **local function:** the paragraph performs the job assigned by its section brief and claims;
-- **technical stability:** notation and terminology agree with the canon;
-- **economy:** every sentence advances the claim, support, inference, limitation, or necessary navigation;
-- **authorial consistency:** observable choices agree with `notes/style.md`, when one exists;
-- **review resistance:** importance, novelty, and conclusions are stated at the strength a skeptical reviewer can verify.
-
-There is deliberately no numerical “human score”.
-Prose features cannot establish whether AI produced a passage, and evading an AI detector is not a STAGE objective.
+Leave the passage unchanged and report the issue if smoother prose would require unimported evidence, a different claim, an unsupported statement about prior work, a new canonical term, or removal of a necessary qualifier.
+A revision is ready only when every number and cited assertion still traces, claim strength and attribution remain intact, and the paragraph performs its assigned job.
