@@ -82,7 +82,7 @@ allowed-tools: >-
 
 ### Step 5：更新各登记项
 
-1. `notes/claims.md`：为每条被陈述的主张，把本节的 slug 加进 Stated in；把 `proposed` 翻成 `drafted`；陈述了却没有证据的主张进入 `unsourced`——它在正文里的那句话带着该状态所要求的 `\todo`。`verified` 的行保持状态；只有 Stated in 增长。
+1. `notes/claims.md`：为每条被陈述的主张，把本节的 slug 加进 Stated in；把 `proposed` 翻成 `drafted`；陈述了却没有证据的主张进入 `unsourced`——它在正文里的那句话带着该状态所要求的 `\todo`。修复走同一列：一次修订把某条主张最后一个 `\todo` 换成能追溯的取值（指纹本次运行读过）→ `unsourced` 送回 `drafted`；一次修订按 `tasks/<cycle>_promises.md` 里已勾选的承诺重述了回应中让步过的主张 → `weakened` 送回 `drafted`；两者的 `verified` 都等 `stage-clms-auditor` 来给。`verified` 的行保持状态；只有 Stated in 增长。
 2. `notes/notation.md`：追加新的 Symbols 行（First defined = 本节）与 Abbreviations 行（First use）；更新 `updated:`（真实日期，§4）。
 3. `notes/outline.md`：本节那一行 → `drafted`（对一个 `polished` 行的实质性修订同样把它退回 `drafted`）；更新 `updated:`。
 
@@ -96,7 +96,7 @@ allowed-tools: >-
 ## 输出
 
 - `manus/secs/<n>_<slug>.tex`——起草或修订好的那一节；它的状态字段是 `notes/outline.md` 里 Sections 行的状态（登记表：Section drafts）。
-- `notes/claims.md`——Stated in 扩充；状态翻成 `drafted` / `unsourced`。
+- `notes/claims.md`——Stated in 扩充；状态翻成 `drafted` / `unsourced`（修复把 `unsourced` 或 `weakened` 送回 `drafted`）。
 - `notes/notation.md`——追加的 Symbols 与 Abbreviations 行。
 - `notes/outline.md`——该节的行状态与 `updated:`。
 - 聊天汇报：陈述了哪些主张、`\todo{}` 清单、读过的证据及其时间戳、过期警告，以及建议的下一个 `/stage-*` 步骤。除这些文件之外什么都不写。

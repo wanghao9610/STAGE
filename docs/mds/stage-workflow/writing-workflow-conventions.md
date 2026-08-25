@@ -37,13 +37,12 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 
 **The discipline is one commit per skill working session** — never unannounced, staging only that session's work, with the subject prefix naming the skill: `stage-sect-drafter: 3_method — first full draft`, `stage-evid-curator: import xseg results`. One skill, one prefix, so the log separates by skill.
 
-**Skills that never commit** — two, for different reasons. `stage-flow-status` writes nothing at all, so its git usage is read-only (`status` / `diff` / `log`). `stage-proj-adopt` writes plenty — file moves, the tex edits those moves force, the adoption record — and still never commits: adoption rearranges a manuscript somebody else built, and reviewing that rearrangement is not a skill's to skip. `git mv` stages the renames it performs and nothing else is added; the commit is the user's.
+**Skills that never commit** — three, for different reasons. `stage-flow-status` writes nothing at all, so its git usage is read-only (`status` / `diff` / `log`). `stage-evid-curator` writes plenty under `mates/` — imports, registrations, the manifest — and still never commits: evidence is what every number in the manuscript is measured against, so what enters that store sits in `git status` for the user to review and commit themselves. `stage-proj-adopt` writes plenty — file moves, the tex edits those moves force, the adoption record — and still never commits: adoption rearranges a manuscript somebody else built, and reviewing that rearrangement is not a skill's to skip. `git mv` stages the renames it performs and nothing else is added; the commit is the user's.
 
 **Skills that may commit**, and what each may stage:
 
 | Skill | Commits | Stages |
 | --- | --- | --- |
-| `stage-evid-curator` | offered once when the session ends | the `mates/` files this run imported or registered, plus `mates/MANIFEST.md` |
 | `stage-stry-coach` | offered once when the session ends | `notes/story.md`, the seeded `notes/claims.md`, the cycle's `venue.yml` when created |
 | `stage-outl-planner` | offered once when the session ends | `notes/outline.md`, `notes/notation.md`, new `manus/secs/` skeletons, the `\input` edits in `manus/main.tex` |
 | `stage-sect-drafter` | offered once per drafted section | that section's `.tex`, plus its ledger, notation, and outline updates |
@@ -51,8 +50,8 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 | `stage-figs-designer` | offered once when the session ends | `manus/figs/` renders, `manus/figs/srcs/` sources, outline updates |
 | `stage-refs-curator` | offered once when the session ends | `manus/bibs/reference.bib`, `notes/refs/` notes and index |
 | `stage-copy-editor` | offered once after the pass | only the `.tex` files the pass edited, plus `notes/style.md` when a `style` run wrote it — the polish report stays in `wkdrs/` |
-| `stage-clms-auditor` | offered once after the audit | `notes/claims.md` status flips and the new `tasks/` items — the audit report stays in `wkdrs/` |
-| `stage-cite-auditor` | offered only when the run fixed bib fields | `manus/bibs/reference.bib` — findings stay in the `wkdrs/` report |
+| `stage-clms-auditor` | offered once after the audit | `notes/claims.md` status flips, the new `tasks/` items, and `notes/adopt.md` when the run set its `backfilled:` — the audit report stays in `wkdrs/` |
+| `stage-cite-auditor` | offered once after the audit, when it filed follow-ups | `tasks/cites_followups.md` — findings stay in the `wkdrs/` report, and the bib is read-only here: a bib repair routes to `stage-refs-curator` |
 | `stage-peer-reviewer` | offered once per review, and never on an `extern=` run | the one `SIM_REVIEW_*` file it wrote. A referee report on an external paper is not a repository artifact and is not staged |
 | `stage-resp-writer` | offered once when the session ends | the `RESPONSE_*` file, `tasks/<cycle>_promises.md`, ledger downgrades |
 | `stage-subm-packer` | one at pack time; one more when a `convert` run registers a venue template kit | `cycls/<cycle>/SUBMISSION_<date>.md`; the `freeze/<cycle>_<date>` tag then lands on that commit — the package itself stays in `wkdrs/builds/`. The `convert` commit is separate and stages only what that run wrote outside `wkdrs/` — the kit under `cycls/<cycle>/template/` and `tasks/<cycle>_venue.md` — so the freeze commit stays the one file it claims to be |
@@ -244,7 +243,7 @@ model_trail:                    # append-only: one entry per write session, neve
 | C1 | <one sentence> | contribution \| performance \| factual | `1_intro`, `abstract`, `tabs/main` | `mates/<slug>/...#<anchor>`; `—` if none | proposed \| drafted \| verified \| unsourced \| weakened \| dropped |
 ```
 
-Lifecycle: `proposed` (story) → `drafted` (stated in text) → `verified` (clms-auditor matched evidence) / `unsourced` (stated, no fingerprint — must carry `\todo`) / `weakened` (conceded in response) / `dropped`.
+Lifecycle: `proposed` (story) → `drafted` (stated in text) → `verified` (clms-auditor matched evidence) / `unsourced` (stated, no fingerprint — must carry `\todo`) / `weakened` (conceded in response) / `dropped`. Repairs are owned like the states are: `stage-clms-auditor` flips `unsourced → verified` when a later audit finds the `\todo` gone and every number tracing to fresh, matching evidence; `stage-sect-drafter` and `stage-tabs-builder` flip `unsourced → drafted` when a revision replaces the `\todo` with a value that traces, and `weakened → drafted` when a revision restates a conceded claim per its kept promise in `tasks/<cycle>_promises.md` — after which verification is the ordinary path. `dropped` is terminal; a claim worth reviving re-enters through `stage-stry-coach` as a new row.
 
 ### 8.2 `mates/MANIFEST.md` — one `##` entry per file under `mates/`
 

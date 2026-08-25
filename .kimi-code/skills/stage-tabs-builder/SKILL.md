@@ -79,7 +79,7 @@ The choice of which methods and metrics the table compares belongs to the outlin
 
 ### Step 6: Update the registries
 
-1. `notes/claims.md`: performance claims the table states get `tabs/<slug>` added to Stated in and `proposed` → `drafted`; one `unsourced` row (Evidence `—`) per `\todo{}` cell; bump `updated:` (real date, §4).
+1. `notes/claims.md`: performance claims the table states get `tabs/<slug>` added to Stated in and `proposed` → `drafted`; one `unsourced` row (Evidence `—`) per `\todo{}` cell; a rebuild that fills a previous `\todo{}` cell with a value that traces returns that claim `unsourced` → `drafted`, and one honoring a checked promise in `tasks/<cycle>_promises.md` returns its conceded claim `weakened` → `drafted` — `verified` stays `stage-clms-auditor`'s to award; bump `updated:` (real date, §4).
 2. `notes/outline.md`: the Tables row → `draft` (`sketch` while todos dominate); bump `updated:`.
 
 ### Step 7: Report and commit

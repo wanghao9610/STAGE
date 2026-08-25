@@ -15,8 +15,7 @@ description: >-
 argument-hint: "[import | register <path> | check] [DESCRIPTION] [involve=low]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),
-  Bash(execs/scpts/import.sh:*), Agent, Bash(git status:*), Bash(git diff:*), Bash(git log:*),
-  Bash(git add:*), Bash(git commit:*)
+  Bash(execs/scpts/import.sh:*), Agent, Bash(git status:*), Bash(git diff:*), Bash(git log:*)
 ---
 
 # Evidence Curator — the manifest and the files behind the numbers
@@ -69,16 +68,16 @@ Read `.env`. `STAR_HOME` set and pointing at a real repo → the star side is li
 
 ### Step 1: `import` — pull or refresh star evidence
 
-1. Preview: `bash execs/scpts/import.sh --diff` — what upstream would add or change relative to each entry's pinned `upstream-commit`, writing nothing.
+1. Preview: `bash execs/scpts/import.sh --diff` — what upstream would add or change relative to each entry's pinned `source-commit`, writing nothing.
 2. A diff that rewrites already-registered entries is confirmed first via one AskUserQuestion, naming each entry and the numbers that move — a refreshed number can silently contradict a sentence the draft already typeset (Principle 6). New-only imports proceed without a question.
 3. Run `bash execs/scpts/import.sh` with the user's arguments passed through unchanged. The script owns the writes: never reimplement it, and never hand-write a star entry — when the script fails, the fix is the script or an honest report, not a forged entry.
 4. Report entries added and rewritten; Step 4 carries the routes.
 
 ### Step 2: `register <path>` — adopt hand-dropped evidence
 
-1. Read the file in full — nothing is registered unread — and say in one line what it actually contains; that line seeds `shows:`.
+1. Read the file in full — nothing is registered unread — and say in one line what it actually contains; that line seeds `covers:`.
 2. Outside `mates/manual/` → copy it in, the original untouched; a name collision is a question, never an overwrite.
-3. One AskUserQuestion for what no probe can know: `source` — where this came from (path, URL, or person) — and `shows`, skipped when the user's request already said both.
+3. One AskUserQuestion for what no probe can know: `source` — where this came from (path, URL, or person) — and `covers`, skipped when the user's request already said both.
 4. Compute `sha256`, write the `##` entry with `source-type: manual` and today's real date. Re-registering an existing file rewrites its entry in place — one entry per file, current state, not history.
 5. A request to register a number with no file behind it is declined (Principle 5): the file comes first, and when the number lives in the paired STAR repo the answer is `import`, not a hand copy that loses the stamp.
 

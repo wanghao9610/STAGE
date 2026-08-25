@@ -39,13 +39,12 @@ STAGE 写作工作流中每个 skill 都遵守的规则。十六个 skill——`
 
 **纪律是"一个 skill 工作会话一次提交"**——绝不无声无息地发生，只暂存这次会话的产出，提交标题前缀点名是哪个 skill：`stage-sect-drafter: 3_method — first full draft`、`stage-evid-curator: import xseg results`。一个 skill，在 log 里就是一个目录树。
 
-**永不提交的 skill**——两个，理由各不相同。`stage-flow-status` 根本什么都不写，所以它对 git 只读使用（`status` / `diff` / `log`）。`stage-proj-adopt` 写得不少——文件搬迁、搬迁逼出的 tex 改动、接入记录——却同样从不提交：接入是在重排别人搭起来的手稿，而复核这次重排不该由一个 skill 替用户跳过。`git mv` 会暂存它自己执行的重命名，除此之外不再 add 任何东西；提交是用户的。
+**永不提交的 skill**——三个，理由各不相同。`stage-flow-status` 根本什么都不写，所以它对 git 只读使用（`status` / `diff` / `log`）。`stage-evid-curator` 在 `mates/` 下写得不少——导入、登记、manifest——却同样从不提交：证据是手稿里每个数字要对照的东西，进入这个仓储的内容留在 `git status` 里，由用户自己复核并提交。`stage-proj-adopt` 写得不少——文件搬迁、搬迁逼出的 tex 改动、接入记录——却同样从不提交：接入是在重排别人搭起来的手稿，而复核这次重排不该由一个 skill 替用户跳过。`git mv` 会暂存它自己执行的重命名，除此之外不再 add 任何东西；提交是用户的。
 
 **可以提交的 skill**，及各自能暂存的范围：
 
 | Skill | 提交时机 | 暂存范围 |
 | --- | --- | --- |
-| `stage-evid-curator` | 会话结束时提供一次 | 本次运行导入或登记的 `mates/` 文件，外加 `mates/MANIFEST.md` |
 | `stage-stry-coach` | 会话结束时提供一次 | `notes/story.md`、播下种子的 `notes/claims.md`，以及新建时的该周期 `venue.yml` |
 | `stage-outl-planner` | 会话结束时提供一次 | `notes/outline.md`、`notes/notation.md`、新建的 `manus/secs/` 骨架文件，以及 `manus/main.tex` 里的 `\input` 改动 |
 | `stage-sect-drafter` | 每起草完一节提供一次 | 该节的 `.tex`，加上它带来的记录表、记号表、提纲更新 |
@@ -53,8 +52,8 @@ STAGE 写作工作流中每个 skill 都遵守的规则。十六个 skill——`
 | `stage-figs-designer` | 会话结束时提供一次 | `manus/figs/` 渲染产物、`manus/figs/srcs/` 源文件、提纲更新 |
 | `stage-refs-curator` | 会话结束时提供一次 | `manus/bibs/reference.bib`、`notes/refs/` 下的笔记与索引 |
 | `stage-copy-editor` | 完成一遍打磨后提供一次 | 只有这一遍改过的 `.tex` 文件，外加 `style` 那一遍写出的 `notes/style.md`——打磨报告留在 `wkdrs/` |
-| `stage-clms-auditor` | 完成审计后提供一次 | `notes/claims.md` 的状态翻转与新增的 `tasks/` 条目——审计报告留在 `wkdrs/` |
-| `stage-cite-auditor` | 仅当本次运行修过 bib 字段时提供 | `manus/bibs/reference.bib`——发现的问题留在 `wkdrs/` 报告里 |
+| `stage-clms-auditor` | 完成审计后提供一次 | `notes/claims.md` 的状态翻转、新增的 `tasks/` 条目，以及本次运行置位了 `backfilled:` 时的 `notes/adopt.md`——审计报告留在 `wkdrs/` |
+| `stage-cite-auditor` | 完成审计后提供一次，且仅当立了跟进条目时 | `tasks/cites_followups.md`——发现的问题留在 `wkdrs/` 报告里，bib 在这里只读：bib 的修复路由给 `stage-refs-curator` |
 | `stage-peer-reviewer` | 每份评审提供一次，带 `extern=` 的运行则从不提供 | 它写出的那一个 `SIM_REVIEW_*` 文件。给外部论文写的审稿意见书不是仓库产物，不加入暂存 |
 | `stage-resp-writer` | 会话结束时提供一次 | `RESPONSE_*` 文件、`tasks/<cycle>_promises.md`、记录表里的降级 |
 | `stage-subm-packer` | 打包时一次；`convert` 运行注册 venue 模板包时再一次 | `cycls/<cycle>/SUBMISSION_<date>.md`；`freeze/<cycle>_<date>` tag 随后落在这个提交上——包本身留在 `wkdrs/builds/`。`convert` 的提交是单独一次，只暂存那次运行在 `wkdrs/` 之外写下的东西——`cycls/<cycle>/template/` 下的模板包与 `tasks/<cycle>_venue.md`——好让冻结提交保持它自称的那一个文件 |
@@ -246,7 +245,7 @@ model_trail:                    # append-only: one entry per write session, neve
 | C1 | <one sentence> | contribution \| performance \| factual | `1_intro`, `abstract`, `tabs/main` | `mates/<slug>/...#<anchor>`; `—` if none | proposed \| drafted \| verified \| unsourced \| weakened \| dropped |
 ```
 
-生命周期：`proposed`（故事阶段）→ `drafted`（已写进正文）→ `verified`（clms-auditor 对上了证据）/ `unsourced`（写了，但没有指纹——必须带 `\todo`）/ `weakened`（在回复里作了让步）/ `dropped`。
+生命周期：`proposed`（故事阶段）→ `drafted`（已写进正文）→ `verified`（clms-auditor 对上了证据）/ `unsourced`（写了，但没有指纹——必须带 `\todo`）/ `weakened`（在回复里作了让步）/ `dropped`。修复和状态一样各有其主：后来的审计发现 `\todo` 已除、每个数字都追溯到新鲜且相符的证据时，`stage-clms-auditor` 把 `unsourced → verified`；一次修订把 `\todo` 换成能追溯的取值时，`stage-sect-drafter` 与 `stage-tabs-builder` 把 `unsourced → drafted`，按 `tasks/<cycle>_promises.md` 里已兑现的承诺重述让步过的主张时把 `weakened → drafted`——此后核验走寻常路径。`dropped` 是终态；值得复活的主张经 `stage-stry-coach` 作为新行重新进入。
 
 ### 8.2 `mates/MANIFEST.md`——`mates/` 下每个文件一个 `##` 条目
 

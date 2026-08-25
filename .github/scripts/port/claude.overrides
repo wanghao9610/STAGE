@@ -28,9 +28,9 @@
 2. A diff that rewrites already-registered entries is confirmed first via one AskUserQuestion, naming each entry and the numbers that move — a refreshed number can silently contradict a sentence the draft already typeset (Principle 6). New-only imports proceed without a question.
 ### stage-evid-curator/SKILL.md
 --- 1
-3. One your question tool for what no probe can know: `source` — where this came from (path, URL, or person) — and `shows`, skipped when the user's request already said both.
+3. One your question tool for what no probe can know: `source` — where this came from (path, URL, or person) — and `covers`, skipped when the user's request already said both.
 +++ 1
-3. One AskUserQuestion for what no probe can know: `source` — where this came from (path, URL, or person) — and `shows`, skipped when the user's request already said both.
+3. One AskUserQuestion for what no probe can know: `source` — where this came from (path, URL, or person) — and `covers`, skipped when the user's request already said both.
 ### stage-evid-curator/SKILL.md
 --- 1
 - Two asks exist — the import-rewrite confirmation (Step 1) and the registration provenance question (Step 2) — via your question tool, one question per call. If it is unavailable (headless / scripted), fall back to plain text and require an explicit answer before the write.
@@ -43,9 +43,9 @@
 2. 会重写已登记条目的 diff，先用一个 AskUserQuestion 确认，点名每条条目以及会移动的数字——一个被刷新的数字可能悄悄与草稿里已经排好版的句子矛盾（原则 6）。只新增的导入不必提问，直接进行。
 ### stage-evid-curator/SKILL_zh.md
 --- 1
-3. 用一个 your question tool 问那些任何探测都无从得知的事：`source`——这份东西哪来的（路径、URL 或人）——以及 `shows`；用户的请求里已经把两者都说了就跳过。
+3. 用一个 your question tool 问那些任何探测都无从得知的事：`source`——这份东西哪来的（路径、URL 或人）——以及 `covers`；用户的请求里已经把两者都说了就跳过。
 +++ 1
-3. 用一个 AskUserQuestion 问那些任何探测都无从得知的事：`source`——这份东西哪来的（路径、URL 或人）——以及 `shows`；用户的请求里已经把两者都说了就跳过。
+3. 用一个 AskUserQuestion 问那些任何探测都无从得知的事：`source`——这份东西哪来的（路径、URL 或人）——以及 `covers`；用户的请求里已经把两者都说了就跳过。
 ### stage-evid-curator/SKILL_zh.md
 --- 1
 - 只存在两处提问——导入重写确认（Step 1）与登记出处问题（Step 2）——通过 your question tool，一次调用一个问题。它不可用时（无人值守 / 脚本化），回落到纯文本，并在写入之前要求一个明确答复。

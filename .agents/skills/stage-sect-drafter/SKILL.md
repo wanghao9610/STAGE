@@ -81,7 +81,7 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 
 ### Step 5: Update the registries
 
-1. `notes/claims.md`: add this section's slug to Stated in for each claim stated; flip `proposed` → `drafted`; a claim stated without evidence goes to `unsourced` — its statement in the text carries the `\todo` that status requires. `verified` rows keep their status; only Stated in grows.
+1. `notes/claims.md`: add this section's slug to Stated in for each claim stated; flip `proposed` → `drafted`; a claim stated without evidence goes to `unsourced` — its statement in the text carries the `\todo` that status requires. Repairs flip the same column: a revision that replaces a claim's last `\todo` with a value that traces (fingerprint read this run) returns `unsourced` → `drafted`, and a revision that restates a claim conceded in response — honoring its checked promise in `tasks/<cycle>_promises.md` — returns `weakened` → `drafted`; both wait on `stage-clms-auditor` for `verified`. `verified` rows keep their status; only Stated in grows.
 2. `notes/notation.md`: append new Symbols rows (First defined = this section) and Abbreviations rows (First use); bump `updated:` (real date, §4).
 3. `notes/outline.md`: this section's row → `drafted` (a substantive revision of a `polished` row also returns it to `drafted`); bump `updated:`.
 
@@ -95,7 +95,7 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 ## Output
 
 - `manus/secs/<n>_<slug>.tex` — the drafted or revised section; its state field is the Sections row status in `notes/outline.md` (output table: Section drafts).
-- `notes/claims.md` — Stated in extended; statuses flipped to `drafted` / `unsourced`.
+- `notes/claims.md` — Stated in extended; statuses flipped to `drafted` / `unsourced` (a repair returns `unsourced` or `weakened` to `drafted`).
 - `notes/notation.md` — appended Symbols and Abbreviations rows.
 - `notes/outline.md` — the section's row status and `updated:`.
 - Chat report: claims stated, the `\todo{}` inventory, evidence read with stamps, staleness warnings, and the recommended next `/stage-*` step. Writes nothing outside these files.

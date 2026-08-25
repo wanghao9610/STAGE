@@ -70,10 +70,16 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
 5. **Stale evidence cannot verify.** Staleness is exact stamp and content comparison, never mtime
    (conventions §8). A drifted source taints every match made against it: report
    matched-but-stale, task a re-import, and do not flip those claims to `verified`.
-6. **Flips are earned — in both directions.** A claim flips `drafted → verified` only when every
-   number under it matched fresh evidence and all its evidence links resolve. Any naked unsourced
-   number under it → `unsourced`. A previously `verified` claim that fails today loses the status
-   — back to `drafted`, with a task saying why. A mismatch never flips anything up.
+6. **Flips are earned — in both directions.** A claim flips to `verified` — from `drafted`, or
+   from `unsourced` once its statement has shed the `\todo` that status required — only when every
+   number under it matched fresh evidence and all its evidence links resolve: the debt a past
+   audit named is cleared by the audit that finds the trace, never by anyone remembering it was
+   paid. Any naked unsourced number under it → `unsourced`. A previously `verified` claim that
+   fails today loses the status — back to `drafted`, with a task saying why. A mismatch never
+   flips anything up. `weakened` is the one status this audit never lifts: it marks a concession
+   made to reviewers, and only the revision that restates the claim — `stage-sect-drafter` or
+   `stage-tabs-builder`, honoring its checked promise in `tasks/<cycle>_promises.md` — returns it
+   to `drafted`, after which verification is the ordinary path.
 7. **Fan out the trace (§6).** More than one `.tex` file in scope → one delegate per in-scope
    `manus/secs/` and `manus/tabs/` file, each following Principle 3's order for its own numbers,
    opening the cited `mates/` file at its anchor, and returning one row per number — the value in
@@ -121,6 +127,15 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    trace found an anchor the ledger's Evidence column lacked, record it; set frontmatter
    `updated:` to the real date. Ledger flips are the audit's durable outcome (conventions §10:
    `wkdrs/` is never committed).
+
+   Adoption backlog rows enter the ledger here, and through no other skill (conventions §9a:
+   every known-but-unfingerprinted value carries an `unsourced` ledger row). Each backlog row of
+   `notes/adopt.md` not yet in the ledger gets one this run — next free ID, the claim as the
+   manuscript states it, its section or table in `Stated in`, Evidence from the trace when one
+   resolved this run or `—`, status per this run's verdict: `verified` when every number under it
+   matched fresh evidence, `unsourced` otherwise — and every `unsourced` one is a Step 8 task,
+   routed to the skill that will source the number or rewrite it as the `\todo` its status
+   requires.
 
    When `notes/adopt.md` exists and this run audited the whole manuscript, close the adoption loop
    in the same pass: every row of its unsourced backlog must by now be either a `verified` claim or

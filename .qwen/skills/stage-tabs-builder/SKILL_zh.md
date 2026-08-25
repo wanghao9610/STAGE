@@ -75,7 +75,7 @@ argument-hint: "[TABLE]"
 
 ### Step 6：更新各登记项
 
-1. `notes/claims.md`：表格陈述的 performance 主张在 Stated in 里加上 `tabs/<slug>`，并把 `proposed` → `drafted`；每个 `\todo{}` 单元格一行 `unsourced`（Evidence 为 `—`）；更新 `updated:`（真实日期，§4）。
+1. `notes/claims.md`：表格陈述的 performance 主张在 Stated in 里加上 `tabs/<slug>`，并把 `proposed` → `drafted`；每个 `\todo{}` 单元格一行 `unsourced`（Evidence 为 `—`）；一次重建把先前的 `\todo{}` 单元格填上能追溯的取值 → 那条主张 `unsourced` 送回 `drafted`，按 `tasks/<cycle>_promises.md` 里已勾选的承诺重建 → 它让步过的主张 `weakened` 送回 `drafted`——`verified` 仍归 `stage-clms-auditor` 来给；更新 `updated:`（真实日期，§4）。
 2. `notes/outline.md`：Tables 那一行 → `draft`（todo 占多数时为 `sketch`）；更新 `updated:`。
 
 ### Step 7：汇报与提交
