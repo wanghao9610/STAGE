@@ -1009,6 +1009,36 @@ grep -qF '"hookSpecificOutput":{"permissionDecision":"deny"' .kimi-code/hooks/st
 grep -qE '"matcher"[[:space:]]*:[[:space:]]*"bash"' .dsh/hooks.json || \
     { fail ".dsh/hooks.json no longer matches DSH's lowercase bash tool"; hook_errors=1; }
 
+# The commit guard's rule body — everything from the segment loop down — is one
+# decision table in seven copies; only the prelude (event wiring, payload
+# parsing, deny encoding, project-root depth) may differ per tree. Existence and
+# parse checks cannot see a tree enforcing someone else's rules: three trees
+# once shipped a guard with no freeze-tag protection and another repository's
+# § numbers, and every check above stayed green. Byte parity over the extracted
+# span is what catches that, and the freeze-tag marker pins the one rule whose
+# loss is a silent hole even if the baseline itself is edited.
+guard_rules() { sed -n '/^while IFS= read -r segment; do$/,$p' "$1"; }
+GUARD_BASE="$(guard_rules .claude/hooks/stage_commit_guard.sh)"
+if [[ -z "${GUARD_BASE}" ]]; then
+    fail ".claude/hooks/stage_commit_guard.sh: rule body not found (segment loop missing)"
+    hook_errors=1
+fi
+for f in .codex/hooks/stage_commit_guard.sh .cursor/hooks/stage_commit_guard.sh \
+         .dsh/hooks/stage_commit_guard.sh .kimi-code/hooks/stage_commit_guard.sh \
+         .pi/extensions/stage-hooks/stage_commit_guard.sh .qwen/hooks/stage_commit_guard.sh; do
+    if [[ "$(guard_rules "${f}")" != "${GUARD_BASE}" ]]; then
+        fail "${f}: commit-guard rule body differs from .claude's — the seven copies decline the same commands, and only the prelude adapts per harness"
+        hook_errors=1
+    fi
+done
+for f in .claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh \
+         .cursor/hooks/stage_commit_guard.sh .dsh/hooks/stage_commit_guard.sh \
+         .kimi-code/hooks/stage_commit_guard.sh .pi/extensions/stage-hooks/stage_commit_guard.sh \
+         .qwen/hooks/stage_commit_guard.sh; do
+    grep -qF 'a freeze tag is the immutable record of what was submitted' "${f}" || \
+        { fail "${f}: freeze-tag protection (conventions §1.4) is missing from the commit guard"; hook_errors=1; }
+done
+
 for f in .claude/settings.json .codex/hooks.json .qwen/settings.json; do
     grep -qF stage_involve_gate.sh "${f}" || { fail "${f} does not register stage_involve_gate.sh"; hook_errors=1; }
 done
@@ -1026,7 +1056,7 @@ done
 for f in docs/mds/stage-workflow/model_id_spec.md docs/mds/stage-workflow/model_id_spec.zh-CN.md; do
     [[ -f "${f}" ]] || { fail "${f} is missing"; hook_errors=1; }
 done
-(( hook_errors == 0 )) && note "hooks ship, parse, and register natively in all seven harnesses"
+(( hook_errors == 0 )) && note "hooks ship, parse, and register natively in all seven harnesses; the commit guard declines the same commands in every tree"
 
 # 18. The provenance line is stated in the same skills in all seven trees.
 #     Conventions §8 makes model_id / model_trail every producer's job; each

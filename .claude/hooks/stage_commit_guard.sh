@@ -17,9 +17,10 @@
 # needs exactly those rewrites. `push` is deliberately absent: no rule here makes
 # a skill likelier to push, and a user who asks for one directly should get it.
 #
-# Registered under PreToolUse matching Bash in .claude/settings.json. One of four
-# copies — Codex and Kimi Code carry the same guard on their own PreToolUse,
-# Cursor on beforeShellExecution — differing only in how each harness names the
+# Registered under PreToolUse matching Bash in .claude/settings.json. One of
+# seven copies — Codex, Kimi Code, and Qwen Code carry the same guard on their
+# own PreToolUse, Cursor on beforeShellExecution, DSH through its Claude Code
+# hook bridge, and Pi on tool_call — differing only in how each harness names the
 # command on the way in and the decision on the way out.
 #
 # A floor, not a proof. It reads one shell line at a time and cannot resolve
