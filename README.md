@@ -254,7 +254,7 @@ bash execs/scpts/import.sh
 The import snapshots the writing-relevant STAR artifacts — the method documents (`metds/overview.md`, `framework.md`, `dataset.md`, `training.md`, `evaluation.md`, plus `adopt.md` and `codearc.md`), idea statements, reference notes and `reference.bib`, results tables, and experiment digests — into `mates/<slug>/` under the same relative paths, and records each file in `mates/MANIFEST.md` with its source, source commit, and content fingerprint. When your manuscript has no bibliography yet, the STAR `reference.bib` is seeded into `manus/bibs/`. Re-run it after new experiments land; check for drift first with:
 
 ```bash
-bash execs/scpts/import.sh --diff   # read-only staleness report; exit 1 when anything drifted
+bash execs/scpts/import.sh --diff   # read-only staleness report; exit 2 when anything drifted, 1 on a hard error
 ```
 
 Several STAR repos can feed one paper: `import.sh --source PATH --slug NAME` imports any additional STAR-shaped checkout under its own slug.

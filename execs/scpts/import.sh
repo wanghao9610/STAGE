@@ -44,8 +44,11 @@ Options:
                   basename, lowercased).
   --diff          Read-only staleness report: compare upstream against
                   mates/<slug>/ and list stale / new upstream / missing
-                  upstream files. Exits 0 when clean, 1 when anything
-                  drifted. Writes nothing.
+                  upstream files. Exits 0 when clean, 2 when anything
+                  drifted, 1 on a hard error (no source configured, bad
+                  slug) — drift and misconfiguration are different answers
+                  and a caller reading the exit code must be able to tell
+                  them apart. Writes nothing.
   -h, --help      Show this help message.
 
 Imported (skipped with a note when absent upstream):
@@ -317,7 +320,10 @@ if [[ "${DIFF}" == true ]]; then
 
     if (( drift > 0 )); then
         log "${drift} path(s) drifted. Re-import with: bash execs/scpts/import.sh --source ${SOURCE_DIR} --slug ${SLUG}"
-        exit 1
+        # 2, not 1: fail() above exits 1 for a hard error (no source, bad slug),
+        # and a skill reading this exit code must not mistake a misconfigured
+        # STAR_HOME for stale evidence — the same triad update.sh --diff uses.
+        exit 2
     fi
     if [[ ! -d "${DEST_DIR}" && ! -s "${LIST_FILE}" ]]; then
         log "Nothing to compare: upstream has no importable artifacts and mates/${SLUG}/ does not exist."

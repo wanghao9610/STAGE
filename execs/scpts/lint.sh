@@ -396,16 +396,28 @@ else
 fi
 
 # ---- 5. identity leaks (hard; only while ANON=true) -------------------------
+# The scan reads what LaTeX would typeset: each line has its comment stripped —
+# from the first unescaped % to end of line — before any pattern is tested, so a
+# commented-out \author or \thanks block, the standard way to anonymize, does
+# not fail the gate (the todo check above strips comments for the same reason).
+# github.com links are a warning, not a failure: citing third-party code by URL
+# is routine in a paper, and only a human can tell facebookresearch from the
+# authors' own account — the warning names each link so that read happens.
 if [[ "${ANON}" == "true" ]]; then
-    LEAKS=""
-    append_lines LEAKS "$(grep -rn --include='*.tex' -E '\\author' "${MANU_DIR}" 2>/dev/null | grep -vi 'anonymous' || true)"
-    append_lines LEAKS "$(grep -rn --include='*.tex' -F '\thanks{' "${MANU_DIR}" 2>/dev/null || true)"
-    append_lines LEAKS "$(grep -rn --include='*.tex' -E 'github\.com/[A-Za-z0-9_.-]+' "${MANU_DIR}" 2>/dev/null || true)"
-    append_lines LEAKS "$(grep -rni --include='*.tex' 'acknowledg' "${MANU_DIR}" 2>/dev/null || true)"
-    if [[ -n "${LEAKS}" ]]; then
-        # One line can trip several detectors; report it once.
-        LEAKS="$(printf '%s\n' "${LEAKS}" | sort -u)"
-    fi
+    ANON_OUT="$(find "${MANU_DIR}" -type f -name '*.tex' -exec awk '
+        {
+            code = $0
+            gsub(/\\%/, "\002", code)
+            sub(/%.*/, "", code)
+            low = tolower(code)
+            loc = FILENAME ":" FNR ":"
+            if (code ~ /\\author/ && low !~ /anonymous/) print "H " loc $0
+            else if (code ~ /\\thanks\{/) print "H " loc $0
+            else if (low ~ /acknowledg/) print "H " loc $0
+            if (code ~ /github\.com\/[A-Za-z0-9_.-]+/) print "W " loc $0
+        }' {} + 2>/dev/null | sort -u || true)"
+    LEAKS="$(printf '%s\n' "${ANON_OUT}" | sed -n 's/^H //p')"
+    LINKS="$(printf '%s\n' "${ANON_OUT}" | sed -n 's/^W //p')"
     n="$(count_lines "${LEAKS}")"
     if (( n > 0 )); then
         log "FAIL: ANON=true and ${n} possible identity leak(s):"
@@ -413,6 +425,12 @@ if [[ "${ANON}" == "true" ]]; then
         HARD=$(( HARD + 1 ))
     else
         log "ok: ANON=true and no identity leaks found."
+    fi
+    n="$(count_lines "${LINKS}")"
+    if (( n > 0 )); then
+        log "warn: ANON=true and ${n} github.com link(s) — verify none points at the authors' own account:"
+        show_hits "${LINKS}"
+        WARNS=$(( WARNS + 1 ))
     fi
 else
     log "note: ANON=false — identity-leak scan skipped."

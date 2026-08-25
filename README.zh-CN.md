@@ -254,7 +254,7 @@ bash execs/scpts/import.sh
 导入会把 STAR 中与写作相关的产物——方法文档（`metds/overview.md`、`framework.md`、`dataset.md`、`training.md`、`evaluation.md`，加上 `adopt.md` 和 `codearc.md`）、选题陈述、参考文献笔记与 `reference.bib`、结果表、实验小结——按相同的相对路径快照进 `mates/<slug>/`，并在 `mates/MANIFEST.md` 里为每个文件记录来源、来源 commit 和内容指纹。当稿件还没有参考文献库时，STAR 的 `reference.bib` 会被播种到 `manus/bibs/`。新实验落地后重新运行即可；先用下面的命令检查漂移：
 
 ```bash
-bash execs/scpts/import.sh --diff   # 只读的过期检查报告；任何漂移都以退出码 1 结束
+bash execs/scpts/import.sh --diff   # 只读的过期检查报告；有漂移以退出码 2 结束，硬错误为 1
 ```
 
 多个 STAR 仓库可以喂同一篇论文：`import.sh --source PATH --slug NAME` 可以用独立的 slug 导入任何一个符合 STAR 布局的本地检出。
