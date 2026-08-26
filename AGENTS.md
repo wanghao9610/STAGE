@@ -65,6 +65,7 @@ The test: every changed line traces to the user's request, and every number in i
 - A name that must appear brings its meaning with it, in the same sentence.
 - Exception: strings matched literally — ledger statuses, IDs, field names, paths — stay verbatim. Explain beside one, never in place of it.
 - A pointer that says nothing on its own — `§9`, `C4`, `R2.W1`, a cycle name — stays verbatim and takes a few words of what it points at, in parentheses: `C4 (the zero-shot transfer claim)`. First use in every reply, not once per conversation; the reader does not scroll back.
+- A reply that closes an execution ends by naming the next command to run, exact and runnable — the `/stage-*` invocation or the shell line, verbatim — or by saying plainly that nothing is left to run. The reader should never have to ask "what do I run now?" (conventions §7.5).
 - Technical prose, no filler and no emoji. Plain does not mean chatty.
 
 ## 8. Project Layout
