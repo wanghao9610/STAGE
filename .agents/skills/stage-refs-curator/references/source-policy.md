@@ -1,6 +1,6 @@
 # Source Policy — where bib records come from, and what may be changed
 
-Every field in `manus/bibs/reference.bib` traces to a record fetched during this run, or to an upstream entry seeded from `mates/`. This file fixes where records may come from, in what order, how a record is matched to a paper, the closed list of edits allowed afterwards, and the shape of every citekey and provenance line. Read it before the first fetch.
+Every field in `manus/bibs/reference.bib` traces to a fetched record — whichever run fetched it, the entry's `% src:` line and its index row name the record URL and the fetch date — or to an upstream entry seeded from `mates/`; an entry the user added by hand is marked `% src: user-supplied` instead. This file fixes where records may come from, in what order, how a record is matched to a paper, the closed list of edits allowed afterwards, and the shape of every citekey and provenance line. Read it before the first fetch.
 
 ## The one hard rule
 
@@ -185,7 +185,7 @@ Then return exactly these fields and nothing else:
 
 ## Self-audit before finishing
 
-1. Every citekey in `reference.bib` has a cached record in the run dir **and** a provenance row in `refs_index.md` **and** a `% src:` line above the entry carrying that row's URL and date. A seeded entry's row says `mates/<...>`; a user-supplied entry's row says so.
+1. Every fetched entry, whichever run fetched it, has a provenance row in `refs_index.md` **and** a `% src:` line above the entry carrying that row's URL and date; one this run fetched also has its record cached under this run's `wkdrs/refs_<date>/raw/`, and an earlier run's cache is not looked for, since `wkdrs/` is never committed. A seeded entry carries `% src: mates/<slug>/metds/refs/reference.bib (seeded YYYY-MM-DD)` and a row with source `mates/<slug>`, no record URL, and the seed date; a user-supplied entry carries `% src: user-supplied` and a row with source `user-supplied` and neither URL nor date.
 2. Re-fetch 5 entries at random (all of them in `verify` mode); diff field-by-field against the file. Any mismatch → correct the file to match the source, then re-check that entry's whole batch.
 3. Parse the file with a bib parser if one is already installed; otherwise check brace balance and key uniqueness mechanically. Never install one to run this check — say it was done by hand.
 4. No entry has an empty required field; no key appears twice.
