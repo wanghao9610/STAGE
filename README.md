@@ -438,7 +438,7 @@ bash execs/update.sh
 
 By default, the command updates these paths from STAGE's `main` branch:
 
-- `AGENTS.md`, `AGENTS.zh-CN.md`, and `CLAUDE.zh-CN.md` always, and `.cursor/rules/` when Cursor is selected — the shared agent instructions, their Chinese reading editions, and Cursor's mirrored runtime copy; your own edits to selected paths are replaced, and a run that includes Cursor moves the runtime copies together
+- `AGENTS.md` always, and `.cursor/rules/` when Cursor is selected — the shared agent instructions and Cursor's mirrored runtime copy; your own edits to selected paths are replaced, and a run that includes Cursor moves the runtime copies together
 - `.agents/skills/` and `.agents/commands/` first, then `.claude/skills/`, `.cursor/skills/`, `.dsh/skills/`, `.kimi-code/skills/`, `.pi/skills/`, and `.qwen/skills/` — the shared store and router plus every native harness copy; links are dereferenced when installed into a paper instance
 - `.codex/plugins/` — the Codex-only `$stage` router plugin and canonical marketplace; `.agents/plugins/marketplace.json` is only a file link to that marketplace, never a link over the directory
 - `.dsh/commands/` and `.kimi-code/plugins/` — the DSH and Kimi `/stage` router packages, updated only when their respective harness is selected
@@ -450,9 +450,11 @@ By default, the command updates these paths from STAGE's `main` branch:
 
 The repository it pulls from is `STAGE_REPOSITORY`, resolved in that order: the environment, then `.env`, then the default `https://github.com/wanghao9610/STAGE.git`. Set it in `.env` to track a fork permanently, or prefix a single command — `STAGE_REPOSITORY=… bash execs/update.sh` — to override it once. Nothing else in `.env` is ever synced, which is why every script under `execs/` is safe to replace: an instance's configuration does not live in them.
 
-Which harness trees it touches is `STAGE_HARNESSES`, resolved from the environment, then `.env`, then `all`. Set `STAGE_HARNESSES=codex` to keep only Codex's `.codex/` tree current, or use any comma-separated set of `claude`, `codex`, `cursor`, `dsh`, `kimi`, `pi`, and `qwen`; `none` updates only the shared skeleton. A tree left out is not installed, updated, or deleted. The shared `.agents/skills/` and `.agents/commands/`, agent instructions in both editions, workflow docs, and `execs/` scripts remain in every run.
+Which harness trees it touches is `STAGE_HARNESSES`, resolved from the environment, then `.env`, then `all`. Set `STAGE_HARNESSES=codex` to keep only Codex's `.codex/` tree current, or use any comma-separated set of `claude`, `codex`, `cursor`, `dsh`, `kimi`, `pi`, and `qwen`; `none` updates only the shared skeleton. A tree left out is not installed, updated, or deleted. The shared `.agents/skills/` and `.agents/commands/`, the agent instructions, workflow docs, and `execs/` scripts remain in every run.
 
 Harness configuration — `.cursorignore`, `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.pi/settings.json`, and `.qwen/settings.json` — is installed only when missing and otherwise kept unless `--force` is supplied. The command reports a kept file that differs from upstream and names any STAGE hook absent from a kept registration.
+
+An updater that still names a path upstream has since dropped stops with `Upstream ref is missing <path>` before it can replace itself. Fetch the current one by hand and commit it, then run `bash execs/update.sh` again:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update.sh -o execs/update.sh
@@ -472,12 +474,12 @@ bash execs/update.sh --skill stage-flow-status
 - When a pinned ref predates `.dsh/commands/` or `.kimi-code/plugins/`, both a normal update and `--adopt` report the absent optional package and continue; a missing required path still stops the run.
 - `--harnesses LIST` overrides `STAGE_HARNESSES` for one run with comma-separated harness names, `all`, or `none`. Unselected trees are outside both the write set and the uncommitted-change check.
 - `--skill NAME` updates that one skill across the shared root and the selected harness trees, and leaves the agent instructions, workflow docs, and entrypoints alone. An invalid name, or one absent from an upstream skill tree in scope, stops the command before it overwrites anything.
-- `--force` updates the same paths with both refusals lifted: uncommitted changes under them are overwritten instead of stopping the command, and the harness configuration is overwritten instead of kept. It widens nothing — a file upstream does not have is still left alone, so your own skills and documents under those directories stay.
+- `--force` updates the same paths with both refusals lifted: uncommitted changes under them are overwritten instead of stopping the command, and the harness configuration is overwritten instead of kept. It widens nothing — a file of your own that upstream does not have is still left alone, so the skills and documents you added under those directories stay.
 - `--adopt` installs the skeleton into a paper repository that already exists, copying only what is absent (see [step 1b](#1b-or-adopt-a-paper-repo-that-already-exists)); `--harnesses` limits which native trees are installed. It cannot be combined with `--force`: never touching an existing file is the whole contract.
 
 `bash execs/update.sh --help` carries the full usage summary, so it stays correct when the flags change.
 
-Files at matching paths are overwritten and new upstream files are added. Project-specific files that exist only in the updated directories are preserved. To avoid deleting custom content, files removed upstream are not removed locally. The update does not modify other directories, the current branch, Git remotes, or the staging area — the manuscript, `mates/`, `notes/`, and `cycls/` are never in scope. Commit current work before updating, then review and commit the result with `git status` and `git diff`.
+Files at matching paths are overwritten and new upstream files are added. Project-specific files that exist only in the updated directories are preserved. A STAGE file upstream no longer ships — each `SKILL_zh.md` beside an upstream skill, and the retired files listed in `RETIRED_FILES` in `execs/update.sh` — is deleted (`--diff` lists it as `removes`); any other file that exists only locally, your own included, is kept. `AGENTS.zh-CN.md` and `CLAUDE.zh-CN.md` at the project root are outside the update: it neither refreshes nor deletes them, so keeping or deleting them is yours. The update does not modify other directories, the current branch, Git remotes, or the staging area — the manuscript, `mates/`, `notes/`, and `cycls/` are never in scope. Commit current work before updating, then review and commit the result with `git status` and `git diff`.
 
 Working on STAGE itself rather than on a paper? Edit only the neutral authored source under `.agents/skills/`, then run `bash .github/scripts/port.sh --write` to regenerate all six harness trees. Harness-only behavior belongs in that tree's rules or anchored overrides. Run `bash .github/scripts/port.sh` to prove every generated harness and shared link still matches, then `bash .github/scripts/check_consistency.sh` for the seven-root semantic invariants. The two checks run in CI.
 

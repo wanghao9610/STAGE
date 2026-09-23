@@ -438,7 +438,7 @@ bash execs/update.sh
 
 该命令默认从 STAGE 的 `main` 分支更新以下路径：
 
-- `AGENTS.md`、`AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md` 始终更新，选择 Cursor 时再更新 `.cursor/rules/`——它们分别是共享 agent 指令、供人阅读的中文版本，以及 Cursor 的运行时镜像；所选路径中的本地改动会被替换，而包含 Cursor 的运行会让两份运行时副本一起移动
+- `AGENTS.md` 始终更新，选择 Cursor 时再更新 `.cursor/rules/`——它们分别是共享 agent 指令与 Cursor 的运行时镜像；所选路径中的本地改动会被替换，而包含 Cursor 的运行会让两份运行时副本一起移动
 - `.agents/skills/` 与 `.agents/commands/` 优先，随后是 `.claude/skills/`、`.cursor/skills/`、`.dsh/skills/`、`.kimi-code/skills/`、`.pi/skills/` 与 `.qwen/skills/`——共用技能根和路由器，加六套原生技能树；安装进论文实例时会解引用链接
 - `.codex/plugins/`——Codex 专属的 `$stage` 分流插件与 marketplace 实体；`.agents/plugins/marketplace.json` 只是一条指向该 marketplace 的文件链接，绝不链接整个目录
 - `.dsh/commands/` 与 `.kimi-code/plugins/`——DSH 和 Kimi 的 `/stage` 分流包，各自只在选中对应宿主时更新
@@ -450,9 +450,11 @@ bash execs/update.sh
 
 拉取来源由 `STAGE_REPOSITORY` 指定，取值顺序为：环境变量、`.env`、内置默认值 `https://github.com/wanghao9610/STAGE.git`。想长期跟随某个 fork，就写进 `.env`；只想临时改一次，在命令前加变量即可——`STAGE_REPOSITORY=… bash execs/update.sh`。`.env` 里的其余内容从不同步——这也正是 `execs/` 下每个脚本都可以放心替换的原因：实例的配置不住在它们里面。
 
-要更新哪些 harness 树由 `STAGE_HARNESSES` 指定，取值顺序为环境变量、`.env`、默认 `all`。写 `STAGE_HARNESSES=codex` 就只维护 Codex 的 `.codex/`，也可从 `claude`、`codex`、`cursor`、`dsh`、`kimi`、`pi`、`qwen` 中任选多个并用逗号分隔；`none` 表示只更新共享骨架。未选中的树既不安装、不更新，也不删除；共享的 `.agents/skills/` 与 `.agents/commands/`、中英两版 agent 指令、工作流文档和 `execs/` 脚本始终更新。
+要更新哪些 harness 树由 `STAGE_HARNESSES` 指定，取值顺序为环境变量、`.env`、默认 `all`。写 `STAGE_HARNESSES=codex` 就只维护 Codex 的 `.codex/`，也可从 `claude`、`codex`、`cursor`、`dsh`、`kimi`、`pi`、`qwen` 中任选多个并用逗号分隔；`none` 表示只更新共享骨架。未选中的树既不安装、不更新，也不删除；共享的 `.agents/skills/` 与 `.agents/commands/`、agent 指令、工作流文档和 `execs/` 脚本始终更新。
 
 harness 配置——`.cursorignore`、`.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json`、`.pi/settings.json` 与 `.qwen/settings.json`——仅在缺失时安装，除非加 `--force`，否则绝不覆盖：论文仓库可能往这些文件里加过自己的设置。若保留下来的文件与上游有差异，命令会打印提示；若保留下来的钩子注册没有某个 STAGE 钩子，也会点名说明。
+
+更新脚本若仍点名某个上游已删除的路径，会在替换自己之前以 `Upstream ref is missing <path>` 中止。用下面这行手动取回当前版本并提交，再运行一次 `bash execs/update.sh`：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/wanghao9610/STAGE/main/execs/update.sh -o execs/update.sh
@@ -472,12 +474,12 @@ bash execs/update.sh --skill stage-flow-status
 - 如果固定的 ref 早于 `.dsh/commands/` 或 `.kimi-code/plugins/`，普通更新与 `--adopt` 都会报告并跳过这个尚不存在的可选包；缺少其他必需路径仍会中止。
 - `--harnesses LIST` 以逗号分隔的 harness 名称、`all` 或 `none` 覆盖本次运行的 `STAGE_HARNESSES`。未选中的树不在写入范围，也不纳入未提交改动检查。
 - `--skill NAME` 只更新共用根与所选 harness 树中的这个 skill，不动 agent 指令、工作流文档和入口脚本。名称无效、或上游所选技能树缺少它，命令会停止且不覆盖任何文件。
-- `--force` 更新同样这批路径，但解除两处拦截：这些路径下的未提交改动直接被覆盖而不再中止命令，harness 配置也改为覆盖而不再保留。它不扩大范围——上游没有的文件依旧原样保留，你自己放在这些目录下的 skill 和文档不会丢。
+- `--force` 更新同样这批路径，但解除两处拦截：这些路径下的未提交改动直接被覆盖而不再中止命令，harness 配置也改为覆盖而不再保留。它不扩大范围——你自己的、上游没有的文件依旧原样保留，你放在这些目录下的 skill 和文档不会丢。
 - `--adopt` 把骨架装进一个已经存在的论文仓库，只复制缺失的文件（见[步骤 1b](#1b-或者接入一个已有的论文仓库)）；`--harnesses` 可限制安装哪些原生树。它不能与 `--force` 同用：绝不碰已有文件正是它的全部契约。
 
 `bash execs/update.sh --help` 里有完整的用法摘要——选项变了它也跟着变，不会过期。
 
-上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。为避免误删自定义内容，上游已删除的文件不会在本地自动删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
+上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。上游已不再提供的 STAGE 文件——上游 skill 旁的每个 `SKILL_zh.md`，以及 `execs/update.sh` 中 `RETIRED_FILES` 列出的已退役文件——会被删除（`--diff` 中显示为 `removes`）；其余只存在于本地的文件，包括你自己的，都会保留。项目根目录下的 `AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md` 不在更新范围内：更新既不刷新也不删除它们，留或删由你决定。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
 如果你改的是 STAGE 本身而不是某篇论文：只编辑 `.agents/skills/` 下工具中立的作者源，再用 `bash .github/scripts/port.sh --write` 重新生成六套 harness 技能树。仅属于某个 harness 的行为写进该树的 rules 或带锚点的 overrides。随后用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七个根目录的语义约束。后两项检查都在 CI 中运行；这些命令只属于上游维护工具，`.github/` 不会同步进论文仓库。
 
