@@ -12,13 +12,15 @@ set -uo pipefail
 
 root="${CLAUDE_PROJECT_DIR:-${PWD}}"
 
+# The payload is read before the level is tested: the runtime writes it to this
+# hook's stdin, and a hook that exits without reading leaves that write to fail.
+input=$(cat)
+
 line="$(grep -sE '^INVOLVE=' "${root}/.env" | tail -1)"
 value="${line#INVOLVE=}"
 value="${value%%#*}"
 involve="$(printf '%s' "${value}" | tr -cd '[:alpha:]')"
 [[ "${involve}" == "low" ]] || exit 0
-
-input=$(cat)
 
 # The edited path, from Edit/Write (file_path) or NotebookEdit (notebook_path).
 edited_path() {
@@ -34,14 +36,15 @@ edited_path() {
 
 path="$(edited_path)"
 case "${path}" in
-    "${root}"/*) ;;
+    "${root}"/*) rel="${path#"${root}"/}" ;;
     *) exit 0 ;;
 esac
 
 # Dot-directories at the project root — .git, .claude, .stage, the other tool
 # trees — keep their prompt, the way acceptEdits mode keeps one for protected
 # paths. Their contents are project machinery, not the manuscript, the notes, or
-# the cycle files a run is writing.
-[[ "${path#"${root}"/}" == .* ]] && exit 0
+# the cycle files a run is writing. A `..` segment can climb back out of the
+# root, so a path carrying one keeps its prompt too.
+[[ "${rel}" == .* || "${rel}" == */../* || "${rel}" == */.. ]] && exit 0
 
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":"INVOLVE=low"}}\n'
