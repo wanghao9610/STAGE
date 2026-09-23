@@ -64,7 +64,7 @@ Propose the plan as one table, one row per file — current path → target → 
 1. Targets: the main file → `manus/main.tex`; sections → `manus/secs/`; rendered figures → `manus/figs/`; editable figure sources (`.svg`, `.drawio`, plot scripts) → `manus/figs/srcs/`; tables → `manus/tabs/`; bibliographies → `manus/bibs/`; local styles → `manus/stys/`.
 2. Edits: every `\input` / `\include` path, `\graphicspath`, `\bibliography` / `\addbibresource` the moves break, named in the row that breaks it — the plan shows each edit before any is applied. One edit is forced by the destination rather than by a broken path and is easy to miss: a draft's own main file arriving at `manus/main.tex` must keep `\usepackage{stys/stage}` from the placeholder it replaces. That package carries the `\todo` macro every downstream skill writes and `lint.sh` counts, plus graphicx/booktabs/xcolor/hyperref and `\graphicspath{{figs/}}`. Drop it and the tree still builds — the loss surfaces only when a drafter first needs a marker — so the row for the main file always names this edit, and a `\graphicspath` the move orphaned is replaced by it rather than kept.
 3. Exclusions: build junk gets no row (listed, left in place); evidence-looking files get no row (they are Step 6's list); a target that already holds real content is shown and asked about per file — only an untouched template placeholder is overwritten freely.
-4. Approval: one AskUserQuestion — approve all, approve by group (sections / figures / tables / bibs / styles), or abort. Unapproved rows do not move.
+4. Approval: one question via AskUserQuestion — approve all, approve by group (sections / figures / tables / bibs / styles), or abort. Unapproved rows do not move.
 
 ### Step 4: Execute the approved plan
 

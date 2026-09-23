@@ -67,8 +67,8 @@ writes, and never present a guess as a state.
 ## Core Principles
 
 1. **Strictly read-only.** Never create, edit, or delete any file — not the outline, not the
-   ledger, not frontmatter — and never commit. Apart from §5's single disambiguation question:
-   no your question tool and no plan mode. Delegation is available and Principle 6 says where it pays; a
+   ledger, not frontmatter — and never commit. Apart from §5's single disambiguation question,
+   do not use your question tool or enter plan mode. Delegation is available and Principle 6 says where it pays; a
    delegate sent from here is read-only like the session that sent it. To act on what you show,
    point at the owner:
    stage-proj-adopt, stage-evid-curator, stage-stry-coach, stage-outl-planner,
