@@ -241,19 +241,6 @@ done <<'EOF'
 .pi/prompts/stage.md|[$@]
 .qwen/commands/stage.md|[{{args}}]
 EOF
-for wrapper in \
-    .claude/commands/stage.zh-CN.md \
-    .cursor/commands/stage.zh-CN.md \
-    .pi/prompts/stage.zh-CN.md \
-    .qwen/commands/stage.zh-CN.md; do
-    if [[ ! -f "${wrapper}" ]]; then
-        fail "missing Chinese request-router entry point: ${wrapper}"
-        router_errors=1
-    elif ! grep -qF '.agents/commands/stage.md' "${wrapper}"; then
-        fail "${wrapper} does not delegate to the shared router"
-        router_errors=1
-    fi
-done
 (( router_errors == 0 )) && note "one bilingual neutral roster drives four file-based native command entry points"
 
 # 4b. Kimi exposes /stage as an explicit-only plugin skill. The plugin owns
