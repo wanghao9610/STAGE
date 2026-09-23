@@ -91,17 +91,16 @@ section "Frontmatter name = directory name"
 name_errors=0
 for root in "${SKILL_ROOTS[@]}"; do
     while IFS= read -r skill; do
-        for manifest in "${root}/${skill}/SKILL.md" "${root}/${skill}/SKILL_zh.md"; do
-            if [[ ! -f "${manifest}" ]]; then
-                fail "${manifest} is missing"
-                name_errors=1
-                continue
-            fi
-            if ! frontmatter_has_line "${manifest}" "name: ${skill}"; then
-                fail "${manifest}: frontmatter name does not match directory '${skill}'"
-                name_errors=1
-            fi
-        done
+        manifest="${root}/${skill}/SKILL.md"
+        if [[ ! -f "${manifest}" ]]; then
+            fail "${manifest} is missing"
+            name_errors=1
+            continue
+        fi
+        if ! frontmatter_has_line "${manifest}" "name: ${skill}"; then
+            fail "${manifest}: frontmatter name does not match directory '${skill}'"
+            name_errors=1
+        fi
     done < <(printf '%s\n' "${SKILLS}")
 done
 (( name_errors == 0 )) && note "every manifest's name matches its directory"
@@ -166,18 +165,16 @@ while IFS= read -r skill; do
     fi
 
     for root in "${FRONTMATTER_ROOTS[@]}"; do
-        for f in SKILL.md SKILL_zh.md; do
-            has=false
-            frontmatter_has_line "${root}/${skill}/${f}" "disable-model-invocation: true" && has=true
-            if [[ "${want_guarded}" != "${has}" ]]; then
-                if [[ "${want_guarded}" == true ]]; then
-                    fail "${root}/${skill}/${f}: slash-only in the conventions roster but no 'disable-model-invocation: true'"
-                else
-                    fail "${root}/${skill}/${f}: carries 'disable-model-invocation: true' but is not slash-only in the conventions roster"
-                fi
-                guard_errors=1
+        has=false
+        frontmatter_has_line "${root}/${skill}/SKILL.md" "disable-model-invocation: true" && has=true
+        if [[ "${want_guarded}" != "${has}" ]]; then
+            if [[ "${want_guarded}" == true ]]; then
+                fail "${root}/${skill}/SKILL.md: slash-only in the conventions roster but no 'disable-model-invocation: true'"
+            else
+                fail "${root}/${skill}/SKILL.md: carries 'disable-model-invocation: true' but is not slash-only in the conventions roster"
             fi
-        done
+            guard_errors=1
+        fi
     done
 done < <(printf '%s\n' "${SKILLS}")
 (( guard_errors == 0 )) && note "$(printf '%s\n' "${SLASH_ONLY}" | wc -l | tr -d ' ') slash-only skills guarded identically in all seven trees"
@@ -265,21 +262,11 @@ elif grep -qE '^\| `stage-[a-z-]+`' "${KIMI_ROUTER_SKILL}"; then
     fail "${KIMI_ROUTER_SKILL} duplicates the roster owned by ${ROUTER}"
     kimi_plugin_errors=1
 fi
-KIMI_ROUTER_SKILL_ZH="${KIMI_PLUGIN_ROOT}/skills/stage/SKILL_zh.md"
-if [[ ! -f "${KIMI_ROUTER_SKILL_ZH}" ]] || \
-   ! frontmatter_has_line "${KIMI_ROUTER_SKILL_ZH}" "name: stage" || \
-   ! frontmatter_has_line "${KIMI_ROUTER_SKILL_ZH}" "disableModelInvocation: true" || \
-   ! grep -qF '.agents/commands/stage.md' "${KIMI_ROUTER_SKILL_ZH}"; then
-    fail "${KIMI_ROUTER_SKILL_ZH} is not the Chinese explicit-only Kimi adapter"
+if ! grep -qF 'STAGE_LANG=zh' "${KIMI_ROUTER_SKILL}" || \
+   ! grep -qF '.agents/commands/stage.zh-CN.md' "${KIMI_ROUTER_SKILL}"; then
+    fail "${KIMI_ROUTER_SKILL} does not apply STAGE's Chinese router wording"
     kimi_plugin_errors=1
 fi
-for skill_file in "${KIMI_ROUTER_SKILL}" "${KIMI_ROUTER_SKILL_ZH}"; do
-    if ! grep -qF 'STAGE_LANG=zh' "${skill_file}" || \
-       ! grep -qF '.agents/commands/stage.zh-CN.md' "${skill_file}"; then
-        fail "${skill_file} does not apply STAGE's Chinese router wording"
-        kimi_plugin_errors=1
-    fi
-done
 (( kimi_plugin_errors == 0 )) && note "Kimi owns one explicit-only /stage adapter around the shared router"
 
 # 4c. DSH exposes /stage through a zero-dependency Cordis bundle. Its handler
@@ -342,19 +329,11 @@ if [[ ! -f "${PLUGIN_ROOT}/skills/stage/SKILL.md" ]] || \
     fail "${PLUGIN_ROOT}/skills/stage is not the explicit-only wrapper around the shared router"
     plugin_errors=1
 fi
-if [[ ! -f "${PLUGIN_ROOT}/skills/stage/SKILL_zh.md" ]] || \
-   ! frontmatter_has_line "${PLUGIN_ROOT}/skills/stage/SKILL_zh.md" "name: stage" || \
-   ! grep -qF '.agents/commands/stage.md' "${PLUGIN_ROOT}/skills/stage/SKILL_zh.md"; then
-    fail "${PLUGIN_ROOT}/skills/stage lacks its Chinese wrapper around the shared router"
+if ! grep -qF 'STAGE_LANG=zh' "${PLUGIN_ROOT}/skills/stage/SKILL.md" || \
+   ! grep -qF '.agents/commands/stage.zh-CN.md' "${PLUGIN_ROOT}/skills/stage/SKILL.md"; then
+    fail "${PLUGIN_ROOT}/skills/stage/SKILL.md does not apply STAGE's Chinese router wording"
     plugin_errors=1
 fi
-for skill_file in "${PLUGIN_ROOT}/skills/stage/SKILL.md" "${PLUGIN_ROOT}/skills/stage/SKILL_zh.md"; do
-    if ! grep -qF 'STAGE_LANG=zh' "${skill_file}" || \
-       ! grep -qF '.agents/commands/stage.zh-CN.md' "${skill_file}"; then
-        fail "${skill_file} does not apply STAGE's Chinese router wording"
-        plugin_errors=1
-    fi
-done
 (( plugin_errors == 0 )) && note "Codex owns one stage plugin; .agents exposes only its marketplace file"
 
 # 4e. All three package-based routers move through adopt and full updates, old
@@ -410,17 +389,25 @@ for readme in README.md README.zh-CN.md; do
 done
 (( deployment_errors == 0 )) && note "all router packages update by harness, tolerate older refs, and share one setup template"
 
-# 5. Bilingual twins: every skill .md has its _zh.md counterpart and vice versa.
+# 5. Bilingual twins: every reference .md has its _zh.md counterpart and vice
+#    versa. SKILL.md is English only, in the skill trees and in the router
+#    plugins alike: no run loads a Chinese edition of it, so a SKILL_zh.md
+#    anywhere fails.
 section "Bilingual twins in skill trees"
 twin_errors=0
 while IFS= read -r f; do
+    [[ "${f}" == */SKILL.md ]] && continue
     if [[ "${f}" == *_zh.md ]]; then
         [[ -f "${f%_zh.md}.md" ]] || { fail "${f} has no English counterpart"; twin_errors=1; }
     else
         [[ -f "${f%.md}_zh.md" ]] || { fail "${f} has no _zh.md counterpart"; twin_errors=1; }
     fi
 done < <(find -L "${SKILL_ROOTS[@]}" -type f -name '*.md')
-(( twin_errors == 0 )) && note "every skill .md file has its bilingual twin"
+while IFS= read -r f; do
+    fail "${f}: SKILL.md has no Chinese edition; a Chinese run reads SKILL.md and replies in Chinese"
+    twin_errors=1
+done < <(find -L "${SKILL_ROOTS[@]}" .codex/skills .codex/plugins .kimi-code/plugins -name SKILL_zh.md | sort)
+(( twin_errors == 0 )) && note "every reference .md file has its bilingual twin; no tree or plugin carries a SKILL_zh.md"
 
 # 6. Every manifest defers to the shared conventions document, by name.
 #    Citing "conventions §8" without naming the file is what stage-proj-adopt
@@ -430,12 +417,10 @@ section "Shared-conventions reference"
 conv_ref_errors=0
 for root in "${SKILL_ROOTS[@]}"; do
     while IFS= read -r skill; do
-        for f in SKILL.md SKILL_zh.md; do
-            grep -q 'writing-workflow-conventions\.md' "${root}/${skill}/${f}" || {
-                fail "${root}/${skill}/${f} does not name the conventions document"
-                conv_ref_errors=1
-            }
-        done
+        grep -q 'writing-workflow-conventions\.md' "${root}/${skill}/SKILL.md" || {
+            fail "${root}/${skill}/SKILL.md does not name the conventions document"
+            conv_ref_errors=1
+        }
     done < <(printf '%s\n' "${SKILLS}")
 done
 (( conv_ref_errors == 0 )) && note "every manifest names the conventions document"
@@ -452,21 +437,19 @@ while IFS= read -r skill; do
             .dsh/skills|.kimi-code/skills) expected="/skill:${skill}" ;;
             *) expected="/${skill}" ;;
         esac
-        for name in SKILL.md SKILL_zh.md; do
-            path="${root}/${skill}/${name}"
-            front="$(awk 'NR == 1 { next } /^---[ \t]*$/ { exit } { print }' "${path}")"
-            body="$(awk 'NR == 1 && /^---[ \t]*$/ { fm = 1; next } fm && /^---[ \t]*$/ { fm = 0; next } !fm { print }' "${path}")"
-            grep -qF -- "${expected}" <<<"${front}" || {
-                fail "${path}: frontmatter does not advertise native invocation ${expected}"
-                token_errors=1
-            }
-            prefixed="$(grep -nE '(\$|/|/skill:)('"${SKILL_ALT}"')([^a-z-]|$)' <<<"${body}" || true)"
-            if [[ -n "${prefixed}" ]]; then
-                fail "${path}: generated body contains a harness invocation prefix instead of a bare skill name:"
-                printf '%s\n' "${prefixed}" | head -n 3 | sed 's/^/      /'
-                token_errors=1
-            fi
-        done
+        path="${root}/${skill}/SKILL.md"
+        front="$(awk 'NR == 1 { next } /^---[ \t]*$/ { exit } { print }' "${path}")"
+        body="$(awk 'NR == 1 && /^---[ \t]*$/ { fm = 1; next } fm && /^---[ \t]*$/ { fm = 0; next } !fm { print }' "${path}")"
+        grep -qF -- "${expected}" <<<"${front}" || {
+            fail "${path}: frontmatter does not advertise native invocation ${expected}"
+            token_errors=1
+        }
+        prefixed="$(grep -nE '(\$|/|/skill:)('"${SKILL_ALT}"')([^a-z-]|$)' <<<"${body}" || true)"
+        if [[ -n "${prefixed}" ]]; then
+            fail "${path}: generated body contains a harness invocation prefix instead of a bare skill name:"
+            printf '%s\n' "${prefixed}" | head -n 3 | sed 's/^/      /'
+            token_errors=1
+        fi
     done
 done < <(printf '%s\n' "${SKILLS}")
 
@@ -664,16 +647,14 @@ norm_sections() { # $1 = file; prints the file's normalized ## headings, sorted 
 }
 section_errors=0
 while IFS= read -r skill; do
-    for manifest in SKILL.md SKILL_zh.md; do
-        baseline=".agents/skills/${skill}/${manifest}"
-        other=".claude/skills/${skill}/${manifest}"
-        [[ -f "${baseline}" && -f "${other}" ]] || continue   # checks 2 and 3 own missing files
-        if ! diff -q <(norm_sections "${baseline}") <(norm_sections "${other}") > /dev/null; then
-            fail "${other}: ## sections differ from ${baseline}:"
-            diff <(norm_sections "${baseline}") <(norm_sections "${other}") | sed 's/^/      /'
-            section_errors=1
-        fi
-    done
+    baseline=".agents/skills/${skill}/SKILL.md"
+    other=".claude/skills/${skill}/SKILL.md"
+    [[ -f "${baseline}" && -f "${other}" ]] || continue   # checks 2 and 3 own missing files
+    if ! diff -q <(norm_sections "${baseline}") <(norm_sections "${other}") > /dev/null; then
+        fail "${other}: ## sections differ from ${baseline}:"
+        diff <(norm_sections "${baseline}") <(norm_sections "${other}") | sed 's/^/      /'
+        section_errors=1
+    fi
 done < <(printf '%s\n' "${SKILLS}")
 (( section_errors == 0 )) && note ".claude manifests carry the same ## sections as the authored .agents source"
 
@@ -692,35 +673,26 @@ open_errors=0
 PROBE_LINE="grep -sE '^STAGE_LANG=' .env"
 for root in "${SKILL_ROOTS[@]}"; do
     while IFS= read -r skill; do
-        for f in SKILL.md SKILL_zh.md; do
-            path="${root}/${skill}/${f}"
-            [[ -f "${path}" ]] || continue   # check 2 owns missing files
+        path="${root}/${skill}/SKILL.md"
+        [[ -f "${path}" ]] || continue   # check 2 owns missing files
 
-            n="$(grep -cF -- "${PROBE_LINE}" "${path}")"
-            if (( n != 1 )); then
-                fail "${path}: ${n} STAGE_LANG probe lines, expected exactly 1"
-                open_errors=1
-            fi
+        n="$(grep -cF -- "${PROBE_LINE}" "${path}")"
+        if (( n != 1 )); then
+            fail "${path}: ${n} STAGE_LANG probe lines, expected exactly 1"
+            open_errors=1
+        fi
 
-            if [[ "${f}" == SKILL_zh.md ]]; then
-                head_re='^\*\*通用规约。'
-                reuse_re='^\*\*复用上一次装载。\*\*'
-            else
-                head_re='^\*\*Shared conventions\.'
-                reuse_re='^\*\*Reusing an earlier load\.\*\*'
-            fi
-            n="$(grep -cE "${head_re}" "${path}")"
-            (( n == 1 )) || { fail "${path}: ${n} shared-conventions blocks, expected exactly 1"; open_errors=1; }
-            n="$(grep -cE "${reuse_re}" "${path}")"
-            (( n == 1 )) || { fail "${path}: ${n} reuse-an-earlier-load paragraphs, expected exactly 1"; open_errors=1; }
+        n="$(grep -cE '^\*\*Shared conventions\.' "${path}")"
+        (( n == 1 )) || { fail "${path}: ${n} shared-conventions blocks, expected exactly 1"; open_errors=1; }
+        n="$(grep -cE '^\*\*Reusing an earlier load\.\*\*' "${path}")"
+        (( n == 1 )) || { fail "${path}: ${n} reuse-an-earlier-load paragraphs, expected exactly 1"; open_errors=1; }
 
-            hits="$(grep -n 'cat docs/mds/stage-workflow/writing-workflow-conventions' "${path}" || true)"
-            if [[ -n "${hits}" ]]; then
-                fail "${path}: cats the whole conventions file through the shell; it spills and costs the round trip the one-message load avoids:"
-                printf '%s\n' "${hits}" | sed 's/^/      /'
-                open_errors=1
-            fi
-        done
+        hits="$(grep -n 'cat docs/mds/stage-workflow/writing-workflow-conventions' "${path}" || true)"
+        if [[ -n "${hits}" ]]; then
+            fail "${path}: cats the whole conventions file through the shell; it spills and costs the round trip the one-message load avoids:"
+            printf '%s\n' "${hits}" | sed 's/^/      /'
+            open_errors=1
+        fi
     done < <(printf '%s\n' "${SKILLS}")
 done
 (( open_errors == 0 )) && note "opening loads hold: one language probe, one conventions block, one reuse paragraph, no conventions cat"
@@ -885,52 +857,25 @@ done
 (( doc_errors == 0 )) && note "guides and landing pages name every skill; workflow docs paired en/zh; links resolve"
 
 # 16. Chinese text carries no space between two Chinese characters.
-#     A folded scalar turns every line break into a space, which is what English
-#     descriptions want and Chinese ones never do: wrapping 中文 across two lines
-#     puts a space inside a word, and the next rewrap bakes that space in and
-#     adds a new one at the new break. The value the harness reads drifts one
-#     space per edit while the file still looks wrapped and tidy.
-#     The invariant is therefore both halves: the description is one line, so a
-#     fold cannot introduce a space, and no such space is already in it. The
-#     scan is non-ASCII-space-non-ASCII, which also catches "——" carrying a
-#     space on one side only; a space between Chinese and Latin (`notes/` 里的)
-#     is correct style and has an ASCII character on one side, so it passes.
-section "Chinese spacing (descriptions, skill bodies, zh docs)"
-zh_desc_errors=0
-while IFS= read -r manifest; do
-    verdict="$(perl -CSD -Mutf8 -0777 -ne '
-        my ($fm) = /\A---\n(.*?)\n---\n/s or exit 0;
-        my ($body) = $fm =~ /^description:[^\n]*\n((?:[ \t]+\S[^\n]*\n?)+)/m or exit 0;
-        my @lines = grep { /\S/ } split /\n/, $body;
-        print "multi-line description: a fold would put a space inside a word\n" if @lines > 1;
-        my $joined = join " ", map { my $l = $_; $l =~ s/^\s+|\s+$//g; $l } @lines;
-        print "space between two Chinese characters\n" if $joined =~ /[^\x00-\x7f] [^\x00-\x7f]/;
-    ' "${manifest}")"
-    while IFS= read -r line; do
-        [[ -n "${line}" ]] || continue
-        fail "${manifest}: ${line}"
-        zh_desc_errors=1
-    done <<< "${verdict}"
-done < <(find "${SKILL_ROOTS[@]}" -name 'SKILL_zh.md' | sort)
-
-# Everywhere else Chinese is written — skill bodies, reference files, the two
-# workflow documents, the memory spec, README.zh-CN.md and the landing pages —
-# no fold is involved, so only a hand-typed space can land between two Chinese
-# characters. The scan is therefore narrower than the description one: Han and
-# CJK punctuation only. A Chinese character beside a *symbol* is correct
-# typography and stays free — 规约 §9, 评审意见 → 要点记录表, 陈述处 ⇄ 证据,
-# 标 † 的五个, "# 2 · 配置", 回到顶部 ↑, the box-drawing rules in the workflow
-# diagram, and "——" spaced on both sides.
+#     Chinese is written in reference files, the two workflow documents, the
+#     memory spec, README.zh-CN.md and the landing pages, where only a
+#     hand-typed space can land between two Chinese characters. The scan is Han
+#     and CJK punctuation only. A Chinese character beside a *symbol* is correct
+#     typography and stays free — 规约 §9, 评审意见 → 要点记录表, 陈述处 ⇄ 证据,
+#     标 † 的五个, "# 2 · 配置", 回到顶部 ↑, the box-drawing rules in the workflow
+#     diagram, and "——" spaced on both sides.
 #     One exception, and it is a real one: 中文要点摘要 is a section title, and
 #     the spaces around it set it off from the sentence carrying it, the way
 #     backticks would in English. Both spaces must be there — a title that lost
 #     one is a typo the scan should still catch — so the pair is dropped before
 #     matching rather than the pattern being loosened.
+section "Chinese spacing (reference files, zh docs)"
+zh_space_errors=0
 while IFS= read -r zhfile; do
     while IFS= read -r hit; do
         [[ -n "${hit}" ]] || continue
         fail "${zhfile}:${hit} — space between two Chinese characters"
-        zh_desc_errors=1
+        zh_space_errors=1
     done < <(perl -CSD -Mutf8 -ne '
         BEGIN { $CJK = qr/[\p{Han}\p{Block=CJK_Symbols_and_Punctuation}\p{Block=Halfwidth_and_Fullwidth_Forms}]/ }
         my $line = $_;
@@ -940,7 +885,7 @@ while IFS= read -r zhfile; do
 done < <(find . -path ./.git -prune -o -path ./wkdrs -prune -o \
               \( -name '*_zh.md' -o -name '*.zh-CN.md' -o -name '*_zh.html' \) -print |
          sed 's|^\./||' | sort)
-(( zh_desc_errors == 0 )) && note "every Chinese description is one line; no space inside a word in any Chinese file"
+(( zh_space_errors == 0 )) && note "no space inside a word in any Chinese file"
 
 # 17. Hooks exist, parse, and are registered through each harness's native path.
 section "Hooks"
@@ -1057,8 +1002,7 @@ prov_errors=0
 prov_marker() { # $1 = tree root; prints the skills whose manifests state it
     local root="$1" skill
     while IFS= read -r skill; do
-        if grep -qF 'model_trail' "${root}/${skill}/SKILL.md" 2>/dev/null &&
-           grep -qF 'model_trail' "${root}/${skill}/SKILL_zh.md" 2>/dev/null; then
+        if grep -qF 'model_trail' "${root}/${skill}/SKILL.md" 2>/dev/null; then
             printf '%s\n' "${skill}"
         fi
     done < <(printf '%s\n' "${SKILLS}")
@@ -1079,15 +1023,14 @@ done
 
 # 19. The neutral root carries the optional local image_gen -> editable PPTX ->
 #     rendered PDF figure pipeline. It is a capability-conditional extension,
-#     not a requirement every harness pretends to have: the English and Chinese
-#     neutral manifests carry the full contract, Codex UI advertises it, and the
+#     not a requirement every harness pretends to have: the neutral manifest
+#     carries the full contract, Codex UI advertises it, and the
 #     six named harness trees do not acquire fragments of it by a broad
 #     sync. Literal markers are used because each one protects a distinct link
 #     in the chain a future edit could otherwise drop silently.
 section "Optional local figure PPTX pipeline"
 codex_fig_errors=0
 CODEX_FIG_EN=".agents/skills/stage-figs-designer/SKILL.md"
-CODEX_FIG_ZH=".agents/skills/stage-figs-designer/SKILL_zh.md"
 CODEX_FIG_UI=".codex/skills/stage-figs-designer/agents/openai.yaml"
 CODEX_FIG_MARKERS=(
     'image_gen'
@@ -1105,15 +1048,17 @@ CODEX_FIG_MARKERS=(
     'bash execs/run.sh'
     'bash execs/scpts/lint.sh'
 )
-for f in "${CODEX_FIG_EN}" "${CODEX_FIG_ZH}"; do
-    [[ -f "${f}" ]] || { fail "${f} is missing"; codex_fig_errors=1; continue; }
+if [[ -f "${CODEX_FIG_EN}" ]]; then
     for marker in "${CODEX_FIG_MARKERS[@]}"; do
-        grep -qF -- "${marker}" "${f}" || {
-            fail "${f}: optional local figure pipeline is missing '${marker}'"
+        grep -qF -- "${marker}" "${CODEX_FIG_EN}" || {
+            fail "${CODEX_FIG_EN}: optional local figure pipeline is missing '${marker}'"
             codex_fig_errors=1
         }
     done
-done
+else
+    fail "${CODEX_FIG_EN} is missing"
+    codex_fig_errors=1
+fi
 for marker in 'editable PPTX' 'Image Gen' 'render the final PDF'; do
     grep -qF -- "${marker}" "${CODEX_FIG_UI}" 2>/dev/null || {
         fail "${CODEX_FIG_UI}: UI contract is missing '${marker}'"
@@ -1125,14 +1070,12 @@ grep -qF 'allow_implicit_invocation: true' "${CODEX_FIG_UI}" 2>/dev/null || {
     codex_fig_errors=1
 }
 for root in .claude/skills .cursor/skills .dsh/skills .kimi-code/skills .pi/skills .qwen/skills; do
-    for f in SKILL.md SKILL_zh.md; do
-        path="${root}/stage-figs-designer/${f}"
-        for marker in 'image_gen' 'manus/figs/srcs/<slug>.pptx'; do
-            if grep -qF -- "${marker}" "${path}" 2>/dev/null; then
-                fail "${path}: contains neutral-root-only figure marker '${marker}'"
-                codex_fig_errors=1
-            fi
-        done
+    path="${root}/stage-figs-designer/SKILL.md"
+    for marker in 'image_gen' 'manus/figs/srcs/<slug>.pptx'; do
+        if grep -qF -- "${marker}" "${path}" 2>/dev/null; then
+            fail "${path}: contains neutral-root-only figure marker '${marker}'"
+            codex_fig_errors=1
+        fi
     done
 done
 (( codex_fig_errors == 0 )) && note "the neutral root carries the optional pipeline; Codex UI links to it; named trees stay native"

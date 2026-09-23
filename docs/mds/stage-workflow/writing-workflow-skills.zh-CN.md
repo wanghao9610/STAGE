@@ -149,5 +149,5 @@ Slash-only。海报不是把论文重新灌进一张更大的纸——它是取�
 ## 各处定义在哪
 
 - 共享规则与 § 编号：[writing-workflow-conventions.zh-CN.md](writing-workflow-conventions.zh-CN.md) —— 产物登记表是 §8，编造边界是 §9，布局是 §10。
-- skill 本身：只在 `.agents/skills/` 下以工具中立形式编写，再机械移植到六套具名 harness 技能树；仅属于某个 harness 的行为放进该树的适配 rules 或带锚点的 overrides。`SKILL_zh.md` 是随之维护的中文对照版，运行时不装载。
+- skill 本身：只在 `.agents/skills/` 下以工具中立形式编写，再机械移植到六套具名 harness 技能树；仅属于某个 harness 的行为放进该树的适配 rules 或带锚点的 overrides。
 - 面向用户的总览与快速上手：仓库 [README.zh-CN](../../../README.zh-CN.md)。

@@ -19,9 +19,8 @@ language, so a Chinese conversation gets Chinese replies; an explicit in-convers
 wins. English whatever it says: everything under `manus/`, the response to reviewers, and every
 structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric
 names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN
-editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the
-conventions — are kept in step for human readers only and are never loaded at runtime, so this
-SKILL.md stays authoritative.
+edition — `writing-workflow-conventions.zh-CN.md` for the conventions — is kept in step for
+human readers only and is never loaded at runtime, so this SKILL.md stays authoritative.
 
 Invocation: `stage-flow-status [SECTION] [DESCRIPTION]` — no argument reports the whole flow; a
 section argument, resolved per conventions §5 by number, file slug, or title against

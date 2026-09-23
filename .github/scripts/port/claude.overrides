@@ -6,21 +6,11 @@
 3. **Staleness gate.** Run `execs/scpts/import.sh --diff` (shell) and record the result: clean, or
 +++ 1
 3. **Staleness gate.** Run `execs/scpts/import.sh --diff` (Bash) and record the result: clean, or
-### stage-clms-auditor/SKILL_zh.md
---- 1
-3. **过期关口。** 跑 `execs/scpts/import.sh --diff`（shell）并记录结果：干净，或者漂移 / 上游新增 / 上游缺失的清单。漂移的路径污染 match（原则 5）。没有配置 STAR 来源 → 记下来并继续；MANIFEST 指纹仍然是参照。
-+++ 1
-3. **过期关口。** 跑 `execs/scpts/import.sh --diff`（Bash）并记录结果：干净，或者漂移 / 上游新增 / 上游缺失的清单。漂移的路径污染 match（原则 5）。没有配置 STAR 来源 → 记下来并继续；MANIFEST 指纹仍然是参照。
 ### stage-copy-editor/SKILL.md
 --- 1
 6. **Verify the build.** Run `execs/run.sh` (shell). On failure, bisect the session's edits,
 +++ 1
 6. **Verify the build.** Run `execs/run.sh` (Bash). On failure, bisect the session's edits,
-### stage-copy-editor/SKILL_zh.md
---- 1
-6. **验证构建。** 跑 `execs/run.sh`（shell）。失败时二分本次会话的编辑、回退那个肇事者、重新构建——只有编译得过的手稿才离开本 skill。
-+++ 1
-6. **验证构建。** 跑 `execs/run.sh`（Bash）。失败时二分本次会话的编辑、回退那个肇事者、重新构建——只有编译得过的手稿才离开本 skill。
 ### stage-evid-curator/SKILL.md
 --- 1
 2. A diff that rewrites already-registered entries is confirmed first via one your question tool, naming each entry and the numbers that move — a refreshed number can silently contradict a sentence the draft already typeset (Principle 6). New-only imports proceed without a question.
@@ -36,31 +26,11 @@
 - Two asks exist — the import-rewrite confirmation (Step 1) and the registration provenance question (Step 2) — via your question tool, one question per call. If it is unavailable (headless / scripted), fall back to plain text and require an explicit answer before the write.
 +++ 1
 - Two asks exist — the import-rewrite confirmation (Step 1) and the registration provenance question (Step 2) — via AskUserQuestion, one question per call. If it is unavailable (headless / scripted), fall back to plain text and require an explicit answer before the write.
-### stage-evid-curator/SKILL_zh.md
---- 1
-2. 会重写已登记条目的 diff，先用一个 your question tool 确认，点名每条条目以及会移动的数字——一个被刷新的数字可能悄悄与草稿里已经排好版的句子矛盾（原则 6）。只新增的导入不必提问，直接进行。
-+++ 1
-2. 会重写已登记条目的 diff，先用一个 AskUserQuestion 确认，点名每条条目以及会移动的数字——一个被刷新的数字可能悄悄与草稿里已经排好版的句子矛盾（原则 6）。只新增的导入不必提问，直接进行。
-### stage-evid-curator/SKILL_zh.md
---- 1
-3. 用一个 your question tool 问那些任何探测都无从得知的事：`source`——这份东西哪来的（路径、URL 或人）——以及 `covers`；用户的请求里已经把两者都说了就跳过。
-+++ 1
-3. 用一个 AskUserQuestion 问那些任何探测都无从得知的事：`source`——这份东西哪来的（路径、URL 或人）——以及 `covers`；用户的请求里已经把两者都说了就跳过。
-### stage-evid-curator/SKILL_zh.md
---- 1
-- 只存在两处提问——导入重写确认（Step 1）与登记出处问题（Step 2）——通过 your question tool，一次调用一个问题。它不可用时（无人值守 / 脚本化），回落到纯文本，并在写入之前要求一个明确答复。
-+++ 1
-- 只存在两处提问——导入重写确认（Step 1）与登记出处问题（Step 2）——通过 AskUserQuestion，一次调用一个问题。它不可用时（无人值守 / 脚本化），回落到纯文本，并在写入之前要求一个明确答复。
 ### stage-figs-designer/SKILL.md
 --- 1
 # Figure Designer — sourced figures, editable PPTX, no orphan PDFs
 +++ 1
 # Figure Designer — sourced figures, no orphan PDFs
-### stage-figs-designer/SKILL.md
---- 1
-**Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this `SKILL.md` stays authoritative.
-+++ 1
-**Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English; their zh-CN editions — `SKILL_zh.md` beside this file, and `writing-workflow-conventions.zh-CN.md` for the conventions — are kept in step for human readers only and are never loaded at runtime, so this SKILL.md stays authoritative.
 ### stage-figs-designer/SKILL.md
 --- 1
 Invocation: `stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no argument audits the Figures table in `notes/outline.md` against disk and proposes one next action; `plan` creates or revises the Figures table from the story and section briefs; `teaser` resolves to the teaser and runs its checklist; anything else names one figure, resolved by outline ID (`F1`), file slug, or purpose/section text against `notes/outline.md` (conventions §5 — ambiguity is asked about, never guessed). Build work is one figure per invocation. There is no separate description slot here: free text is already the figure's own description — that is how a figure resolves by purpose or section text, and how one with no Figures row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the figure is for; it never supplies a plotted number, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}` in the caption. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
@@ -234,184 +204,6 @@ Fails become the figure's todo list; the teaser's row stays short of `final` whi
 - `notes/outline.md` — Figures table rows (`ID, File, Purpose, Section, Source, Status`), the output-table state field for figures (§8).
 - Chat digest per Step 6. Nothing under `mates/` (read-only), nothing in `manus/secs/`, no reports in `wkdrs/`.
 - Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.
-### stage-figs-designer/SKILL_zh.md
---- 1
-# Figure Designer —— 有来源、可编辑 PPTX、没有孤儿 PDF
-+++ 1
-# Figure Designer —— 有来源的图，没有孤儿 PDF
-### stage-figs-designer/SKILL_zh.md
---- 1
-调用方式：`stage-figs-designer [FIGURE | plan | teaser] [involve=low]`——不带参数时，对着磁盘审计 `notes/outline.md` 里的 Figures 表并提出唯一的下一步动作；`plan` 从故事与各节简介出发创建或修订 Figures 表；`teaser` 解析到 teaser 并跑它的检查清单；其他内容点名一张图，按提纲 ID（`F1`）、文件 slug 或用途/章节文字对着 `notes/outline.md` 解析（规约 §5——有歧义就问，绝不猜）。建图是一次调用一张。这里没有独立的描述位：自由文本本身就是这张图的描述——图正是靠用途或章节文字解析出来的，还没有Figures 行的图也正是这样说出来的——所以规约 §7.13 说的那句描述*就是*这个参数，不再从中剥出别的东西。它说明这张图是干什么的；它绝不提供图上任何一个数，那个数要么来自本次运行读过的、带指纹的 `mates/` 条目，要么在图注里写成 `\todo{...}`。参数后面可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），不属于参数，在参数被读取之前就被剥离。
-+++ 1
-调用方式：`stage-figs-designer [FIGURE | plan | teaser] [involve=low]`——不带参数时，对着磁盘上的文件审计 `notes/outline.md` 里的 Figures 表并提出唯一的下一步动作；`plan` 从故事与各节简介出发创建或修订 Figures 表；`teaser` 解析到 teaser 图并跑它的检查清单；其他内容点名一张图，按提纲 ID（`F1`）、文件 slug 或用途/章节文字对着 `notes/outline.md` 解析（规约 §5——有歧义就问，绝不猜）。建图的活儿是一次调用一张。这里没有独立的描述位：自由文本本身就是这张图的描述——图正是靠用途或章节文字解析出来的，还没有Figures 行的图也正是这样说出来的——所以规约 §7.13 说的那句描述*就是*这个参数，不再从中剥出别的东西。它说明这张图是干什么的；它绝不提供图上任何一个数，那个数要么来自本次运行读过的、带指纹的 `mates/` 条目，要么在图注里写成 `\todo{...}`。参数后面可以跟一个可选的 `involve=low|medium|high` 记号：它设定本次运行的 involve 档位（规约 §7.7），不属于参数，在参数被读取之前就被剥离。
-### stage-figs-designer/SKILL_zh.md
---- 1
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——不做分节选读。它对本 skill 约束最紧的是 §5（解析指的是哪张图）、§8（产物登记表与精确过期判定）、§9（编造边界——图同样在陈述主张）和 §1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-+++ 1
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是每个 STAGE skill 都要装载的共享基线：每次运行开始时整份读完——不做分节选读。它对本 skill 约束最紧的是 §5（解析指的是哪张图）、§8（产物登记表及其过期规则）、§9（编造边界——图同样在陈述主张）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-### stage-figs-designer/SKILL_zh.md
---- 1
-你是这个家族的美术总监。`stage-sect-drafter` 用散文论证、`stage-tabs-builder` 用表格论证；你做视觉论证——扛起第 1 页的 teaser、省掉散文的方法图、让已验证模式看得见的结果图。你拥有 `notes/outline.md` 里的 Figures 表：一张图先挣到一行用途才挣到像素；若它的用途已有计划中的表格在服务，就提议退役它。
-+++ 1
-你是这个家族的美术总监。`stage-sect-drafter` 用散文论证、`stage-tabs-builder` 用表格论证；你做视觉论证——第 1 页上扛起故事的 teaser、省掉一页散文的方法图、让优势看得见的结果图。你拥有 `notes/outline.md` 里的 Figures 表：一张图先挣到一行、用一个从句写清它的用途，才挣到像素；而一张图的用途如果某张已计划的表格已经在服务了，那就砍掉它，不要画。
-### stage-figs-designer/SKILL_zh.md
---- 1
-宿主提供本地作图流水线时，可编辑交付物是一页 PowerPoint 源文件。只有生成式说明层确实能改善视觉时才用 Image Gen；科学结构、标签、数据与主张都留在栅格层之外，保持可编辑和有来源。绝不把数据手敲进美术素材，绝不写章节正文，绝不把 `\includegraphics` 放进 `manus/secs/`，也绝不写 `mates/` 或 `mates/MANIFEST.md`——导入证据与图由 `stage-evid-curator` 登记。
-+++ 1
-你绝不把数据手敲进美术素材，绝不写章节正文，绝不把 `\includegraphics` 放进 `manus/secs/`（那是 `stage-sect-drafter` 的），也绝不写 `mates/` 或 `mates/MANIFEST.md`——导入的美术素材由 `stage-evid-curator` 登记。
-### stage-figs-designer/SKILL_zh.md
---- 9
-1. **先有用途行，后有像素。** Figures 表（`| ID | File | Purpose | Section | Source | Status |`，Status 为 `planned | sketch | draft | final`；规约 §8）是本 skill 拥有的清单。没有行就不建图；Purpose 若不能用一个从句说明它为什么值得占版面，要先展示给用户再退役（§7）。
-2. **本地图的唯一真源是 PPTX。** 用这条流水线新建或实质修订的每张图都有一页 `manus/figs/srcs/<slug>.pptx`；Source 列点名该文件，而 `manus/figs/<slug>.pdf` 从它导出。审计时保留既有 TikZ、Python 与 Draw.io 源，但不再新建只有这些旧格式的源。仓库外制作的图仍可在 `stage-evid-curator` 登记后采用 `mates/MANIFEST.md` 出处。两种出处都没有的 PDF 是孤儿。
-3. **生成的像素是说明，不是证据。** `image_gen` 只用于概念物体、纹理、环境，或不适合用原生形状表达的独立科学插图。绝不生成 plot、benchmark sample、定性模型输出、论文图复刻、logo、标签、数字，或任何要让评审当成观测结果的东西。文字、箭头、坐标轴、marker、callout 与数据全部用可编辑 PowerPoint 对象。`ANON=true` 时，prompt 不含论文标题、作者身份、仓库路径、未公开数值或逐字手稿；无法去身份化就改用原生对象。
-4. **画出的数字仍须追溯（§9a）。** 排图之前创建 `manus/figs/srcs/<slug>.sources.md`。每条系列以及 caption 中每个数字或比较主张各占一行，并含 `% src: mates/<...>#<anchor>`；一条总括来源不得覆盖多条系列。PPTX speaker notes 里的 `[Sources]` block 镜像同一份 element→anchor 映射。带指纹的证据里没有的值就不画，并把它作为 `\todo{...}` caption 文本交给 `stage-sect-drafter`；绝不凭记忆补点、插值或画一条像真的曲线。
-5. **Image Gen 素材可复现且有界。** 每个接受的输出放在 `manus/figs/srcs/<slug>.assets/`；把完整 prompt、预期裁切和 `role: illustrative-only` 记进 `<slug>.sources.md`，检查后再嵌入。素材文件与 prompt 是辅助材料；PPTX 仍是可编辑主源，并嵌入已接受的像素。一次只做一张图，因此调用次数与审核范围都有界。
-6. **渲染精确判定，不看 mtime。** PPTX 导出 PDF 后，写 `manus/figs/srcs/<slug>.render.yml`，含 `source_sha256`、`output_sha256`、`renderer` 与系统时钟给出的真实 `rendered` 日期。不带参数的审计逐字节比较当前 hash。PPTX 已变而 PDF 仍旧，哪怕两个文件都存在，也算过期。
-7. **teaser 要为整篇论文负责。** 它有 Step 6 的专门检查清单，只要一项不过，其行就绝不到 `final`。
-8. **先看得清，再好看。** slide 尺寸按目标 figure 的宽高比设，不沿用默认 deck；文字在最终印刷宽度下可读、含义在灰度下成立、符号与 `notes/notation.md` 一致，且 `ANON=true` 时不出现作者名、实验室标识或仓库 URL。
-9. **按图并行分派（§6）。** 不带参数审计且 Figures 行超过 6 个时，一张图分派一个只读子代理；每个只读该行及其点名文件，只返回来源判定、来源表判定、渲染 hash 判定，别的什么都不返回。一次要建多张图时也按图切开，但本 skill 通常会拒绝扩大范围，因为一次调用只拥有一张图。主 agent 独自写 `notes/outline.md`、渲染并目检集成后的图、运行仓库闸、与用户对话并提出提交。
-+++ 6
-1. **先有用途行，后有像素。** Figures 表（`| ID | File | Purpose | Section | Source | Status |`，Status 为 `planned | sketch | draft | final`；schema 见规约 §8）是本 skill 拥有的清单。没有行就不建图；而一行的 Purpose 若无法用一个从句说清它凭什么值这点版面，就提议退役它——要有用户确认（§7），绝不静默。
-2. **不许有孤儿 PDF。** 每个 `manus/figs/<slug>.pdf` 恰好有两种出处之一，写在它那一行的 Source 列里：一个提交在它旁边的可编辑源文件 `manus/figs/srcs/<slug>.*`（tikz、python、drawio），或者一条针对别处产出的美术素材的 `mates/MANIFEST.md` 条目——经 `stage-evid-curator` 登记，因为 `mates/` 及其 MANIFEST 对本 skill 是只读的（§10）。两种出处都没有的 PDF 既不能重新生成也不能审计；不带参数的审计就是去搜捕它们。
-3. **画出来的数字也是数字（§9a）。** 源文件里的每条数据系列都带一条 `% src: mates/<...>#<anchor>` 注释（python 里是 `# src:`），点名它所依据的带指纹证据——与 `stage-tabs-builder` 施加在表格行上的是同一套纪律。证据没有承载的取值就不画，并在 caption 里以 `\todo{...}` 点名这个缺口；一条看着合理、手敲出来的曲线是编造，不是插图。
-4. **caption 也是主张（§9a）。** 陈述了一个数字或一句比较的 caption 遵循散文的规则：追溯到 `mates/`，或者写 `\todo{}`。让 caption 对 `stage-clms-auditor` 保持可核查，并让 caption 陈述的任何主张与 `notes/claims.md` 保持同步。
-5. **teaser 要为整篇论文负责。** 它有 Step 5 的专门检查清单，只要还有一项不过，它那一行就绝不到 `final`。
-6. **先看得清，再好看。** 文字在最终印刷宽度下可读、含义在灰度下仍然成立、符号与术语与 `notes/notation.md` 一致；`ANON=true` 时（§3），美术素材内部不出现作者名、实验室标识或仓库 URL。
-### stage-figs-designer/SKILL_zh.md
---- 1
-## 工作流
-+++ 3
-7. **按图并行分派（§6）。** 不带参数那次审计要拿 Figures 表的每一行去对 `manus/figs/` 与 `manus/figs/srcs/`：图超过 6 张 → 一张图一个委派者，各自只返回自己那一行的来源判定——可编辑源文件、`mates/` 条目、还是孤儿——别的什么都不返回。一次要生成好几个源文件的运行按同样方式切开，一张图一个委派者，各自独占自己那个 `manus/figs/srcs/<slug>.*`，不碰别的文件（§6.2），而数据序列上的每条 `% src:` 注释由画它的那个人写下（原则 3、§6.4）。不切开的是：渲染，它是一个源文件一次调用；Figures 表，它只有一个写入者；以及 teaser 清单，它是对整篇论文的判断，要在一个地方做。
-
-## 工作流
-### stage-figs-designer/SKILL_zh.md
---- 3
-读规约（整份），然后读 `notes/outline.md`、`notes/story.md`、`notes/notation.md`、`notes/claims.md` 与 `mates/MANIFEST.md`；列出 `manus/figs/` 与 `manus/figs/srcs/`。从 `.env` 解析 `LATEX_ENGINE`、`ANON`、`STAGE_LANG` 与 `INVOLVE`。还没有 `notes/outline.md` → 说明并路由到 `stage-outl-planner`；Figures 表住在那里，所以停下。
-
-建图或修图时，还要装载已安装的 `Presentations` skill 及其必读的 PowerPoint 风格/API 说明，再调用 workspace dependency loader。把论文的 figure brief 当作明确的定制视觉方向：不套通用 slide deck 模板，也不让排 slide 的内部语言出现在图中。
-+++ 1
-读规约（整份），然后读 `notes/outline.md`、`notes/story.md`、`notes/notation.md`、`notes/claims.md` 与 `mates/MANIFEST.md`；列出 `manus/figs/` 与 `manus/figs/srcs/`。从 `.env` 记下 `LATEX_ENGINE` 与 `ANON`（§3）。还没有 `notes/outline.md` → 说出来并路由到 `stage-outl-planner`；Figures 表住在那里，所以停下。
-### stage-figs-designer/SKILL_zh.md
---- 1
-首个命中者胜出：`plan` → Step 2；`teaser` → teaser，走 Step 3–6；给出图的记号 → 那张图（§5 匹配；有歧义 → 提问，§7），走 Step 3–5；不带参数 → 审计：
-+++ 1
-首个命中者胜出：`plan` → Step 2；`teaser` → teaser 图，走 Step 3–5；给出图的记号 → 那张图（§5 匹配；有歧义 → 提问，§7），走 Step 3–4；不带参数 → 审计：
-### stage-figs-designer/SKILL_zh.md
---- 6
-1. 把每个 `manus/figs/*.pdf` 解析到本地可编辑源或 `mates/MANIFEST.md` 条目；逐一点名孤儿。
-2. 用这条本地流水线建图必须有 `<slug>.pptx`、`<slug>.sources.md` 与 `<slug>.render.yml`；用记下的 SHA-256 对当前 PPTX/PDF 做精确比较，绝不看 mtime。
-3. 每一行 Figures 都对磁盘核查：File 存在或 Status 是 `planned`；Source 能解析；`mates/` Source 仍有 MANIFEST 条目；本地来源表为每条数据系列和承载主张的 caption 句各有一条 `% src:`。
-4. 既有 TikZ、Python 或 Draw.io 源仍是有效的 legacy 出处，但等它下次需要实质修订时才提议改走 PPTX；审计本身不重写。
-5. 扫描已起草章节中的 `\includegraphics`，找出没有任何行计划的图；提议一行，绝不静默收编。
-6. 报出漂移以及唯一的下一步动作与确切命令；未被要求就不再往下走。
-+++ 4
-1. `manus/figs/` 下每个 PDF 都要按原则 2 解析到一个出处——孤儿是头条发现。
-2. 每一行 Figures 都对着磁盘核查：File 存在，或 Status 是 `planned`；Source 能解析；`mates/` 类 Source 仍然有它的 MANIFEST 条目（§8——过期是时间戳比对，绝不看 mtime；上游漂移经 `import.sh --diff` 浮出来）。
-3. 扫描已起草的章节，找出没有任何行计划过的 `\includegraphics` 图——一张计划外的图得到的是一行提议行，不是静默收编。
-4. 报出漂移，以及唯一的下一步动作与它的确切命令；没被要求就不再往下走。
-### stage-figs-designer/SKILL_zh.md
---- 14
-从 `notes/story.md` 的 `## Pitch` 与 `## Contributions`，以及提纲里的章节简介推导各行：teaser；机制需要时的方法图；只有视觉能展示 `manus/tabs/` 展示不了的东西时才要结果图或消融图。填满每一列——File slug、一个从句写清的 Purpose、Section、本地建图用 `manus/figs/srcs/<slug>.pptx` 或导入图用计划中的 `mates/` 路径、Status 为 `planned`。按页数预算和计划中的表核对整组图。覆盖非本次运行创建的行之前，展示行级 diff 并提问（§7），然后更新 `notes/outline.md`、`updated:`、`model_id` 与 `model_trail`（规约 §8）。
-
-### Step 3：映射证据与视觉素材
-
-1. 确认这张图已有一行；没有就按 Step 2 的规则起草一行、展示它，并在写入前取得必要确认。
-2. 定下预期的手稿宽度与宽高比；画出层级草图，找出哪些元素承载数据或主张。
-3. 通过 `notes/claims.md`、`mates/MANIFEST.md` 与本次运行亲自打开的证据文件解析每个数据元素。先写 `<slug>.sources.md`，一条 element 一行、一行一个 `% src:` anchor。缺证据 → 路由到 `stage-evid-curator`，Status 留在 `sketch`，缺失元素不画。
-4. 判断某个纯说明层是否真的值得用 Image Gen。若是，先告诉用户本 skill 正在生成素材，规划裁切和留白，明确要求无文字、无标签、无数字、无 logo、无水印，调用 `image_gen`，用 `view_image` 检查输出，只留下已接受的输出及其完整 prompt 到 `<slug>.assets/`。若否，全图都用可编辑 PowerPoint 对象组成。
-
-### Step 4：组合并检查可编辑 PPTX
-
-从 `wkdrs/builds/figs/<slug>/` 下的临时 ES module 用 `@oai/artifact-tool` 创建一页 PowerPoint，把最终 deck 写到 `manus/figs/srcs/<slug>.pptx`。采用与目标宽高比一致的定制科学图排版。标签、箭头、connector、坐标轴、chart mark、legend 与主张文字全部用原生可编辑 PowerPoint 对象；生成式栅格图只作为说明层嵌入。先画 connector 再画 node，让连线留在图形后面；speaker notes 中放一个与 `<slug>.sources.md` 一致的 `[Sources]` block。
-
-运行 `slides_test.py`，用 `render_slides.py` 把该页渲染成 PNG，再以 `view_image` 全尺寸检查。修掉所有意外重叠、裁切、换行、断裂 connector、模糊 crop、不一致标签，以及与 `notes/notation.md` 的偏差。不能靠把字缩到低于最终印刷可读阈值来让 PPTX 通过。
-+++ 1
-从 `notes/story.md` 的 `## Pitch` 与 `## Contributions`，以及提纲里各节的简介，推导出各行：teaser；机制需要时的方法图；只有在图能展示 `manus/tabs/` 展示不了的东西时，才要结果图或消融图。把每一列都填上——文件 slug、一个从句写清的 Purpose、Section、打算采用的 Source 形式、Status 为 `planned`。把这一组对着提纲的页数预算核一遍；标出任何已被某张计划中的表格服务了的用途。在覆盖任何非本次运行创建的行之前，展示行级 diff 并提问（§7），然后更新 `notes/outline.md` 及其 `updated:`。
-### stage-figs-designer/SKILL_zh.md
---- 1
-### Step 5：从 PPTX 渲染手稿 PDF，并运行闸
-+++ 1
-### Step 3：建源文件
-### stage-figs-designer/SKILL_zh.md
---- 1
-通过 bundled workspace dependencies 解析 `soffice`；绝不硬编码机器路径，也绝不安装 renderer。把 PPTX headless 导出到 `wkdrs/builds/figs/<slug>/`，用 `pdfinfo` 要求恰好一页，再把该导出页原样复制到 `manus/figs/<slug>.pdf`。把最终 PDF 页再渲染成图片并目检一次；PPTX preview 通过不能证明交付的 PDF 通过。
-+++ 4
-1. 确认这张图的行存在；不存在就按 Step 2 的规则建一行。
-2. 选择源文件形式——架构与示意图用 tikz、数据图用 python、流程图用 drawio——然后写或修订 `manus/figs/srcs/<slug>.*`。
-3. 数据图：通过 `notes/claims.md` 与 `mates/MANIFEST.md` 定位证据；给每条系列它的 `src:` 注释（原则 3）。证据尚未导入 → 路由到 `stage-evid-curator` 并把 Status 按在 `sketch`。
-4. 在仓库之外产出的美术素材：先让 `stage-evid-curator` 登记它，然后把 `mates/` 路径记进 Source 列——绝不接受一个光秃秃的 PDF。
-### stage-figs-designer/SKILL_zh.md
---- 1
-视觉检查后，对最终 PPTX 与 PDF 计算 SHA-256，把两个 hash、renderer 名称/版本和 `date +%Y-%m-%d` 写进 `<slug>.render.yml`；绝不把 mtime 当作新鲜度证据。把 `<slug>.sources.md` 再对 PPTX notes 和可见元素核一遍。然后运行 `bash execs/run.sh` 与 `bash execs/scpts/lint.sh`，因为改动一张已引用的图可能改变手稿页数，也可能暴露 todo/reference 闸。缺 renderer 或 QA 工具是降级检查：Status 留在 `final` 之前，准确点名缺失命令，绝不用另一条未记录的导出路径替代 PPTX→PDF 链。
-+++ 1
-### Step 4：渲染
-### stage-figs-designer/SKILL_zh.md
---- 1
-把 `\includegraphics{figs/<slug>}` 报给 `stage-sect-drafter`；摆放与 LaTeX caption 仍归起草者写。
-+++ 1
-tikz 源用 `.env` 的引擎独立编译进 `wkdrs/builds/figs/`，PDF 复制到 `manus/figs/<slug>.pdf`；python 源从仓库根运行，自己写出 `manus/figs/<slug>.pdf`；drawio 导出在这个环境之外进行——把确切的导出步骤交给用户，并把 Status 按在 `draft` 直到 PDF 落地。工具链跑不动的渲染不算失败：提交源文件、准确说明还剩什么，让 Status 保持诚实。报出 `\includegraphics{figs/<slug>}` 那一行交给 `stage-sect-drafter`——摆放是起草者的事，不是你的。
-### stage-figs-designer/SKILL_zh.md
---- 1
-### Step 6：teaser 检查清单（`teaser` 运行时）
-+++ 1
-### Step 5：teaser 检查清单（`teaser` 运行时）
-### stage-figs-designer/SKILL_zh.md
---- 1
-逐项报告 pass / fail / todo：
-+++ 1
-逐项走完，并逐项报出 pass / fail / todo：
-### stage-figs-designer/SKILL_zh.md
---- 8
-1. 只看图与拟议 caption，读者能说出问题、核心想法、以及为什么赢，并与 `## Pitch` 一致。
-2. 拟议 caption 点明任务、想法与头条结果，并带证据 anchor 或 `\todo{}`。
-3. 主要主张是最大的视觉元素；辅助细节不争夺注意力。
-4. 术语与符号与 `notes/notation.md` 一致；摘要尚未引入的缩写不出现。
-5. 导出的 PDF 在灰度与第 1 页印刷宽度下仍成立；最小文字不小于 caption 文字。
-6. 每条系列、每个数字与每句比较主张都有自己的 Step 3 来源表条目。
-7. 每个 Image Gen 层都显然只是说明，不含烙进像素的科学标签或数据，并已记录 prompt。
-8. PPTX/PDF hash 与 `<slug>.render.yml` 一致；PDF 正是目检过的那一页导出物。
-+++ 6
-1. 独自讲故事：只看这张图与它的 caption 的读者，能说出问题、核心想法、以及它为什么赢——对着 `notes/story.md` 的 `## Pitch` 核。
-2. caption 自足：点明任务、想法，以及带证据锚点或 `\todo{}` 的头条结果。
-3. 单一层级：主要主张是最大的视觉元素；辅助细节不与任何东西争夺注意力。
-4. 术语与符号与 `notes/notation.md` 一致；不出现摘要还没引入过的缩写。
-5. 在灰度与第 1 页印刷宽度下仍然成立；最小的文字不小于 caption 文字。
-6. 图里的每条系列与每个数字都带着它按原则 3 的来源。
-### stage-figs-designer/SKILL_zh.md
---- 1
-不过的项变成这张图的 todo 清单；只要还有一项不过，teaser 行就到不了 `final`。
-+++ 1
-不过的项变成这张图的 todo 清单；只要还有一项不过，teaser 那一行就到不了 `final`。
-### stage-figs-designer/SKILL_zh.md
---- 1
-### Step 7：更新登记项并汇报
-+++ 1
-### Step 6：更新登记项并汇报
-### stage-figs-designer/SKILL_zh.md
---- 3
-1. 诚实翻转 Status：源不存在时为 `planned`；证据或来源表不完整时为 `sketch`；PPTX/PDF 已存在但渲染、溯源、视觉、构建、lint 或 teaser 任一检查未过时为 `draft`；只有所有适用检查都通过才是 `final`。Source 填 PPTX 或已登记的 `mates/` 路径，并更新提纲 provenance 字段（§8）。
-2. 汇报改了哪些行；PPTX、素材、来源表、渲染记录和 PDF 路径；用了哪些 `% src:` anchor；生成了哪些 Image Gen prompt/素材；渲染 hash；视觉、构建、lint、检查清单或审计结论；以及未解决项的确切路由。
-3. 只为本次运行的文件提出一次提交，标题以 `stage-figs-designer:` 开头（§1）。运行开始时已经 dirty 的路径绝不 stage，`wkdrs/` 绝不 stage，没有用户明确回答绝不提交。
-+++ 3
-1. 诚实地翻转这张图的 Status（`planned → sketch → draft → final`）、填好它的 Source 列、更新提纲的 `updated:`——Figures 行就是本 skill 的登记表状态（§8）。
-2. 在聊天里给摘要：改了哪些行、写了哪些文件、用了哪些 `src:` 锚点、检查清单或审计结论，以及路由——未登记的美术素材或缺失的证据 → `stage-evid-curator`；摆放 → `stage-sect-drafter`；caption 里的主张 → `stage-clms-auditor`。
-3. 一个工作会话提交一次，标题点名本 skill（§1）。
-### stage-figs-designer/SKILL_zh.md
---- 8
-- `manus/figs/srcs/<slug>.pptx`——用本地流水线新建或实质修订图的一页可编辑主源。
-- `manus/figs/srcs/<slug>.sources.md`——可 grep 的 element 映射：每条系列或主张一个 `% src:` anchor，Image Gen 的完整 prompt 标为 `role: illustrative-only`。
-- `manus/figs/srcs/<slug>.assets/`——PPTX 使用并已接受的生成式栅格素材；不需要时不存在。
-- `manus/figs/srcs/<slug>.render.yml`——精确的 PPTX/PDF hash、renderer 身份与真实渲染日期。
-- `manus/figs/<slug>.pdf`——从该 PPTX 导出的单页 PDF，或一份诚实的渲染阻塞说明。
-- `notes/outline.md`——Figures 行（`ID, File, Purpose, Section, Source, Status`）及登记表 provenance。
-- 按 Step 7 给出的聊天摘要。`mates/` 下什么都不写，`manus/secs/` 里什么都不写，`wkdrs/` 下的文件不提交。
-- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:` 与一条追加的 `model_trail:`。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。
-+++ 5
-- `manus/figs/srcs/<slug>.*`——可编辑的源文件，每条数据系列一条 `src:` 注释。
-- `manus/figs/<slug>.pdf`——渲染出来的图，或者一份关于"还剩哪一步渲染"的诚实说明。
-- `notes/outline.md`——Figures 表的各行（`ID, File, Purpose, Section, Source, Status`），即图的登记表状态字段（§8）。
-- 按 Step 6 给出的聊天摘要。`mates/` 下什么都不写（只读），`manus/secs/` 里什么都不写，`wkdrs/` 里不留报告。
-- 溯源（规约 §8）：本次运行写进 `notes/`、`tasks/`、`cycls/`、`wkdrs/reports/` 的每份产物都带 `model_id:`——本次会话的模型 id，原样抄录——并追加一条本次运行的 `model_trail:` 条目。`manus/` 与 `mates/` 下的一切两者都不带，`cycls/<cycle>/venue.yml` 也不带。
 ### stage-flow-status/SKILL.md
 --- 1
    no your question tool and no plan mode. Delegation is available and Principle 6 says where it pays; a
@@ -427,21 +219,6 @@ tikz 源用 `.env` 的引擎独立编译进 `wkdrs/builds/figs/`，PDF 复制到
    limit, and a shell result past roughly 30 KB is written out to a file that costs a round trip to
 +++ 1
    limit, and a Bash result past roughly 30 KB is written out to a file that costs a round trip to
-### stage-flow-status/SKILL_zh.md
---- 1
-1. **严格只读。** 绝不创建、编辑或删除任何文件——不动提纲、不动记录表、不动 frontmatter——也绝不提交。除了 §5 那唯一一个消歧问题之外：不用 your question tool、不进 plan 模式。委派是可用的，哪里划算见原则 6；从这里派出去的委派者与派出它的会话一样只读。用户想据此行动，就把他们指向对应的 skill：stage-proj-adopt、stage-evid-curator、stage-stry-coach、stage-outl-planner、stage-sect-drafter、stage-tabs-builder、stage-figs-designer、stage-refs-curator、stage-copy-editor、stage-clms-auditor、stage-cite-auditor、stage-peer-reviewer、stage-resp-writer、stage-subm-packer。
-+++ 1
-1. **严格只读。** 绝不创建、编辑或删除任何文件——不动提纲、不动记录表、不动 frontmatter——也绝不提交。除了 §5 那唯一一个消歧问题之外：不用 AskUserQuestion、不进 plan 模式。委派是可用的，哪里划算见原则 6；从这里派出去的委派者与派出它的会话一样只读。用户想据此行动，就把他们指向对应的 skill：stage-proj-adopt、stage-evid-curator、stage-stry-coach、stage-outl-planner、stage-sect-drafter、stage-tabs-builder、stage-figs-designer、stage-refs-curator、stage-copy-editor、stage-clms-auditor、stage-cite-auditor、stage-peer-reviewer、stage-resp-writer、stage-subm-packer。
-### stage-flow-status/SKILL_zh.md
---- 1
-1. **一次装载，然后开始判断。** 本 skill 要读的一切都在一条消息里到齐——五个 shell 调用一起发出，它们之间只花一次往返，而不是各花一次。第 2–8 步都在这一次返回的内容上做，摘要已经打印过的文件不再重开。本 skill 是整条流程里跑得最勤的一个，而往返正是它慢的全部原因。
-+++ 1
-1. **一次装载，然后开始判断。** 本 skill 要读的一切都在一条消息里到齐——五个 Bash 调用一起发出，它们之间只花一次往返，而不是各花一次。第 2–8 步都在这一次返回的内容上做，摘要已经打印过的文件不再重开。本 skill 是整条流程里跑得最勤的一个，而往返正是它慢的全部原因。
-### stage-flow-status/SKILL_zh.md
---- 1
-   规约分三次调用而不是一次，是因为每个工具返回都有自己的大小上限，超过大约 30 KB 的 shell 返回会被存成文件，读回来又要花一次往返——正是这条单消息要省掉的那一次。装载的八节加起来 60 KB，共用一个返回装不下；这样切开，每一份都稳稳在线以下，摘要独占一个返回（它是唯一随论文长大的那部分），两条脚本信号占第五个，否则它们那几行会搭在最接近溢出的那个返回上。某段摘录什么都没打印出来——同步过来的规约副本可能换了编号——就用 `sed -n '/^## 0\./,$p'` 整份装载，并在回复里说明这次改成了整份装载。
-+++ 1
-   规约分三次调用而不是一次，是因为每个工具返回都有自己的大小上限，超过大约 30 KB 的 Bash 返回会被存成文件，读回来又要花一次往返——正是这条单消息要省掉的那一次。装载的八节加起来 60 KB，共用一个返回装不下；这样切开，每一份都稳稳在线以下，摘要独占一个返回（它是唯一随论文长大的那部分），两条脚本信号占第五个，否则它们那几行会搭在最接近溢出的那个返回上。某段摘录什么都没打印出来——同步过来的规约副本可能换了编号——就用 `sed -n '/^## 0\./,$p'` 整份装载，并在回复里说明这次改成了整份装载。
 ### stage-outl-planner/SKILL.md
 --- 1
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline every STAGE skill shares. Read the whole file at the start of every run — there is no section-selective loading — as its own file read, never `cat`-ed through shell. The sections that bind this skill hardest: conventions §5 (manuscript and cycle resolution), §7 (dialogue), §8 (the output table and the outline / notation schemas), and §9 (the fabrication boundary: §9(a) — skeletons state no facts and no numbers; §9(c) — an unconfirmed page limit is not a limit). This file states what is specific to this skill and wins wherever it is stricter.
@@ -477,51 +254,11 @@ Show the full table with the budget arithmetic (Principle 2) — e.g. `sum 7.75 
 Figures, teaser first: `F1` is the figure that tells the story alone — its row exists before any results figure. Rows per conventions §8 — `ID`, `File` (`manus/figs/<slug>.pdf`), `Purpose` (what it must show, not how), `Section`, `Source` (the planned source under `manus/figs/srcs/`, or the `mates/` path for imported artwork), `Status` `planned`. Tables — `ID`, `File` (`manus/tabs/<slug>.tex`), `Purpose`, `Section`, `Evidence` (the `mates/` path the data will come from; `—` when nothing imported covers it yet, each `—` named for `stage-evid-curator`), `Status` `planned`. Show both tables in the reply, then confirm via your question tool (conventions §7.12: rows the user cannot see are rows nobody reviewed).
 +++ 1
 Figures, teaser first: `F1` is the figure that tells the story alone — its row exists before any results figure. Rows per conventions §8 — `ID`, `File` (`manus/figs/<slug>.pdf`), `Purpose` (what it must show, not how), `Section`, `Source` (the planned source under `manus/figs/srcs/`, or the `mates/` path for imported artwork), `Status` `planned`. Tables — `ID`, `File` (`manus/tabs/<slug>.tex`), `Purpose`, `Section`, `Evidence` (the `mates/` path the data will come from; `—` when nothing imported covers it yet, each `—` named for `stage-evid-curator`), `Status` `planned`. Show both tables in the reply, then confirm via AskUserQuestion (conventions §7.12: rows the user cannot see are rows nobody reviewed).
-### stage-outl-planner/SKILL_zh.md
---- 1
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线。每次运行开始时整份读完——不做分节选读——用它自己的 file read，绝不通过 shell `cat`。对本 skill 约束最紧的几节：规约 §5（手稿与周期解析）、§7（对话）、§8（登记表，以及 outline / notation 的 schema）、§9（编造边界：§9(a)——骨架不陈述任何事实、任何数字；§9(c)——未确认的页数上限不算上限）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-+++ 1
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线。每次运行开始时整份读完——不做分节选读——用它自己的 `Read`，绝不通过 Bash `cat`。对本 skill 约束最紧的几节：规约 §5（手稿与周期解析）、§7（对话）、§8（登记表，以及 outline / notation 的 schema）、§9（编造边界：§9(a)——骨架不陈述任何事实、任何数字；§9(c)——未确认的页数上限不算上限）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-### stage-outl-planner/SKILL_zh.md
---- 1
-3. **先确认形状，再自动起草各节简介。** 两个决定经 your question tool 提出（一次调用一个问题，标出推荐）：带预算的章节清单，然后是图与表的计划。这之后，从故事、主张与证据出发自主起草每一份简介；只有当某份简介离开用户就定不下来时，才追加一个有针对性的问题。在 `low` 档，把带算术展示出来的计划直接采纳——Step 0 的覆盖确认任何档位都要问，提交则随档位走（规约 §1.6）。your question tool 不可用时（headless 运行），回落到纯文本——依然一次一个决定。
-+++ 1
-3. **先确认形状，再自动起草各节简介。** 两个决定经 AskUserQuestion 提出（一次调用一个问题，标出推荐）：带预算的章节清单，然后是图与表的计划。这之后，从故事、主张与证据出发自主起草每一份简介；只有当某份简介离开用户就定不下来时，才追加一个有针对性的问题。在 `low` 档，把带算术展示出来的计划直接采纳——Step 0 的覆盖确认任何档位都要问，提交则随档位走（规约 §1.6）。AskUserQuestion 不可用时（headless 运行），回落到纯文本——依然一次一个决定。
-### stage-outl-planner/SKILL_zh.md
---- 1
-6. **骨架必须编译得过。** 接好线之后跑 `execs/run.sh`（一次 shell 调用）——确定性检查住在脚本里，判断住在这里。这次运行以一个绿色构建、或一份"什么坏了、为什么"的诚实说明收尾。
-+++ 1
-6. **骨架必须编译得过。** 接好线之后跑 `execs/run.sh`（一次 Bash 调用）——确定性检查住在脚本里，判断住在这里。这次运行以一个绿色构建、或一份"什么坏了、为什么"的诚实说明收尾。
-### stage-outl-planner/SKILL_zh.md
---- 1
-1. 开场装载，尽可能一条消息完成：规约文件（用它自己的 file read）；`notes/story.md`；`notes/claims.md`；存在时的 `notes/outline.md` 与 `notes/notation.md`；`manus/main.tex`；一次 shell 调用取 `date +%F`（规约 §4）外加 `manus/secs/` 与 `cycls/` 的目录清单。然后读当前周期的 `cycls/<cycle>/venue.yml`。
-+++ 1
-1. 开场装载，尽可能一条消息完成：规约文件（用它自己的 `Read`）；`notes/story.md`；`notes/claims.md`；存在时的 `notes/outline.md` 与 `notes/notation.md`；`manus/main.tex`；一次 Bash 调用取 `date +%F`（规约 §4）外加 `manus/secs/` 与 `cycls/` 的目录清单。然后读当前周期的 `cycls/<cycle>/venue.yml`。
-### stage-outl-planner/SKILL_zh.md
---- 1
-5. 已存在 `notes/outline.md` → 经 your question tool 问清这是哪种重跑：**reconcile**（照实际存在的文件修复各行——起草已经开始之后推荐这个）、**extend**（新增章节、图或表；其余保持）、或 **re-outline**（从头来——对任何 outline Status 已经走过 `skeleton`、或内容已经长出简介之外的 `manus/secs/` 文件，逐文件确认后才动；已起草的散文绝不被覆盖）。
-+++ 1
-5. 已存在 `notes/outline.md` → 经 AskUserQuestion 问清这是哪种重跑：**reconcile**（照实际存在的文件修复各行——起草已经开始之后推荐这个）、**extend**（新增章节、图或表；其余保持）、或 **re-outline**（从头来——对任何 outline Status 已经走过 `skeleton`、或内容已经长出简介之外的 `manus/secs/` 文件，逐文件确认后才动；已起草的散文绝不被覆盖）。
-### stage-outl-planner/SKILL_zh.md
---- 1
-展示完整表格与预算算术（原则 2）——例如 `sum 7.75 / limit 8 (references outside) / slack 0.25`——以及主张覆盖那一行；不断再平衡直到总和放得下；经 your question tool 确认（"看着行" / "改清单" / "换粒度"）。
-+++ 1
-展示完整表格与预算算术（原则 2）——例如 `sum 7.75 / limit 8 (references outside) / slack 0.25`——以及主张覆盖那一行；不断再平衡直到总和放得下；经 AskUserQuestion 确认（"看着行" / "改清单" / "换粒度"）。
-### stage-outl-planner/SKILL_zh.md
---- 1
-图，teaser 优先：`F1` 是那张能独自把故事讲清楚的图——它的行在任何结果图之前就存在。行的格式按规约 §8——`ID`、`File`（`manus/figs/<slug>.pdf`）、`Purpose`（它必须展示什么，不是怎么画）、`Section`、`Source`（`manus/figs/srcs/` 下计划中的源文件，或导入美术素材的 `mates/` 路径）、`Status` 为 `planned`。表——`ID`、`File`（`manus/tabs/<slug>.tex`）、`Purpose`、`Section`、`Evidence`（数据将来自的 `mates/` 路径；还没有任何导入内容覆盖它时写 `—`，每个 `—` 都点名交给 `stage-evid-curator`）、`Status` 为 `planned`。两张表都引进回复，再经 your question tool 确认（规约 §7.12：用户看不见的行，也就没有人审阅过）。
-+++ 1
-图，teaser 优先：`F1` 是那张能独自把故事讲清楚的图——它的行在任何结果图之前就存在。行的格式按规约 §8——`ID`、`File`（`manus/figs/<slug>.pdf`）、`Purpose`（它必须展示什么，不是怎么画）、`Section`、`Source`（`manus/figs/srcs/` 下计划中的源文件，或导入美术素材的 `mates/` 路径）、`Status` 为 `planned`。表——`ID`、`File`（`manus/tabs/<slug>.tex`）、`Purpose`、`Section`、`Evidence`（数据将来自的 `mates/` 路径；还没有任何导入内容覆盖它时写 `—`，每个 `—` 都点名交给 `stage-evid-curator`）、`Status` 为 `planned`。两张表都引进回复，再经 AskUserQuestion 确认（规约 §7.12：用户看不见的行，也就没有人审阅过）。
 ### stage-peer-reviewer/SKILL.md
 --- 1
 Panel: five delegates, disjoint by perspective — writing sub-agents, all five dispatched in a single message so the panelists run concurrently. No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
 +++ 1
 Panel: five delegates, disjoint by perspective — `Agent` subagents (`subagent_type: general-purpose`), all five dispatched in a single message so the panelists run concurrently. No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
-### stage-peer-reviewer/SKILL_zh.md
---- 1
-panel：五个委派，按视角互不重叠——用your sub-agent tool 子代理（writing），五个一起放在同一条消息里派出去，评审员才是并行的。前面不加提问：要不要扇出是主席自己的决定，它不问（§6.1）。只有宿主根本不提供派发、或者拒绝了这次调用，才走 `quick` 那条路——综合评审里随之写上 `mode: quick`，一个从来就不独立的评审组，那才是它诚实的名字，而摘要要点名那次没能发出去的扇出。每份简介包含它在 `references/review-dimensions.md` 里那一节的逐字文本、两份约定的逐字文本、摘要，以及范围那一行"只做这个视角；返回收集器约定的那些字段，除此之外什么都不返回"。每份简介另外带上这位评审员对某台 host 两次自己的请求之间等多少秒，以及它自己在运行目录下的缓存前缀（原则 3）——绝不带请求额度，礼貌不是用额度做成的。在 `high` 档，派发之前先说明切分方式（§6.8）。quick：主席把论文读一遍，自己按视角顺序填完五份收集器返回，魔鬼代言人放最后。
-+++ 1
-panel：五个委派，按视角互不重叠——用`Agent` 子代理（`subagent_type: general-purpose`），五个一起放在同一条消息里派出去，评审员才是并行的。前面不加提问：要不要扇出是主席自己的决定，它不问（§6.1）。只有宿主根本不提供派发、或者拒绝了这次调用，才走 `quick` 那条路——综合评审里随之写上 `mode: quick`，一个从来就不独立的评审组，那才是它诚实的名字，而摘要要点名那次没能发出去的扇出。每份简介包含它在 `references/review-dimensions.md` 里那一节的逐字文本、两份约定的逐字文本、摘要，以及范围那一行"只做这个视角；返回收集器约定的那些字段，除此之外什么都不返回"。每份简介另外带上这位评审员对某台 host 两次自己的请求之间等多少秒，以及它自己在运行目录下的缓存前缀（原则 3）——绝不带请求额度，礼貌不是用额度做成的。在 `high` 档，派发之前先说明切分方式（§6.8）。quick：主席把论文读一遍，自己按视角顺序填完五份收集器返回，魔鬼代言人放最后。
 ### stage-proj-adopt/SKILL.md
 --- 1
 Ask via your question tool, one question at a time, only about what the survey could not settle: which candidate is the main file, which directories are prose vs evidence vs junk, whether a paired STAR repo exists (that fills `STAR_HOME`), the target venue when nothing names one. Options come from the survey with the recommendation marked. Nothing is written until this point clears.
@@ -537,21 +274,6 @@ Ask via AskUserQuestion, one question at a time, only about what the survey coul
 - Both confirmation points go through your question tool, one question per call. If it is unavailable (headless / scripted), fall back to plain text — still one at a time, still requiring an explicit answer before any write.
 +++ 1
 - Both confirmation points go through AskUserQuestion, one question per call. If it is unavailable (headless / scripted), fall back to plain text — still one at a time, still requiring an explicit answer before any write.
-### stage-proj-adopt/SKILL_zh.md
---- 1
-通过 your question tool 提问，一次一个，只问探测定不下来的事：哪个候选是主文件、哪些目录是正文 / 证据 / 垃圾、是否存在配对的 STAR 仓库（它来填 `STAR_HOME`）、以及没有任何东西点名 venue 时的目标 venue。选项来自探测结果，并标出推荐。这个点通过之前什么都不写。
-+++ 1
-通过 AskUserQuestion 提问，一次一个，只问探测定不下来的事：哪个候选是主文件、哪些目录是正文 / 证据 / 垃圾、是否存在配对的 STAR 仓库（它来填 `STAR_HOME`）、以及没有任何东西点名 venue 时的目标 venue。选项来自探测结果，并标出推荐。这个点通过之前什么都不写。
-### stage-proj-adopt/SKILL_zh.md
---- 1
-4. 批准：一个 your question tool——全部批准、按组批准（章节 / 图 / 表 / bib / 样式）、或者中止。未获批准的行不动。
-+++ 1
-4. 批准：一个 AskUserQuestion——全部批准、按组批准（章节 / 图 / 表 / bib / 样式）、或者中止。未获批准的行不动。
-### stage-proj-adopt/SKILL_zh.md
---- 1
-- 两个确认点都走 your question tool，一次调用一个问题。它不可用时（无人值守 / 脚本化），回落到纯文本——依然一次一个，依然要求在任何写入之前给出明确答复。
-+++ 1
-- 两个确认点都走 AskUserQuestion，一次调用一个问题。它不可用时（无人值守 / 脚本化），回落到纯文本——依然一次一个，依然要求在任何写入之前给出明确答复。
 ### stage-pstr-builder/SKILL.md
 --- 1
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own file read call, never `cat`-ed into a shell command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — a poster states claims to strangers, with the authors' names on it), §5 (resolving the cycle), §8 (the output table and its staleness rule), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
@@ -567,41 +289,16 @@ Ask via AskUserQuestion, one question at a time, only about what the survey coul
 5. Present the whole cut — takeaway, claims in, claims out, figures, layout — and ask before writing via your question tool (plain text when it is unavailable), per §7. Then write `POSTER_PLAN.md`: frontmatter (`cycle:`, `size:`, `layout:`, `state: planned`, `updated:` with a real date per §4, plus `model_id:` and `model_trail:` per §8), the takeaway, the zone table `| Zone | Content | Source | Status |`, and the excluded list with reasons.
 +++ 1
 5. Present the whole cut — takeaway, claims in, claims out, figures, layout — and ask before writing via AskUserQuestion (plain text when it is unavailable), per §7. Then write `POSTER_PLAN.md`: frontmatter (`cycle:`, `size:`, `layout:`, `state: planned`, `updated:` with a real date per §4, plus `model_id:` and `model_trail:` per §8), the takeaway, the zone table `| Zone | Content | Source | Status |`, and the excluded list with reasons.
-### stage-pstr-builder/SKILL_zh.md
---- 1
-**通用规约。** 动手之前读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份文件，每次运行开始时读完；不做分节选读。它通过自己的 file read 调用到达，绝不被 `cat` 进一条 shell 命令。它是每个 STAGE skill 共享的基线；对本 skill 约束最紧的是 §9（编造边界——海报是把主张讲给陌生人听，而且署着作者的名字）、§5（解析是哪个轮次）、§8（产物登记表及其过期规则）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-+++ 1
-**通用规约。** 动手之前读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份文件，每次运行开始时读完；不做分节选读。它通过自己的 `Read` 调用到达，绝不被 `cat` 进一条 Bash 命令。它是每个 STAGE skill 共享的基线；对本 skill 约束最紧的是 §9（编造边界——海报是把主张讲给陌生人听，而且署着作者的名字）、§5（解析是哪个轮次）、§8（产物登记表及其过期规则）、§1（git）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-### stage-pstr-builder/SKILL_zh.md
---- 1
-1. 读规约文件（整份，独立的 file read 调用），然后读 `notes/story.md`（`## Pitch`、`## Contributions`、当前活跃的 `cycle:`）、`notes/claims.md`、`notes/outline.md`（Figures 与 Tables 行）、`notes/notation.md`、`cycls/<cycle>/venue.yml`，以及 `manus/main.tex` 取论文标题——海报逐字照搬，绝不重排也绝不缩写。
-+++ 1
-1. 读规约文件（整份，独立的 `Read` 调用），然后读 `notes/story.md`（`## Pitch`、`## Contributions`、当前活跃的 `cycle:`）、`notes/claims.md`、`notes/outline.md`（Figures 与 Tables 行）、`notes/notation.md`、`cycls/<cycle>/venue.yml`，以及 `manus/main.tex` 取论文标题——海报逐字照搬，绝不重排也绝不缩写。
-### stage-pstr-builder/SKILL_zh.md
---- 1
-5. 把整套取舍摆出来——核心结论、进来的主张、出去的主张、图、版式——写之前用 your question tool 询问（不可用时用纯文本），依 §7。然后写 `POSTER_PLAN.md`：frontmatter（`cycle:`、`size:`、`layout:`、`state: planned`、按 §4 取真实日期的 `updated:`，以及按 §8 的 `model_id:` 与 `model_trail:`）、核心结论、分区表 `| Zone | Content | Source | Status |`，以及带理由的排除清单。
-+++ 1
-5. 把整套取舍摆出来——核心结论、进来的主张、出去的主张、图、版式——写之前用 AskUserQuestion 询问（不可用时用纯文本），依 §7。然后写 `POSTER_PLAN.md`：frontmatter（`cycle:`、`size:`、`layout:`、`state: planned`、按 §4 取真实日期的 `updated:`，以及按 §8 的 `model_id:` 与 `model_trail:`）、核心结论、分区表 `| Zone | Content | Source | Status |`，以及带理由的排除清单。
 ### stage-refs-curator/SKILL.md
 --- 1
 **Fanning the read out (Principle 9).** More than one paper in a run — an `add` list, or the batch a `discover` run's user picked — splits one delegate per paper — writing sub-agents, dispatched in a single message so they run concurrently. No question precedes it (§6.1); a host that offers no dispatch, or refuses the call, falls back to reading them here, and the digest says so. Items 1 and 2 still run at home — the bibliographic record is what the entry is transcribed from, and no delegate fetches one — but not for the whole list before the first reader starts. Per paper: resolve the record, transcribe the entry, assign the note's filename, dispatch that paper's reader, then begin the next paper's record. The two streams reach different hosts — records to DBLP and Crossref, pages to arXiv and the venue sites — so neither spends the other's rate and a backoff on one no longer stops the other, where resolving every record first left every reader idle through a rate-limit storm at DBLP. Item 3 is what travels, and each brief carries its paper's page candidates in the order item 3 names them, the seconds it waits between its own requests to a host (`references/source-policy.md`, Rate limits), its own cache prefix under `wkdrs/refs_<date>/raw/`, the note path it is to write, the collector contract verbatim, the story and the claim ledger so `## Relation to ours` is written where the paper was read, and the scope line "ONLY this paper; fetch only its pages; write only that one note file". At involve `high`, announce the partition before dispatch (§6.8). Item 4 then runs at home over what came back, per paper: the index row and the `% src:` line, the impact score, and the batch self-check — all in files no delegate opens. A return whose `floor_evidence` says `not reached` wrote no note and leaves the bib entry standing alone, which is item 3's unfetchable path in fanned-out form; a return claiming the floor was reached while naming no note file contradicts itself, and that paper is read again here (§6.3).
 +++ 1
 **Fanning the read out (Principle 9).** More than one paper in a run — an `add` list, or the batch a `discover` run's user picked — splits one delegate per paper — `Agent` subagents (`subagent_type: general-purpose`), dispatched in a single message so they run concurrently. No question precedes it (§6.1); a host that offers no dispatch, or refuses the call, falls back to reading them here, and the digest says so. Items 1 and 2 still run at home — the bibliographic record is what the entry is transcribed from, and no delegate fetches one — but not for the whole list before the first reader starts. Per paper: resolve the record, transcribe the entry, assign the note's filename, dispatch that paper's reader, then begin the next paper's record. The two streams reach different hosts — records to DBLP and Crossref, pages to arXiv and the venue sites — so neither spends the other's rate and a backoff on one no longer stops the other, where resolving every record first left every reader idle through a rate-limit storm at DBLP. Item 3 is what travels, and each brief carries its paper's page candidates in the order item 3 names them, the seconds it waits between its own requests to a host (`references/source-policy.md`, Rate limits), its own cache prefix under `wkdrs/refs_<date>/raw/`, the note path it is to write, the collector contract verbatim, the story and the claim ledger so `## Relation to ours` is written where the paper was read, and the scope line "ONLY this paper; fetch only its pages; write only that one note file". At involve `high`, announce the partition before dispatch (§6.8). Item 4 then runs at home over what came back, per paper: the index row and the `% src:` line, the impact score, and the batch self-check — all in files no delegate opens. A return whose `floor_evidence` says `not reached` wrote no note and leaves the bib entry standing alone, which is item 3's unfetchable path in fanned-out form; a return claiming the floor was reached while naming no note file contradicts itself, and that paper is read again here (§6.3).
-### stage-refs-curator/SKILL_zh.md
---- 1
-**把阅读扇出去（原则 9）。** 一次运行里多于一篇——一份 `add` 清单，或 `discover` 那一轮用户挑中的一批——就按一篇论文一个委派者拆开——用your sub-agent tool 子代理（writing），在同一条消息里一次派出去，它们才是并行的。前面不加提问（§6.1）；宿主根本不提供派发、或者拒绝了这次调用，就退回来在这里读，并在摘要里说明。第 1、2 步仍在家里跑——条目是照着书目记录誊的，而委派者不抓记录——但不是整份清单全跑完才轮到第一个读者开工。逐篇来：解析记录、誊写条目、定下笔记的文件名、把这一篇的读者派出去，然后才开始下一篇的记录。这两条流打的不是同一批主机——记录走 DBLP 与 Crossref，页面走 arXiv 与各 venue 站点——所以谁也不花谁的速率，一边退避不再让另一边停摆；而"先把每条记录都解析完"的做法，会让 DBLP 一场限流风暴期间所有读者全程空转。出门的是第 3 步，每份任务书带着它那篇论文的候选页面（顺序照第 3 步点的名）、它对某台 host 两次自己的请求之间等多少秒（`references/source-policy_zh.md`，限速一节）、它自己在 `wkdrs/refs_<date>/raw/` 下的缓存前缀、它要写的那个笔记路径、逐字的收集者合同、故事与主张记录表（这样 `## Relation to ours` 就在读到论文的那个地方写），以及范围那一句"只读这一篇；只抓它自己的页面；只写那一个笔记文件"。involve 为 `high` 时，派发之前先把分工说出来（§6.8）。第 4 步随后拿回来的东西逐篇在家里跑：索引行、`% src:` 那一行、影响力分与整批自查——全在没有委派者会打开的文件里。`floor_evidence` 写着 `not reached` 的那一份没有写出笔记，让 bib 条目单独留着——那就是第 3 步里正文抓不到那条路的扇出形态；而一份声称够到了阅读底线、却报不出笔记文件的返回是自相矛盾的，那篇论文在这里重读一遍（§6.3）。
-+++ 1
-**把阅读扇出去（原则 9）。** 一次运行里多于一篇——一份 `add` 清单，或 `discover` 那一轮用户挑中的一批——就按一篇论文一个委派者拆开——用`Agent` 子代理（`subagent_type: general-purpose`），在同一条消息里一次派出去，它们才是并行的。前面不加提问（§6.1）；宿主根本不提供派发、或者拒绝了这次调用，就退回来在这里读，并在摘要里说明。第 1、2 步仍在家里跑——条目是照着书目记录誊的，而委派者不抓记录——但不是整份清单全跑完才轮到第一个读者开工。逐篇来：解析记录、誊写条目、定下笔记的文件名、把这一篇的读者派出去，然后才开始下一篇的记录。这两条流打的不是同一批主机——记录走 DBLP 与 Crossref，页面走 arXiv 与各 venue 站点——所以谁也不花谁的速率，一边退避不再让另一边停摆；而"先把每条记录都解析完"的做法，会让 DBLP 一场限流风暴期间所有读者全程空转。出门的是第 3 步，每份任务书带着它那篇论文的候选页面（顺序照第 3 步点的名）、它对某台 host 两次自己的请求之间等多少秒（`references/source-policy_zh.md`，限速一节）、它自己在 `wkdrs/refs_<date>/raw/` 下的缓存前缀、它要写的那个笔记路径、逐字的收集者合同、故事与主张记录表（这样 `## Relation to ours` 就在读到论文的那个地方写），以及范围那一句"只读这一篇；只抓它自己的页面；只写那一个笔记文件"。involve 为 `high` 时，派发之前先把分工说出来（§6.8）。第 4 步随后拿回来的东西逐篇在家里跑：索引行、`% src:` 那一行、影响力分与整批自查——全在没有委派者会打开的文件里。`floor_evidence` 写着 `not reached` 的那一份没有写出笔记，让 bib 条目单独留着——那就是第 3 步里正文抓不到那条路的扇出形态；而一份声称够到了阅读底线、却报不出笔记文件的返回是自相矛盾的，那篇论文在这里重读一遍（§6.3）。
 ### stage-resp-writer/SKILL.md
 --- 1
    point at a time via your question tool (§7); evidence-backed rebuttals may proceed and are
 +++ 1
    point at a time via AskUserQuestion (§7); evidence-backed rebuttals may proceed and are
-### stage-resp-writer/SKILL_zh.md
---- 1
-3. **三种处置；代价大的那些归用户。** rebut——证据在手，引用它；promise——论文会改，一个复选框由此诞生；concede——这条主张守不住，它的状态降为 `weakened`。让步与承诺永远经过用户，一次一条，走 your question tool（§7）；有证据支撑的反驳可以直接进行，事后一并列出供复核。提问时把评审人的原话和你打算发出的措辞一并引出来，而不是各自的概括（§7.12）。
-+++ 1
-3. **三种处置；代价大的那些归用户。** rebut——证据在手，引用它；promise——论文会改，一个复选框由此诞生；concede——这条主张守不住，它的状态降为 `weakened`。让步与承诺永远经过用户，一次一条，走 AskUserQuestion（§7）；有证据支撑的反驳可以直接进行，事后一并列出供复核。提问时把评审人的原话和你打算发出的措辞一并引出来，而不是各自的概括（§7.12）。
 ### stage-sect-drafter/SKILL.md
 --- 1
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own file read call, never `cat`-ed into a shell command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §5 (section and cycle resolution), §8 (the output table and its staleness rule), and §9 (the fabrication boundary). This file states what is specific to this skill and wins wherever it is stricter.
@@ -617,21 +314,6 @@ Ask via AskUserQuestion, one question at a time, only about what the survey coul
 1. Interpret `SECTION` per §5 against the Sections table: number, file slug, or title match. Absent or ambiguous → list the rows with statuses and ask via your question tool (plain text when unavailable).
 +++ 1
 1. Interpret `SECTION` per §5 against the Sections table: number, file slug, or title match. Absent or ambiguous → list the rows with statuses and ask via AskUserQuestion (plain text when unavailable).
-### stage-sect-drafter/SKILL_zh.md
---- 1
-**通用规约。** 动手之前先读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份读，每次运行开始时；不做分节选读。它通过自己的 file read 调用到达，绝不被 `cat` 进一条 shell 命令。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §5（章节与周期解析）、§8（产物登记表及其过期规则）、§9（编造边界）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-+++ 1
-**通用规约。** 动手之前先读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份读，每次运行开始时；不做分节选读。它通过自己的 `Read` 调用到达，绝不被 `cat` 进一条 Bash 命令。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §5（章节与周期解析）、§8（产物登记表及其过期规则）、§9（编造边界）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-### stage-sect-drafter/SKILL_zh.md
---- 1
-1. 读规约文件（整份，用它自己的 file read 调用），然后读 `notes/story.md`（pitch、当前 `cycle:`）、`notes/outline.md`、`notes/claims.md`、`notes/notation.md`，以及存在时的 `notes/style.md`（原则 7）。
-+++ 1
-1. 读规约文件（整份，用它自己的 `Read` 调用），然后读 `notes/story.md`（pitch、当前 `cycle:`）、`notes/outline.md`、`notes/claims.md`、`notes/notation.md`，以及存在时的 `notes/style.md`（原则 7）。
-### stage-sect-drafter/SKILL_zh.md
---- 1
-1. 按 §5 对着 Sections 表解释 `SECTION`：编号、文件 slug 或标题匹配。缺失或有歧义 → 列出各行及状态，经 your question tool 提问（不可用时用纯文本）。
-+++ 1
-1. 按 §5 对着 Sections 表解释 `SECTION`：编号、文件 slug 或标题匹配。缺失或有歧义 → 列出各行及状态，经 AskUserQuestion 提问（不可用时用纯文本）。
 ### stage-stry-coach/SKILL.md
 --- 1
 **Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline every STAGE skill shares. Read the whole file at the start of every run — there is no section-selective loading — as its own file read, never `cat`-ed through shell. The sections that bind this skill hardest: conventions §5 (the active cycle is `cycle:` in `notes/story.md`, and this skill is what sets it), §7 (dialogue: the question machinery and involve levels), §8 (the output table and the story / claims / venue schemas), and §9 (the fabrication boundary — above all §9(c): venue rules are user-confirmed facts). This file states what is specific to this skill and wins wherever it is stricter.
@@ -652,36 +334,11 @@ Ask via AskUserQuestion, one question at a time, only about what the survey coul
 Work the schema order (conventions §8), each section drafted → quoted in the reply as it would land in the file (conventions §7.12) → confirmed via your question tool ("write it" / "needs edits") → written, `updated:` refreshed; close each boundary in 1–2 sentences — what settled, what the next section opens:
 +++ 1
 Work the schema order (conventions §8), each section drafted → quoted in the reply as it would land in the file (conventions §7.12) → confirmed via AskUserQuestion ("write it" / "needs edits") → written, `updated:` refreshed; close each boundary in 1–2 sentences — what settled, what the next section opens:
-### stage-stry-coach/SKILL_zh.md
---- 1
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线。每次运行开始时整份读完——不做分节选读——用它自己的 file read，绝不通过 shell `cat`。对本 skill 约束最紧的几节：规约 §5（当前周期是 `notes/story.md` 里的 `cycle:`，而设定它的正是本 skill）、§7（对话：提问机制与参与度档位）、§8（产物登记表，以及 story / claims / venue 的 schema）、§9（编造边界——尤其是 §9(c)：venue 规则是用户确认过的事实）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-+++ 1
-**通用规约。** `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）是所有 STAGE skill 共享的基线。每次运行开始时整份读完——不做分节选读——用它自己的 `Read`，绝不通过 Bash `cat`。对本 skill 约束最紧的几节：规约 §5（当前周期是 `notes/story.md` 里的 `cycle:`，而设定它的正是本 skill）、§7（对话：提问机制与参与度档位）、§8（产物登记表，以及 story / claims / venue 的 schema）、§9（编造边界——尤其是 §9(c)：venue 规则是用户确认过的事实）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-### stage-stry-coach/SKILL_zh.md
---- 1
-2. **一次一个问题，走 your question tool。** 一次调用一个问题；等答复；绝不把一串问题当纯文本倒出来。待议的草稿要引进提问的那条回复——要点、句子、段落本身，绝不只给一个文件 diff，也绝不只在选项里概括（规约 §7.12）。选项随后说清选它会把那份草稿变成什么，而不只是它叫什么（规约 §7）："定位成一篇 benchmark 论文"是标题——"pitch 以数据集打头，方法降格成一个参考 baseline"才是正在做的选择。每 2–3 个答复之后，用一两句复述你听到的，然后继续。只有开放到给不出有意义候选的问题（开场那句"这篇论文是关于什么的？"）可以用纯文本。your question tool 不可用时（headless 运行），回落到纯文本——依然一次一个问题。
-+++ 1
-2. **一次一个问题，走 AskUserQuestion。** 一次调用一个问题；等答复；绝不把一串问题当纯文本倒出来。待议的草稿要引进提问的那条回复——要点、句子、段落本身，绝不只给一个文件 diff，也绝不只在选项里概括（规约 §7.12）。选项随后说清选它会把那份草稿变成什么，而不只是它叫什么（规约 §7）："定位成一篇 benchmark 论文"是标题——"pitch 以数据集打头，方法降格成一个参考 baseline"才是正在做的选择。每 2–3 个答复之后，用一两句复述你听到的，然后继续。只有开放到给不出有意义候选的问题（开场那句"这篇论文是关于什么的？"）可以用纯文本。AskUserQuestion 不可用时（headless 运行），回落到纯文本——依然一次一个问题。
-### stage-stry-coach/SKILL_zh.md
---- 1
-1. 开场装载，尽可能一条消息完成：规约文件（用它自己的 file read）；存在时的 `notes/story.md`、`notes/claims.md` 与 `notes/adopt.md`；`mates/MANIFEST.md`；一次 shell 调用取 `date +%F`（真实日期，规约 §4）外加 `mates/` 与 `cycls/` 的目录清单。
-+++ 1
-1. 开场装载，尽可能一条消息完成：规约文件（用它自己的 `Read`）；存在时的 `notes/story.md`、`notes/claims.md` 与 `notes/adopt.md`；`mates/MANIFEST.md`；一次 Bash 调用取 `date +%F`（真实日期，规约 §4）外加 `mates/` 与 `cycls/` 的目录清单。
-### stage-stry-coach/SKILL_zh.md
---- 1
-按 schema 顺序走（规约 §8），每节起草 → 按将要写入文件的样子引进回复（规约 §7.12）→ 经 your question tool 确认（"写进去" / "还要改"）→ 写入，并刷新 `updated:`；每个边界用 1–2 句收尾——定下了什么、下一节打开了什么：
-+++ 1
-按 schema 顺序走（规约 §8），每节起草 → 按将要写入文件的样子引进回复（规约 §7.12）→ 经 AskUserQuestion 确认（"写进去" / "还要改"）→ 写入，并刷新 `updated:`；每个边界用 1–2 句收尾——定下了什么、下一节打开了什么：
 ### stage-subm-packer/SKILL.md
 --- 1
    your question tool — proceed with named waivers, or abort — recording waivers per Principle 5.
 +++ 1
    AskUserQuestion — proceed with named waivers, or abort — recording waivers per Principle 5.
-### stage-subm-packer/SKILL_zh.md
---- 1
-5. **齐备性巡检。** 检查：提纲 Sections 行处于 `polished` 或更好，Figures 与 Tables 行处于 `final`；每个 `manus/figs/*.pdf` 都有 `figs/srcs/` 下的源文件或一条 `mates/MANIFEST.md` 条目；手稿里陈述过的主张在 `notes/claims.md` 里没有一条还停在 `unsourced` **或 `weakened`**——`weakened` 意味着某份回复已经白纸黑字让过步，于是仍在陈述它的手稿等于寄出了一条作者自己已经撤回的主张，这在评审人眼里比原来的夸大更难看；`import.sh --diff` 报告没有漂移（`STAR_HOME` 未设时跳过并注明）。每处未达标都是一条软性发现：把清单连同建议摆出来，经 your question tool 提问——带着点名的豁免继续，还是中止——并按原则 5 记录豁免。
-+++ 1
-5. **齐备性巡检。** 检查：提纲 Sections 行处于 `polished` 或更好，Figures 与 Tables 行处于 `final`；每个 `manus/figs/*.pdf` 都有 `figs/srcs/` 下的源文件或一条 `mates/MANIFEST.md` 条目；手稿里陈述过的主张在 `notes/claims.md` 里没有一条还停在 `unsourced` **或 `weakened`**——`weakened` 意味着某份回复已经白纸黑字让过步，于是仍在陈述它的手稿等于寄出了一条作者自己已经撤回的主张，这在评审人眼里比原来的夸大更难看；`import.sh --diff` 报告没有漂移（`STAR_HOME` 未设时跳过并注明）。每处未达标都是一条软性发现：把清单连同建议摆出来，经 AskUserQuestion 提问——带着点名的豁免继续，还是中止——并按原则 5 记录豁免。
 ### stage-tabs-builder/SKILL.md
 --- 1
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own file read call, never `cat`-ed into a shell command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — this skill is its enforcement at the table level), §8 (the output table and its staleness rule), and §5 (resolution). This file states what is specific to this skill and wins wherever it is stricter.
@@ -697,18 +354,3 @@ Work the schema order (conventions §8), each section drafted → quoted in the 
 1. Match `TABLE` against the Tables rows by ID, file slug, then purpose phrase; absent or ambiguous → list the rows with statuses and ask via your question tool (plain text when unavailable).
 +++ 1
 1. Match `TABLE` against the Tables rows by ID, file slug, then purpose phrase; absent or ambiguous → list the rows with statuses and ask via AskUserQuestion (plain text when unavailable).
-### stage-tabs-builder/SKILL_zh.md
---- 1
-**通用规约。** 动手之前先读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份读，每次运行开始时；不做分节选读。它通过自己的 file read 调用到达，绝不被 `cat` 进一条 shell 命令。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §9（编造边界——本 skill 就是它在表格层面的执行者）、§8（产物登记表及其过期规则）、§5（解析）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-+++ 1
-**通用规约。** 动手之前先读 `docs/mds/stage-workflow/writing-workflow-conventions.md`（中文对照：`writing-workflow-conventions.zh-CN.md`）——整份读，每次运行开始时；不做分节选读。它通过自己的 `Read` 调用到达，绝不被 `cat` 进一条 Bash 命令。它是所有 STAGE skill 共享的基线；对本 skill 约束最紧的是 §9（编造边界——本 skill 就是它在表格层面的执行者）、§8（产物登记表及其过期规则）、§5（解析）。本文件只写本 skill 特有的部分，更严处以本文件为准。
-### stage-tabs-builder/SKILL_zh.md
---- 1
-1. 读规约文件（整份，用它自己的 file read 调用），然后读 `notes/outline.md`（Tables 与 Sections）、`notes/claims.md`、`notes/notation.md`、`notes/story.md`（当前 `cycle:`）与 `mates/MANIFEST.md`。
-+++ 1
-1. 读规约文件（整份，用它自己的 `Read` 调用），然后读 `notes/outline.md`（Tables 与 Sections）、`notes/claims.md`、`notes/notation.md`、`notes/story.md`（当前 `cycle:`）与 `mates/MANIFEST.md`。
-### stage-tabs-builder/SKILL_zh.md
---- 1
-1. 把 `TABLE` 依次按 ID、文件 slug、用途短语对着 Tables 行匹配；缺失或有歧义 → 列出各行及状态并经 your question tool 提问（不可用时用纯文本）。
-+++ 1
-1. 把 `TABLE` 依次按 ID、文件 slug、用途短语对着 Tables 行匹配；缺失或有歧义 → 列出各行及状态并经 AskUserQuestion 提问（不可用时用纯文本）。

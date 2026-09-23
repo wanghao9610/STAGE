@@ -19,6 +19,4 @@ Cursor discovers both `.cursor/skills/` and the tool-neutral shared root `.agent
 
 When duplicate names are surfaced, load and follow `.cursor/skills/<name>/SKILL.md`; the path shown by discovery does not change ownership. The shared root remains a safe fallback because it names no other harness's tools, but Cursor-native wording is preferred when present.
 
-`SKILL_zh.md` is a human-readable edition, never the runtime authority.
-
 The six decision-point skills — `stage-proj-adopt`, `stage-stry-coach`, `stage-outl-planner`, `stage-resp-writer`, `stage-subm-packer`, and `stage-pstr-builder` — remain slash-only and must not be started without the user's explicit choice.

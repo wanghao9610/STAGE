@@ -60,7 +60,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - **投稿周期即数据**：每次投稿尝试都住在 `cycls/<venue>_<year>/` 里：经用户确认的 `venue.yml` 档案、真实与模拟评审、回复，以及冻结的投稿记录。
 - **一套工作流，七套 harness**：同样的十六个 skill 供 Claude Code、Codex、Cursor、DSH、Kimi Code、Pi 和 Qwen Code 使用。工具无关的 skill 文件只在 `.agents/skills/` 保存一份，完整的 `/stage` 请求路由器只在 `.agents/commands/` 保存一份；各原生树只保留 harness 专属措辞和参数适配层。
 - **属于论文自己的记忆**：一次会话学到、而仓库里没有任何文件认领的东西——某个 TeX 工具链的坑、你的一项长期偏好、一个试过又被否掉的框架——记在 `.stage/memory/` 下，并由一个钩子在下一次会话开头摆到 agent 面前；不管你用哪个工具驱动 STAGE 都一样。
-- **供人阅读的中文镜像**：每个 `SKILL.md` 旁边一份 `SKILL_zh.md`、peer-reviewer 的 references 旁边一份 `*_zh.md`、共享请求路由器旁边一份 `stage.zh-CN.md`、工作流文档旁边一份 `*.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
+- **供人阅读的中文镜像**：peer-reviewer 的 references 旁边一份 `*_zh.md`、共享请求路由器旁边一份 `stage.zh-CN.md`、工作流文档旁边一份 `*.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
 
 每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.zh-CN.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)中，守住证据边界的文字处理流程见[学术自然写作指南](docs/mds/stage-workflow/human-writing-guide.zh-CN.md)。
 

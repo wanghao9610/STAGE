@@ -56,7 +56,7 @@ The test: every changed line traces to the user's request, and every number in i
 - Set (`en` or `zh`) → use it, whatever the chat's language. Unset or empty → follow the user's dialogue language; an explicit in-conversation request wins over both. Resolve it once per run: `grep -sE '^STAGE_LANG=' .env || true`.
 - Always English whatever it says: everything under `manus/` — prose, captions, `% src:` comments, `\todo{}` text — and the response to reviewers under `cycls/<cycle>/response/`. Both are read by people outside this repository.
 - Structural literals stay English inside a document written in any language: frontmatter keys and values, ledger statuses, claim and point IDs, paths, bibkeys, venue, dataset, and metric names — anything a script greps.
-- An existing document keeps the language it was written in; `STAGE_LANG` governs what a run writes, never a retranslation. The `*.zh-CN.md` docs and `SKILL_zh.md` files are editions for human readers: never loaded at runtime, never authoritative.
+- An existing document keeps the language it was written in; `STAGE_LANG` governs what a run writes, never a retranslation. The `*.zh-CN.md` docs are editions for human readers: never loaded at runtime, never authoritative.
 
 ## 7. Reply Wording
 

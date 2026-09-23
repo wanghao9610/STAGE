@@ -147,5 +147,5 @@ The read-only map of the whole flow: per-section, per-figure, per-table status f
 ## Where everything is defined
 
 - Shared rules and § numbers: [writing-workflow-conventions.md](writing-workflow-conventions.md) — the output table is §8, the fabrication boundary §9, the layout §10.
-- The skills themselves: authored once in tool-neutral form under `.agents/skills/` and ported mechanically into the six named harness trees; harness-only behavior lives in that tree's adapter rules or anchored overrides. `SKILL_zh.md` beside each is its Chinese edition, kept in step for human readers and never loaded at runtime.
+- The skills themselves: authored once in tool-neutral form under `.agents/skills/` and ported mechanically into the six named harness trees; harness-only behavior lives in that tree's adapter rules or anchored overrides.
 - The user-facing overview and quick start: the repository [README](../../../README.md).
