@@ -60,7 +60,7 @@ The three projects cover successive scales of a researcher's work. Use any one i
 - **Submission cycles as data**: each venue attempt lives in `cycls/<venue>_<year>/` with a user-confirmed `venue.yml` profile, received and simulated reviews, the response, and a frozen submission record.
 - **One workflow, seven harnesses**: the same sixteen skills for Claude Code, Codex, Cursor, DSH, Kimi Code, Pi, and Qwen Code. Tool-neutral skill files live once under `.agents/skills/`, and the full `/stage` request router lives once under `.agents/commands/`; native trees link or delegate there and retain only harness-specific wording and argument adapters.
 - **A memory the paper owns**: what a session learns that no file in the repository holds — a TeX toolchain quirk, a standing preference of yours, a framing already tried and rejected — is recorded under `.stage/memory/` and put in front of the next session by a hook, in whichever tool you drive STAGE with.
-- **zh-CN mirrors for human readers**: `*_zh.md` beside the peer-reviewer references, `stage.zh-CN.md` beside the shared request router, and `*.zh-CN.md` beside the workflow docs — kept in step, never loaded at runtime, and the English files stay authoritative.
+- **zh-CN mirrors for human readers**: `*_zh.md` beside the peer-reviewer references, `stage.zh-CN.md` beside the shared request router, and `writing-workflow-skills.zh-CN.md` beside the skills guide — kept in step, never loaded at runtime, and the English files stay authoritative.
 
 See [Writing workflow](#writing-workflow) for what each skill does and how to invoke it. The [Writing Workflow Skills Guide](docs/mds/stage-workflow/writing-workflow-skills.md) adds a paragraph per skill and the pipeline diagram; the rules every skill shares are in the [Writing Workflow Conventions](docs/mds/stage-workflow/writing-workflow-conventions.md), with the evidence-preserving prose pass in the [Human Writing Guide](docs/mds/stage-workflow/human-writing-guide.md).
 
@@ -120,7 +120,7 @@ STAGE/
 ├── .qwen/                  # Qwen-native skills, commands, hooks, and settings
 ├── .cursorignore           # Keeps builds and LaTeX junk out of Cursor's index
 ├── .env.example            # Local configuration example
-├── AGENTS.md               # Shared instructions for AI writing agents (+ AGENTS.zh-CN.md)
+├── AGENTS.md               # Shared instructions for AI writing agents
 ├── CLAUDE.md               # Symlink to AGENTS.md, so Claude Code loads the same rules
 └── README.md
 ```
@@ -443,7 +443,7 @@ By default, the command updates these paths from STAGE's `main` branch:
 - `.codex/plugins/` — the Codex-only `$stage` router plugin and canonical marketplace; `.agents/plugins/marketplace.json` is only a file link to that marketplace, never a link over the directory
 - `.dsh/commands/` and `.kimi-code/plugins/` — the DSH and Kimi `/stage` router packages, updated only when their respective harness is selected
 - the corresponding hook, command, prompt, agent, and extension trees, plus `.codex/skills/` for Codex's per-skill UI manifests; the paper-owned memory store under `.stage/memory/` is never synced
-- `docs/mds/stage-workflow/` — the workflow conventions, the skill guide, the memory spec, and the model-id spec, in both editions
+- `docs/mds/stage-workflow/` — the workflow conventions, the skill guide and its Chinese edition, the memory spec, and the model-id spec
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
 - `execs/scpts/import.sh`, `execs/scpts/lint.sh`, `execs/scpts/fmt.sh` — the utilities, for the same reason: sixteen skills call `import.sh --diff` and five call `lint.sh --no-build`, and a caller reading an exit code means the one its own version documents. A ref older than a utility simply skips it with a printed line
 - `execs/update.sh` — the updater itself, so that no repository strands on an update mechanism too old to fetch its successor. It is installed by rename: the run doing the update finishes on the old file, and the next invocation uses the new one
@@ -479,7 +479,7 @@ bash execs/update.sh --skill stage-flow-status
 
 `bash execs/update.sh --help` carries the full usage summary, so it stays correct when the flags change.
 
-Files at matching paths are overwritten and new upstream files are added. Project-specific files that exist only in the updated directories are preserved. A STAGE file upstream no longer ships — each `SKILL_zh.md` beside an upstream skill, and the retired files listed in `RETIRED_FILES` in `execs/update.sh` — is deleted (`--diff` lists it as `removes`); any other file that exists only locally, your own included, is kept. `AGENTS.zh-CN.md` and `CLAUDE.zh-CN.md` at the project root are outside the update: it neither refreshes nor deletes them, so keeping or deleting them is yours. The update does not modify other directories, the current branch, Git remotes, or the staging area — the manuscript, `mates/`, `notes/`, and `cycls/` are never in scope. Commit current work before updating, then review and commit the result with `git status` and `git diff`.
+Files at matching paths are overwritten and new upstream files are added. Project-specific files that exist only in the updated directories are preserved. A STAGE file upstream no longer ships — each `SKILL_zh.md` beside an upstream skill, and the retired files listed in `RETIRED_FILES` in `execs/update.sh` — is deleted (`--diff` lists it as `removes`); any other file that exists only locally, your own included, is kept. STAGE no longer ships `AGENTS.zh-CN.md` or `CLAUDE.zh-CN.md`: an update keeps yours, so delete them if they came from STAGE. The update does not modify other directories, the current branch, Git remotes, or the staging area — the manuscript, `mates/`, `notes/`, and `cycls/` are never in scope. Commit current work before updating, then review and commit the result with `git status` and `git diff`.
 
 Working on STAGE itself rather than on a paper? Edit only the neutral authored source under `.agents/skills/`, then run `bash .github/scripts/port.sh --write` to regenerate all six harness trees. Harness-only behavior belongs in that tree's rules or anchored overrides. Run `bash .github/scripts/port.sh` to prove every generated harness and shared link still matches, then `bash .github/scripts/check_consistency.sh` for the seven-root semantic invariants. The two checks run in CI.
 
@@ -494,7 +494,7 @@ Working on STAGE itself rather than on a paper? Edit only the neutral authored s
 7. Every number in `manus/` either traces to a fingerprinted `mates/` entry or is written as `\todo{...}` — no third state — and every date written into an artifact comes from the system clock.
 8. What a session learns that no file above owns goes to `.stage/memory/`, offered before it is written, with machine-specific facts in `.stage/memory/local/`; a memory never sources a number, a venue rule, or a claim about a cited paper.
 
-The full collaboration and writing conventions are in [`AGENTS.md`](AGENTS.md) ([简体中文](AGENTS.zh-CN.md)) and [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md) ([简体中文](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)).
+The full collaboration and writing conventions are in [`AGENTS.md`](AGENTS.md) and [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 ## Adapting STAGE to a new paper
 

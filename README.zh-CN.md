@@ -60,9 +60,9 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - **投稿周期即数据**：每次投稿尝试都住在 `cycls/<venue>_<year>/` 里：经用户确认的 `venue.yml` 档案、真实与模拟评审、回复，以及冻结的投稿记录。
 - **一套工作流，七套 harness**：同样的十六个 skill 供 Claude Code、Codex、Cursor、DSH、Kimi Code、Pi 和 Qwen Code 使用。工具无关的 skill 文件只在 `.agents/skills/` 保存一份，完整的 `/stage` 请求路由器只在 `.agents/commands/` 保存一份；各原生树只保留 harness 专属措辞和参数适配层。
 - **属于论文自己的记忆**：一次会话学到、而仓库里没有任何文件认领的东西——某个 TeX 工具链的坑、你的一项长期偏好、一个试过又被否掉的框架——记在 `.stage/memory/` 下，并由一个钩子在下一次会话开头摆到 agent 面前；不管你用哪个工具驱动 STAGE 都一样。
-- **供人阅读的中文镜像**：peer-reviewer 的 references 旁边一份 `*_zh.md`、共享请求路由器旁边一份 `stage.zh-CN.md`、工作流文档旁边一份 `*.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
+- **供人阅读的中文镜像**：peer-reviewer 的 references 旁边一份 `*_zh.md`、共享请求路由器旁边一份 `stage.zh-CN.md`、skill 指南旁边一份 `writing-workflow-skills.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
 
-每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.zh-CN.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)中，守住证据边界的文字处理流程见[学术自然写作指南](docs/mds/stage-workflow/human-writing-guide.zh-CN.md)。
+每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.zh-CN.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.md)中，守住证据边界的文字处理流程见[学术自然写作指南](docs/mds/stage-workflow/human-writing-guide.md)。
 
 ## 项目结构
 
@@ -120,7 +120,7 @@ STAGE/
 ├── .qwen/                  # Qwen 原生 skill、command、钩子与设置
 ├── .cursorignore           # 把构建产物与 LaTeX 垃圾挡在 Cursor 索引之外
 ├── .env.example            # 本地配置示例
-├── AGENTS.md               # AI 写作助手共享的协作规范（另有 AGENTS.zh-CN.md）
+├── AGENTS.md               # AI 写作助手共享的协作规范
 ├── CLAUDE.md               # 指向 AGENTS.md 的符号链接，供 Claude Code 加载同一份规范
 └── README.md
 ```
@@ -239,9 +239,9 @@ STAGE_LANG=
 
 `STAR_HOME` 决定你走哪条快速开始路径。本地 `.env` 已被 Git 忽略。
 
-`INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code、Codex 与 Qwen Code 里，文件编辑前的权限提示也会被跳过。`medium`（默认）按文档所写发问，`high` 逐条确认。硬门槛任何档位都要问：红线、删除与覆盖、以及每一个以"已确认"身份进入 `venue.yml` 的取值。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 3_method involve=low`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)。
+`INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code、Codex 与 Qwen Code 里，文件编辑前的权限提示也会被跳过。`medium`（默认）按文档所写发问，`high` 逐条确认。硬门槛任何档位都要问：红线、删除与覆盖、以及每一个以"已确认"身份进入 `venue.yml` 的取值。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 3_method involve=low`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
-`STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)。
+`STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
 ### 3. 路径 A：与 STAR 仓库配对
 
@@ -288,7 +288,7 @@ bash execs/scpts/fmt.sh    # 一句一行；--check 只报告偏离，不写入
 
 **两个会话钩子。** 一个在每次会话开头提供[项目记忆](#项目记忆)索引；另一个报出运行时模型 id，让产物记录 `model_id` 与追加的 `model_trail`（工作流规约 §8）。Claude、Codex、Cursor、Pi 和 Qwen 从项目内注册；Kimi 与 DSH 因为把钩子注册放在项目外，需要各运行一次 `.kimi-code/hooks/install.sh` 与 `.dsh/hooks/install.sh`。Codex 项目钩子仍需通过 `/hooks` 批准。
 
-**另外两个钩子做决定而非注入。** Claude、Codex 与 Qwen 带 `INVOLVE=low` 的编辑权限放行钩子。七套 harness 都带 `stage_commit_guard.sh`，用于拒绝[规约 §1](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md) 禁止的 git 命令；Pi 从项目扩展注册，DSH 与 Kimi 通过各自的钩子桥接注册。
+**另外两个钩子做决定而非注入。** Claude、Codex 与 Qwen 带 `INVOLVE=low` 的编辑权限放行钩子。七套 harness 都带 `stage_commit_guard.sh`，用于拒绝[规约 §1](docs/mds/stage-workflow/writing-workflow-conventions.md) 禁止的 git 命令；Pi 从项目扩展注册，DSH 与 Kimi 通过各自的钩子桥接注册。
 
 ## 写作工作流
 
@@ -335,7 +335,7 @@ dsh --profile YOUR_PROFILE --dump-config
 
 不带参数的 `/stage` 显示当前论文状态，也可以传入描述，例如 `/stage 审计实验章节中的每个数字`。命令会从共享的 `.agents/commands/stage.md` 名册发起一个后续轮次，因此 DSH 与其他宿主始终从同一来源分流。
 
-六个 skill（下表以 † 标注）仅限显式调用（slash-only）：接入、故事、提纲、回复、投稿与海报选择。六套具名 harness 的 manifest 使用 `disable-model-invocation: true`；Codex 在 `.codex/skills/` 中使用 `allow_implicit_invocation: false`，再链接到共用根。CI 会把七套实现都与[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md) 核对。
+六个 skill（下表以 † 标注）仅限显式调用（slash-only）：接入、故事、提纲、回复、投稿与海报选择。六套具名 harness 的 manifest 使用 `disable-model-invocation: true`；Codex 在 `.codex/skills/` 中使用 `allow_implicit_invocation: false`，再链接到共用根。CI 会把七套实现都与[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 核对。
 
 <div align="center">
   <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE 写作工作流：十六个 skill 分成五条相位带——建仓、规划、写作、润色与审计、投稿周期——各自写出什么，以及起草循环与拒稿回流如何闭合" width="100%">
@@ -426,7 +426,7 @@ dsh --profile YOUR_PROFILE --dump-config
 - **只有当没有任何文件已经认领这条事实时，才把它记进记忆。** 数字属于带指纹的 `mates/` 条目，论断属于 `notes/claims.md`，页数限制属于对应周期的 `venue.yml`，论文内容属于 `notes/refs/`，承诺属于 `tasks/`。记忆只装剩余信息。
 - **记忆永远不是来源。** 它不能支撑 `manus/` 里的数字、venue 规则或关于被引工作的断言；记忆记得某个值，并不会放松禁止编造的边界。记忆与仓库文件冲突时，以文件为准。
 
-只在本机成立的事实放进 `.stage/memory/local/`，git 像忽略 `.env` 一样忽略它；`env` 条目超过 180 天未重新确认时，会在会话里标为过期。任何内容都先由 agent 提议、再由你决定是否记录；`.env` 设为 `INVOLVE=low` 时改为先记下再说明。文件格式、钩子解析的索引行以及记忆如何退场，见[项目记忆](docs/mds/stage-workflow/memory_spec.zh-CN.md)。
+只在本机成立的事实放进 `.stage/memory/local/`，git 像忽略 `.env` 一样忽略它；`env` 条目超过 180 天未重新确认时，会在会话里标为过期。任何内容都先由 agent 提议、再由你决定是否记录；`.env` 设为 `INVOLVE=low` 时改为先记下再说明。文件格式、钩子解析的索引行以及记忆如何退场，见[项目记忆](docs/mds/stage-workflow/memory_spec.md)。
 
 ## 更新 STAGE 的 skill 与工作流文档
 
@@ -443,7 +443,7 @@ bash execs/update.sh
 - `.codex/plugins/`——Codex 专属的 `$stage` 分流插件与 marketplace 实体；`.agents/plugins/marketplace.json` 只是一条指向该 marketplace 的文件链接，绝不链接整个目录
 - `.dsh/commands/` 与 `.kimi-code/plugins/`——DSH 和 Kimi 的 `/stage` 分流包，各自只在选中对应宿主时更新
 - 对应的钩子、command、prompt、agent 与 extension 目录，以及保存 Codex 逐 skill UI manifest 的 `.codex/skills/`；`.stage/memory/` 下的记忆库属于论文自己，从不同步
-- `docs/mds/stage-workflow/`——工作流规约、skill 指南、记忆规范与模型 id 规范，中英两版
+- `docs/mds/stage-workflow/`——工作流规约、skill 指南及其中文版、记忆规范与模型 id 规范
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
 - `execs/scpts/import.sh`、`execs/scpts/lint.sh`、`execs/scpts/fmt.sh`——三个工具脚本，理由同上：十六个 skill 调用 `import.sh --diff`，五个调用 `lint.sh --no-build`，而读退出码的调用方，认的是它自己那一版写明的那套码。比某个工具脚本更老的 ref 会打印一行跳过它
 - `execs/update.sh`——更新脚本自己，为的是不让任何仓库卡在一个老到取不回后继版本的更新机制上。它用重命名装上：执行更新的那一次仍读旧文件跑完，下一次调用才用上新的
@@ -479,7 +479,7 @@ bash execs/update.sh --skill stage-flow-status
 
 `bash execs/update.sh --help` 里有完整的用法摘要——选项变了它也跟着变，不会过期。
 
-上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。上游已不再提供的 STAGE 文件——上游 skill 旁的每个 `SKILL_zh.md`，以及 `execs/update.sh` 中 `RETIRED_FILES` 列出的已退役文件——会被删除（`--diff` 中显示为 `removes`）；其余只存在于本地的文件，包括你自己的，都会保留。项目根目录下的 `AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md` 不在更新范围内：更新既不刷新也不删除它们，留或删由你决定。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
+上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。上游已不再提供的 STAGE 文件——上游 skill 旁的每个 `SKILL_zh.md`，以及 `execs/update.sh` 中 `RETIRED_FILES` 列出的已退役文件——会被删除（`--diff` 中显示为 `removes`）；其余只存在于本地的文件，包括你自己的，都会保留。STAGE 不再提供 `AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md`：更新会保留你手上的这两个文件，若它们来自 STAGE，可自行删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
 如果你改的是 STAGE 本身而不是某篇论文：只编辑 `.agents/skills/` 下工具中立的作者源，再用 `bash .github/scripts/port.sh --write` 重新生成六套 harness 技能树。仅属于某个 harness 的行为写进该树的 rules 或带锚点的 overrides。随后用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七个根目录的语义约束。后两项检查都在 CI 中运行；这些命令只属于上游维护工具，`.github/` 不会同步进论文仓库。
 
@@ -494,7 +494,7 @@ bash execs/update.sh --skill stage-flow-status
 7. `manus/` 里的每个数字，要么可追溯到一条带指纹的 `mates/` 记录，要么写成 `\todo{...}`——没有第三种状态；写进文档的日期一律取自系统时钟。
 8. 一次会话学到、而上面这些文件都不认领的东西，记进 `.stage/memory/`——先提议再写入，只对本机成立的放 `.stage/memory/local/`；记忆永远不为某个数字、某条会场规则、某句关于被引论文的断言充当来源。
 
-完整的协作与写作规范见 [`AGENTS.md`](AGENTS.md)（[中文对照版](AGENTS.zh-CN.md)）与 [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md)（[中文对照版](docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md)）。
+完整的协作与写作规范见 [`AGENTS.md`](AGENTS.md) 与 [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
 ## 将 STAGE 用于新论文
 

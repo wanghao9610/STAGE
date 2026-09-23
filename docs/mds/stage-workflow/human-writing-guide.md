@@ -1,7 +1,5 @@
 # Clear writing in an evidence-bound paper
 
-**Language:** English | [简体中文](human-writing-guide.zh-CN.md)
-
 This guide applies shared checks for formulaic writing to STAGE manuscript prose.
 The goal is clear, natural scholarship in the author's voice, not authorship detection or detector evasion.
 It governs `stage-sect-drafter`, `stage-copy-editor`, and the clarity review in `stage-peer-reviewer`; the [writing workflow conventions](writing-workflow-conventions.md) remain authoritative.

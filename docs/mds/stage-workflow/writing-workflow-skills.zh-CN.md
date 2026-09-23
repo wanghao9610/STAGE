@@ -6,7 +6,7 @@
 
 STAGE 提供十六个彼此衔接的写作工作流 skill，把导入的证据和一个故事，变成一篇带可审计主张链的、已投出的论文：一个与研究项目配对好的仓库、一份每个文件都有指纹的只读证据库、一个贡献即被跟踪主张的故事、一份带页数预算的提纲、对着证据起草的章节、由证据生成而非手敲的表格、带可编辑源文件的图、核实过的参考文献、不碰数字的散文打磨、每个数字与每条引用都被审计、一份按 venue 自身格式写的模拟评审、一份带跟踪承诺的回复，一个冻结、打包好的投稿，以及把录用结果带进展厅的那张海报。
 
-本指南每个 skill 一段紧凑的话。所有 skill 共用的规则——git、红线、`.env` 与构建工具链、日期、解析、委派、对话、产物登记表、编造边界、布局——住在 [writing-workflow-conventions.zh-CN.md](writing-workflow-conventions.zh-CN.md)（英文：[writing-workflow-conventions.md](writing-workflow-conventions.md)）；各 skill 引用它的 § 编号。起草、润色和清晰度评审共同使用[学术自然写作指南](human-writing-guide.zh-CN.md)中守住证据边界的标准。本目录由上游管理：只在 STAGE 模板仓库里改它，绝不在某个论文实例里改——`execs/update.sh` 会覆盖它。
+本指南每个 skill 一段紧凑的话。所有 skill 共用的规则——git、红线、`.env` 与构建工具链、日期、解析、委派、对话、产物登记表、编造边界、布局——住在 [writing-workflow-conventions.md](writing-workflow-conventions.md)；各 skill 引用它的 § 编号。起草、润色和清晰度评审共同使用[学术自然写作指南](human-writing-guide.md)中守住证据边界的标准。本目录由上游管理：只在 STAGE 模板仓库里改它，绝不在某个论文实例里改——`execs/update.sh` 会覆盖它。
 
 ## 流水线
 
@@ -66,7 +66,7 @@ STAGE 提供十六个彼此衔接的写作工作流 skill，把导入的证据�
 
 六个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`、`stage-pstr-builder`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。命名 harness 的清单用 `disable-model-invocation: true` 强制它；Codex 的 `allow_implicit_invocation: false` 放在 `.codex/skills/`，再链接进 `.agents/skills/`。另外十个在任务明显匹配时也可以由 agent 自行拾起。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
 
-每个 skill 都共用同一个参数形状——`<skill> [TARGET] [DESCRIPTION] [involve=<level>]`。`involve=low|medium|high` 最先被剥离，它设定这次运行问到什么程度（规约 §7.7）；每个 skill 都会剥它，包括那些 `argument-hint` 里没有标出它的。目标照上面的规则解析。剩下的一切是一句描述：用你自己的话说明这次运行是为了什么——`/stage-sect-drafter 4_experiments 消融才是重点，开篇就摆出来`。它是一条线索，不是一条命令：它可以把运行引到该 skill 自己的某条路径上，也可以提供运行随后记下的文字；但它绝不代替任何确认点，绝不替一个有歧义的章节名下结论，绝不放行一个没有指纹的数字，也绝不授权 STOP 线上的任何一件事。被描述引到某条路径上的运行，要在写任何东西之前说清自己走的是哪条，这样读错一次只赔一行字，而不是一处错改。若某个 skill 的首参数本身就是自由文本——`stage-refs-curator` 收论文标题，`stage-tabs-builder` 与 `stage-figs-designer` 收还没有提纲行的表或图的用途——那个参数就是描述。完整规则见[规约 §7.13](writing-workflow-conventions.zh-CN.md)。
+每个 skill 都共用同一个参数形状——`<skill> [TARGET] [DESCRIPTION] [involve=<level>]`。`involve=low|medium|high` 最先被剥离，它设定这次运行问到什么程度（规约 §7.7）；每个 skill 都会剥它，包括那些 `argument-hint` 里没有标出它的。目标照上面的规则解析。剩下的一切是一句描述：用你自己的话说明这次运行是为了什么——`/stage-sect-drafter 4_experiments 消融才是重点，开篇就摆出来`。它是一条线索，不是一条命令：它可以把运行引到该 skill 自己的某条路径上，也可以提供运行随后记下的文字；但它绝不代替任何确认点，绝不替一个有歧义的章节名下结论，绝不放行一个没有指纹的数字，也绝不授权 STOP 线上的任何一件事。被描述引到某条路径上的运行，要在写任何东西之前说清自己走的是哪条，这样读错一次只赔一行字，而不是一处错改。若某个 skill 的首参数本身就是自由文本——`stage-refs-curator` 收论文标题，`stage-tabs-builder` 与 `stage-figs-designer` 收还没有提纲行的表或图的用途——那个参数就是描述。完整规则见[规约 §7.13](writing-workflow-conventions.md)。
 
 ## 各个 skill
 
@@ -148,6 +148,6 @@ Slash-only。海报不是把论文重新灌进一张更大的纸——它是取�
 
 ## 各处定义在哪
 
-- 共享规则与 § 编号：[writing-workflow-conventions.zh-CN.md](writing-workflow-conventions.zh-CN.md) —— 产物登记表是 §8，编造边界是 §9，布局是 §10。
+- 共享规则与 § 编号：[writing-workflow-conventions.md](writing-workflow-conventions.md) —— 产物登记表是 §8，编造边界是 §9，布局是 §10。
 - skill 本身：只在 `.agents/skills/` 下以工具中立形式编写，再机械移植到六套具名 harness 技能树；仅属于某个 harness 的行为放进该树的适配 rules 或带锚点的 overrides。
 - 面向用户的总览与快速上手：仓库 [README.zh-CN](../../../README.zh-CN.md)。

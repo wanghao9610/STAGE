@@ -22,7 +22,6 @@ SKILL_ROOTS=(.agents/skills .claude/skills .cursor/skills .dsh/skills .kimi-code
 # Codex does it through .codex/skills/*/agents/openai.yaml instead (check 4).
 FRONTMATTER_ROOTS=(.claude/skills .cursor/skills .dsh/skills .kimi-code/skills .pi/skills .qwen/skills)
 CONV_EN="docs/mds/stage-workflow/writing-workflow-conventions.md"
-CONV_ZH="docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md"
 
 FAILURES=0
 fail() { printf 'FAIL  %s\n' "$*"; FAILURES=$(( FAILURES + 1 )); }
@@ -748,10 +747,9 @@ conv_subheads() { # $1 = file, $2 = section number -> ### n.m subheadings in it
     ' "$1"
 }
 conv_letters() { # $1 = file, $2 = section number -> lettered rules in it
-    # The Chinese edition writes the same rules with fullwidth parentheses.
     awk -v want="$2" "${CONV_AWK_PRELUDE}"'
         /^## / { n = $2; sub(/\./, "", n); insec = (n == want) }
-        insec && /^\*\*[（(][a-z][）)]/ { c++ }
+        insec && /^\*\*\([a-z]\)/ { c++ }
         END { print c + 0 }
     ' "$1"
 }
@@ -764,22 +762,16 @@ if [[ "${expected_conv}" != "${actual_conv}" ]]; then
     diff <(printf '%s\n' "${expected_conv}") <(printf '%s\n' "${actual_conv}") | sed 's/^/      /'
     conv_errors=1
 fi
-if [[ "$(conv_headings "${CONV_EN}" | sed -nE 's/^([0-9]+)\..*/\1/p')" != "$(conv_headings "${CONV_ZH}" | sed -nE 's/^([0-9]+)\..*/\1/p')" ]]; then
-    fail "${CONV_ZH} does not carry the same section numbers as ${CONV_EN}; a §n citation resolves to a different rule per language"
-    conv_errors=1
-fi
 for spec in "items:${CONV_ITEMS[*]}" "subheads:${CONV_SUBHEADS[*]}" "letters:${CONV_LETTERS[*]}"; do
     kind="${spec%%:*}"
     for row in ${spec#*:}; do
         sec="${row%%|*}"
         want="${row#*|}"
-        for f in "${CONV_EN}" "${CONV_ZH}"; do
-            got="$(conv_${kind} "${f}" "${sec}")"
-            if [[ "${got}" != "${want}" ]]; then
-                fail "${f}: §${sec} carries ${got} ${kind}, pinned at ${want} — every §${sec}.n citation past the change now points elsewhere"
-                conv_errors=1
-            fi
-        done
+        got="$(conv_${kind} "${CONV_EN}" "${sec}")"
+        if [[ "${got}" != "${want}" ]]; then
+            fail "${CONV_EN}: §${sec} carries ${got} ${kind}, pinned at ${want} — every §${sec}.n citation past the change now points elsewhere"
+            conv_errors=1
+        fi
     done
 done
 
@@ -818,7 +810,7 @@ section "Docs cover every skill"
 doc_errors=0
 for guide in docs/mds/stage-workflow/writing-workflow-skills.md \
              docs/mds/stage-workflow/writing-workflow-skills.zh-CN.md \
-             "${CONV_EN}" "${CONV_ZH}" \
+             "${CONV_EN}" \
              README.md README.zh-CN.md; do
     [[ -f "${guide}" ]] || { fail "${guide} is missing"; doc_errors=1; continue; }
     while IFS= read -r skill; do
@@ -831,14 +823,28 @@ for guide in docs/mds/stage-workflow/writing-workflow-skills.md \
     done < <(printf '%s\n' "${SKILLS}")
 done
 
-# Workflow docs ship as en/zh pairs.
+# The workflow docs are English, apart from the skills guide, which ships as an
+# en/zh pair. The workflow reads only the English docs, so no other Chinese
+# edition may come back, here or beside the agent instructions.
+ZH_DOC_PAIRS=(docs/mds/stage-workflow/writing-workflow-skills)
+for base in "${ZH_DOC_PAIRS[@]}"; do
+    for f in "${base}.md" "${base}.zh-CN.md"; do
+        [[ -f "${f}" ]] || { fail "${f} is missing; the skills guide ships as an en/zh pair"; doc_errors=1; }
+    done
+done
 while IFS= read -r f; do
-    if [[ "${f}" == *.zh-CN.md ]]; then
-        [[ -f "${f%.zh-CN.md}.md" ]] || { fail "${f} has no English counterpart"; doc_errors=1; }
-    else
-        [[ -f "${f%.md}.zh-CN.md" ]] || { fail "${f} has no .zh-CN.md counterpart"; doc_errors=1; }
+    [[ -f "${f%.zh-CN.md}.md" ]] || { fail "${f} has no English counterpart"; doc_errors=1; }
+    if [[ " ${ZH_DOC_PAIRS[*]} " != *" ${f%.zh-CN.md} "* ]]; then
+        fail "${f}: only the skills guide has a Chinese edition among the workflow docs"
+        doc_errors=1
     fi
-done < <(find docs/mds/stage-workflow -type f -name '*.md')
+done < <(find docs/mds/stage-workflow -name '*.zh-CN.md' | sort)
+for f in AGENTS.zh-CN.md CLAUDE.zh-CN.md; do
+    if [[ -e "${f}" || -L "${f}" ]]; then
+        fail "${f}: STAGE ships no Chinese edition of this file; the English one is the only copy"
+        doc_errors=1
+    fi
+done
 
 # Every relative link in the guides resolves.
 for guide in docs/mds/stage-workflow/writing-workflow-skills.md \
@@ -854,11 +860,11 @@ for guide in docs/mds/stage-workflow/writing-workflow-skills.md \
     done < <(grep -oE '\]\([^)#][^)]*\)' "${guide}" | sed 's/^](//; s/)$//; s/#.*$//' |
              grep -vE '^(https?|mailto):' | grep -v '^$' | sort -u)
 done
-(( doc_errors == 0 )) && note "guides and landing pages name every skill; workflow docs paired en/zh; links resolve"
+(( doc_errors == 0 )) && note "guides and landing pages name every skill; only the skills guide is paired en/zh, and no retired Chinese edition is back; links resolve"
 
 # 16. Chinese text carries no space between two Chinese characters.
-#     Chinese is written in reference files, the two workflow documents, the
-#     memory spec, README.zh-CN.md and the landing pages, where only a
+#     Chinese is written in reference files, the skills guide,
+#     README.zh-CN.md and the landing pages, where only a
 #     hand-typed space can land between two Chinese characters. The scan is Han
 #     and CJK punctuation only. A Chinese character beside a *symbol* is correct
 #     typography and stays free — 规约 §9, 评审意见 → 要点记录表, 陈述处 ⇄ 证据,
@@ -985,9 +991,7 @@ for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
     grep -qF 'writing-workflow-conventions section 8' "${f}" 2>/dev/null || \
         { fail "${f} no longer points at writing-workflow-conventions section 8"; hook_errors=1; }
 done
-for f in docs/mds/stage-workflow/model_id_spec.md docs/mds/stage-workflow/model_id_spec.zh-CN.md; do
-    [[ -f "${f}" ]] || { fail "${f} is missing"; hook_errors=1; }
-done
+[[ -f docs/mds/stage-workflow/model_id_spec.md ]] || { fail "docs/mds/stage-workflow/model_id_spec.md is missing"; hook_errors=1; }
 (( hook_errors == 0 )) && note "hooks ship, parse, and register natively in all seven harnesses; the commit guard declines the same commands in every tree"
 
 # 18. The provenance line is stated in the same skills in all seven trees.
