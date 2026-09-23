@@ -219,11 +219,12 @@ origin, query, and cache path, every lead with the criterion it was settled by a
 every reference the chair demoted and why, searches with no result;
 OFFLINE degradation noted when the host had no network (§3.5). Durable:
 `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` — the meta-review per the template, `mode:`
-honest, the 中文要点摘要 section appended when the dialogue is Chinese. Real date (§4); a
-same-day re-run replaces its file after saying so. Touch nothing else: not `manus/`, not
-`notes/claims.md`, not `venue.yml`, not `tasks/`. Under `extern=` the durable file is instead
-`REFEREE_<date>.md` at the destination the external-target paragraph fixes, in the
-external-report shape of `references/review-template.md`; `cycls/` is not written at all.
+honest, the 中文要点摘要 section appended when the language resolved under conventions §7.6 is
+Chinese. Real date (§4); a same-day re-run replaces its file after saying so. Touch nothing
+else: not `manus/`, not `notes/claims.md`, not `venue.yml`, not `tasks/`. Under `extern=` the
+durable file is instead `REFEREE_<date>.md` at the destination the external-target paragraph
+fixes, in the external-report shape of `references/review-template.md`; `cycls/` is not
+written at all.
 
 ### Step 8: Report and commit
 

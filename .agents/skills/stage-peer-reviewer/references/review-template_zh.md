@@ -2,7 +2,7 @@
 
 > 本文件是 `review-template.md` 的中文对照版，随英文版同步维护，供人阅读；运行时装载的仍是英文版。两版冲突时，以 `review-template.md` 为准。
 
-五份模板：单视角评审、quick 模式的合并评审、综合评审、外部评审对象的审稿意见书、引用审计。每一节都要填；没什么可说的一节写 "None found."——缺失的一节读起来像是没查过的一节。所有产物都用英文写；对话是中文时，以 中文要点摘要 收尾综合评审。
+五份模板：单视角评审、quick 模式的合并评审、综合评审、外部评审对象的审稿意见书、引用审计。每一节都要填；没什么可说的一节写 "None found."——缺失的一节读起来像是没查过的一节。所有产物都用英文写；按规约 §7.6 解析出的语言是中文时，以 中文要点摘要 收尾综合评审。
 
 ## review_<perspective>.md
 
@@ -107,7 +107,7 @@ resolved, or "none">. Perspectives missing: <dropped panelist, or "none">.
 ## Action List (ranked by score impact)
 1. <fix> — <file> — <what it buys> — <sibling skill>
 
-<Chinese dialogue only:>
+<Only when the language resolved under conventions §7.6 is Chinese:>
 ## 中文要点摘要
 <推荐意见与置信度、主要问题 3 条以内、最高优先级修改项；不引入英文正文没有的内容。>
 ```

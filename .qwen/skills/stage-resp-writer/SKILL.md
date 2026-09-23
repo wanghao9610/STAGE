@@ -121,7 +121,7 @@ own wording; measure the draft against it, report the measurement, and trim unti
 
 - `cycls/<cycle>/response/RESPONSE_<date>.md` — real date (§4); create `response/` when absent;
   shape below. **Always English, whatever `STAGE_LANG` says (§7.6)** — a program committee reads
-  it. A Chinese dialogue still gets its chat report in Chinese; only the artifact is fixed.
+  it. The chat report still follows the language resolved under §7.6; only the artifact is fixed.
 - `tasks/<cycle>_promises.md` — one `- [ ]` per promise. Merge on re-runs: never uncheck,
   reword, or delete an existing box; append new ones.
 - `notes/claims.md` — conceded claims flip to `weakened` and `updated:` is bumped. `weakened`

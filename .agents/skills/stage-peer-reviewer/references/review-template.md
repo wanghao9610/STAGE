@@ -3,7 +3,7 @@
 Five templates: the individual perspective review, the quick-mode combined review, the
 meta-review, the external-target referee report, and the citation audit. Fill every section; a section with nothing to say gets
 "None found." — an absent section reads as an unexamined one. All artifacts in English; the
-中文要点摘要 closes the meta-review when the dialogue is Chinese.
+中文要点摘要 closes the meta-review when the language resolved under conventions §7.6 is Chinese.
 
 ## review_<perspective>.md
 
@@ -111,7 +111,7 @@ resolved, or "none">. Perspectives missing: <dropped panelist, or "none">.
 ## Action List (ranked by score impact)
 1. <fix> — <file> — <what it buys> — <sibling skill>
 
-<Chinese dialogue only:>
+<Only when the language resolved under conventions §7.6 is Chinese:>
 ## 中文要点摘要
 <推荐意见与置信度、主要问题 3 条以内、最高优先级修改项；不引入英文正文没有的内容。>
 ```
