@@ -592,9 +592,18 @@ while IFS= read -r segment; do
                 tracked "${a}" && exit 0
             done < <(landing "${lmode}" ${args[@]+"${args[@]}"})
             # A copy reads its sources: out of mates/ or a kit is not a write there.
+            # install -d copies nothing: it creates every operand as a directory,
+            # so it goes on to the rule for any command naming a protected path,
+            # as mkdir does.
             if [[ "${name}" == cp || "${name}" == install ]]; then
                 (( in_protected || (via_xargs && line_names) )) && exit 0
-                continue
+                makes_dirs=0
+                if [[ "${name}" == install ]]; then
+                    for a in ${args[@]+"${args[@]}"}; do
+                        case "${a}" in --) break ;; --directory) makes_dirs=1 ;; --*) ;; -*d*) makes_dirs=1 ;; esac
+                    done
+                fi
+                (( makes_dirs )) || continue
             fi
             ;;
         git)
