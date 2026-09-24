@@ -21,10 +21,9 @@ The exclusivity cuts hardest against the fabrication boundary (conventions §9):
 
 ```text
 .stage/memory/
-├── MEMORY.md          # the index: one line per memory
+├── .gitkeep           # what the template tracks here; the memories are yours
 ├── <slug>.md          # one memory per file
 └── local/             # git-ignored: what stays on this machine
-    ├── MEMORY.md
     └── <slug>.md
 ```
 
@@ -38,6 +37,7 @@ One fact per file, named for its slug:
 ---
 type: env
 scope: machine:mbp-a
+summary: stage.cls builds here only under xelatex
 language: en
 verified: 2026-08-03
 model_id: claude-opus-5[1m]
@@ -54,6 +54,7 @@ source: wkdrs/builds/main.log
 |---|---|
 | `type` | one of the four above; `env` is the only one the hooks age |
 | `scope` | `global`, `machine:<name>`, `cycle:<cycle>`, or `manus:<path>` — where the fact is true, not where it was learned |
+| `summary` | the one line the index shows for it: what the fact *is*, not what it is about — "stage.cls builds here only under xelatex", not "notes on the build engine" |
 | `language` | the body's language (conventions §7.6, the reply-language rule); frontmatter keys stay English |
 | `verified` | the date the fact was last confirmed true, from the system clock (conventions §4, real dates) |
 | `model_id` | the model that wrote or last re-verified it, verbatim (conventions §8, the output table; fallbacks in `model_id_spec.md`) |
@@ -62,25 +63,25 @@ source: wkdrs/builds/main.log
 
 The body opens with one sentence stating the fact, then carries only what a reader needs to act on it. A memory carries no history of its own, and no `model_trail`: a re-verification rewrites `verified` and `model_id` rather than appending, and what the file used to say is in git. Conventions §8 asks for a trail where several sessions each write a different part of one artifact, which is not what happens to a file this small.
 
-**The language rule applies to the body only.** `STAGE_LANG` governs what a run writes (conventions §7.6), so a Chinese session records a Chinese body — and every frontmatter key, every value in the table above, and the `<type>` token in the index line stay English, because the hooks and this spec match them byte-exactly.
+**The language rule applies to the body only.** `STAGE_LANG` governs what a run writes (conventions §7.6), so a Chinese session records a Chinese body — and every frontmatter key, every value in the table above (`summary` included), and the `<type>` token in the index line stay English: that same section keeps frontmatter keys and their values English as structural literals, and the hooks read the keys and the `env` token literally.
 
 ## The index line
 
-`MEMORY.md` lists every memory beside it, one line each, newest first:
+Nothing is hand-written: the session hook reads every `<slug>.md` in the two directories and builds one line per memory from its frontmatter, newest `verified` first:
 
-    - <type> · <scope> · <verified> · [<slug>](<slug>.md) — <one line>
+    - <type> · <scope> · <verified> · [<slug>](<slug>.md) — <summary>
     - env · machine:mbp-a · 2026-08-03 · [xelatex-only](xelatex-only.md) — stage.cls builds here only under xelatex
 
-The first four fields are separated by a space, a middle dot, and a space; everything after the em dash is free text and may contain anything, that separator included. **The session hooks split on it byte-exactly** — reword the separator and they silently stop marking anything, with no error anywhere. The aging check is as literal about the type token: `env` stays English, whatever language the one-liner speaks. Only lines starting with `- ` are read, so the index file's own header is invisible to them.
+Writing a memory is therefore writing one file, and re-verifying one is editing one field. The hook reads the frontmatter literally: a file whose frontmatter is not closed by a second `---` is not listed; the aging check matches the type token `env` as written — English, like the summary, whatever language the body speaks; and a file without `summary` is listed by its first body line, the sentence the body opens with anyway, so a memory written before the field existed still reaches the session.
 
-That one line is what a session judges relevance on, so it says what the fact *is*, not what it is about: "stage.cls builds here only under xelatex", not "notes on the build engine". Keep the index under roughly 60 lines; past that, group the entries under one heading per type — in this same file, never a second one: the hooks read no other file as an index, so a split-off index silently stops reaching sessions, while a heading is just another line they skip.
+That one line is what a session judges relevance on, so it says what the fact *is*, not what it is about. Keep the store under roughly 60 memories; past that, retire rather than group — there is no index file to add headings to, and every line reaches every session.
 
 ## Retiring a memory
 
 Three ways out, and the first is the common one:
 
-- **Re-verified** — the fact still holds: set `verified` to today and `model_id` to the model that checked it, and carry the new date into the memory's index line — the stale flag reads that line, not the frontmatter.
-- **Superseded** — the fact changed: write the new memory with `supersedes: <old-slug>`, then delete the old file and its index line. Git holds the history, and nothing is archived inside the store — that is what keeps the index short enough to inject into every session.
+- **Re-verified** — the fact still holds: set `verified` to today and `model_id` to the model that checked it; the index line follows on its own.
+- **Superseded** — the fact changed: write the new memory with `supersedes: <old-slug>`, then delete the old file. Git holds the history, and nothing is archived inside the store — that is what keeps the index short enough to inject into every session.
 - **Wrong** — delete it. A memory that was never true is not history worth keeping.
 
 Deleting a memory is a deletion like any other: it is confirmed with the user at every involve level (conventions §7.7, how much the skills ask).
@@ -94,8 +95,11 @@ A cycle is not a retirement event. A `cycle:<cycle>` memory from a submission th
 | Claude Code | `.claude/hooks/stage_memory.sh` | `SessionStart`, and `SubagentStart` for a delegate | the index, as `additionalContext` |
 | Codex | `.codex/hooks/stage_memory.sh` | `SessionStart` | the index, as `additionalContext` |
 | Cursor | `.cursor/hooks/stage_memory.sh` | `sessionStart` | the index, as `additional_context` |
+| DSH | `.dsh/hooks/stage_memory.sh` | `SessionStart`, through the Claude Code hook bridge | the index, as `additionalContext` |
 | Kimi | `.kimi-code/hooks/stage_memory.sh` | `UserPromptSubmit` | the index, once per session |
+| Pi | `.pi/extensions/stage-hooks/stage_memory.sh` | `before_agent_start`, wired by `.pi/extensions/stage-hooks/index.ts` | the index, as a hidden message before the first agent run, and again after a model change |
+| Qwen Code | `.qwen/hooks/stage_memory.sh` | `SessionStart` | the index, as `additionalContext` |
 
-Each hook prints the two indexes and nothing else — the shared one, and `local/`'s where it exists. An `env` line whose `verified` is more than 180 days old is marked stale in what the session sees, because a machine changes under a fact recorded about it; the other three types are not aged, since a dead end stays dead and a flag that fires on healthy entries teaches the reader to skip it. A store with no entries prints nothing at all, so a paper that has recorded nothing pays nothing.
+Each hook prints the index and nothing else — the versioned directory's memories, then `local/`'s where it exists; run any copy with `--list` to see the same lines as plain text. An `env` line whose `verified` is more than 180 days old is marked stale in what the session sees, because a machine changes under a fact recorded about it; the other three types are not aged, since a dead end stays dead and a flag that fires on healthy entries teaches the reader to skip it. A store with no entries prints nothing at all, so a paper that has recorded nothing pays nothing.
 
-A hook that exists is not necessarily registered. Claude, Codex and Cursor ship theirs registered in `.claude/settings.json`, `.codex/hooks.json` and `.cursor/hooks.json`; Kimi has no project-level config, so `bash .kimi-code/hooks/install.sh` registers it once per machine. On Codex, registered is still not running until the project is trusted and the hook approved with `/hooks` in the CLI. A paper repository adopted before this hook existed keeps its own registration file, which `execs/update.sh` never overwrites — it reports the gap instead, and the entry is added by hand.
+A hook that exists is not necessarily registered. Claude, Codex, Cursor and Qwen Code ship theirs registered in `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json` and `.qwen/settings.json`; Kimi has no project-level config, so `bash .kimi-code/hooks/install.sh` registers it once per machine. DSH is the same shape: `.dsh/hooks.json` is the table, but the row pointing DSH at it belongs in the machine's `$DSH_HOME/cordis.patch.yml`, written once by `bash .dsh/hooks/install.sh` — and the bridge it loads is not a dsh dependency, so each profile needs `dsh plugin --profile <name> add @deepseek-ai/dsh-hooks-claude-code`. Pi's registration is code, not config — the extension is discovered automatically, but only in a trusted project (`/trust`, or `defaultProjectTrust`); untrusted, it loads no project extension and injects nothing. On Codex, registered is still not running until the project is trusted and the hook approved with `/hooks` in the CLI; on Qwen Code, a project-level hook runs only in a trusted folder, which applies only where folder trust is on (`security.folderTrust.enabled`, off by default). A paper repository adopted before this hook existed keeps its own registration file, which `execs/update.sh` never overwrites — it reports the gap instead, and the entry is added by hand.

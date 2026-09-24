@@ -419,14 +419,14 @@ dsh --profile YOUR_PROFILE --dump-config
 
 ## 项目记忆
 
-一次会话学到、又没有任何仓库文件认领的事实——某种构建引擎只在这台机器上能工作、你的某项长期偏好、模拟评审已经否决过的一种论述方式——记在论文的 `.stage/memory/`，而不是你当时在用的那个工具里。一事一文件，每条在 `.stage/memory/MEMORY.md` 里占一行；会话钩子会在每个受支持宿主的会话开头把这份索引交给 agent。
+一次会话学到、又没有任何仓库文件认领的事实——某种构建引擎只在这台机器上能工作、你的某项长期偏好、模拟评审已经否决过的一种论述方式——记在论文的 `.stage/memory/`，而不是你当时在用的那个工具里。一事一文件；会话钩子从这些文件生成每条一行的索引，在每个受支持宿主的会话开头交给 agent。
 
 记忆分四类：`env`（通常从失败中得知的机器或 TeX 工具链事实）、`pref`（你希望怎样写作）、`insight`（产生它的那次运行结束后仍然有效的判断）和 `deadend`（已经尝试、否决、不值得重试的路径——跨投稿周期尤其重要）。两条规则防止记忆库变成仓库事实的第二份漂移副本：
 
 - **只有当没有任何文件已经认领这条事实时，才把它记进记忆。** 数字属于带指纹的 `mates/` 条目，论断属于 `notes/claims.md`，页数限制属于对应周期的 `venue.yml`，论文内容属于 `notes/refs/`，承诺属于 `tasks/`。记忆只装剩余信息。
 - **记忆永远不是来源。** 它不能支撑 `manus/` 里的数字、venue 规则或关于被引工作的断言；记忆记得某个值，并不会放松禁止编造的边界。记忆与仓库文件冲突时，以文件为准。
 
-只在本机成立的事实，以及你不想入库的记忆，放进 `.stage/memory/local/`，git 像忽略 `.env` 一样忽略它；其余记忆都受版本管理，随克隆一起走。`env` 条目超过 180 天未重新确认时，会在会话里标为过期。任何内容都先由 agent 提议、再由你决定是否记录；`.env` 设为 `INVOLVE=low` 时改为先记下再说明。文件格式、钩子解析的索引行以及记忆如何退场，见[项目记忆](docs/mds/stage-workflow/memory_spec.md)。
+只在本机成立的事实，以及你不想入库的记忆，放进 `.stage/memory/local/`，git 像忽略 `.env` 一样忽略它；其余记忆都受版本管理，随克隆一起走。`env` 条目超过 180 天未重新确认时，会在会话里标为过期。任何内容都先由 agent 提议、再由你决定是否记录；`.env` 设为 `INVOLVE=low` 时改为先记下再说明。文件格式、钩子生成的索引行以及记忆如何退场，见[项目记忆](docs/mds/stage-workflow/memory_spec.md)。
 
 ## 更新 STAGE 的 skill 与工作流文档
 
@@ -483,7 +483,7 @@ bash execs/update.sh --skill stage-flow-status
 
 上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。上游已不再提供的 STAGE 文件——上游 skill 旁的每个 `SKILL_zh.md`，以及 `execs/update.sh` 中 `RETIRED_FILES` 列出的已退役文件——会被删除（`--diff` 中显示为 `removes`）；其余只存在于本地的文件，包括你自己的，都会保留。STAGE 不再提供 `AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md`：更新会保留你手上的这两个文件，若它们来自 STAGE，可自行删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
-如果你改的是 STAGE 本身而不是某篇论文：只编辑 `.agents/skills/` 下工具中立的作者源，再用 `bash .github/scripts/port.sh --write` 重新生成六套 harness 技能树。仅属于某个 harness 的行为写进该树的 rules 或带锚点的 overrides。随后用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七个根目录的语义约束。后两项检查都在 CI 中运行；这些命令只属于上游维护工具，`.github/` 不会同步进论文仓库。STAGE 自己的记忆无论作用域，一律放 git 忽略的 `.stage/memory/local/`：克隆或 GitHub 模板会原样复制受版本管理的 `.stage/memory/`，`update.sh --adopt` 也会播下它的 `MEMORY.md`，关于开发 STAGE 的记忆就会作为论文自己的事实出现在每个论文仓库里。`check_consistency.sh` 发现那里有模板所带索引文件之外的被跟踪文件就会失败。
+如果你改的是 STAGE 本身而不是某篇论文：只编辑 `.agents/skills/` 下工具中立的作者源，再用 `bash .github/scripts/port.sh --write` 重新生成六套 harness 技能树。仅属于某个 harness 的行为写进该树的 rules 或带锚点的 overrides。随后用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七个根目录的语义约束。后两项检查都在 CI 中运行；这些命令只属于上游维护工具，`.github/` 不会同步进论文仓库。STAGE 自己的记忆无论作用域，一律放 git 忽略的 `.stage/memory/local/`：克隆或 GitHub 模板会原样复制受版本管理的 `.stage/memory/`，关于开发 STAGE 的记忆就会作为论文自己的事实出现在每个论文仓库里。`check_consistency.sh` 发现那里有模板所带 `.gitkeep` 之外的被跟踪文件就会失败。
 
 ## 项目约定
 

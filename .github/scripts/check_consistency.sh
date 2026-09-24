@@ -373,7 +373,7 @@ for readme in README.md README.zh-CN.md; do
         'STAGE_LANG' \
         'STAGE_HARNESSES' \
         'INVOLVE=low' \
-        '.stage/memory/MEMORY.md' \
+        '.stage/memory/' \
         'bash execs/update.sh --diff' \
         'bash execs/update.sh TAG_OR_BRANCH' \
         'bash execs/update.sh --harnesses claude' \
@@ -982,6 +982,63 @@ grep -qF '"hookSpecificOutput":{"permissionDecision":"deny"' .kimi-code/hooks/st
     { fail ".pi stage hook extension no longer blocks a declined shell command"; hook_errors=1; }
 grep -qE '"matcher"[[:space:]]*:[[:space:]]*"bash"' .dsh/hooks.json || \
     { fail ".dsh/hooks.json no longer matches DSH's lowercase bash tool"; hook_errors=1; }
+#     The memory index's field separator — space, middle dot, space — is what all
+#     seven memory hooks build their lines with, and what the spec documents as
+#     the shape a session reads. Reword it in one place and the hooks and the spec
+#     describe two different lines.
+for f in .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
+         .cursor/hooks/stage_memory.sh .kimi-code/hooks/stage_memory.sh \
+         .dsh/hooks/stage_memory.sh .pi/extensions/stage-hooks/stage_memory.sh \
+         .qwen/hooks/stage_memory.sh docs/mds/stage-workflow/memory_spec.md; do
+    grep -qF ' · ' "${f}" 2>/dev/null || \
+        { fail "${f} no longer carries the memory index separator ' · '"; hook_errors=1; }
+done
+#     The aging rule is copied the same way: every memory hook carries both date
+#     spellings of the 180-day cutoff (BSD and GNU) and gates the stale mark on
+#     the literal type `env` read from the frontmatter, and the spec states the
+#     same window. Change one copy and the others keep answering for a rule the
+#     store no longer follows.
+for f in .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
+         .cursor/hooks/stage_memory.sh .kimi-code/hooks/stage_memory.sh \
+         .dsh/hooks/stage_memory.sh .pi/extensions/stage-hooks/stage_memory.sh \
+         .qwen/hooks/stage_memory.sh; do
+    { grep -qF -- '-v-180d' "${f}" && grep -qF '180 days ago' "${f}"; } || \
+        { fail "${f} lost a spelling of the 180-day cutoff (-v-180d / '180 days ago')"; hook_errors=1; }
+    grep -qF 'f["type"] == "env"' "${f}" || \
+        { fail "${f} no longer gates the stale mark on the literal type env"; hook_errors=1; }
+done
+grep -qF '180 days' docs/mds/stage-workflow/memory_spec.md || \
+    { fail "memory_spec.md no longer states the 180-day aging window"; hook_errors=1; }
+#     What the awk does is shown, not read: every copy is run at its own depth
+#     against one store of three memories — an aged `env`, a `deadend` of the
+#     same date, and a legacy file with no `summary:` — and has to list all three
+#     and mark exactly one, so a copy whose parsing breaks fails here rather than
+#     silently injecting nothing into every session of that harness.
+memory_fixture="$(mktemp -d "${TMPDIR:-/tmp}/stage-memory-fixture.XXXXXX")" || {
+    fail "could not create the memory-hook fixture directory"
+    hook_errors=1
+    memory_fixture=""
+}
+if [[ -n "${memory_fixture}" ]]; then
+    mkdir -p "${memory_fixture}/.stage/memory/local"
+    printf -- '---\ntype: env\nscope: machine:box\nsummary: stage.cls builds here only under xelatex\nverified: 2025-01-01\n---\nbody\n' > "${memory_fixture}/.stage/memory/xelatex-only.md"
+    printf -- '---\ntype: deadend\nscope: cycle:demo_2026\nsummary: the benchmark framing read as incremental\nverified: 2025-01-01\n---\nbody\n' > "${memory_fixture}/.stage/memory/benchmark-framing.md"
+    printf -- '---\ntype: pref\nscope: global\nverified: 2026-09-01\n---\n\nThe first body line stands in.\n' > "${memory_fixture}/.stage/memory/local/legacy.md"
+    for f in .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
+             .cursor/hooks/stage_memory.sh .kimi-code/hooks/stage_memory.sh \
+             .dsh/hooks/stage_memory.sh .pi/extensions/stage-hooks/stage_memory.sh \
+             .qwen/hooks/stage_memory.sh; do
+        mkdir -p "${memory_fixture}/$(dirname "${f}")"
+        cp "${f}" "${memory_fixture}/${f}"
+        listed="$(bash "${memory_fixture}/${f}" --list </dev/null 2>/dev/null)"
+        if [[ "$(grep -c '^- ' <<< "${listed}")" != 3 || "$(grep -c '\[stale:' <<< "${listed}")" != 1 || "${listed}" != *"— The first body line stands in."* ]]; then
+            fail "${f} --list does not index the fixture store (3 lines, 1 stale mark, legacy summary from the body):"
+            printf '%s\n' "${listed:-<nothing>}" | sed 's/^/      /'
+            hook_errors=1
+        fi
+    done
+    rm -rf "${memory_fixture}"
+fi
 
 # The commit guard's rule body — everything from the segment loop down — is one
 # decision table in seven copies; only the prelude (event wiring, payload
@@ -1154,7 +1211,7 @@ if [[ -n "${model_check_dir}" ]]; then
 
     rm -rf "${model_check_dir}"
 fi
-(( hook_errors == 0 )) && note "hooks ship, parse, and register natively in all seven harnesses; the commit guard declines the same commands in every tree"
+(( hook_errors == 0 )) && note "hooks ship, parse, and register natively in all seven harnesses; the memory hooks index a fixture store; the commit guard declines the same commands in every tree"
 
 # 18. The provenance line is stated in the same skills in all seven trees.
 #     Conventions §8 makes model_id / model_trail every producer's job; each
@@ -1317,13 +1374,13 @@ rm -rf -- "${PROSE_TEST_DIR}"
 
 # 21. The versioned memory store ships as its template. STAGE is the template
 #     every paper starts from — a clone or the GitHub template copies
-#     .stage/memory/ as is, and update.sh --adopt seeds its MEMORY.md — so a
-#     memory about developing STAGE would arrive in every paper as a fact about
-#     that paper. Upstream's own memories live under the git-ignored
-#     .stage/memory/local/ whatever their scope (README, "Working on STAGE
-#     itself"); this holds the tracked store to the files the template ships.
+#     .stage/memory/ as is — so a memory about developing STAGE would arrive in
+#     every paper as a fact about that paper. Upstream's own memories live
+#     under the git-ignored .stage/memory/local/ whatever their scope (README,
+#     "Working on STAGE itself"); this holds the tracked store to the files the
+#     template ships.
 section "Upstream memory store ships as its template"
-MEMORY_TEMPLATE_FILES=$'.stage/memory/MEMORY.md\n.stage/memory/MEMORY.zh-CN.md'
+MEMORY_TEMPLATE_FILES='.stage/memory/.gitkeep'
 tracked_memory="$(git ls-files .stage/memory)"
 if [[ "${tracked_memory}" == "${MEMORY_TEMPLATE_FILES}" ]]; then
     note ".stage/memory/ tracks only the files the template ships"

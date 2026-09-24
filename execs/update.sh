@@ -606,10 +606,10 @@ if [[ "${ADOPT}" == true ]]; then
         "${EXTENSION_FILES[@]}"
         "${HOOK_FILES[@]}"
         ".pi/APPEND_SYSTEM.md"
-        # The memory store's index. The store is the paper's own from here on;
-        # only this seed file, which documents the line format, comes from
-        # upstream.
-        ".stage/memory/MEMORY.md"
+        # The memory store. It is the paper's own from here on; only the empty
+        # directory marker comes from upstream — the hooks build the index
+        # from the memory files themselves.
+        ".stage/memory/.gitkeep"
         ".env.example"
         ".gitignore"
         # The line-break rule fmt.sh applies and .vscode/settings.json points
