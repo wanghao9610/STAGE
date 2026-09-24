@@ -1,0 +1,6 @@
+interface:
+  display_name: "STAGE Auto"
+  short_description: "Pursue a stated paper goal across STAGE skills"
+  default_prompt: "Use $stage-auto <goal> to pursue that paper goal."
+policy:
+  allow_implicit_invocation: false

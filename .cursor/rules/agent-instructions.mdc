@@ -49,6 +49,7 @@ The test: every changed line traces to the user's request, and every number in i
 
 - Evidence lives read-only under `mates/`, fingerprinted in `mates/MANIFEST.md`; every claim's statements, evidence, and status are one row in `notes/claims.md`.
 - Run `/stage-flow-status` first when you do not know where things stand — it reads the outline, the ledger, the manifest, and the cycle state, and names the single next action.
+- A typed `stage-auto <goal>` pursues a stated goal across the ten unmarked skills and stops at any skill marked †, printing its command; its limits are conventions §11.5.
 - The rules every workflow skill follows are in `docs/mds/stage-workflow/writing-workflow-conventions.md`, read whole at the start of every run; the skill roster is its §11, and what each skill does is in `writing-workflow-skills.md`.
 - Commit once per skill run, at that skill's commit step, and not otherwise (conventions §1).
 - Do not hand-edit generated reports under `wkdrs/`. In a paper repository, `execs/update.sh` replaces `docs/mds/stage-workflow/`, the skill trees, and every script under `execs/` — the two entrypoints and the three utilities in `execs/scpts/` alike — this file included; change them in the STAGE upstream, then sync.
@@ -100,7 +101,7 @@ The test: every changed line traces to the user's request, and every number in i
 
 - Record a fact there only when no file in the repository already owns it — a number belongs to `mates/`, a claim to `notes/claims.md`, a page limit to the cycle's `venue.yml`, what a paper says to `notes/refs/`, a promise to `tasks/`. Memory holds the residue.
 - A memory is never a source: it can never back a number in `manus/`, a venue rule, or an assertion about a cited work (§2 stands whatever a memory says).
-- Offer, never assume: at most two offers per session, and write only after the user agrees. `INVOLVE=low` records unasked and says so.
+- Offer, never assume: at most two offers per session, counting every skill a `stage-auto` goal run starts, and write only after the user agrees. `INVOLVE=low` records unasked and says so.
 - What travels with the repository goes to the versioned `.stage/memory/`; a `machine:` scoped fact, true only here, goes to the git-ignored `.stage/memory/local/`, as does any memory the user keeps off the repository. Where a memory disagrees with a file in the repository, the file wins.
 - Types, file format, the index line the hooks build from each file, and how a memory is retired: `docs/mds/stage-workflow/writing-workflow-conventions.md` §12.
 

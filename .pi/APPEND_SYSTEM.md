@@ -4,7 +4,7 @@ Pi can discover the same sixteen `stage-*` skills from `.pi/skills/` and `.agent
 
 If that exclusion is removed, follow `.pi/skills/`. The shared `.agents/skills/` root is deliberately tool-neutral; the Pi copy names Pi's own tools and the extensions below.
 
-Skills are invoked as `/stage-<name>` through `.pi/prompts/`. `enableSkillCommands` is false, so there is no duplicate `/skill:stage-<name>` command. This keeps the six slash-only skills reachable only through their prompt templates.
+Skills are invoked as `/stage-<name>` through `.pi/prompts/`, beside `/stage` to route a request and `/stage-auto <goal>` to pursue a goal across the unmarked skills, stopping at any skill marked †. `enableSkillCommands` is false, so there is no duplicate `/skill:stage-<name>` command. This keeps the six slash-only skills reachable only through their prompt templates.
 
 ## What `.pi/extensions/` adds
 

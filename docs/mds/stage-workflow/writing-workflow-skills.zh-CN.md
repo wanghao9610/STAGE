@@ -62,9 +62,11 @@ STAGE 提供十六个彼此衔接的写作工作流 skill，把导入的证据�
 | Pi | `.pi/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Qwen Code | `.qwen/skills/` | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 
-七种 harness 都带同样的十六个 skill。工具中立的共用 skill 文件只在 `.agents/skills/` 存一份；命名 harness 树逐字节一致时链接过去，只有原生调用方式或工具措辞不同的文件才保留实文件。`/stage` 命令遵循同一归属规则：完整清单与路由策略放在 `.agents/commands/stage.md`，供人阅读的 `.agents/commands/stage.zh-CN.md` 放在它旁边，Claude、Cursor、Pi 与 Qwen 只保留原生参数适配层。有本 harness 的 skill 副本就跟它走；没有时，中立副本也可安全使用。
+七种 harness 都带同样的十六个 skill。工具中立的共用 skill 文件只在 `.agents/skills/` 存一份；命名 harness 树逐字节一致时链接过去，只有原生调用方式或工具措辞不同的文件才保留实文件。`/stage` 命令遵循同一归属规则：完整清单与路由策略放在 `.agents/commands/stage.md`，Claude、Cursor、Pi 与 Qwen 只保留原生参数适配层。有本 harness 的 skill 副本就跟它走；没有时，中立副本也可安全使用。
 
 六个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`、`stage-pstr-builder`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。命名 harness 的清单用 `disable-model-invocation: true` 强制它；Codex 的 `allow_implicit_invocation: false` 放在 `.codex/skills/`，再链接进 `.agents/skills/`。另外十个在任务明显匹配时也可以由 agent 自行拾起。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
+
+有一条命令在名册之外：`stage-auto <目标> [involve=<level>]` 追求一个写明的目标，例如 `stage-auto 方法章节起草完成且其中数字审计完毕`。它先运行 `stage-flow-status`，再接手每次运行点名的下一步，自己启动十个未标记的 skill，每次启动只做一个工作单元——因为敲下这条命令就是你为这次推进一次性做出的决定；不推进目标的动作只列出、不执行。遇到标 † 的 skill 它就停下并打印准确命令；遇到红线动作、只有你能回答的问题，或一整轮没有任何改动时同样停下。确认点照常询问，被启动的每个 skill 保留各自的提交步骤，目标运行中的任何一步都不导入证据、不录入 venue 事实（规约 §11.5）。
 
 每个 skill 都共用同一个参数形状——`<skill> [TARGET] [DESCRIPTION] [involve=<level>]`。`involve=low|medium|high` 最先被剥离，它设定这次运行问到什么程度（规约 §7.7）——它不会收回你已经给出的批准，也不会替你给出你没给的批准；每个 skill 都会剥它，包括那些 `argument-hint` 里没有标出它的。目标照上面的规则解析。剩下的一切是一句描述：用你自己的话说明这次运行是为了什么——`/stage-sect-drafter 4_experiments 消融才是重点，开篇就摆出来`。它承载你的意图、你划的界限，以及你明确给出的授权：它可以把运行引到该 skill 自己的某条路径上，也可以提供运行随后记下的文字；一句要求执行某个明确操作的清楚请求——比如 `and commit it`——就预先回答了这个操作的提问，而背景交代或含糊的偏好什么也不回答。它绝不回答任何强制确认点（规约 §7.7），绝不替一个有歧义的章节名下结论，绝不放行一个没有指纹的数字，也绝不授权 STOP 线上的任何一件事。被描述引到某条路径上的运行，要在写任何东西之前说清自己走的是哪条，这样读错一次只赔一行字，而不是一处错改。若某个 skill 的首参数本身就是自由文本——`stage-refs-curator` 收论文标题，`stage-tabs-builder` 与 `stage-figs-designer` 收还没有提纲行的表或图的用途——那个参数就是描述。完整规则见[规约 §7.13](writing-workflow-conventions.md)。
 

@@ -178,21 +178,21 @@ while IFS= read -r skill; do
 done < <(printf '%s\n' "${SKILLS}")
 (( guard_errors == 0 )) && note "$(printf '%s\n' "${SLASH_ONLY}" | wc -l | tr -d ' ') slash-only skills guarded identically in all seven trees"
 
-# 4a. The full /stage router and its Chinese reading edition are neutral content
-#     and live together under .agents.
+# 4a. The full /stage router is neutral content and lives once under .agents,
+#     English only: its Chinese reading edition is retired, and a run in Chinese
+#     follows the English roster and replies in Chinese.
 #     Native command files adapt only their harness's argument syntax and skill
 #     mechanism. Copying the roster into those files creates four policy surfaces
 #     whose explicit-only set can drift independently.
 section "Shared request router"
 router_errors=0
 ROUTER=".agents/commands/stage.md"
-ROUTER_ZH=".agents/commands/stage.zh-CN.md"
 router_rows() { # $1 = router file, $2 = row regex -> matching skill names, sorted
     sed -nE "$2" "$1" | sort
 }
 ROUTER_ANY='s/^\| `(stage-[a-z-]+)` \|.*$/\1/p'
 ROUTER_DAGGER='s/^\| `(stage-[a-z-]+)` \| † \|.*$/\1/p'
-for router in "${ROUTER}" "${ROUTER_ZH}"; do
+for router in "${ROUTER}"; do
     if [[ ! -f "${router}" ]]; then
         fail "${router} is missing"
         router_errors=1
@@ -211,6 +211,10 @@ for router in "${ROUTER}" "${ROUTER_ZH}"; do
         router_errors=1
     fi
 done
+if [[ -e .agents/commands/stage.zh-CN.md ]]; then
+    fail ".agents/commands/stage.zh-CN.md is retired; the English router is the only copy"
+    router_errors=1
+fi
 
 while IFS='|' read -r wrapper argument_marker; do
     [[ -n "${wrapper}" ]] || continue
@@ -237,7 +241,7 @@ done <<'EOF'
 .pi/prompts/stage.md|[$@]
 .qwen/commands/stage.md|[{{args}}]
 EOF
-(( router_errors == 0 )) && note "one bilingual neutral roster drives four file-based native command entry points"
+(( router_errors == 0 )) && note "one English neutral roster drives four file-based native command entry points"
 
 # 4b. Kimi exposes /stage as an explicit-only plugin skill. The plugin owns
 #     only the native invocation adapter; the roster remains under .agents.
@@ -261,9 +265,9 @@ elif grep -qE '^\| `stage-[a-z-]+`' "${KIMI_ROUTER_SKILL}"; then
     fail "${KIMI_ROUTER_SKILL} duplicates the roster owned by ${ROUTER}"
     kimi_plugin_errors=1
 fi
-if ! grep -qF 'STAGE_LANG=zh' "${KIMI_ROUTER_SKILL}" || \
-   ! grep -qF '.agents/commands/stage.zh-CN.md' "${KIMI_ROUTER_SKILL}"; then
-    fail "${KIMI_ROUTER_SKILL} does not apply STAGE's Chinese router wording"
+if ! grep -qF 'STAGE_LANG=en|zh' "${KIMI_ROUTER_SKILL}" || \
+   grep -qF 'stage.zh-CN.md' "${KIMI_ROUTER_SKILL}"; then
+    fail "${KIMI_ROUTER_SKILL} does not resolve the reply language over the English-only router"
     kimi_plugin_errors=1
 fi
 (( kimi_plugin_errors == 0 )) && note "Kimi owns one explicit-only /stage adapter around the shared router"
@@ -328,9 +332,9 @@ if [[ ! -f "${PLUGIN_ROOT}/skills/stage/SKILL.md" ]] || \
     fail "${PLUGIN_ROOT}/skills/stage is not the explicit-only wrapper around the shared router"
     plugin_errors=1
 fi
-if ! grep -qF 'STAGE_LANG=zh' "${PLUGIN_ROOT}/skills/stage/SKILL.md" || \
-   ! grep -qF '.agents/commands/stage.zh-CN.md' "${PLUGIN_ROOT}/skills/stage/SKILL.md"; then
-    fail "${PLUGIN_ROOT}/skills/stage/SKILL.md does not apply STAGE's Chinese router wording"
+if ! grep -qF 'STAGE_LANG=en|zh' "${PLUGIN_ROOT}/skills/stage/SKILL.md" || \
+   grep -qF 'stage.zh-CN.md' "${PLUGIN_ROOT}/skills/stage/SKILL.md"; then
+    fail "${PLUGIN_ROOT}/skills/stage/SKILL.md does not resolve the reply language over the English-only router"
     plugin_errors=1
 fi
 (( plugin_errors == 0 )) && note "Codex owns one stage plugin; .agents exposes only its marketplace file"
@@ -387,6 +391,99 @@ for readme in README.md README.zh-CN.md; do
     done
 done
 (( deployment_errors == 0 )) && note "all router packages update by harness, tolerate older refs, and share one setup template"
+
+# 4f. /stage-auto is the goal-run grant (conventions §11.5): one shared
+#     procedure under .agents/commands, thin native entry points in every
+#     harness, each explicit-only. The procedure never starts a skill marked †,
+#     so it must name every one of them, and every wrapper must carry that rule.
+section "Goal run grant (/stage-auto)"
+auto_errors=0
+AUTO_PROCEDURE=".agents/commands/stage-auto.md"
+if [[ ! -f "${AUTO_PROCEDURE}" ]]; then
+    fail "${AUTO_PROCEDURE} is missing"
+    auto_errors=1
+else
+    while IFS= read -r skill; do
+        grep -qF "\`${skill}\`" "${AUTO_PROCEDURE}" || {
+            fail "${AUTO_PROCEDURE} does not name ${skill} among the † skills a goal run never starts"
+            auto_errors=1
+        }
+    done < <(printf '%s\n' "${SLASH_ONLY}")
+    grep -qF 'Green lint is never the check' "${AUTO_PROCEDURE}" || {
+        fail "${AUTO_PROCEDURE} lost the rule that green lint is never a goal run's check"
+        auto_errors=1
+    }
+    if grep -qE 'stop=|auto=unattended|tier=' "${AUTO_PROCEDURE}"; then
+        fail "${AUTO_PROCEDURE} carries STAR's grant machinery (stop=, auto=unattended, tier=)"
+        auto_errors=1
+    fi
+    if grep -qE '^\| `stage-[a-z-]+`' "${AUTO_PROCEDURE}"; then
+        fail "${AUTO_PROCEDURE} duplicates the roster owned by ${ROUTER}"
+        auto_errors=1
+    fi
+fi
+while IFS='|' read -r wrapper argument_marker; do
+    [[ -n "${wrapper}" ]] || continue
+    if [[ ! -f "${wrapper}" ]]; then
+        fail "missing native goal-run entry point: ${wrapper}"
+        auto_errors=1
+        continue
+    fi
+    if ! grep -qF 'Read `.agents/commands/stage-auto.md`' "${wrapper}" || \
+       ! grep -qF -- "${argument_marker}" "${wrapper}" || \
+       ! grep -qF '†' "${wrapper}"; then
+        fail "${wrapper} does not delegate to ${AUTO_PROCEDURE} with its native argument marker ${argument_marker}, or drops its † rule"
+        auto_errors=1
+    fi
+done <<'EOF'
+.claude/commands/stage-auto.md|[$ARGUMENTS]
+.cursor/commands/stage-auto.md|beside `/stage-auto`
+.pi/prompts/stage-auto.md|[$@]
+.qwen/commands/stage-auto.md|[{{args}}]
+EOF
+if [[ -f .claude/commands/stage-auto.md ]] && \
+   ! frontmatter_has_line .claude/commands/stage-auto.md 'disable-model-invocation: true'; then
+    fail '.claude/commands/stage-auto.md must stay user-only (disable-model-invocation: true)'
+    auto_errors=1
+fi
+CODEX_AUTO_SKILL="${PLUGIN_ROOT}/skills/stage-auto/SKILL.md"
+if [[ ! -f "${CODEX_AUTO_SKILL}" ]] || \
+   ! frontmatter_has_line "${CODEX_AUTO_SKILL}" 'name: stage-auto' || \
+   ! grep -qF 'Read `.agents/commands/stage-auto.md`' "${CODEX_AUTO_SKILL}" || \
+   ! grep -qF 'allow_implicit_invocation: false' "${PLUGIN_ROOT}/skills/stage-auto/agents/openai.yaml" || \
+   ! grep -qF '$stage-auto' "${PLUGIN_ROOT}/.codex-plugin/plugin.json"; then
+    fail "${PLUGIN_ROOT} does not carry the explicit-only \$stage-auto wrapper around ${AUTO_PROCEDURE}"
+    auto_errors=1
+fi
+KIMI_AUTO_SKILL="${KIMI_PLUGIN_ROOT}/skills/stage-auto/SKILL.md"
+if [[ ! -f "${KIMI_AUTO_SKILL}" ]] || \
+   ! frontmatter_has_line "${KIMI_AUTO_SKILL}" 'name: stage-auto' || \
+   ! frontmatter_has_line "${KIMI_AUTO_SKILL}" 'disableModelInvocation: true' || \
+   ! grep -qF 'Read `.agents/commands/stage-auto.md`' "${KIMI_AUTO_SKILL}" || \
+   ! grep -qF '/stage-auto' "${KIMI_PLUGIN_ROOT}/.kimi-plugin/plugin.json"; then
+    fail "${KIMI_PLUGIN_ROOT} does not carry the explicit-only /stage-auto wrapper around ${AUTO_PROCEDURE}"
+    auto_errors=1
+fi
+if ! grep -qF 'name: "stage-auto",' "${DSH_COMMAND_IMPL}" || \
+   ! grep -qF 'Read `.agents/commands/stage-auto.md`' "${DSH_COMMAND_IMPL}" || \
+   ! grep -qF "except \`/stage-auto <goal>\`, which DSH registers as a command" "${DSH_COMMAND_IMPL}" || \
+   ! grep -qF '/stage-auto' "${DSH_COMMAND_ROOT}/cordis.patch.yml"; then
+    fail "${DSH_COMMAND_ROOT} does not also register /stage-auto, or its follow-ups do not respell /stage-<name> while keeping /stage-auto"
+    auto_errors=1
+fi
+grep -qF '`/stage-auto <goal>`' "${ROUTER}" || {
+    fail "${ROUTER} does not hand goal pursuit to /stage-auto"
+    auto_errors=1
+}
+if ! grep -qF '(../../../.agents/commands/stage-auto.md)' "${CONV_EN}"; then
+    fail "${CONV_EN} does not link the goal-run procedure from §11"
+    auto_errors=1
+fi
+if ! grep -qF '`stage-auto <goal>`' AGENTS.md || grep -qF '/stage-auto' AGENTS.md; then
+    fail 'AGENTS.md must name `stage-auto <goal>`, harness-neutrally'
+    auto_errors=1
+fi
+(( auto_errors == 0 )) && note "/stage-auto is one shared procedure behind explicit-only entry points in all seven harnesses; it never starts the $(printf '%s\n' "${SLASH_ONLY}" | wc -l | tr -d ' ') skills marked † and carries no STAR grant machinery"
 
 # 5. Bilingual twins: every reference .md has its _zh.md counterpart and vice
 #    versa. SKILL.md is English only, in the skill trees and in the router
@@ -741,7 +838,7 @@ CONV_HEADINGS=(
     '13. Harness hooks and model provenance'
 )
 # section|numbered top-level items
-CONV_ITEMS=("1|6" "3|7" "4|4" "5|6" "6|9" "7|13" "10|5" "11|4")
+CONV_ITEMS=("1|6" "3|7" "4|4" "5|6" "6|9" "7|13" "10|5" "11|5")
 CONV_SUBHEADS=("8|11")    # ### 8.n subheadings
 CONV_LETTERS=("9|5")      # **(a) ... **(e) rules
 

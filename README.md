@@ -60,7 +60,7 @@ The three projects cover successive scales of a researcher's work. Use any one i
 - **Submission cycles as data**: each venue attempt lives in `cycls/<venue>_<year>/` with a user-confirmed `venue.yml` profile, received and simulated reviews, the response, and a frozen submission record.
 - **One workflow, seven harnesses**: the same sixteen skills for Claude Code, Codex, Cursor, DSH, Kimi Code, Pi, and Qwen Code. Tool-neutral skill files live once under `.agents/skills/`, and the full `/stage` request router lives once under `.agents/commands/`; native trees link or delegate there and retain only harness-specific wording and argument adapters.
 - **A memory the paper owns**: what a session learns that no file in the repository holds — a TeX toolchain quirk, a standing preference of yours, a framing already tried and rejected — is recorded under `.stage/memory/` and put in front of the next session by a hook, in whichever tool you drive STAGE with.
-- **zh-CN mirrors for human readers**: `*_zh.md` beside the peer-reviewer references, `stage.zh-CN.md` beside the shared request router, and `writing-workflow-skills.zh-CN.md` beside the skills guide — kept in step, never loaded at runtime, and the English files stay authoritative.
+- **zh-CN mirrors for human readers**: `*_zh.md` beside the peer-reviewer references and `writing-workflow-skills.zh-CN.md` beside the skills guide — kept in step, never loaded at runtime, and the English files stay authoritative.
 
 See [Writing workflow](#writing-workflow) for what each skill does and how to invoke it. The [Writing Workflow Skills Guide](docs/mds/stage-workflow/writing-workflow-skills.md) adds a paragraph per skill and the pipeline diagram; the rules every skill shares are in the [Writing Workflow Conventions](docs/mds/stage-workflow/writing-workflow-conventions.md), with the evidence-preserving prose pass in its [human-writing contract](docs/mds/stage-workflow/writing-workflow-conventions.md#human-writing-contract).
 
@@ -102,18 +102,18 @@ STAGE/
 │   └── settings.json       # Registers all five hooks
 ├── .agents/
 │   ├── skills/             # Tool-neutral shared skill store; the only target of skill links
-│   ├── commands/           # Shared /stage router and its zh-CN reading edition
+│   ├── commands/           # Shared /stage router and /stage-auto goal-run procedure
 │   └── plugins/            # Codex marketplace discovery: one file link into .codex/plugins/
-├── .codex/                 # Codex hooks, per-skill manifests, and the $stage router plugin
+├── .codex/                 # Codex hooks, per-skill manifests, and the $stage / $stage-auto plugin
 ├── .cursor/
 │   ├── skills/             # Writing workflow skills for Cursor
 │   ├── rules/              # Always-on rules: AGENTS.md body + skill-root ownership
 │   ├── hooks/              # Hooks, registered in hooks.json
 │   └── hooks.json
-├── .dsh/                   # DSH-native skills, hooks, and the /stage command bundle
+├── .dsh/                   # DSH-native skills, hooks, and the /stage and /stage-auto command bundle
 ├── .kimi-code/
 │   ├── skills/             # Writing workflow skills for Kimi Code
-│   ├── plugins/            # User-installed /stage router plugin and marketplace
+│   ├── plugins/            # User-installed /stage and /stage-auto plugin and marketplace
 │   ├── hooks/              # Hooks + install.sh (Kimi registers globally)
 │   └── hooks.example.toml  # The registration snippet install.sh writes for you
 ├── .pi/                    # Pi-native skills, prompts, agents, and capability extensions
@@ -334,6 +334,8 @@ dsh --profile YOUR_PROFILE --dump-config
 ```
 
 Use `/stage` with no argument for the current paper status, or pass a request such as `/stage audit every number in the experiments section`. The command starts one follow-up turn against the shared `.agents/commands/stage.md` roster, so DSH and the other harnesses route from the same source.
+
+`/stage-auto <goal> [involve=<level>]` pursues a stated goal rather than one request — `$stage-auto` in Codex; in Kimi Code and DSH it arrives with the same plugin or bundle as `/stage`. For example, `/stage-auto the method section drafted and its numbers audited` runs `stage-flow-status` first, then starts each next unmarked skill the goal needs, one unit of work at a time. It stops when the goal's check passes, at any skill marked † (printing the exact command for you to type), at a STOP-line action, at a question only you can answer, or after a pass that changed nothing. It never imports evidence, enters a venue fact, or commits on its own; each skill it starts keeps its own commit step. The procedure lives once in `.agents/commands/stage-auto.md`, and every harness's entry point delegates to it ([conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md), item 5).
 
 Six skills (marked † below) are slash-only: adoption, story, outline, response, submission, and poster selection. Named harness manifests use `disable-model-invocation: true`; Codex uses `allow_implicit_invocation: false` in `.codex/skills/`, linked into the shared root. CI checks all seven against [conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md).
 

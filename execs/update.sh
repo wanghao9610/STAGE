@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # execs/update.sh — sync STAGE-managed content from the upstream template (the
-# seven skill trees, the Codex $stage plugin, the Kimi and DSH /stage router
-# entries, their hook and capability trees,
+# seven skill trees, the Codex $stage / $stage-auto plugin, the Kimi and DSH
+# /stage and /stage-auto entries, their hook and capability trees,
 # docs/mds/stage-workflow/, the shared agent instructions, and
 # every script under execs/
 # — both entrypoints, this one included, and the three utilities in execs/scpts/),
@@ -57,9 +57,10 @@ HOOK_TREES=(
 )
 
 # Pi supplies the capabilities its core does not ship. The neutral request
-# router lives once under .agents/commands; four harnesses expose thin native
-# file entry points, while Kimi and DSH own package-based adapters. These are
-# STAGE-owned and overwritten on update like the skills.
+# router and the /stage-auto goal-run procedure live once under
+# .agents/commands; four harnesses expose thin native file entry points,
+# while Kimi and DSH own package-based adapters. These are STAGE-owned and
+# overwritten on update like the skills.
 EXTENSION_TREES=(
     ".pi/agents"
     ".pi/extensions/stage-plan-mode"
@@ -141,6 +142,7 @@ AGENT_RULES_TREE=".cursor/rules"
 # A file of the project's own under the same paths is never on this list, and
 # nothing outside the synced paths is — the two root files above included.
 RETIRED_FILES=(
+    ".agents/commands/stage.zh-CN.md"
     ".claude/commands/stage.zh-CN.md"
     ".cursor/commands/stage.zh-CN.md"
     ".pi/prompts/stage.zh-CN.md"
@@ -589,10 +591,10 @@ if [[ "${ADOPT}" == true ]]; then
         # Shared roots first; they are installed for every harness selection.
         ".agents/skills"
         "${CODEX_MANIFEST_ROOT}"
-        # The Codex-only $stage router plugin. Its .agents discovery entry is a
+        # The Codex-only $stage / $stage-auto plugin. Its .agents discovery entry is a
         # single file in ADOPT_FILES, not a link over the whole directory.
         ".codex/plugins"
-        # Kimi and DSH own package-based adapters for the generic /stage entry.
+        # Kimi and DSH own package-based adapters for /stage and /stage-auto.
         ".dsh/commands"
         ".kimi-code/plugins"
         "${SKILL_ROOTS[@]:1}"
@@ -687,11 +689,11 @@ else
         "${AGENT_DOCS[@]}"
         "${AGENT_RULES_TREE}"
         "${CODEX_MANIFEST_ROOT}"
-        # Codex's $stage plugin stays private to its tree. Only the marketplace
+        # Codex's $stage / $stage-auto plugin stays private to its tree. Only the marketplace
         # file is exposed through the exact .agents path the host discovers.
         ".codex/plugins"
         ".agents/plugins/marketplace.json"
-        # Kimi's /stage skill plugin and DSH's /stage command bundle stay private
+        # Kimi's /stage and /stage-auto plugin and DSH's command bundle stay private
         # to their own trees and are installed into each host separately.
         ".dsh/commands"
         ".kimi-code/plugins"

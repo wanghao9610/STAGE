@@ -60,7 +60,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - **投稿周期即数据**：每次投稿尝试都住在 `cycls/<venue>_<year>/` 里：经用户确认的 `venue.yml` 档案、真实与模拟评审、回复，以及冻结的投稿记录。
 - **一套工作流，七套 harness**：同样的十六个 skill 供 Claude Code、Codex、Cursor、DSH、Kimi Code、Pi 和 Qwen Code 使用。工具无关的 skill 文件只在 `.agents/skills/` 保存一份，完整的 `/stage` 请求路由器只在 `.agents/commands/` 保存一份；各原生树只保留 harness 专属措辞和参数适配层。
 - **属于论文自己的记忆**：一次会话学到、而仓库里没有任何文件认领的东西——某个 TeX 工具链的坑、你的一项长期偏好、一个试过又被否掉的框架——记在 `.stage/memory/` 下，并由一个钩子在下一次会话开头摆到 agent 面前；不管你用哪个工具驱动 STAGE 都一样。
-- **供人阅读的中文镜像**：peer-reviewer 的 references 旁边一份 `*_zh.md`、共享请求路由器旁边一份 `stage.zh-CN.md`、skill 指南旁边一份 `writing-workflow-skills.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
+- **供人阅读的中文镜像**：peer-reviewer 的 references 旁边一份 `*_zh.md`、skill 指南旁边一份 `writing-workflow-skills.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
 
 每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.zh-CN.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.md)中，守住证据边界的文字处理流程见其中的[自然写作契约](docs/mds/stage-workflow/writing-workflow-conventions.md#human-writing-contract)。
 
@@ -98,22 +98,22 @@ STAGE/
 ├── .stage/memory/          # 项目记忆：早先会话学到的东西（local/ 被 git 忽略）
 ├── .agents/
 │   ├── skills/             # 工具无关的共用 skill；其他技能树链接到这里
-│   ├── commands/           # 共用 /stage 路由器及其 zh-CN 阅读版
+│   ├── commands/           # 共用 /stage 路由器与 /stage-auto 目标运行流程
 │   └── plugins/            # Codex marketplace 发现入口：仅一个指向 .codex/plugins/ 的文件链接
 ├── .claude/
 │   ├── skills/             # Claude Code 使用的写作工作流 skill
 │   ├── hooks/              # 钩子：项目记忆索引、本次会话的模型 id、参与度放行与 shell 放行、提交守卫
 │   └── settings.json       # 注册这五个钩子
-├── .codex/                 # Codex 的钩子、逐 skill manifest 与 $stage 分流插件
+├── .codex/                 # Codex 的钩子、逐 skill manifest 与 $stage / $stage-auto 插件
 ├── .cursor/
 │   ├── skills/             # Cursor 使用的写作工作流 skill
 │   ├── rules/              # 常驻规则：AGENTS.md 正文 + skill 目录归属
 │   ├── hooks/              # 钩子，注册在 hooks.json 里
 │   └── hooks.json
-├── .dsh/                   # DSH 原生 skill、钩子与 /stage 命令 bundle
+├── .dsh/                   # DSH 原生 skill、钩子与 /stage、/stage-auto 命令 bundle
 ├── .kimi-code/
 │   ├── skills/             # Kimi Code 使用的写作工作流 skill
-│   ├── plugins/            # 用户安装的 /stage 分流插件与 marketplace
+│   ├── plugins/            # 用户安装的 /stage、/stage-auto 插件与 marketplace
 │   ├── hooks/              # 钩子 + install.sh（Kimi 只认全局注册）
 │   └── hooks.example.toml  # install.sh 替你写进配置的那段注册片段
 ├── .pi/                    # Pi 原生 skill、prompt、agent 与能力扩展
@@ -334,6 +334,8 @@ dsh --profile YOUR_PROFILE --dump-config
 ```
 
 不带参数的 `/stage` 显示当前论文状态，也可以传入描述，例如 `/stage 审计实验章节中的每个数字`。命令会从共享的 `.agents/commands/stage.md` 名册发起一个后续轮次，因此 DSH 与其他宿主始终从同一来源分流。
+
+`/stage-auto <目标> [involve=<level>]` 追求一个写明的目标，而不是处理单个请求——Codex 里写作 `$stage-auto`；Kimi Code 与 DSH 里它随 `/stage` 所在的同一个插件或 bundle 一起提供。例如 `/stage-auto 方法章节起草完成且其中数字审计完毕` 会先运行 `stage-flow-status`，再逐个启动目标需要的下一个未标记 skill，每次只做一个工作单元。目标的检查通过时它就停下；遇到任何标 † 的 skill 时也停下（打印准确命令，由你来敲）；遇到红线动作、只有你能回答的问题，或一整轮没有任何改动时同样停下。它从不导入证据、不录入 venue 事实，自己也不提交；它启动的每个 skill 保留各自的提交步骤。流程只在 `.agents/commands/stage-auto.md` 保存一份，各宿主的入口都委托给它（[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 第 5 条）。
 
 六个 skill（下表以 † 标注）仅限显式调用（slash-only）：接入、故事、提纲、回复、投稿与海报选择。六套具名 harness 的 manifest 使用 `disable-model-invocation: true`；Codex 在 `.codex/skills/` 中使用 `allow_implicit_invocation: false`，再链接到共用根。CI 会把七套实现都与[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 核对。
 
