@@ -21,7 +21,7 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 | what it may write | the paths a skill, or a subagent it dispatches, may create or edit — and nothing outside them | §6, §8 |
 | fallback | the route taken when the first choice returns nothing | §6, `model_id_spec.md` |
 | fan-out | several subagents dispatched at once, reading and writing files that do not overlap | §6 |
-| size limit | how much one tool result holds; past roughly 30 KB it is written out to a file that costs a second read | each `SKILL.md` |
+| size limit | how much one tool result holds; past roughly 30 KB it is written out to a file that costs a second read | `stage-flow-status` (Workflow step 1) |
 | style profile | `notes/style.md`: the author's prose preferences as dials a run applies and a report measures; binds `manus/` prose only | §8 |
 | cycle | one submission attempt at one venue: `cycls/<venue>_<year>/` and everything in it | §5, §8 |
 | active cycle | the cycle skills act on: `cycle:` in `notes/story.md` frontmatter | §5 |
@@ -47,12 +47,13 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 | `stage-tabs-builder` | offered once when the session ends | the tables written, plus their outline and ledger updates |
 | `stage-figs-designer` | offered once when the session ends | `manus/figs/` renders, `manus/figs/srcs/` sources, outline updates |
 | `stage-refs-curator` | offered once when the session ends | `manus/bibs/reference.bib`, `notes/refs/` notes and index |
-| `stage-copy-editor` | offered once after the pass | only the `.tex` files the pass edited, plus `notes/style.md` when a `style` run wrote it — the polish report stays in `wkdrs/` |
+| `stage-copy-editor` | offered once after the pass | only the `.tex` files the pass edited and `tasks/polish_followups.md`, or `notes/style.md` alone after a `style` run — the polish report stays in `wkdrs/` |
 | `stage-clms-auditor` | offered once after the audit | `notes/claims.md` status flips, the new `tasks/` items, and `notes/adopt.md` when the run set its `backfilled:` — the audit report stays in `wkdrs/` |
 | `stage-cite-auditor` | offered once after the audit, when it filed follow-ups | `tasks/cites_followups.md` — findings stay in the `wkdrs/` report, and the bib is read-only here: a bib repair routes to `stage-refs-curator` |
 | `stage-peer-reviewer` | offered once per review, and never on an `extern=` run | the one `SIM_REVIEW_*` file it wrote. A referee report on an external paper is not a repository artifact and is not staged |
 | `stage-resp-writer` | offered once when the session ends | the `RESPONSE_*` file, `tasks/<cycle>_promises.md`, ledger downgrades |
 | `stage-subm-packer` | one at pack time; one more when a `convert` run registers a venue template kit | `cycls/<cycle>/SUBMISSION_<date>.md`; the `freeze/<cycle>_<date>` tag then lands on that commit — the package itself stays in `wkdrs/builds/`. The `convert` commit is separate and stages only what that run wrote outside `wkdrs/` — the kit under `cycls/<cycle>/template/` and `tasks/<cycle>_venue.md` — so the freeze commit stays the one file it claims to be |
+| `stage-pstr-builder` | offered once when the session ends | `cycls/<cycle>/poster/POSTER_PLAN.md`, `poster.tex`, and, when a kit was supplied, the registered kit under `cycls/<cycle>/poster/template/` with the `poster_template:` line it recorded in `cycls/<cycle>/venue.yml` — the render stays in `wkdrs/builds/poster/` |
 
 **Universal rules:**
 
@@ -198,7 +199,7 @@ Every skill's durable output, in one table. `stage-flow-status` reads this as th
 | Tables | `stage-tabs-builder` | `manus/tabs/<slug>.tex` | per-data-row `% src:` comment; Tables row in outline |
 | Figures | `stage-figs-designer` | `manus/figs/<slug>.pdf`, `manus/figs/srcs/<slug>.*` | Figures row in outline |
 | References | `stage-refs-curator` | `manus/bibs/reference.bib`, `notes/refs/refs_index.md`, `notes/refs/<ABBREV>.md` | index presence |
-| Audit reports | `stage-clms-auditor`, `stage-cite-auditor`, `stage-copy-editor` | `wkdrs/reports/CLAIMS_<date>.md`, `CITES_<date>.md`, `POLISH_<date>.md` (ephemeral) | date in filename |
+| Audit reports | `stage-clms-auditor`, `stage-cite-auditor`, `stage-copy-editor` | `wkdrs/reports/CLAIMS_<date>.md`, `CITES_<date>.md`, `POLISH_<date>.md` (ephemeral); follow-ups in `tasks/claims_followups.md`, `tasks/cites_followups.md`, `tasks/polish_followups.md` (tracked) | date in filename; open follow-up checkboxes |
 | Simulated review | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` — the panel meta-review; per-perspective working files in `wkdrs/reports/peer_<cycle>_<date>/`. An `extern=` run registers nothing: its `REFEREE_<date>.md` reviews somebody else's paper and is not one of this paper's stages | date in filename |
 | Response | `stage-resp-writer` | `cycls/<cycle>/response/RESPONSE_<date>.md`, promises in `tasks/<cycle>_promises.md` | promise checkboxes |
 | Submission | `stage-subm-packer` | `cycls/<cycle>/SUBMISSION_<date>.md`, git tag `freeze/<cycle>_<date>`, package under `wkdrs/builds/`, the registered venue template kit at `cycls/<cycle>/template/`, venue follow-ups in `tasks/<cycle>_venue.md` | `frozen:`; venue follow-up checkboxes |
@@ -428,7 +429,7 @@ Where a skill puts what it writes. Each destination is exclusive — a file belo
 | Writing metadata | `notes/` fixed files: `story.md`, `claims.md`, `outline.md`, `notation.md`, `style.md`, `adopt.md`; reading notes in `notes/refs/` |
 | Submission cycles | `cycls/<venue>_<year>/`: `venue.yml`, `template/` (the official venue kit, unpacked whole, byte-for-byte, never edited), `reviews/`, `response/`, `SUBMISSION_<date>.md`, `poster/` (the poster plan and its source, with an official poster kit under `poster/template/`) |
 | Revision scratch, promise lists | `tasks/` |
-| Builds and ephemeral reports | `wkdrs/builds/`, `wkdrs/reports/` (gitignored, regenerable) |
+| Builds, ephemeral reports, fetch caches | `wkdrs/builds/`, `wkdrs/reports/`, `wkdrs/refs_<date>/raw/` (gitignored, regenerable) |
 | What earlier sessions learned, owned by no other file | `.stage/memory/`; machine-specific facts in `.stage/memory/local/`, which git ignores ([`memory_spec.md`](memory_spec.md)) |
 | Entrypoints | `execs/run.sh`, `execs/update.sh` — **execs/ root is closed**; utilities go in `execs/scpts/` (`import.sh`, `lint.sh`, `fmt.sh`). Every script under `execs/` is upstream-managed and `execs/update.sh` overwrites all five; per-project settings live in `.env`, never in an edited copy of one |
 | Workflow docs (upstream-managed) | `docs/mds/stage-workflow/` |
