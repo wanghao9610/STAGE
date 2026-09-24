@@ -301,6 +301,25 @@ note_resolver_rule() { # $1 = config path relative to the project root
     log "      Copy \"Bash(bash .claude/hooks/stage_model_id.sh --resolve:*)\" from upstream $1 into its permissions.allow."
 }
 
+# A kept .codex/hooks.json from before the memory hook got a SessionStart group
+# of its own registers it beside the model-id hook under "startup|resume", so a
+# session Codex starts any other way gets no memory index. The hook is named,
+# so report_unregistered_hooks stays quiet about it; this says so instead. With
+# no JSON reader at hand it stays silent rather than guess.
+note_codex_memory_group() { # $1 = config path relative to the project root
+    [[ "$1" == ".codex/hooks.json" && -e "${ROOT_DIR}/$1" ]] || return 0
+    grep -q 'stage_memory\.sh' "${ROOT_DIR}/$1" 2>/dev/null || return 0
+    command -v python3 >/dev/null 2>&1 || return 0
+    python3 - "${ROOT_DIR}/$1" <<'PY' 2>/dev/null || return 0
+import json, sys
+groups = (json.load(open(sys.argv[1])).get("hooks") or {}).get("SessionStart") or []
+sys.exit(1 if any(g.get("matcher") in (None, "", "*") and "stage_memory.sh" in json.dumps(g.get("hooks"))
+                  for g in groups) else 0)
+PY
+    log "NOTE: $1 runs stage_memory.sh only on a SessionStart matcher, so some Codex sessions start without the memory index."
+    log "      Move it into a SessionStart group of its own with no matcher, as upstream $1 does."
+}
+
 # A kept registration config that does not name one of the hooks: the script is
 # installed, nothing errors, and either no memory reaches a session, or every
 # artifact it writes records "unrecorded", or a git command §1 forbids meets no
@@ -352,6 +371,7 @@ report_unregistered_hooks() {
             log "      Run /hooks in the Codex CLI and approve it — re-approve whenever it changes."
         fi
         note_resolver_rule "${cfg}"
+        note_codex_memory_group "${cfg}"
     done
 }
 
