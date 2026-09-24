@@ -489,7 +489,7 @@ bash execs/update.sh --skill stage-flow-status
 
 `bash execs/update.sh --help` 里有完整的用法摘要——选项变了它也跟着变，不会过期。
 
-上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。上游已不再提供的 STAGE 文件——上游 skill 旁的每个 `SKILL_zh.md`，以及 `execs/update.sh` 中 `RETIRED_FILES` 列出的已退役文件——会被删除（`--diff` 中显示为 `removes`）；其余只存在于本地的文件，包括你自己的，都会保留。STAGE 不再提供 `AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md`：更新会保留你手上的这两个文件，若它们来自 STAGE，可自行删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
+上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。上游已不再提供的 STAGE 文件——上游 skill 旁的每个 `SKILL_zh.md`，以及 `execs/update.sh` 中 `RETIRED_FILES` 列出的已退役文件——会被删除（`--diff` 中显示为 `removes`）；其余只存在于本地的文件，包括你自己的，都会保留。STAGE 不再提供 `AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md`：更新会保留你手上的这两个文件，若它们来自 STAGE，可自行删除。记忆钩子改为从每条记忆的 frontmatter 生成索引之前就建好的论文仓库，会留着它的 `.stage/memory/MEMORY.md` 与 `MEMORY.zh-CN.md`：已没有钩子读取它们，可以删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
 如果你改的是 STAGE 本身而不是某篇论文：只编辑 `.agents/skills/` 下工具中立的作者源，再用 `bash .github/scripts/port.sh --write` 重新生成六套 harness 技能树。仅属于某个 harness 的行为写进该树的 rules 或带锚点的 overrides。随后用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七个根目录的语义约束。后两项检查都在 CI 中运行；这些命令只属于上游维护工具，`.github/` 不会同步进论文仓库。STAGE 自己的记忆无论作用域，一律放 git 忽略的 `.stage/memory/local/`：克隆或 GitHub 模板会原样复制受版本管理的 `.stage/memory/`，关于开发 STAGE 的记忆就会作为论文自己的事实出现在每个论文仓库里。`check_consistency.sh` 发现那里有模板所带 `.gitkeep` 之外的被跟踪文件就会失败。
 
