@@ -3,7 +3,7 @@ name: stage-sect-drafter
 description: >-
   Draft or revise one manuscript section per run from its outline brief, the claim ledger, and
   fingerprinted mates/ evidence, updating the ledger, notation, and outline row. Use when the user
-  invokes stage-sect-drafter, a run names it next, or asks to draft, write, expand, or revise a
+  invokes stage-sect-drafter, stage-auto starts it, or asks to draft, write, expand, or revise a
   section, or turn an outline row into prose. Every number traces to a mates/ entry read this run or
   is written as \todo{...}, no third state; never edits mates/ or re-scopes the outline.
 ---

@@ -2,8 +2,8 @@
 name: stage-refs-curator
 description: >-
   Curate the reference base, manus/bibs/reference.bib and its reading notes in notes/refs/: read
-  papers in, discover, tidy, verify, and score. Use when the user invokes stage-refs-curator, a run
-  names it next, or asks to add a reference or reading note, find work worth citing, dedupe the
+  papers in, discover, tidy, verify, and score. Use when the user invokes stage-refs-curator,
+  stage-auto starts it, or asks to add a reference or reading note, find work worth citing, dedupe the
   bibliography, or position against related work. Every bib field comes from a fetched record, never
   memory; discover takes nothing in unasked; an unfetchable paper goes to manual check, never guessed.
 ---

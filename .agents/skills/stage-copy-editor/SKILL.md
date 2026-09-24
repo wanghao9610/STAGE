@@ -3,7 +3,7 @@ name: stage-copy-editor
 description: >-
   Polish one section or the whole manuscript for clarity, flow, natural scholarly prose, consistent
   notation, and page budget; a style run only records preferences in notes/style.md. Use when the user
-  invokes stage-copy-editor, a run names it next, or asks to polish, tighten, proofread, de-jargon,
+  invokes stage-copy-editor, stage-auto starts it, or asks to polish, tighten, proofread, de-jargon,
   cut formulaic or AI-like phrasing, restore the author's voice, or set the style. Never changes
   technical meaning, a number, a \cite or \ref key, or a \todo; content cuts are routed, not applied.
 ---

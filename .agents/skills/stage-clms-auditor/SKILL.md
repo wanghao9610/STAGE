@@ -3,7 +3,7 @@ name: stage-clms-auditor
 description: >-
   Trace every number in manus/tabs/ and manus/secs/ through its % src: comment and the claim ledger to
   a fingerprinted mates/ entry, grade it matched, mismatched, or unsourced, and flip its status in
-  notes/claims.md. Use when the user invokes stage-clms-auditor, a run names it next, before a
+  notes/claims.md. Use when the user invokes stage-clms-auditor, stage-auto starts it, before a
   submission freeze, or when asked whether the paper's numbers are backed by evidence. Never edits the
   manuscript or mates/; every fix routes to the skill that owns the file.
 ---

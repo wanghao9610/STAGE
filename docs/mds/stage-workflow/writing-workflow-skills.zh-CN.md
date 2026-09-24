@@ -64,7 +64,7 @@ STAGE 提供十六个彼此衔接的写作工作流 skill，把导入的证据�
 
 七种 harness 都带同样的十六个 skill。工具中立的共用 skill 文件只在 `.agents/skills/` 存一份；命名 harness 树逐字节一致时链接过去，只有原生调用方式或工具措辞不同的文件才保留实文件。`/stage` 命令遵循同一归属规则：完整清单与路由策略放在 `.agents/commands/stage.md`，Claude、Cursor、Pi 与 Qwen 只保留原生参数适配层。有本 harness 的 skill 副本就跟它走；没有时，中立副本也可安全使用。
 
-六个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`、`stage-pstr-builder`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。命名 harness 的清单用 `disable-model-invocation: true` 强制它；Codex 的 `allow_implicit_invocation: false` 放在 `.codex/skills/`，再链接进 `.agents/skills/`。另外十个在任务明显匹配时也可以由 agent 自行拾起。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
+六个 skill——`stage-proj-adopt`、`stage-stry-coach`、`stage-outl-planner`、`stage-resp-writer`、`stage-subm-packer`、`stage-pstr-builder`——是 slash-only：只有被显式点名时才运行，agent 绝不主动发起，因为每一个都坐在一个属于作者的决定上。命名 harness 的清单用 `disable-model-invocation: true` 强制它；Codex 的 `allow_implicit_invocation: false` 放在 `.codex/skills/`，再链接进 `.agents/skills/`。另外十个在任务明显匹配时也可以由 agent 选用。每次运行都以报告和下一步的准确命令结束，自己不会接着启动别的运行：请求状态、审计或评审，就停在那份报告；继续推进是下文 `/stage-auto` 的事，或者由你明确要求某次运行接着做（规约 §11.4）。章节参数按编号、文件 slug 或标题对着 `notes/outline.md` 解析（规约 §5）；当前周期是 `notes/story.md` 里的 `cycle:` 字段。
 
 有一条命令在名册之外：`stage-auto <目标> [involve=<level>]` 追求一个写明的目标，例如 `stage-auto 方法章节起草完成且其中数字审计完毕`。它先运行 `stage-flow-status`，再接手每次运行点名的下一步，自己启动十个未标记的 skill，每次启动只做一个工作单元——因为敲下这条命令就是你为这次推进一次性做出的决定；不推进目标的动作只列出、不执行。遇到标 † 的 skill 它就停下并打印准确命令；遇到红线动作、只有你能回答的问题，或一整轮没有任何改动时同样停下。确认点照常询问，被启动的每个 skill 保留各自的提交步骤，目标运行中的任何一步都不导入证据、不录入 venue 事实（规约 §11.5）。
 

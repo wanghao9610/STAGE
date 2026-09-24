@@ -3,7 +3,7 @@ name: stage-evid-curator
 description: >-
   Curate mates/, the paper's fingerprinted evidence: import or refresh STAR results, register a
   hand-dropped result file, or check disk against mates/MANIFEST.md. Use when the user runs
-  /stage-evid-curator, a run names it next, wants STAR results imported, has a file to put behind a
+  /stage-evid-curator, /stage-auto starts it, wants STAR results imported, has a file to put behind a
   claim, or asks whether the evidence is current. Evidence is read-only: a wrong number is fixed at
   its source and re-imported, never in place; an unregistered file does not exist to the writing
   skills.

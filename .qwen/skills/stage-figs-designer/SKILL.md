@@ -3,7 +3,7 @@ name: stage-figs-designer
 description: >-
   Plan the figure inventory and build or fix one figure per run, each PDF backed by an editable tikz,
   python, or drawio source under manus/figs/srcs/ or by imported artwork in mates/MANIFEST.md. Use
-  when the user runs /stage-figs-designer, a run names it next, or asks to plan, sketch, render, or
+  when the user runs /stage-figs-designer, /stage-auto starts it, or asks to plan, sketch, render, or
   fix a figure, the teaser, or the inventory. Data figures draw only numbers from fingerprinted mates/
   evidence; a missing value becomes a \todo, never a plausible curve.
 argument-hint: "[FIGURE | plan | teaser] [involve=low]"

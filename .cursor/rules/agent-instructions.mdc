@@ -42,6 +42,7 @@ The test: every changed line traces to the user's request, and every number in i
 
 - Turn the task into a check you can run: "draft the experiments section" -> the build passes and every number carries a `% src:` anchor or a `\todo`; "cut it to eight pages" -> `lint.sh` reports the page count under the active cycle's `page_limit_main`; "answer the reviewers" -> every point in the ledger has a response or a promise.
 - For multi-step tasks, state the steps and the check that closes each one. Existing explicit approval stays valid within its scope; do not ask for the same approval again (conventions §7.2).
+- A request to inspect, explain, or review without changes ends with that deliverable and its exact next command, and never starts a writing skill. A run ends with its report and does not start the next one: continuing is the job of a typed `stage-auto <goal>`, or happens when the user's own request asks for it (conventions §11.4).
 
 ## 5. Writing Workflow
 

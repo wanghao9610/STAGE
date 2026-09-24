@@ -3,8 +3,8 @@ name: stage-cite-auditor
 description: >-
   Check that every \cite key resolves in manus/bibs/reference.bib and every assertion about a cited
   work is backed by a reading note in notes/refs/ or an imported ref under mates/; also missing
-  citations and bib hygiene. Use when the user runs /skill:stage-cite-auditor, a run names it next, or
-  asks whether the citations and related-work claims hold up. Read-only on the manuscript, the bib,
+  citations and bib hygiene. Use when the user runs /skill:stage-cite-auditor, /stage-auto starts it,
+  or asks whether the citations and related-work claims hold up. Read-only on the manuscript, the bib,
   and the ledger: problems are flagged and routed, never silently fixed.
 ---
 

@@ -3,9 +3,9 @@ name: stage-tabs-builder
 description: >-
   Build or update one booktabs table under manus/tabs/ from fingerprinted mates/ evidence, a % src:
   comment on every data row and every number re-read before it ships; a missing number becomes a
-  \todo{...} cell that opens an unsourced claim. Use when the user invokes stage-tabs-builder, a run
-  names it next, or asks to build, fill, extend, or fix a results, ablation, or comparison table, or
-  turn imported results into LaTeX. No number comes from memory, chat, or recalled papers.
+  \todo{...} cell that opens an unsourced claim. Use when the user invokes stage-tabs-builder,
+  stage-auto starts it, or asks to build, fill, extend, or fix a results, ablation, or comparison
+  table, or turn imported results into LaTeX. No number comes from memory, chat, or recalled papers.
 ---
 
 # Table Builder — evidence-to-booktabs compiler

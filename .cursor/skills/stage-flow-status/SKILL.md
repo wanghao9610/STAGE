@@ -3,9 +3,9 @@ name: stage-flow-status
 description: >-
   Show where the paper stands and what to write next: outline, claims, evidence freshness, references,
   cycle state, and the last build and lint, ending in one next action with its exact /stage-* command.
-  Use when the user runs /stage-flow-status, a run names it next, or asks where the paper stands, what
-  to work on next, or whether the evidence or build is fresh. Read-only: it reports in chat, routes
-  each action to its owning skill, and never writes.
+  Use when the user runs /stage-flow-status, /stage-auto starts it, or asks where the paper stands,
+  what to work on next, or whether the evidence or build is fresh. Read-only: it reports in chat,
+  routes each action to its owning skill without starting it, and never writes.
 ---
 
 # Writing Flow Status — read-only overview
@@ -151,9 +151,9 @@ not the session's model.
    simulated review this cycle → stage-peer-reviewer; (10) all green → stage-subm-packer.
    Give the one-line reason with the exact command; when the recommended level differs from the one
    `INVOLVE` in `.env` resolves to, the command carries the explicit `involve=low|medium|high`
-   token, copyable as printed (conventions §7.5). When that command names one of the ten the
-   agent may start (conventions §11.4) and its target is settled, it is picked up once this
-   report is done rather than left for the author to type — this skill starts nothing itself.
+   token, copyable as printed (conventions §7.5). Always print the recommendation and end this
+   status run: the report starts no successor, whichever skill it names (conventions §11.4) —
+   continuing is a `stage-auto` goal run's job, or the author's own request.
 
    **A red gate outranks the list.** When step 6 found `lint.sh` failing hard — the build broken, a `\todo{` that would ship, a page count over the limit, an identity leak under `ANON=true` — that is the next action whichever numbered rule matched, routed to the owner lint itself names: a marker to `stage-sect-drafter` or `stage-tabs-builder`, an over-limit paper to `stage-copy-editor`, an undefined citation to `stage-cite-auditor` or `stage-refs-curator`. Nothing downstream of a red gate is worth recommending — `stage-subm-packer` refuses it, and a simulated review of a manuscript that does not build reviews the wrong artifact. The list resumes once the gate is green.
 8. **Report and stop.** Render in the Output order, then stop: never writes, never commits — and

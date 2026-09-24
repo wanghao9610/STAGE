@@ -21,8 +21,10 @@ Use the roster below to route a paper-writing request to exactly one workflow sk
 | `stage-pstr-builder` | † | Plan, build, or check the poster |
 | `stage-flow-status` | | Report status and the single next action |
 
-The six skills marked † are explicit-only because each controls an author-owned decision. This generic `/stage` router never starts one: ask for explicit confirmation, give the exact `/stage-<name> <argument>` command, and wait. The other ten may be selected when the request plainly matches.
+The six skills marked † are explicit-only because each controls an author-owned decision. This generic `/stage` router never starts one: ask for explicit confirmation, give the exact `/stage-<name> <argument>` command, and wait. The other ten may be selected when the request plainly matches; selection authorizes only what the user requested.
 
 A request to pursue a goal across several steps, running whatever the paper needs next until something is reached, is not routed to one skill: give the exact `/stage-auto <goal>` command and stop. Typing it is what authorizes a goal run (conventions §11.5), and even then a skill marked † is never started: the goal run stops at it and prints its command.
 
 If the request is empty, select `stage-flow-status`. Otherwise, name the chosen skill, give the one-line reason, and pass through the request as its argument. Start an unmarked skill through the active harness's native skill mechanism and use that harness's owned copy. If two skills are equally plausible, ask one concise question instead of blending their scopes. Never bypass a skill by producing its owned artifact from general knowledge.
+
+A status, explanation, or review-only request authorizes only that deliverable. Preserve it through routing: the chosen skill ends with its report and the exact next command, and nothing starts drafting, polishing, an import, a ledger-writing audit such as `stage-clms-auditor`, or any other skill merely because that report recommends one. Follow-through happens only when the user's own request already names the further work, within its scope, or through `/stage-auto`; `INVOLVE=low` is not such a request (conventions §11.4).

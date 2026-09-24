@@ -3,8 +3,8 @@ name: stage-figs-designer
 description: >-
   Plan the figure inventory and build or fix one figure per run; where the local pipeline exists,
   image_gen supplies illustrative raster only and every label, data mark, and claim stays editable in
-  a one-slide PPTX that renders the PDF. Use when the user invokes stage-figs-designer, a run names it
-  next, or asks to plan, sketch, render, or fix a figure, the teaser, a PPTX source, an Image Gen
+  a one-slide PPTX that renders the PDF. Use when the user invokes stage-figs-designer, stage-auto
+  starts it, or asks to plan, sketch, render, or fix a figure, the teaser, a PPTX source, an Image Gen
   asset, or the inventory. Data comes only from fingerprinted mates/ evidence; generated pixels are
   never evidence, and a missing value becomes a \todo, never plausible artwork.
 ---
