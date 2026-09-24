@@ -376,6 +376,7 @@ for readme in README.md README.zh-CN.md; do
     for shared_topic in \
         'STAGE_LANG' \
         'STAGE_HARNESSES' \
+        'STAGE_PLAN_MODEL' \
         'INVOLVE=low' \
         '.stage/memory/' \
         'bash execs/update.sh --diff' \
@@ -789,11 +790,12 @@ done < <(printf '%s\n' "${SKILLS}")
 (( section_errors == 0 )) && note ".claude manifests carry the same ## sections as the authored .agents source"
 
 # 13. Every manifest carries one Shared conventions paragraph naming the shared
-#     .env controls — STAGE_LANG under conventions §7.6, INVOLVE under §7.7 —
-#     and prescribes no tool-call itinerary: which reader, how many calls and
-#     what output budget are the host's. A manifest that drops the paragraph,
-#     or never names .env, STAGE_LANG or INVOLVE, runs without the controls
-#     every other skill resolves.
+#     .env controls — STAGE_LANG under conventions §7.6, INVOLVE under §7.7,
+#     the STAGE_*_MODEL tier keys under §11.6 — and prescribes no tool-call
+#     itinerary: which reader, how many calls and what output budget are the
+#     host's. A manifest that drops the paragraph, or never names .env,
+#     STAGE_LANG, INVOLVE or the tier keys, runs without the controls every
+#     other skill resolves.
 section "Shared environment and language controls"
 control_errors=0
 for root in "${SKILL_ROOTS[@]}"; do
@@ -803,7 +805,7 @@ for root in "${SKILL_ROOTS[@]}"; do
 
         n="$(grep -cE '^\*\*Shared conventions\.' "${path}")"
         (( n == 1 )) || { fail "${path}: ${n} shared-conventions paragraphs, expected exactly 1"; control_errors=1; }
-        for key in .env STAGE_LANG INVOLVE '§7.6' '§7.7'; do
+        for key in .env STAGE_LANG INVOLVE 'STAGE_*_MODEL' '§7.6' '§7.7' '§11.6'; do
             if ! grep -Fq -- "${key}" "${path}"; then
                 fail "${path}: missing shared environment control ${key}"
                 control_errors=1
@@ -811,7 +813,7 @@ for root in "${SKILL_ROOTS[@]}"; do
         done
     done < <(printf '%s\n' "${SKILLS}")
 done
-(( control_errors == 0 )) && note "all manifests carry one Shared conventions paragraph naming .env, STAGE_LANG and INVOLVE under §7.6 and §7.7"
+(( control_errors == 0 )) && note "all manifests carry one Shared conventions paragraph naming .env, STAGE_LANG, INVOLVE and STAGE_*_MODEL under §7.6, §7.7 and §11.6"
 
 # 14. The conventions document's numbered structure is pinned, and every
 #     citation of it resolves.
@@ -838,7 +840,7 @@ CONV_HEADINGS=(
     '13. Harness hooks and model provenance'
 )
 # section|numbered top-level items
-CONV_ITEMS=("1|6" "3|7" "4|4" "5|6" "6|9" "7|13" "10|5" "11|5")
+CONV_ITEMS=("1|6" "3|7" "4|4" "5|6" "6|10" "7|13" "10|5" "11|6")
 CONV_SUBHEADS=("8|11")    # ### 8.n subheadings
 CONV_LETTERS=("9|5")      # **(a) ... **(e) rules
 
@@ -919,6 +921,83 @@ while IFS= read -r cite; do
 done < <(grep -rhoE '(conventions|规约) §[0-9]+(\.[0-9]+)?' "${CITATION_SCAN[@]}" 2>/dev/null |
          grep -oE '[0-9]+(\.[0-9]+)?' | sort -u)
 (( conv_errors == 0 )) && note "conventions structure pinned; ${cite_checked} distinct §n citations resolve"
+
+# 14a. Every roster row carries a run tier (§11.6), and the Tier column covers
+#      the whole skill set. The tier is what a run's one-line model notice and
+#      its delegates' routing start from; a row without one, or with a value
+#      outside plan, exec and read, leaves that skill's runs with no tier to
+#      name.
+section "Roster run tiers"
+tier_errors=0
+ROSTER_SECTION="$(awk '/^## 11\. /{ f = 1 } f' "${CONV_EN}")"
+ROSTER_TIERS="$(sed -nE 's/^\| `(stage-[a-z-]+)`( †)? \| (plan|exec|read) \|.*/\1 \3/p' <<< "${ROSTER_SECTION}" | sort)"
+ROSTER_ALL="$(sed -nE 's/^\| `(stage-[a-z-]+)`( †)? \|.*/\1/p' <<< "${ROSTER_SECTION}" | sort)"
+if [[ "${ROSTER_ALL}" != "${SKILLS}" ]]; then
+    fail "${CONV_EN} §11 roster rows differ from the skill set:"
+    diff <(printf '%s\n' "${SKILLS}") <(printf '%s\n' "${ROSTER_ALL}") | sed 's/^/      /'
+    tier_errors=1
+fi
+if [[ "$(cut -d' ' -f1 <<< "${ROSTER_TIERS}")" != "${ROSTER_ALL}" ]]; then
+    fail "${CONV_EN} §11 roster rows without a Tier of plan, exec or read:"
+    diff <(printf '%s\n' "${ROSTER_ALL}") <(cut -d' ' -f1 <<< "${ROSTER_TIERS}") | sed 's/^/      /'
+    tier_errors=1
+fi
+(( tier_errors == 0 )) && note "all $(printf '%s\n' "${ROSTER_ALL}" | wc -l | tr -d ' ') roster rows carry a tier: $(cut -d' ' -f2 <<< "${ROSTER_TIERS}" | sort | uniq -c | awk '{ printf "%s%s %s", sep, $1, $2; sep = ", " }')"
+
+# 14b. Every manifest opens its Workflow with the one-line tier notice (§11.6):
+#      exactly one paragraph led "Where this run executes.", the first thing
+#      under "## Workflow", naming its roster tier, the one way to get the
+#      tier's model — switching the session's model — and never handing the
+#      run to a delegate. No skill is exempt. The paragraph is read whole, up
+#      to its blank line, because some manifests are hard-wrapped.
+section "Where-this-run-executes paragraph"
+where_errors=0
+WHERE_LEAD='**Where this run executes.**'
+where_paragraph() { # $1 = manifest -> the Workflow's first paragraph, on one line
+    awk '
+        /^## / { inwf = ($0 == "## Workflow"); next }
+        !inwf { next }
+        !started && /^[[:space:]]*$/ { next }
+        started && /^[[:space:]]*$/ { exit }
+        { started = 1; printf "%s ", $0 }
+    ' "$1"
+}
+for root in "${SKILL_ROOTS[@]}"; do
+    while IFS= read -r skill; do
+        path="${root}/${skill}/SKILL.md"
+        [[ -f "${path}" ]] || continue   # check 2 owns missing files
+        n="$(grep -cF -- "${WHERE_LEAD}" "${path}")"
+        if (( n != 1 )); then
+            fail "${path}: ${n} Where-this-run-executes paragraphs, expected exactly 1"
+            where_errors=1
+            continue
+        fi
+        para="$(where_paragraph "${path}")"
+        if [[ "${para}" != "${WHERE_LEAD}"* ]]; then
+            fail "${path}: the Where-this-run-executes paragraph is not the first thing under ## Workflow"
+            where_errors=1
+            continue
+        fi
+        tier="$(sed -n "s/^${skill} //p" <<< "${ROSTER_TIERS}" | tr '[:lower:]' '[:upper:]')"
+        for want in '§11.6' "switch the session's model"; do
+            if [[ "${para}" != *"${want}"* ]]; then
+                fail "${path}: the Where-this-run-executes paragraph does not name ${want}"
+                where_errors=1
+            fi
+        done
+        # The tier is stated as a predicate ("tier is PLAN", "... are EXEC"),
+        # not merely present inside a key name such as STAGE_PLAN_MODEL.
+        if [[ -z "${tier}" || ! "${para}" =~ (is|are)\ ${tier}([^A-Z_]|$) ]]; then
+            fail "${path}: the Where-this-run-executes paragraph does not state its roster tier ${tier:-<none>}"
+            where_errors=1
+        fi
+        if grep -qiE 'relocat|hand the (complete|whole) run' <<< "${para}"; then
+            fail "${path}: the Where-this-run-executes paragraph hands the run away; a run stays in the session that started it (§11.6)"
+            where_errors=1
+        fi
+    done < <(printf '%s\n' "${SKILLS}")
+done
+(( where_errors == 0 )) && note "every manifest in all seven trees opens its Workflow with one tier notice naming its roster tier and the session-model switch"
 
 # 15. The docs stay tied to the skills they describe.
 #     Two thirds of the skills guide paraphrases the fifteen SKILL.md files,

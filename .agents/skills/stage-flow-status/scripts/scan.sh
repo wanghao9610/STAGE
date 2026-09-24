@@ -161,12 +161,14 @@ say "# Apply your skill's own rules to what follows."
 # ------------------------------------------------------------------ env
 # The four runtime variables decide what several boards can say at all:
 # STAR_HOME whether evidence freshness is knowable, ANON whether the identity
-# scan runs, STAGE_LANG the reply language, LATEX_ENGINE the build. Values only —
-# .env holds no secrets by §3, and a path is a fact the report may need.
+# scan runs, STAGE_LANG the reply language, LATEX_ENGINE the build. The three
+# tier keys decide whether this run owes its one-line tier notice (§11.6).
+# Values only — .env holds no secrets by §3, and a path is a fact the report
+# may need.
 say ""
 say "## ENV — .env (§3)"
 if [ -f .env ]; then
-    grep -sE '^(STAR_HOME|LATEX_ENGINE|ANON|STAGE_REPOSITORY|STAGE_LANG|INVOLVE)=' .env || say "(none of the six set)"
+    grep -sE '^(STAR_HOME|LATEX_ENGINE|ANON|STAGE_REPOSITORY|STAGE_LANG|INVOLVE|STAGE_(PLAN|EXEC|READ)_MODEL)=' .env || say "(none of the nine set)"
 else
     say "(.env absent — every variable at its documented default)"
 fi

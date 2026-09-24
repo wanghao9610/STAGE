@@ -235,6 +235,10 @@ STAGE_HARNESSES=
 INVOLVE=medium
 # 可选。回复与文档语言：en | zh；留空 = 跟随对话
 STAGE_LANG=
+# 可选。每一档的模型：PLAN | EXEC | READ；留空 = 什么都不变
+STAGE_PLAN_MODEL=
+STAGE_EXEC_MODEL=
+STAGE_READ_MODEL=
 ```
 
 `STAR_HOME` 决定你走哪条快速开始路径。本地 `.env` 已被 Git 忽略。
@@ -242,6 +246,8 @@ STAGE_LANG=
 `INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code、Codex 与 Qwen Code 里，文件编辑前的权限提示也会被跳过；在 Claude Code 里，shell 命令前的权限提示同样跳过，除非该命令删除、覆盖已跟踪文件、安装、推送，或写入 `mates/`、venue 模板包或 `.env`。`medium`（默认）按文档所写发问，`high` 逐条确认。任何档位都不会收回你已经给出的批准，也不会替你给出你没给的批准：你已经批准过的事——之前的一次回答，或调用时一句明确的请求，比如 `and commit it`——在其范围内不会再问第二次。硬门槛任何档位都要问，之前的批准也替代不了它：红线、删除与覆盖、每一个以"已确认"身份进入 `venue.yml` 的取值、登记证据时它的来源，以及六个 slash-only skill 各自的决定点。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 3_method involve=low`——在 Claude Code 里这个 token 连权限提示一并作数：钩子从会话里最近一条 STAGE 命令读它，一直有效到下一条命令为止；别的宿主的权限提示只认 `.env`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
 `STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md)。
+
+`STAGE_PLAN_MODEL`、`STAGE_EXEC_MODEL` 与 `STAGE_READ_MODEL`（可选）分别指定论文判断——故事、提纲、起草、模拟评审、回复——所用的模型，产出与核查所用的模型，以及只读状态报告、检查模式与只做收集的委派所用的模型；规约 §11 的 skill 名单写明每个 skill 属于哪一档。每个键写一个模型名，或逗号分隔、按 `STAGE_HARNESSES` 标签写的 `<harness>:<model>` 条目：运行先取本树的条目，再取无标签的条目，两者都没有就沿用 harness 的默认模型。只有派发工具能逐次指定模型的 harness 才读取这三个键——Claude Code，以及子代理接口接受模型参数时的 Codex；Cursor、DSH、Kimi Code、Pi 与 Qwen Code 忽略它们。你敲下的 skill 留在你会话的模型上，它那一档指定了别的模型时会用一行说明；拿到那个模型的唯一办法是切换会话的模型。留空时它们什么都不改变。完整规则见[规约 §11.6](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
 ### 3. 路径 A：与 STAR 仓库配对
 
@@ -450,7 +456,7 @@ bash execs/update.sh
 - `execs/scpts/import.sh`、`execs/scpts/lint.sh`、`execs/scpts/fmt.sh`——三个工具脚本，理由同上：十六个 skill 调用 `import.sh --diff`，五个调用 `lint.sh --no-build`，而读退出码的调用方，认的是它自己那一版写明的那套码。比某个工具脚本更老的 ref 会打印一行跳过它
 - `execs/update.sh`——更新脚本自己，为的是不让任何仓库卡在一个老到取不回后继版本的更新机制上。它用重命名装上：执行更新的那一次仍读旧文件跑完，下一次调用才用上新的
 
-拉取来源由 `STAGE_REPOSITORY` 指定，取值顺序为：环境变量、`.env`、内置默认值 `https://github.com/wanghao9610/STAGE.git`。想长期跟随某个 fork，就写进 `.env`；只想临时改一次，在命令前加变量即可——`STAGE_REPOSITORY=… bash execs/update.sh`。`.env` 里的其余内容从不同步——这也正是 `execs/` 下每个脚本都可以放心替换的原因：实例的配置不住在它们里面。
+拉取来源由 `STAGE_REPOSITORY` 指定，取值顺序为：环境变量、`.env`、内置默认值 `https://github.com/wanghao9610/STAGE.git`。想长期跟随某个 fork，就写进 `.env`；只想临时改一次，在命令前加变量即可——`STAGE_REPOSITORY=… bash execs/update.sh`。`.env` 里的其余内容从不同步——这也正是 `execs/` 下每个脚本都可以放心替换的原因：实例的配置不住在它们里面。`.env.example` 本身只在 `--adopt` 时进入项目，更新时从不带过去；所以模型键出现之前创建的项目，想用时要手工把 `STAGE_PLAN_MODEL`、`STAGE_EXEC_MODEL` 与 `STAGE_READ_MODEL` 加进自己的 `.env`——[上游的 `.env.example`](.env.example) 里有解释它们的注释；不加，它们什么都不改变。
 
 要更新哪些 harness 树由 `STAGE_HARNESSES` 指定，取值顺序为环境变量、`.env`、默认 `all`。写 `STAGE_HARNESSES=codex` 就只维护 Codex 的 `.codex/`，也可从 `claude`、`codex`、`cursor`、`dsh`、`kimi`、`pi`、`qwen` 中任选多个并用逗号分隔；`none` 表示只更新共享骨架。未选中的树既不安装、不更新，也不删除；共享的 `.agents/skills/` 与 `.agents/commands/`、agent 指令、工作流文档和 `execs/` 脚本始终更新。
 
@@ -505,7 +511,7 @@ bash execs/update.sh --skill stage-flow-status
 基于 STAGE 开始写一篇新论文时，建议完成以下调整：
 
 - 把 `manus/main.tex` 里的标题、作者、机构换成真实信息。双盲周期内保持匿名占位——`.env` 里 `ANON=true` 会让 `lint.sh` 在 `manus/` 下搜身份泄漏，注释也算。
-- 复制 `.env.example` 为 `.env`，设好 `STAR_HOME`（不与 STAR 配对就留空）、`LATEX_ENGINE`、`ANON` 与可选的 `INVOLVE`、`STAGE_LANG`。
+- 复制 `.env.example` 为 `.env`，设好 `STAR_HOME`（不与 STAR 配对就留空）、`LATEX_ENGINE`、`ANON` 与可选的 `INVOLVE`、`STAGE_LANG` 以及模型键 `STAGE_PLAN_MODEL`、`STAGE_EXEC_MODEL`、`STAGE_READ_MODEL`。
 - 用 `/stage-stry-coach` 建立第一个投稿周期和它的 `venue.yml`；页数上限、截止日期与检查单只以你确认的事实录入，绝不臆造。
 - venue 官方模板包整包解压到 `cycls/<cycle>/template/`，不要放进 `manus/`——那是 `lint.sh` 扫描的目录树，模板包自带的示例 `.tex` 会污染 `\todo` 计数和身份扫描。
 - 更新 `LICENSE` 中的年份和版权所有者。

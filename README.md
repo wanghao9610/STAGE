@@ -235,6 +235,10 @@ STAGE_HARNESSES=
 INVOLVE=medium
 # Optional. Reply and document language: en | zh; empty = follow the conversation
 STAGE_LANG=
+# Optional. Model for each tier: PLAN | EXEC | READ; empty = nothing changes
+STAGE_PLAN_MODEL=
+STAGE_EXEC_MODEL=
+STAGE_READ_MODEL=
 ```
 
 `STAR_HOME` decides which quick-start path you are on. The local `.env` is ignored by Git.
@@ -242,6 +246,8 @@ STAGE_LANG=
 `INVOLVE` (optional, `low` | `medium` | `high`) sets how much the skills ask before they decide. At `low` a skill takes the recommended option on judgment calls and logs that it did, commits what its run wrote without asking and names each commit in its reply, and — in Claude Code, Codex, and Qwen Code — the permission prompt before each file edit is skipped, in Claude Code also the one before a shell command that does not delete, overwrite a tracked file, install, push, or write to `mates/`, a venue kit, or `.env`; `medium` (the default) asks as documented; `high` confirms item by item. No level revokes an approval you already gave or grants one you did not: what you already approved — an earlier answer, or a clear request such as `and commit it` in the invocation — is not asked again within its scope. Hard gates are asked at every level, and no earlier approval stands in for one: the STOP line, deletions and overwrites, every `venue.yml` value entering as confirmed, the provenance of evidence being registered, and the decision points of the six slash-only skills. To change the level for one run, add the same token when you call a skill: `/stage-sect-drafter 3_method involve=low` — in Claude Code that token reaches the permission prompts too, since the hooks read it off the session's most recent STAGE command and it holds until the next one; elsewhere the prompts follow `.env` alone. Full rule: [conventions §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 `STAGE_LANG` (optional, `en` | `zh`) sets the language of chat replies and of the Markdown the workflow writes — `notes/`, `tasks/`, simulated reviews, `wkdrs/` reports. Left empty, everything follows the conversation's own language. Two things stay English whatever it says, because people outside the repository read them: the manuscript under `manus/`, and the response to reviewers. So do structural literals in any document — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names — which is what keeps a Chinese note machine-readable. Full rule: [conventions §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md).
+
+`STAGE_PLAN_MODEL`, `STAGE_EXEC_MODEL` and `STAGE_READ_MODEL` (optional) select the model for the paper's judgment — story, outline, drafting, simulated review, response — for production and checking, and for read-only status, the check modes, and delegates that only gather; the roster in conventions §11 gives each skill its tier. Each takes one model name, or comma-separated `<harness>:<model>` entries using the `STAGE_HARNESSES` tags: a run uses its own tree's entry, then an untagged one, and with neither keeps the harness default. Only a harness whose dispatch tool takes a model per call reads the keys — Claude Code, and Codex where its subagent interface accepts one; Cursor, DSH, Kimi Code, Pi, and Qwen Code ignore them. A skill you type stays on your session's model and says in one line when its tier names another; switching the session's model is the one way to get it. Empty, they change nothing. Full rule: [conventions §11.6](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 ### 3. Path A: paired with a STAR repo
 
@@ -450,7 +456,7 @@ By default, the command updates these paths from STAGE's `main` branch:
 - `execs/scpts/import.sh`, `execs/scpts/lint.sh`, `execs/scpts/fmt.sh` — the utilities, for the same reason: sixteen skills call `import.sh --diff` and five call `lint.sh --no-build`, and a caller reading an exit code means the one its own version documents. A ref older than a utility simply skips it with a printed line
 - `execs/update.sh` — the updater itself, so that no repository strands on an update mechanism too old to fetch its successor. It is installed by rename: the run doing the update finishes on the old file, and the next invocation uses the new one
 
-The repository it pulls from is `STAGE_REPOSITORY`, resolved in that order: the environment, then `.env`, then the default `https://github.com/wanghao9610/STAGE.git`. Set it in `.env` to track a fork permanently, or prefix a single command — `STAGE_REPOSITORY=… bash execs/update.sh` — to override it once. Nothing else in `.env` is ever synced, which is why every script under `execs/` is safe to replace: an instance's configuration does not live in them.
+The repository it pulls from is `STAGE_REPOSITORY`, resolved in that order: the environment, then `.env`, then the default `https://github.com/wanghao9610/STAGE.git`. Set it in `.env` to track a fork permanently, or prefix a single command — `STAGE_REPOSITORY=… bash execs/update.sh` — to override it once. Nothing else in `.env` is ever synced, which is why every script under `execs/` is safe to replace: an instance's configuration does not live in them. `.env.example` itself reaches a project only with `--adopt`, never on an update, so a project created before the model keys adds `STAGE_PLAN_MODEL`, `STAGE_EXEC_MODEL` and `STAGE_READ_MODEL` to its `.env` by hand when it wants them — [upstream's `.env.example`](.env.example) carries the comment that explains them; left out, they change nothing.
 
 Which harness trees it touches is `STAGE_HARNESSES`, resolved from the environment, then `.env`, then `all`. Set `STAGE_HARNESSES=codex` to keep only Codex's `.codex/` tree current, or use any comma-separated set of `claude`, `codex`, `cursor`, `dsh`, `kimi`, `pi`, and `qwen`; `none` updates only the shared skeleton. A tree left out is not installed, updated, or deleted. The shared `.agents/skills/` and `.agents/commands/`, the agent instructions, workflow docs, and `execs/` scripts remain in every run.
 
@@ -505,7 +511,7 @@ The full collaboration and writing conventions are in [`AGENTS.md`](AGENTS.md) a
 When you start a paper from STAGE, these are the adjustments worth making:
 
 - Replace the title, authors, and affiliations in `manus/main.tex` with the real ones. Keep the anonymous placeholders during a double-blind cycle — `ANON=true` in `.env` makes `lint.sh` hunt identity leaks anywhere under `manus/`, comments included.
-- Copy `.env.example` to `.env` and set `STAR_HOME` (empty when you are not pairing with a STAR repository), `LATEX_ENGINE`, `ANON`, and the optional `INVOLVE` and `STAGE_LANG`.
+- Copy `.env.example` to `.env` and set `STAR_HOME` (empty when you are not pairing with a STAR repository), `LATEX_ENGINE`, `ANON`, and the optional `INVOLVE`, `STAGE_LANG`, and model keys `STAGE_PLAN_MODEL`, `STAGE_EXEC_MODEL`, `STAGE_READ_MODEL`.
 - Create the first submission cycle and its `venue.yml` with `/stage-stry-coach`. Page limits, deadlines, and checklist requirements are entered only as facts you confirmed — never invented.
 - Unpack the venue's official kit whole into `cycls/<cycle>/template/`, not into `manus/`: that tree is the namespace `lint.sh` scans, and a kit's example `.tex` would trip its `\todo` count and its identity scan.
 - Update the year and copyright holder in `LICENSE`.

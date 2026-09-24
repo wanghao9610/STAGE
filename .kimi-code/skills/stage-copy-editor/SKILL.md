@@ -30,14 +30,14 @@ argument nor the description, and is stripped before either is read.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
 the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever
-it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime values this run
-needs, and reuse `.env` values and conventions text still verbatim visible in this conversation.
-Resolve the language once under conventions §7.6 — an explicit request first, then a valid
-`STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly
+it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
+conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
+valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly
 writes; everything under `manus/`, the response to reviewers, and every structural literal stay
 English, and an existing document keeps the language it was written in. Resolve the involve level
-once under conventions §7.7. Repository resources load in English: a `references/*_zh.md` edition
-is for human readers and is never loaded at runtime.
+once under conventions §7.7, and the tier value once under §11.6. Repository resources load in
+English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
 **Human-writing contract.** Apply the human-writing contract (conventions §7), the evidence-bound
 natural-writing pass used here; this skill's stricter rules on meaning, numbers, and citations
@@ -109,6 +109,11 @@ from the same ones instead of each session inventing a voice.
    the whole return set; and Step 6's build, the gate the main agent runs itself (§6.3).
 
 ## Workflow
+
+**Where this run executes.** This run's tier is EXEC (conventions §11.6); it stays in the session
+that started it, on the session's model. When the `STAGE_EXEC_MODEL` value names a model that is not
+an alias of the session's, say so in one line at the start — the tier, that model, and the one way
+to get it: switch the session's model — then continue here.
 
 1. **Load.** Read the conventions whole; then `notes/notation.md`, `notes/outline.md`
    (section rows and budgets), and `notes/claims.md` (know which sentences carry claims), plus
