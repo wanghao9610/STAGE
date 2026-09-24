@@ -28,8 +28,9 @@ allowed-tools: >-
 Invocation: `stage-flow-status [SECTION] [DESCRIPTION]` — no argument reports the whole flow; a
 section argument, resolved per conventions §5 by number, file slug, or title against
 `notes/outline.md`, narrows the outline board and claim detail to that section. An
-`involve=<level>` token is stripped before SECTION resolves (§7) and changes nothing else here. An
-ambiguous section argument is the one question this skill may ask (§5); it asks nothing else.
+`involve=<level>` token is stripped before SECTION resolves (§7); it sets the level step 7's command
+carries (§7.5) and changes nothing else here. An ambiguous section argument is the one question this
+skill may ask (§5); it asks nothing else.
 Anything left after `SECTION` is a description (conventions §7.13): in your own words, what this
 run is for. Prose that resolves to no section is description alone, not a missing target — report
 the whole flow, and say so in the reply's first line. A description can steer what the report
@@ -153,7 +154,9 @@ writes, and never present a guess as a state.
    stage-clms-auditor; (8) all rows drafted but the newest `CITES_*` / `POLISH_*` report date
    trails the outline's `updated:` → stage-cite-auditor, then stage-copy-editor; (9) no
    simulated review this cycle → stage-peer-reviewer; (10) all green → stage-subm-packer.
-   Give the one-line reason with the exact command. When that command names one of the ten the
+   Give the one-line reason with the exact command; when the recommended level differs from the one
+   `INVOLVE` in `.env` resolves to, the command carries the explicit `involve=low|medium|high`
+   token, copyable as printed (conventions §7.5). When that command names one of the ten the
    agent may start (conventions §11.4) and its target is settled, it is picked up once this
    report is done rather than left for the author to type — this skill starts nothing itself.
 
