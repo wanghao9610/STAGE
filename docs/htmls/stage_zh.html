@@ -1034,10 +1034,21 @@
           <div class="skill"><code>/stage-flow-status</code><p>只读的全局地图 —— 大纲、记录表、清单、投稿周期状态 —— 并给出唯一的下一步动作及其确切命令，本身从不写入。</p></div>
         </div>
       </div>
+
+      <div class="phase reveal" style="--phase-c: var(--gold-deep); --phase-glow: rgba(245,166,35,0.45)">
+        <div class="phase-head">
+          <div class="phase-star">✦</div>
+          <h3>追求目标<small>一条由你敲下的命令，授权有边界。</small></h3>
+        </div>
+        <div class="skills">
+          <div class="skill"><code>/stage-auto &lt;目标&gt;</code><p>这是你敲下的命令，不是技能：它先运行 <em>stage-flow-status</em>，再逐个启动目标需要的未标记技能，每次只做一个工作单元，直到目标的检查通过。它从不启动六个 † 技能 —— 遇到时停下，打印命令由你来敲 —— 每个确认点照常询问。它从不导入证据、不录入 venue 事实，自己也不提交；lint 全绿从来不是它的目标。</p></div>
+        </div>
+      </div>
     </div>
 
     <p class="flow-note reveal">
       <code>†</code> 标记六个只能显式调用的技能：它们只在你点名时运行，因为决策点 —— 接入、故事、大纲、回复、投稿与海报选择 —— 始终由你决定。
+      技能写作 <code>/stage-&lt;name&gt;</code> —— Codex 中为 <code>$stage-&lt;name&gt;</code>，DeepSeek Harness 与 Kimi Code 中为 <code>/skill:stage-&lt;name&gt;</code> —— 目标运行写作 <code>/stage-auto</code>（Codex 中为 <code>$stage-auto</code>）。
     </p>
 
     <figure class="workflow-map reveal">
@@ -1077,6 +1088,7 @@
 
 <span class="c"># 5 · 进入工作流 —— 它会告诉你唯一的下一步动作</span>
 <span class="p">❯</span> <span class="cmd">/stage-flow-status</span>
+<span class="p">❯</span> <span class="cmd">/stage-auto <span class="str">&lt;目标&gt;</span></span>   <span class="c"># 或者追求一个目标，遇到 † 技能即停</span>
 <span class="p">❯</span> <span class="cursor-blink"></span></div>
     </div>
   </div>

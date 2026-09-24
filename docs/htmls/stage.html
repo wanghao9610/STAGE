@@ -1035,11 +1035,22 @@
           <div class="skill"><code>/stage-flow-status</code><p>Read-only map of the whole flow — outline, ledger, manifest, cycle state — and the single next action with its exact command. Never writes.</p></div>
         </div>
       </div>
+
+      <div class="phase reveal" style="--phase-c: var(--gold-deep); --phase-glow: rgba(245,166,35,0.45)">
+        <div class="phase-head">
+          <div class="phase-star">✦</div>
+          <h3>Pursue a goal<small>One typed command, bounded authority.</small></h3>
+        </div>
+        <div class="skills">
+          <div class="skill"><code>/stage-auto &lt;goal&gt;</code><p>A command you type, not a skill: it runs <em>stage-flow-status</em>, then each unmarked skill your goal needs, one unit of work at a time, until the goal's check passes. It never starts the six † skills — it stops and prints the command for you to type — and every confirmation point is still asked. It never imports evidence, enters a venue fact, or commits on its own, and green lint is never its goal.</p></div>
+        </div>
+      </div>
     </div>
 
     <p class="flow-note reveal">
       <code>†</code> marks the six slash-only skills: they run only when you name them, because the
       decision points — adoption, story, outline, response, submission, and poster selection — stay yours.
+      Invoke a skill as <code>/stage-&lt;name&gt;</code> — <code>$stage-&lt;name&gt;</code> in Codex, <code>/skill:stage-&lt;name&gt;</code> in DeepSeek Harness and Kimi Code — and a goal run as <code>/stage-auto</code> (<code>$stage-auto</code> in Codex).
     </p>
 
     <figure class="workflow-map reveal">
@@ -1079,6 +1090,7 @@
 
 <span class="c"># 5 · Pick up the workflow — it names the single next action for you</span>
 <span class="p">❯</span> <span class="cmd">/stage-flow-status</span>
+<span class="p">❯</span> <span class="cmd">/stage-auto <span class="str">&lt;goal&gt;</span></span>   <span class="c"># or pursue a goal, stopping at any † skill</span>
 <span class="p">❯</span> <span class="cursor-blink"></span></div>
     </div>
   </div>
