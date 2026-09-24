@@ -90,7 +90,7 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
    delegate that fetches nothing but its own leads (§6.9) and writes exactly one file, its own
    `review_<perspective>.md` in the run directory (§6.2, §6.4), carrying its brief and the two
    contracts verbatim plus the built paper. It writes nothing under `manus/`, `notes/`, or
-   `cycls/`: the meta-review is the chair's synthesis, not five reviews concatenated. Exactly five, all dispatched in one message so the panel is genuinely concurrent (§6.2). `quick` is the
+   `cycls/`: the meta-review is the chair's synthesis, not five reviews concatenated. Exactly five; their independence comes from five separate briefs and contexts, not from running at the same moment, so how many run at once is the chair's call (§6.2). `quick` is the
    no-fan-out path: the chair walks all five perspectives itself in one sequential pass, and
    the meta-review says so (`mode: quick` — cheaper, and not independent).
 2. **The rubric is anchored; caps bind.** The score is the band whose description the paper
@@ -106,7 +106,7 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
    cannot be verified is phrased as a direction, and every search — empty ones included — is
    logged. **A panelist runs its own leads (§6.9).** The rate divides rather than the
    quota: each brief states, in seconds, the wait between that panelist's own requests to a
-   host — the host's interval times the five running at once — so the panel as a whole asks
+   host — the host's interval times the most panelists the chair runs at once (§6.2) — so the panel as a whole asks
    each host no faster than one agent would have. Every payload is cached under that
    panelist's own prefix in the run directory. What does not move is the discipline the leads
    were built on: a panelist writes `what_it_would_settle` into its return **before** it runs
@@ -183,7 +183,7 @@ line "no claim ledger — `attacked_claims` is empty" in place of the claims tab
 
 ### Step 4: Dispatch the panel (or walk it in quick mode)
 
-Panel: five delegates, disjoint by perspective — `Agent` subagents (`subagent_type: coder`), all five dispatched in a single message so the panelists run concurrently. No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
+Panel: five delegates, disjoint by perspective — `Agent` subagents (`subagent_type: coder`), all five dispatched concurrently or in turn as the chair judges, and those it runs at once go out in one message (§6.1, §6.2). No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
 its perspective section from `references/review-dimensions.md` verbatim, both contracts
 verbatim, the digest, and the scope line "ONLY this perspective; return the collector
 contract's fields and nothing else". Each brief also carries the seconds that panelist waits
