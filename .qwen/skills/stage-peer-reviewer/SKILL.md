@@ -54,9 +54,8 @@ English, and an existing document keeps the language it was written in. Resolve 
 once under conventions §7.7. Repository resources load in English: a `references/*_zh.md` edition
 is for human readers and is never loaded at runtime.
 
-**Human-writing guide.** Also read `docs/mds/stage-workflow/human-writing-guide.md` whole at the
-start of every run. It defines the evidence-bound natural-writing criteria the clarity perspective
-applies.
+**Human-writing contract.** The clarity perspective applies the evidence-bound natural-writing
+criteria of the human-writing contract (conventions §7).
 
 **This skill's references.** `references/review-dimensions.md` — the five perspective briefs and
 the two contracts (citation-integrity, collector); `references/review-template.md` — the four
@@ -150,7 +149,7 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
 
 ### Step 1: Load and resolve
 
-Read the conventions and human-writing guide whole, then `notes/story.md` (active cycle), `cycls/<cycle>/venue.yml`
+Read the conventions whole, then `notes/story.md` (active cycle), `cycls/<cycle>/venue.yml`
 (`scale:`, `anonymized:`, the venue's form), `notes/claims.md`, and this skill's `references/`
 per the list above. Resolve the mode (default `panel`) and the involve level once (§7.7).
 Missing story, ledger, or venue profile → stop and route to `stage-stry-coach`. A manuscript

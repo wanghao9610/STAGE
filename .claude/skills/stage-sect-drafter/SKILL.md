@@ -20,7 +20,7 @@ Invocation: `stage-sect-drafter SECTION [DESCRIPTION] [involve=low]` — `SECTIO
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime values this run needs, and reuse `.env` values and conventions text still verbatim visible in this conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly writes; everything under `manus/`, the response to reviewers, and every structural literal stay English, and an existing document keeps the language it was written in. Resolve the involve level once under conventions §7.7. Repository resources load in English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
-**Human-writing guide.** Also read `docs/mds/stage-workflow/human-writing-guide.md` whole at the start of every run. It defines the evidence-bound natural-writing pass used here; this skill's stricter evidence and ledger rules still win.
+**Human-writing contract.** Apply the human-writing contract (conventions §7), the evidence-bound natural-writing pass used here; this skill's stricter evidence and ledger rules still win.
 
 ## Role
 
@@ -47,8 +47,7 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 ### Step 0: Load
 
 1. Read the conventions file whole, then `notes/story.md` (pitch, active `cycle:`), `notes/outline.md`, `notes/claims.md`, `notes/notation.md`, and `notes/style.md` when it exists (Principle 7).
-2. Read the human-writing guide whole.
-3. Missing story or outline means the pipeline is not ready for drafting: stop and route to `stage-stry-coach` or `stage-outl-planner` rather than improvising a structure.
+2. Missing story or outline means the pipeline is not ready for drafting: stop and route to `stage-stry-coach` or `stage-outl-planner` rather than improvising a structure.
 
 ### Step 1: Resolve the section
 

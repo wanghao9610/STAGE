@@ -20,7 +20,7 @@ Project constraints for completing the user's task with proportionate care. This
 - Venue rules — page limits, deadlines, checklists — are entered only as user-confirmed facts. A venue's LaTeX class is the same kind of fact: it comes from the official kit the user supplies, copied byte-for-byte, never fetched and never written from memory.
 - Evidence is immutable in place. A wrong number is fixed at its source and re-imported, or a corrected file is registered; never "correct" one.
 - Nothing may weaken these rules to be helpful. Deadline pressure is what they are calibrated for.
-- Drafting and copy-editing follow `docs/mds/stage-workflow/human-writing-guide.md`: preserve author-confirmed voice, diagnose formulaic prose from pattern clusters rather than isolated words, and never add facts or personality merely to sound human.
+- Drafting and copy-editing follow the human-writing contract in `docs/mds/stage-workflow/writing-workflow-conventions.md` §7: preserve author-confirmed voice, diagnose formulaic prose from pattern clusters rather than isolated words, and never add facts or personality merely to sound human.
 
 ## 3. Surgical Changes
 
@@ -99,7 +99,7 @@ The test: every changed line traces to the user's request, and every number in i
 - A memory is never a source: it can never back a number in `manus/`, a venue rule, or an assertion about a cited work (§2 stands whatever a memory says).
 - Offer, never assume: at most two offers per session, and write only after the user agrees. `INVOLVE=low` records unasked and says so.
 - What travels with the repository goes to the versioned `.stage/memory/`; a `machine:` scoped fact, true only here, goes to the git-ignored `.stage/memory/local/`, as does any memory the user keeps off the repository. Where a memory disagrees with a file in the repository, the file wins.
-- Types, file format, the index line the hooks build from each file, and how a memory is retired: `docs/mds/stage-workflow/memory_spec.md`.
+- Types, file format, the index line the hooks build from each file, and how a memory is retired: `docs/mds/stage-workflow/writing-workflow-conventions.md` §12.
 
 ## 11. Verification
 

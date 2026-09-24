@@ -42,9 +42,9 @@ English, and an existing document keeps the language it was written in. Resolve 
 once under conventions §7.7. Repository resources load in English: a `references/*_zh.md` edition
 is for human readers and is never loaded at runtime.
 
-**Human-writing guide.** Also read `docs/mds/stage-workflow/human-writing-guide.md` whole at the
-start of every run. It defines the evidence-bound natural-writing pass used here; this skill's
-stricter rules on meaning, numbers, and citations still win.
+**Human-writing contract.** Apply the human-writing contract (conventions §7), the evidence-bound
+natural-writing pass used here; this skill's stricter rules on meaning, numbers, and citations
+still win.
 
 ## Role
 
@@ -113,7 +113,7 @@ from the same ones instead of each session inventing a voice.
 
 ## Workflow
 
-1. **Load.** Read the conventions and human-writing guide whole; then `notes/notation.md`, `notes/outline.md`
+1. **Load.** Read the conventions whole; then `notes/notation.md`, `notes/outline.md`
    (section rows and budgets), and `notes/claims.md` (know which sentences carry claims), plus
    `notes/style.md` when it exists (Principle 7). Real date from the system clock (conventions §4).
 2. **Resolve scope (conventions §5).** The literal `style` → the profile branch below, and
@@ -137,7 +137,7 @@ from the same ones instead of each session inventing a voice.
    (route it; do not fix it). Record the exact numbers, math, citation/reference/label keys, `% src:`
    anchors, `\todo{}` markers, claim strength, attribution, and evidence-required qualifiers that the
    pass may not change.
-4. **Diagnose and edit in place.** Inspect paragraphs for clusters from the human-writing guide:
+4. **Diagnose and edit in place.** Inspect paragraphs for clusters from the human-writing contract:
    inflated significance, vague attribution, shallow analysis tails, formulaic contrast,
    over-signposting, forced symmetry or triads, terminology drift, uniform rhythm, generic outlooks,
    manufactured depth, and chatbot residue. Identify what the cluster is doing before rewriting the

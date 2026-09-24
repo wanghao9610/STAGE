@@ -145,8 +145,11 @@ RETIRED_FILES=(
     ".cursor/commands/stage.zh-CN.md"
     ".pi/prompts/stage.zh-CN.md"
     ".qwen/commands/stage.zh-CN.md"
+    "docs/mds/stage-workflow/human-writing-guide.md"
     "docs/mds/stage-workflow/human-writing-guide.zh-CN.md"
+    "docs/mds/stage-workflow/memory_spec.md"
     "docs/mds/stage-workflow/memory_spec.zh-CN.md"
+    "docs/mds/stage-workflow/model_id_spec.md"
     "docs/mds/stage-workflow/model_id_spec.zh-CN.md"
     "docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md"
 )

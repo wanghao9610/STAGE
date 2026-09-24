@@ -62,7 +62,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - **属于论文自己的记忆**：一次会话学到、而仓库里没有任何文件认领的东西——某个 TeX 工具链的坑、你的一项长期偏好、一个试过又被否掉的框架——记在 `.stage/memory/` 下，并由一个钩子在下一次会话开头摆到 agent 面前；不管你用哪个工具驱动 STAGE 都一样。
 - **供人阅读的中文镜像**：peer-reviewer 的 references 旁边一份 `*_zh.md`、共享请求路由器旁边一份 `stage.zh-CN.md`、skill 指南旁边一份 `writing-workflow-skills.zh-CN.md`——与英文版同步维护，运行时不装载，英文版始终是权威版本。
 
-每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.zh-CN.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.md)中，守住证据边界的文字处理流程见[学术自然写作指南](docs/mds/stage-workflow/human-writing-guide.md)。
+每个 skill 做什么、如何调用，见[写作工作流](#写作工作流)；逐 skill 的说明和流水线图，见[写作工作流 Skills 指南](docs/mds/stage-workflow/writing-workflow-skills.zh-CN.md)；所有 skill 共享的规则在[写作工作流规范](docs/mds/stage-workflow/writing-workflow-conventions.md)中，守住证据边界的文字处理流程见其中的[自然写作契约](docs/mds/stage-workflow/writing-workflow-conventions.md#human-writing-contract)。
 
 ## 项目结构
 
@@ -426,7 +426,7 @@ dsh --profile YOUR_PROFILE --dump-config
 - **只有当没有任何文件已经认领这条事实时，才把它记进记忆。** 数字属于带指纹的 `mates/` 条目，论断属于 `notes/claims.md`，页数限制属于对应周期的 `venue.yml`，论文内容属于 `notes/refs/`，承诺属于 `tasks/`。记忆只装剩余信息。
 - **记忆永远不是来源。** 它不能支撑 `manus/` 里的数字、venue 规则或关于被引工作的断言；记忆记得某个值，并不会放松禁止编造的边界。记忆与仓库文件冲突时，以文件为准。
 
-只在本机成立的事实，以及你不想入库的记忆，放进 `.stage/memory/local/`，git 像忽略 `.env` 一样忽略它；其余记忆都受版本管理，随克隆一起走。`env` 条目超过 180 天未重新确认时，会在会话里标为过期。任何内容都先由 agent 提议、再由你决定是否记录；`.env` 设为 `INVOLVE=low` 时改为先记下再说明。文件格式、钩子生成的索引行以及记忆如何退场，见[项目记忆](docs/mds/stage-workflow/memory_spec.md)。
+只在本机成立的事实，以及你不想入库的记忆，放进 `.stage/memory/local/`，git 像忽略 `.env` 一样忽略它；其余记忆都受版本管理，随克隆一起走。`env` 条目超过 180 天未重新确认时，会在会话里标为过期。任何内容都先由 agent 提议、再由你决定是否记录；`.env` 设为 `INVOLVE=low` 时改为先记下再说明。文件格式、钩子生成的索引行以及记忆如何退场，见[项目记忆](docs/mds/stage-workflow/writing-workflow-conventions.md#12-project-memory)。
 
 ## 更新 STAGE 的 skill 与工作流文档
 

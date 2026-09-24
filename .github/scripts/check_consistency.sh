@@ -737,6 +737,8 @@ CONV_HEADINGS=(
     '9. The fabrication boundary'
     '10. Project layout'
     '11. The skill roster'
+    '12. Project memory'
+    '13. Harness hooks and model provenance'
 )
 # section|numbered top-level items
 CONV_ITEMS=("1|6" "3|7" "4|4" "5|6" "6|9" "7|13" "10|5" "11|4")
@@ -804,7 +806,7 @@ while IFS= read -r cite; do
     c_sec="${cite%%.*}"
     c_item=""
     [[ "${cite}" == *.* ]] && c_item="${cite#*.}"
-    if (( c_sec > 11 )); then
+    if (( c_sec > 13 )); then
         fail "conventions §${cite} is cited, but the document has no §${c_sec}"
         conv_errors=1
         continue
@@ -969,19 +971,19 @@ grep -qF '"hookSpecificOutput":{"permissionDecision":"deny"' .kimi-code/hooks/st
 grep -qE '"matcher"[[:space:]]*:[[:space:]]*"bash"' .dsh/hooks.json || \
     { fail ".dsh/hooks.json no longer matches DSH's lowercase bash tool"; hook_errors=1; }
 #     The memory index's field separator — space, middle dot, space — is what all
-#     seven memory hooks build their lines with, and what the spec documents as
-#     the shape a session reads. Reword it in one place and the hooks and the spec
+#     seven memory hooks build their lines with, and what conventions §12 documents as
+#     the shape a session reads. Reword it in one place and the hooks and §12
 #     describe two different lines.
 for f in .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
          .cursor/hooks/stage_memory.sh .kimi-code/hooks/stage_memory.sh \
          .dsh/hooks/stage_memory.sh .pi/extensions/stage-hooks/stage_memory.sh \
-         .qwen/hooks/stage_memory.sh docs/mds/stage-workflow/memory_spec.md; do
+         .qwen/hooks/stage_memory.sh "${CONV_EN}"; do
     grep -qF ' · ' "${f}" 2>/dev/null || \
         { fail "${f} no longer carries the memory index separator ' · '"; hook_errors=1; }
 done
 #     The aging rule is copied the same way: every memory hook carries both date
 #     spellings of the 180-day cutoff (BSD and GNU) and gates the stale mark on
-#     the literal type `env` read from the frontmatter, and the spec states the
+#     the literal type `env` read from the frontmatter, and §12 states the
 #     same window. Change one copy and the others keep answering for a rule the
 #     store no longer follows.
 for f in .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
@@ -993,8 +995,8 @@ for f in .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
     grep -qF 'f["type"] == "env"' "${f}" || \
         { fail "${f} no longer gates the stale mark on the literal type env"; hook_errors=1; }
 done
-grep -qF '180 days' docs/mds/stage-workflow/memory_spec.md || \
-    { fail "memory_spec.md no longer states the 180-day aging window"; hook_errors=1; }
+grep -qF '180 days' "${CONV_EN}" || \
+    { fail "conventions §12 (project memory) no longer states the 180-day aging window"; hook_errors=1; }
 #     What the awk does is shown, not read: every copy is run at its own depth
 #     against one store of three memories — an aged `env`, a `deadend` of the
 #     same date, and a legacy file with no `summary:` — and has to list all three
@@ -1135,7 +1137,8 @@ for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
     grep -qF 'writing-workflow-conventions section 8' "${f}" 2>/dev/null || \
         { fail "${f} no longer points at writing-workflow-conventions section 8"; hook_errors=1; }
 done
-[[ -f docs/mds/stage-workflow/model_id_spec.md ]] || { fail "docs/mds/stage-workflow/model_id_spec.md is missing"; hook_errors=1; }
+grep -qF 'stage_model_id.sh --check' "${CONV_EN}" || \
+    { fail "conventions §13 (harness hooks) no longer spells the Codex post-write check"; hook_errors=1; }
 
 #     Codex closes provenance with a write-after check. Four cases pin its
 #     precedence, its failure boundary, and that it expects exactly what the
