@@ -9,7 +9,7 @@ Invocation shape: `stage-auto <GOAL> [involve=<level>]`.
 - Strip `involve=<level>` first, wherever it sits (conventions §7.7). This run's level is that token; with no token, it is `INVOLVE` in `.env`, and `medium` when that is absent, unset, or invalid. A plain-language instruction during the run changes it as §7.7 says. A goal run has no default of its own: it resolves the level exactly as every skill does.
 - What remains is the goal, in the user's own words: `stage-auto the method section drafted and its numbers audited`, `stage-auto a simulated review of the current draft`. With no goal, ask for one. Never infer a goal from the repository.
 - One goal per invocation. The next goal is the next invocation.
-- A goal that asks where the paper stands, rather than naming a state to reach, is `stage-flow-status`'s: run it once, relay its report, and stop. A read-only request never starts a writing skill (conventions §11.4).
+- A goal that asks where the paper stands, rather than naming a state to reach, is `stage-flow-status`'s: run it once, relay its report, and stop. Such a goal asks to be told, not to have the paper changed, so it starts no writing skill (conventions §11.4).
 
 ## Before the loop
 
