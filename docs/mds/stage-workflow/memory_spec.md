@@ -1,6 +1,6 @@
 # Project Memory
 
-Where a session records what it learned, and how that reaches the next one. The rule that decides *whether* to record — offer, never assume; the repository's own files come first — is `AGENTS.md` §10 and is not repeated here. This file is the format both halves of that rule stand on: what the store holds, what one memory looks like, and what the session hooks parse.
+Where a session records what it learned, and how that reaches the next one. The rule that decides *whether* to record: offer, never assume — at most two offers per session, written only after the user agrees, `INVOLVE=low` recording unasked and saying so; a fact a repository file already owns goes there (`AGENTS.md` §10 where present). This file is the format both halves of that rule stand on: what the store holds, what one memory looks like, and what the session hooks parse.
 
 ## What belongs here
 
