@@ -1346,9 +1346,12 @@ prompt|/mates/a.csv
 prompt|//mates/a.csv
 prompt|/notes/../mates/a.csv
 prompt|/.env
+prompt|/cycls/x_2026/template/k.cls
+prompt|/cycls/x_2026/poster/template/p.cls
+allow|/cycls/x_2026/venue.yml
 CASES
     done
-    (( edit_errors == 0 )) && note "the claude, qwen, and codex edit gates allow notes/ at involve=low and keep the prompt for mates/ however it is spelled"
+    (( edit_errors == 0 )) && note "the claude, qwen, and codex edit gates allow notes/ at involve=low and keep the prompt for mates/ however it is spelled, and for a venue kit"
     rm -rf "${edit_dir}"
 fi
 

@@ -48,8 +48,10 @@ except Exception:
 # Every path the patch names must sit in the project, outside the dot-directories
 # at its root — .git, .codex, .stage, the other tool trees — whose contents are
 # project machinery rather than the manuscript, the notes, or the cycle files a
-# run is writing, and outside mates/, the read-only evidence that only
-# execs/scpts/import.sh and stage-evid-curator write.
+# run is writing, outside mates/, the read-only evidence that only
+# execs/scpts/import.sh and stage-evid-curator write, and outside a venue kit
+# under cycls/<cycle>/template/, poster kits included, unpacked whole and never
+# edited (§10.4).
 path_ok() { # $1 = path as the header writes it, relative to cwd or absolute
     local rel="$1"
     case "$1" in
@@ -60,7 +62,7 @@ path_ok() { # $1 = path as the header writes it, relative to cwd or absolute
     esac
     # A doubled slash hides mates/ from the patterns (`<root>//mates/x`).
     case "${rel}" in
-        .*|mates|mates/*|*/..|*/../*|/*|*//*) return 1 ;;
+        .*|mates|mates/*|cycls/*/template/*|*/..|*/../*|/*|*//*) return 1 ;;
     esac
     return 0
 }

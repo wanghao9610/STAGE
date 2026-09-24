@@ -44,10 +44,12 @@ esac
 # trees — keep their prompt, the way auto-edit mode keeps one for protected
 # paths. Their contents are project machinery, not the code a run is editing.
 # mates/ keeps its prompt too: the evidence is read-only, written only through
-# execs/scpts/import.sh and stage-evid-curator. A `..` segment can climb back out
-# of the root, and a doubled slash hides mates/ from the test
-# (`<root>//mates/x`), so a path carrying either keeps its prompt as well.
-[[ "${rel}" == .* || "${rel}" == mates/* || "${rel}" == */../* || "${rel}" == */.. ]] && exit 0
+# execs/scpts/import.sh and stage-evid-curator. So does a venue kit under
+# cycls/<cycle>/template/, poster kits included: it is unpacked whole and never
+# edited (§10.4). A `..` segment can climb back out of the root, and a doubled
+# slash hides mates/ from the test (`<root>//mates/x`), so a path carrying either
+# keeps its prompt as well.
+[[ "${rel}" == .* || "${rel}" == mates/* || "${rel}" == cycls/*/template/* || "${rel}" == */../* || "${rel}" == */.. ]] && exit 0
 [[ "${rel}" == /* || "${rel}" == *//* ]] && exit 0
 
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":"INVOLVE=low"}}\n'
