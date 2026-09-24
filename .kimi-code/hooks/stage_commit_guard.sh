@@ -82,6 +82,119 @@ staged_oversize() {
     printf '%s' "${out}"
 }
 
+# A heredoc body is data, not commands: a commit message's line that reads like
+# a declined git command is not that command. Each body is dropped through its
+# delimiter before the segments are read, by the reader stage_bash_gate.sh uses
+# (CI holds the two copies equal); a `<<` it cannot place leaves the lines after
+# it to be read as commands, never hidden.
+bodies=""
+strip_heredocs() {
+    # st is a stack of quoting contexts, innermost last: n unquoted (the line,
+    # or a `$(…)` / `(…)` inside it), b a backtick substitution, d double
+    # quotes, s single quotes, a an ANSI-C $'…', m arithmetic (`$((…))` or
+    # `((…))`), r a parenthesis inside it, p a parameter expansion `${…}`.
+    local line rest delim="" body=0 out="" held="" st="n" found i n c
+    while IFS= read -r line; do
+        if (( body )); then
+            if [[ "${line}" == "${delim}" || "${line//$'\t'/}" == "${delim}" ]]; then
+                body=0
+                bodies="${bodies}${held}"
+                held=""
+            else
+                held="${held}${line}"$'\n'
+            fi
+            continue
+        fi
+        out="${out}${line}"$'\n'
+        found=0
+        rest=""
+        n=${#line}
+        for ((i = 0; i < n; i++)); do
+            c="${line:i:1}"
+            case "${st: -1}" in
+                s)
+                    [[ "${c}" == "'" ]] && st="${st%?}" ;;
+                a)
+                    if [[ "${c}" == '\' ]]; then i=$((i + 1))
+                    elif [[ "${c}" == "'" ]]; then st="${st%?}"; fi ;;
+                d)
+                    case "${c}" in
+                        '\') i=$((i + 1)) ;;
+                        '"') st="${st%?}" ;;
+                        '`') st="${st}b" ;;
+                        '$')
+                            case "${line:i+1:2}" in
+                                '((') st="${st}m"; i=$((i + 2)) ;;
+                                '('*) st="${st}n"; i=$((i + 1)) ;;
+                                '{'*) st="${st}p"; i=$((i + 1)) ;;
+                            esac ;;
+                    esac ;;
+                m|r|p)
+                    # A `<<` in here is a shift or a pattern: it opens nothing.
+                    case "${c}" in
+                        '\') i=$((i + 1)) ;;
+                        "'") st="${st}s" ;;
+                        '"') st="${st}d" ;;
+                        '`') st="${st}b" ;;
+                        '$')
+                            case "${line:i+1:2}" in
+                                '((') st="${st}m"; i=$((i + 2)) ;;
+                                '('*) st="${st}n"; i=$((i + 1)) ;;
+                                '{'*) st="${st}p"; i=$((i + 1)) ;;
+                                "'"*) st="${st}a"; i=$((i + 1)) ;;
+                            esac ;;
+                        '(') [[ "${st: -1}" == p ]] || st="${st}r" ;;
+                        ')')
+                            case "${st: -1}" in
+                                r) st="${st%?}" ;;
+                                m) [[ "${line:i+1:1}" == ')' ]] && { st="${st%?}"; i=$((i + 1)); } ;;
+                            esac ;;
+                        '}') [[ "${st: -1}" == p ]] && st="${st%?}" ;;
+                    esac ;;
+                *)
+                    case "${c}" in
+                        '\') i=$((i + 1)) ;;
+                        "'") st="${st}s" ;;
+                        '"') st="${st}d" ;;
+                        '`') if [[ "${st: -1}" == b ]]; then st="${st%?}"; else st="${st}b"; fi ;;
+                        '$')
+                            case "${line:i+1:2}" in
+                                '((') st="${st}m"; i=$((i + 2)) ;;
+                                '('*) st="${st}n"; i=$((i + 1)) ;;
+                                '{'*) st="${st}p"; i=$((i + 1)) ;;
+                                "'"*) st="${st}a"; i=$((i + 1)) ;;
+                            esac ;;
+                        '(')
+                            if [[ "${line:i+1:1}" == '(' ]]; then st="${st}m"; i=$((i + 1)); else st="${st}n"; fi ;;
+                        ')') [[ ${#st} -gt 1 && "${st: -1}" == n ]] && st="${st%?}" ;;
+                        '#')
+                            # A comment runs to the end of the line.
+                            (( i == 0 )) && break
+                            case "${line:i-1:1}" in [[:space:]]|';'|'&'|'|'|'('|')'|'<'|'>') break ;; esac ;;
+                        '<')
+                            if [[ "${line:i+1:1}" == '<' ]]; then
+                                if [[ "${line:i+2:1}" == '<' ]]; then
+                                    i=$((i + 2))
+                                else
+                                    found=1; rest="${line:i+2}"; i=$((i + 1))
+                                fi
+                            fi ;;
+                    esac ;;
+            esac
+        done
+        (( found )) || continue
+        rest="${rest#-}"
+        read -r delim rest <<< "${rest}" || delim=""
+        delim="${delim#\'}"; delim="${delim%\'}"; delim="${delim#\"}"; delim="${delim%\"}"
+        case "${delim}" in
+            [A-Za-z_]*[!A-Za-z0-9_]*) ;;
+            [A-Za-z_]*) body=1 ;;
+        esac
+    done <<< "${cmd}"
+    cmd="${out}${held}"
+}
+strip_heredocs
+
 # One shell line can carry several commands, so each is read on its own: `cd x &&
 # git add -A` is the add it looks like.
 while IFS= read -r segment; do

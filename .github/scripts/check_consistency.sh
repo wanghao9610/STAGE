@@ -1273,7 +1273,7 @@ if [[ -n "${memory_fixture}" ]]; then
     rm -rf "${memory_fixture}"
 fi
 
-# The commit guard's rule body — everything from the segment loop down — is one
+# The commit guard's rule body — everything from its heredoc reader down — is one
 # decision table in seven copies; only the prelude (event wiring, payload
 # parsing, deny encoding, project-root depth) may differ per tree. Existence and
 # parse checks cannot see a tree enforcing someone else's rules: three trees
@@ -1281,10 +1281,10 @@ fi
 # § numbers, and every check above stayed green. Byte parity over the extracted
 # span is what catches that, and the freeze-tag marker pins the one rule whose
 # loss is a silent hole even if the baseline itself is edited.
-guard_rules() { sed -n '/^while IFS= read -r segment; do$/,$p' "$1"; }
+guard_rules() { sed -n '/^# A heredoc body is data, not commands: a commit/,$p' "$1"; }
 GUARD_BASE="$(guard_rules .claude/hooks/stage_commit_guard.sh)"
 if [[ -z "${GUARD_BASE}" ]]; then
-    fail ".claude/hooks/stage_commit_guard.sh: rule body not found (segment loop missing)"
+    fail ".claude/hooks/stage_commit_guard.sh: rule body not found (heredoc reader missing)"
     hook_errors=1
 fi
 for f in .codex/hooks/stage_commit_guard.sh .cursor/hooks/stage_commit_guard.sh \
@@ -1302,6 +1302,14 @@ for f in .claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh 
     grep -qF 'a freeze tag is the immutable record of what was submitted' "${f}" || \
         { fail "${f}: freeze-tag protection (conventions §1.4) is missing from the commit guard"; hook_errors=1; }
 done
+#     The guards read heredocs with the Bash gate's reader; a fix to one that
+#     misses the other leaves a body hiding a command from one hook alone.
+heredoc_reader() { sed -n '/^strip_heredocs() {$/,/^}$/p' "$1"; }
+if [[ -z "$(heredoc_reader .claude/hooks/stage_bash_gate.sh)" || \
+      "$(heredoc_reader .claude/hooks/stage_commit_guard.sh)" != "$(heredoc_reader .claude/hooks/stage_bash_gate.sh)" ]]; then
+    fail ".claude/hooks/stage_commit_guard.sh: strip_heredocs differs from stage_bash_gate.sh's"
+    hook_errors=1
+fi
 #     Parity shows the seven rule bodies agree, not what they decide, and each
 #     prelude still filters and parses on its own. Every copy runs, in a scratch
 #     repository at its own depth and fed the way its harness feeds it, over
@@ -1348,6 +1356,9 @@ deny|git add "."
 deny|git commit --amend
 pass|git add notes/claims.md
 pass|git commit -m "fix: -a is fine inside a message"
+pass|git commit -F- <<'EOF'\ngit add -A is declined now\nEOF
+pass|git commit -m "$(cat <<'EOF'\nfix: x\n\ngit rebase is declined too\nEOF\n)"
+deny|echo $(( 1 << EOF ))\ngit add -A\nEOF
 CASES
     (( guard_errors == 0 )) && note "all seven commit guards decline a blanket add however git is spelled, and pass a named one"
     rm -rf "${guard_dir}"
