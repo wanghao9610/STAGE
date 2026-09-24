@@ -52,12 +52,12 @@ say() { printf '%s\n' "$*"; }
 # output byte-identical whatever the caller ran it with.
 find_files() {  # $1 = dir, $2 = depth, $3 = name pattern
     [ -d "$1" ] || return 0
-    find "$1" -mindepth "$2" -maxdepth "$2" -type f -name "$3" 2>/dev/null | sort
+    find -L "$1" -mindepth "$2" -maxdepth "$2" -type f -name "$3" 2>/dev/null | sort
 }
 
 find_dirs() {   # $1 = dir; immediate subdirectories, trailing slash kept
     [ -d "$1" ] || return 0
-    find "$1" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sed 's|$|/|' | sort
+    find -L "$1" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sed 's|$|/|' | sort
 }
 
 # Modification time, printed for the artifacts whose age is the signal: a build
