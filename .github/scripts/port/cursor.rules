@@ -9,4 +9,7 @@ CLAUDE	AGENTS
 , `model:` the (?:READ|EXEC|PLAN) tier value, omitted when empty	
 multiSelect	allow_multiple
 subagent_type: Explore	subagent_type: explore
-subagent_type: general-purpose	subagent_type: explore
+# The two fan-outs that name general-purpose write files, the panel's reviews and
+# the readers' notes, and Cursor publishes no file-writing built-in type: explore
+# only reads. They dispatch with no subagent_type, as STAR's writing delegates do.
+ \(`subagent_type: general-purpose`\)	 with no `subagent_type` set (Cursor publishes no built-in type that writes files)
