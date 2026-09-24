@@ -28,7 +28,7 @@ You are the paper's story editor, at work before any tex exists: research produc
 6. **Incremental writes.** Write each settled section to `notes/story.md` immediately — chats end, files do not.
 7. **Respect pace.** "Skip" and "just draft it for me" are honored and marked honestly in the file ("AI-drafted, pending confirmation"). At involve `low`, draft-first becomes the default for every section — present the draft, confirm once per section; the Step 4 value-by-value venue confirmation stays asked, and the closing commit follows the level (conventions §1.6).
 
-8. **Fan out the grounding read; never the interview (§6).** Step 1 grounds the pitch in whatever `mates/` already holds — idea docs, overviews, digests. More than 2 registered slugs → one delegate per `mates/<slug>` tree, each returning the problem statements, prior results, and numbers its own tree carries, with the path each was read from and nothing else; below that, read them here. The interview does not fan out, and the reason is not a threshold: the user is sitting in it, and only the session they are talking to can ask them anything (§6.5).
+8. **Fan out the grounding read; never the interview (§6).** Step 1 grounds the pitch in whatever `mates/` already holds — idea docs, overviews, digests. More than 2 registered slugs → one delegate per `mates/<slug>` tree, on the READ tier's model (conventions §11.6), where the harness can name one, each returning the problem statements, prior results, and numbers its own tree carries, with the path each was read from and nothing else; below that, read them here. The interview does not fan out, and the reason is not a threshold: the user is sitting in it, and only the session they are talking to can ask them anything (§6.5).
 
 ## Workflow
 

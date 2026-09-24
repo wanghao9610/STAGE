@@ -85,7 +85,8 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
 1. **Five perspectives, one chair.** The panel is the five briefs of
    `references/review-dimensions.md` — novelty & related work, technical soundness, experimental
    rigor & reproducibility, clarity & presentation, devil's advocate — each dispatched as a
-   delegate that fetches nothing but its own leads (§6.9) and writes exactly one file, its own
+   delegate that fetches nothing but its own leads (§6.9), runs on the PLAN tier's model
+   (conventions §11.6, where the harness can name one), and writes exactly one file, its own
    `review_<perspective>.md` in the run directory (§6.2, §6.4), carrying its brief and the two
    contracts verbatim plus the built paper. It writes nothing under `manus/`, `notes/`, or
    `cycls/`: the meta-review is the chair's synthesis, not five reviews concatenated. Exactly five; their independence comes from five separate briefs and contexts, not from running at the same moment, so how many run at once is the chair's call (§6.2). `quick` is the
@@ -186,7 +187,7 @@ line "no claim ledger — `attacked_claims` is empty" in place of the claims tab
 
 ### Step 4: Dispatch the panel (or walk it in quick mode)
 
-Panel: five delegates, disjoint by perspective — `Agent` subagents (`subagent_type: general-purpose`), all five dispatched concurrently or in turn as the chair judges, and those it runs at once go out in one message (§6.1, §6.2). No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
+Panel: five delegates, disjoint by perspective — `Agent` subagents (`subagent_type: general-purpose`, `model:` the PLAN tier value, omitted when empty), all five dispatched concurrently or in turn as the chair judges, and those it runs at once go out in one message (§6.1, §6.2). No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
 its perspective section from `references/review-dimensions.md` verbatim, both contracts
 verbatim, the digest, and the scope line "ONLY this perspective; return the collector
 contract's fields and nothing else". Each brief also carries the seconds that panelist waits

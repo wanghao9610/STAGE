@@ -76,8 +76,9 @@ writes, and never present a guess as a state.
    message, so a delegate sent to re-read one of them would add a round trip to fetch what is
    already in front of you — the collector does in a single call what three delegates were once
    split across. Delegation is still available and still read-only (§6.4), and it pays in one
-   case: a SECTION-scoped run that must open several section sources for per-row detail the
-   digest does not carry. Two things never fan out either way — the script signals, run once each
+   case: a SECTION-scoped run that must open several section sources for per-row detail the digest
+   does not carry, read by delegates on the READ tier's model (conventions §11.6), where the harness
+   can name one. Two things never fan out either way — the script signals, run once each
    in step 1 (§6.3), and Principle 5's single next action, a judgment across every board at once.
 
 ## Workflow

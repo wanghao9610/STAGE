@@ -1,11 +1,9 @@
 # Kimi Code: skills are invoked as /skill:<name>; the context file is AGENTS.md;
-# no per-subagent model hint; the question tool's multi-select field is snake_case.
+# no per-subagent model hint, so Claude's `model:` tier clause is dropped (conventions §11.6);
+# the question tool's multi-select field is snake_case.
 CLAUDE\.md	AGENTS.md
 CLAUDE	AGENTS
-, `model: sonnet`	
-、`model: sonnet`	
-`Explore` with `model: sonnet`	`explore`
-`Explore`、`model: sonnet`	`explore`
+, `model:` the (?:READ|EXEC|PLAN) tier value, omitted when empty	
 multiSelect	multi_select
 subagent_type: Explore	subagent_type: explore
 subagent_type: general-purpose	subagent_type: coder

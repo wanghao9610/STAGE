@@ -103,7 +103,8 @@ from the same ones instead of each session inventing a voice.
    this pass proves authorship or defeats an AI detector.
 
 9. **Fan out per section file (§6).** A whole-manuscript run polishes files that do not touch each
-   other: one delegate per in-scope `manus/secs/<n>_<slug>.tex`, each owning that file alone for
+   other: one delegate per in-scope `manus/secs/<n>_<slug>.tex`, on the EXEC tier's model
+   (conventions §11.6), where the harness can name one, each owning that file alone for
    the length of the fan-out (§6.2) and editing it in place under Principles 1–4 — no number
    changed, no citation key touched, no `\todo` moved, the canon in `notes/notation.md` enforced,
    and every meaning-adjacent edit returned as a question rather than applied. One section in scope

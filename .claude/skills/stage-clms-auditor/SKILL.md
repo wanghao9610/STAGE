@@ -82,7 +82,8 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    `stage-tabs-builder`, honoring its checked promise in `tasks/<cycle>_promises.md` — returns it
    to `drafted`, after which verification is the ordinary path.
 7. **Fan out the trace (§6).** More than one `.tex` file in scope → one delegate per in-scope
-   `manus/secs/` and `manus/tabs/` file, each following Principle 3's order for its own numbers,
+   `manus/secs/` and `manus/tabs/` file, on the EXEC tier's model (conventions §11.6), where the
+   harness can name one, each following Principle 3's order for its own numbers,
    opening the cited `mates/` file at its anchor, and returning one row per number — the value in
    the tex, the value at the anchor, the verdict — and nothing else. `notes/claims.md` has one
    writer and it is the main agent: Step 7 reads across every delegate's rows at once, a claim is

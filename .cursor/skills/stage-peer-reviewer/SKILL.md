@@ -80,7 +80,8 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
 1. **Five perspectives, one chair.** The panel is the five briefs of
    `references/review-dimensions.md` — novelty & related work, technical soundness, experimental
    rigor & reproducibility, clarity & presentation, devil's advocate — each dispatched as a
-   delegate that fetches nothing but its own leads (§6.9) and writes exactly one file, its own
+   delegate that fetches nothing but its own leads (§6.9), runs on the PLAN tier's model
+   (conventions §11.6, where the harness can name one), and writes exactly one file, its own
    `review_<perspective>.md` in the run directory (§6.2, §6.4), carrying its brief and the two
    contracts verbatim plus the built paper. It writes nothing under `manus/`, `notes/`, or
    `cycls/`: the meta-review is the chair's synthesis, not five reviews concatenated. Exactly five; their independence comes from five separate briefs and contexts, not from running at the same moment, so how many run at once is the chair's call (§6.2). `quick` is the

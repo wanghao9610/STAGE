@@ -71,7 +71,8 @@ re-reading routes to `stage-refs-curator`.
    keys), missing required fields, inconsistent venue naming, arXiv entries where the note
    records a published version. The fix is `stage-refs-curator`'s.
 6. **Fan out the assertion audit (§6).** More than 20 in-scope citing sentences → split them one
-   delegate per cited key, so every sentence about a given paper reaches the same reader with the
+   delegate per cited key, on the EXEC tier's model (conventions §11.6), where the harness can name
+   one, so every sentence about a given paper reaches the same reader with the
    same note in front of it, each returning one verdict per sentence — supported, unsupported, or
    unverifiable, with the note line it turned on — and nothing else. Two checks stay whole because
    splitting them would blind them: key resolution greps the whole manuscript against the whole
