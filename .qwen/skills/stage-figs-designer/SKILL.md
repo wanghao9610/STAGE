@@ -11,7 +11,7 @@ argument-hint: "[FIGURE | plan | teaser] [involve=low]"
 
 # Figure Designer — sourced figures, no orphan PDFs
 
-Invocation: `stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no argument audits the Figures table in `notes/outline.md` against the files on disk and proposes one next action; `plan` creates or revises the Figures table from the story and section briefs; `teaser` resolves to the teaser figure and runs its checklist; anything else names one figure, resolved by outline ID (`F1`), file slug, or purpose/section text against `notes/outline.md` (conventions §5 — ambiguity is asked about, never guessed). Build work is one figure per invocation. There is no separate description slot here: free text is already the figure's own description — that is how a figure resolves by purpose or section text, and how one with no Figures row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the figure is for; it never supplies a plotted number, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}` in the caption. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
+Invocation: `stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no argument audits the Figures table in `notes/outline.md` against the files on disk, demotes to `draft` a figure whose cited evidence changed since its build, and proposes one next action; `plan` creates or revises the Figures table from the story and section briefs; `teaser` resolves to the teaser figure and runs its checklist; anything else names one figure, resolved by outline ID (`F1`), file slug, or purpose/section text against `notes/outline.md` (conventions §5 — ambiguity is asked about, never guessed). Build work is one figure per invocation. There is no separate description slot here: free text is already the figure's own description — that is how a figure resolves by purpose or section text, and how one with no Figures row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the figure is for; it never supplies a plotted number, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}` in the caption. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime values this run needs, and reuse `.env` values and conventions text still verbatim visible in this conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly writes; everything under `manus/`, the response to reviewers, and every structural literal stay English, and an existing document keeps the language it was written in. Resolve the involve level once under conventions §7.7, and the tier value once under §11.6. Repository resources load in English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
@@ -24,13 +24,13 @@ You never hand-type data into artwork, never write section prose, never place `\
 ## Core Principles
 
 1. **A purpose row precedes pixels.** The Figures table (`| ID | File | Purpose | Section | Source | Status |`, Status `planned | sketch | draft | final`; schema in conventions §8) is the inventory this skill owns. No figure is built without a row, and a row whose Purpose cannot justify its page cost in one clause is proposed for retirement — with the user's confirmation (§7), never silently.
-2. **No orphan PDFs.** Every `manus/figs/<slug>.pdf` has exactly one of two origins, named in its row's Source column: an editable source `manus/figs/srcs/<slug>.*` (tikz, python, drawio) committed beside it, or a `mates/MANIFEST.md` entry for artwork produced elsewhere — registered through `stage-evid-curator`, since `mates/` and its MANIFEST are read-only to this skill (§10). A PDF with neither origin cannot be regenerated or audited; the no-argument audit hunts them.
-3. **Plotted numbers are numbers (§9a).** Every data series in a source file carries a `% src: mates/<...>#<anchor>` comment (`# src:` in python) naming the fingerprinted evidence it draws from — the same discipline `stage-tabs-builder` applies to table rows. A value the evidence does not carry is left out and the gap named in the caption as `\todo{...}`; a plausible hand-typed curve is fabrication, not illustration.
+2. **No orphan PDFs.** Every `manus/figs/<slug>.pdf` has exactly one of two origins, named in its row's Source column: an editable source `manus/figs/srcs/<slug>.*` (tikz, python, drawio, or a one-slide `.pptx` with its `<slug>.render.yml`, which the neutral copy's local figure pipeline builds) committed beside it, or a `mates/MANIFEST.md` entry for artwork produced elsewhere — registered through `stage-evid-curator`, since `mates/` and its MANIFEST are read-only to this skill (§10). A PDF with neither origin cannot be regenerated or audited; the no-argument audit hunts them.
+3. **Plotted numbers are numbers (§9a).** Every data series in a source file carries a `% src: mates/<...>#<anchor> sha256: <hex>` comment (`# src:` in python) naming the fingerprinted evidence it draws from and that entry's `sha256:` in `mates/MANIFEST.md` as read this run — the same discipline `stage-tabs-builder` applies to table rows. A value the evidence does not carry is left out and the gap named in the caption as `\todo{...}`; a plausible hand-typed curve is fabrication, not illustration.
 4. **Captions are claims (§9a).** A caption stating a number or a comparative follows prose rules: trace it to `mates/` or write `\todo{}`. Keep captions checkable by `stage-clms-auditor`, and keep any claim a caption states in step with `notes/claims.md`.
 5. **The teaser answers for the whole paper.** It gets the dedicated checklist in Step 5, and its row never reaches `final` while an item fails.
 6. **Legible before beautiful.** Text readable at final print width, meaning survives grayscale, symbols and terms match `notes/notation.md`; when `ANON=true` (§3), no author names, lab marks, or repo URLs inside artwork.
 
-7. **Fan out per figure (§6).** The no-argument audit walks every Figures row against `manus/figs/` and `manus/figs/srcs/`: more than 6 figures → one delegate per figure, on the READ tier's model (conventions §11.6), where the harness can name one, each returning its row's origin verdict — editable source, `mates/` entry, or orphan — and nothing else. A run that builds several sources splits the same way, one delegate per figure on the EXEC tier's model, each owning its own `manus/figs/srcs/<slug>.*` and no other file (§6.2), and each `% src:` comment on a data series is written by whoever draws it (Principle 3, §6.4). What does not split: rendering, which is one call per source; the Figures table, which has one writer; and the teaser checklist, which is a judgment about the whole paper made in one place.
+7. **Fan out per figure (§6).** The no-argument audit walks every Figures row against `manus/figs/` and `manus/figs/srcs/`: more than 6 figures → one delegate per figure, on the READ tier's model (conventions §11.6), where the harness can name one, each returning its row's origin verdict — editable source, `mates/` entry, or orphan — and its fingerprint verdict, and nothing else. A build does not split: one invocation builds one figure (conventions §11.3). What does not split: rendering, which is one call per source; the Figures table, which has one writer; and the teaser checklist, which is a judgment about the whole paper made in one place.
 
 ## Workflow
 
@@ -38,16 +38,16 @@ You never hand-type data into artwork, never write section prose, never place `\
 
 ### Step 0: Load
 
-Read the conventions (whole file), then `notes/outline.md`, `notes/story.md`, `notes/notation.md`, `notes/claims.md`, and `mates/MANIFEST.md`; list `manus/figs/` and `manus/figs/srcs/`. Note `LATEX_ENGINE` and `ANON` from `.env` (§3). No `notes/outline.md` yet → say so and route to `stage-outl-planner`; the Figures table lives there, so stop.
+Read the conventions (whole file), then `notes/outline.md`, `notes/story.md`, `notes/notation.md`, `notes/claims.md`, `mates/MANIFEST.md`, and the active cycle's `tasks/<cycle>_promises.md` when it exists (Step 6.1); list `manus/figs/` and `manus/figs/srcs/`. Note `LATEX_ENGINE` and `ANON` from `.env` (§3). No `notes/outline.md` yet → say so and route to `stage-outl-planner`; the Figures table lives there, so stop.
 
 ### Step 1: Resolve the mode
 
-First match wins: `plan` → Step 2; `teaser` → the teaser figure, Steps 3–5; a figure token → that figure (§5 matching; ambiguity → ask, §7), Steps 3–4; no argument → the audit:
+First match wins: `plan` → Step 2; `teaser` → the teaser figure, Steps 3–5; a figure token → that figure (§5 matching; ambiguity → ask, §7), Steps 3–4; `plan`, `teaser`, and a figure run all end with Step 6 (`plan`: 6.2–6.3 only); no argument → the audit:
 
 1. Every PDF under `manus/figs/` resolves to an origin per Principle 2 — orphans are the headline finding.
-2. Every Figures row checks against disk: File exists or Status is `planned`; Source resolves; a `mates/` Source still has its MANIFEST entry (§8 — staleness is stamp comparison, never mtime; upstream drift surfaces via `import.sh --diff`).
+2. Every Figures row checks against disk: File exists or Status is `planned`; Source resolves; a `mates/` Source still has its MANIFEST entry (§8 — staleness is stamp comparison, never mtime; upstream drift surfaces via `import.sh --diff`); every `sha256:` a `src:` comment recorded still equals its entry's current MANIFEST `sha256:` — a mismatch sets that row's Status to `draft` in `notes/outline.md` unless it already stands lower, with its `updated:` and provenance fields (§8) and the run's one commit (§1), and names `stage-figs-designer <ID>` as its rebuild, and a comment recording none is reported as unchecked.
 3. Drafted sections are scanned for `\includegraphics` of figures no row plans — an unplanned figure gets a proposed row, not silent adoption.
-4. Report drift and one next action with its exact command; go no further unless asked.
+4. Report drift, any row item 2 demoted, and one next action with its exact command; beyond item 2's Status write and its commit (§1.6), go no further unless asked.
 
 ### Step 2: Plan the inventory (`plan`)
 
@@ -55,8 +55,8 @@ Derive rows from `## Pitch` and `## Contributions` in `notes/story.md` and the o
 
 ### Step 3: Build the source
 
-1. Confirm the figure's row exists; create one under Step 2's rules when it does not.
-2. Choose the source form — tikz for architecture and diagrams, python for data plots, drawio for flowcharts — and write or revise `manus/figs/srcs/<slug>.*`.
+1. Confirm the figure's row exists; if absent, draft one under Step 2's rules, show it (conventions §7.12), and ask before writing it, at every involve level (§7.9).
+2. Choose the source form — tikz for architecture and diagrams, python for data plots, drawio for flowcharts — and write or revise `manus/figs/srcs/<slug>.*`. A row whose Source is a `.pptx` is not rewritten in another form: say that revising it needs the neutral copy's local figure pipeline, name `stage-figs-designer <ID>` for a harness that carries it, and stop.
 3. Data figures: locate the evidence through `notes/claims.md` and `mates/MANIFEST.md`; give every series its `src:` comment (Principle 3). Evidence not yet imported → route to `stage-evid-curator` and hold Status at `sketch`.
 4. Artwork produced outside the repo: have it registered by `stage-evid-curator` first, then record the `mates/` path in the Source column — never accept a bare PDF.
 
@@ -79,14 +79,15 @@ Fails become the figure's todo list; the teaser's row stays short of `final` whi
 
 ### Step 6: Update the output table and report
 
-1. Flip the figure's Status honestly (`planned → sketch → draft → final`), fill its Source column, touch the outline's `updated:` — the Figures row is this skill's output-table state (§8).
+1. Flip the figure's Status honestly (`planned → sketch → draft → final`), fill its Source column, touch the outline's `updated:` — the Figures row is this skill's output-table state (§8). Then, in `tasks/<cycle>_promises.md`, for each open box naming this figure, ask once "does this revision keep <point id>?" with no recommended answer — a mandatory confirmation point, asked at every involve level (conventions §7.7, §7.9); on a yes, tick that box `- [ ]` → `- [x]` and append this run's `model_trail:` entry, in this run's commit.
 2. Digest in chat: rows changed, files written, `src:` anchors used, checklist or audit verdicts, and routing — unregistered artwork or missing evidence → `stage-evid-curator`; placement → `stage-sect-drafter`; caption claims → `stage-clms-auditor`.
-3. Commit once for the working session, subject naming this skill (§1).
+3. Commit once for the run, subject naming this skill (§1).
 
 ## Output
 
 - `manus/figs/srcs/<slug>.*` — the editable source, a `src:` comment on every data series.
 - `manus/figs/<slug>.pdf` — the rendered figure, or an honest statement of the render step that remains.
 - `notes/outline.md` — Figures table rows (`ID, File, Purpose, Section, Source, Status`), the output-table state field for figures (§8).
+- `tasks/<cycle>_promises.md` — the boxes this revision keeps, ticked on the author's yes (Step 6.1).
 - Chat digest per Step 6. Nothing under `mates/` (read-only), nothing in `manus/secs/`, no reports in `wkdrs/`.
 - Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

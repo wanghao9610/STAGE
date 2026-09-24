@@ -61,11 +61,11 @@ find_dirs() {   # $1 = dir; immediate subdirectories, trailing slash kept
 }
 
 # Modification time, printed for the artifacts whose age is the signal: a build
-# and a report are compared against the outline's `updated:`. BSD and GNU stat
-# take different flags and neither accepts the other's, so try both.
+# and a report are compared against the outline's `updated:`. `date -r FILE`
+# reads a file's mtime on BSD/macOS, GNU and BusyBox alike; stat does not — GNU
+# stat takes BSD's -f and -t as bare flags and prints a filesystem line first.
 mtime() {
-    stat -f '%Sm' -t '%Y-%m-%d %H:%M' "$1" 2>/dev/null && return 0
-    stat -c '%y' "$1" 2>/dev/null | cut -c1-16
+    date -r "$1" '+%Y-%m-%d %H:%M' 2>/dev/null
 }
 
 # Leading --- block, capped. model_trail is counted rather than printed: it grows
@@ -75,6 +75,7 @@ mtime() {
 # reports — the last writer of each artifact, and which artifacts have no trail.
 frontmatter() {
     awk -v cap="$FM_CAP" '
+        { sub(/\r$/, "") }
         NR == 1 && $0 != "---" { exit }
         NR == 1 { next }
         /^---$/ { exit }
@@ -97,6 +98,7 @@ frontmatter() {
 # ledger alike — the script does not know which is which, and does not need to.
 rows() {
     awk -v cap="$ROW_CAP" '
+        { sub(/\r$/, "") }
         /^[ \t]*\|/ { if (++shown <= cap) print; else omitted++ }
         END { if (omitted) printf "… (%d more table rows)\n", omitted }
     ' "$1"
@@ -107,6 +109,7 @@ rows() {
 # reader must see — so the cap counts ticked ones only.
 boxes() {
     awk -v cap="$ROW_CAP" '
+        { sub(/\r$/, "") }
         /^[ \t]*- \[[ xX]\]/ {
             if ($0 ~ /- \[[xX]\]/) { if (++ticked > cap) { omitted++; next } }
             print
@@ -129,9 +132,10 @@ cap_list() {  # stdin, capped, with the remainder counted
 # skill reports, so a missing file prints its name and "(absent)" rather than
 # nothing — a silent gap reads as a scan that forgot to look.
 #
-# A file with no leading `---` still gets its `model_id:` looked for: §8 has
-# refs_index.md carrying that field as a plain header line, and the provenance
-# read wants it from every artifact that names a writer at all.
+# A file with no leading `---` still gets its `model_id:` looked for: a
+# refs_index.md written before §8 gave it a frontmatter block may carry the
+# field as a plain header line, and the provenance read wants it from every
+# artifact that names a writer at all.
 dump_file() {
     say ""
     if [ ! -f "$1" ]; then
@@ -139,10 +143,10 @@ dump_file() {
         return 0
     fi
     say "### $1 — mtime $(mtime "$1")"
-    if [ "$(head -n 1 "$1")" = "---" ]; then
+    if [ "$(head -n 1 "$1" | tr -d '\r')" = "---" ]; then
         frontmatter "$1"
     else
-        head -n 10 "$1" | grep -E '^model_id:' || true
+        head -n 10 "$1" | tr -d '\r' | grep -E '^model_id:' || true
     fi
     rows "$1"
 }
@@ -238,6 +242,14 @@ else
         { find_files "$c" 1 'SUBMISSION_*'
           find_dirs "$c" | grep -E '/(poster|template)/$' || true
         } | cap_list
+        { find_files "$c/reviews" 1 '*.md'
+          find_files "$c/response" 1 '*.md'
+          find_files "$c" 1 'SUBMISSION_*.md'
+          find_files "$c/poster" 1 'POSTER_PLAN.md'
+        } | while IFS= read -r f; do
+            fm=$(frontmatter "$f")
+            [ -z "$fm" ] || { say "-- $f frontmatter --"; say "$fm"; }
+        done
     done
 fi
 
@@ -251,6 +263,7 @@ else
     printf '%s\n' "$task_files" | while IFS= read -r t; do
         say ""
         say "### $t — mtime $(mtime "$t")"
+        frontmatter "$t"
         boxes "$t"
     done
 fi

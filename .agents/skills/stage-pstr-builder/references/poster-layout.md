@@ -9,9 +9,9 @@ recorded in the plan, and the font sizes are arithmetic.**
 
 ## 1. Sheet sizes
 
-The size comes from `cycls/<cycle>/venue.yml` with `confirmed:` set (conventions §9c). This table
-exists to check a confirmed value against a plausible one and to convert units — never to supply a
-size the user has not confirmed.
+The size is the one the user confirmed, recorded in `POSTER_PLAN.md` as `size:` and `orientation:`
+with `size_confirmed:` (SKILL.md Principle 6). This table exists to check a confirmed value against a
+plausible one and to convert units — never to supply a size the user has not confirmed.
 
 | Name | Portrait (w × h) | Landscape (w × h) |
 |---|---|---|
@@ -96,9 +96,12 @@ declares; anything authored at one size and printed at another scales with the r
 effective_pt = authored_pt × (print_width / authored_width)
 ```
 
-So a body font of 25pt authored on A0 (841 mm wide) and printed at 36 in (914 mm) is effectively
-25 × 914/841 ≈ 27pt — above the floor. The same file printed on A1 (594 mm) is effectively
-25 × 594/841 ≈ 18pt, and fails. Compute it; do not look at it.
+Fits (§6) pins the rendered page to the confirmed sheet, so for the document font the ratio is 1
+and the class's base size is the effective size. The ratio matters for text inside an included
+figure: `effective_pt = label_pt × placed_width / natural_width`, with `natural_width` the figure's
+`Page size` from `pdfinfo manus/figs/<slug>.pdf` and `placed_width` its `width=` in `poster.tex`. A
+10pt label in a figure 72pt wide placed 600pt wide prints at about 83pt; the same label in a figure
+500pt wide placed 600pt wide prints at 12pt and fails. Compute it; do not look at it.
 
 Two sizes escape the class's base font and must be checked separately: text **inside** an included
 figure PDF, which scales with the box the figure is placed in, not with the document font; and
@@ -115,6 +118,7 @@ generation mechanical enough to audit.
 ```latex
 \documentclass[a0paper, portrait, 25pt]{tikzposter}
 \usepackage{graphicx}
+\tikzposterlatexaffectionproofoff  % the class's credit line prints under the 20pt floor
 % \usepackage{qrcode}   % only when a QR target was supplied
 
 \title{...}                    % the paper title, verbatim from manus/main.tex
@@ -140,11 +144,13 @@ Rules that hold whichever class is in play:
 
 1. **One block per zone row, in the plan's order.** A block with no row, or a row with no block, is
    the drift the no-argument audit reports.
-2. **`% src:` sits on the line above the number it sources**, one comment per number — the same
-   discipline `stage-tabs-builder` applies to table rows, so `stage-clms-auditor` can walk the
-   poster the way it walks a table.
-3. **Figures are included by relative path from `manus/figs/`**, unmodified. Scale with the
-   `width` argument only; never `trim`, `clip`, or a recolor.
+2. **`% src:` sits on the line above the number it sources**, one comment per number — finer than
+   `stage-tabs-builder`'s one comment per data row, so the check gate's Sourced lane (SKILL.md
+   Step 5.1) can walk every number on the poster to its fingerprint. `stage-clms-auditor` reads
+   only `manus/` and does not audit the poster.
+3. **Figures are included from `manus/figs/` by their path relative to `poster.tex`**
+   (`../../../manus/figs/<slug>.pdf`; `run.sh` compiles from the entry point's directory),
+   unmodified. Scale with the `width` argument only; never `trim`, `clip`, or a recolor.
 4. **No `\todo` macro is defined here at all.** The manuscript's third state does not exist on a
    poster (SKILL.md Principle 3), and a class where the macro is undefined fails loudly at compile
    time rather than printing a marker onto a wall.
@@ -154,9 +160,11 @@ Rules that hold whichever class is in play:
 ## 5. When the venue supplies a kit
 
 Copy it whole into `cycls/<cycle>/poster/template/`, byte-for-byte, unedited, and record
-`poster_template:` in `venue.yml` naming the class inside it. Then §4's house skeleton is not used:
-the kit's own class, its own block or column commands, and its own title macros are, and the zone
-map is a mapping onto whatever structure the kit provides rather than onto `tikzposter`'s.
+`poster_template:` in `POSTER_PLAN.md`'s frontmatter naming the class inside it. Then §4's house
+skeleton is not used: the kit's own class, its own block or column commands, and its own title
+macros are, and the zone map is a mapping onto whatever structure the kit provides rather than onto
+`tikzposter`'s. The render prefixes `TEXINPUTS=./template//:` to SKILL.md Step 4's command;
+`\documentclass{template/<class>}` alone fails as soon as the class loads a sibling file.
 
 Everything in §3 still applies — a supplied kit sets a look, not a legibility floor, and its example
 content is an example, not a constraint. When the kit will not compile as delivered, the fix goes in
@@ -169,6 +177,11 @@ compile locally is wrong in a way that surfaces at the print shop.
 - **Page size and count.** Read them off the render rather than trusting the class:
   `pdfinfo wkdrs/builds/poster/poster.pdf` reports `Page size` in points (1 in = 72 pt) and `Pages`,
   which must be exactly 1. Compare against the confirmed sheet within a millimetre.
+- **Smallest text.** `pdftotext -bbox wkdrs/builds/poster/poster.pdf -` lists every word on the
+  sheet, figure text included at its placed scale. A word box's height (`yMax − yMin`, pt) reads
+  slightly under the set size, so it errs toward failing. Text a figure carries as outlines is
+  invisible to it: where `label_pt` can be read neither from the figure source nor from box
+  heights, report Legible as degraded (conventions §3.5), never passed.
 - **Grayscale.** Convert a copy and look at it — every distinction the poster relies on (series,
   highlight, panel grouping) must survive. Where the toolchain cannot convert, say so and name what
   was checked by reasoning about the palette instead; do not report a check that was not run.

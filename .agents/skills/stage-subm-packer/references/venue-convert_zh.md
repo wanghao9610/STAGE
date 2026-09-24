@@ -73,6 +73,8 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 **只加拷进来的正文文件真正用到的那些。** 逐条在 `secs/`、`tabs/`、`figs/` 里扫这些构造，命中了才把对应宏包加进去。把 `stage.cls` 的整份 `\RequirePackage` 清单抄进 `compat.sty`，正是制造 option clash 的办法：venue class 通常已经带选项加载过它自己的 hyperref、geometry 与 caption 设置，一次不带选项的二次加载会跟它打起来。
 
+有一行不管正文用了什么都要进每一份 `compat.sty`：`\ifdefined\AddToHook \AddToHook{env/thebibliography/before}{\label{stage@refs}}\fi`，即 `stage.cls` 自带的那个钩子，好让副本的 `.aux` 记下参考文献列表起始的那一页，第 6 步才能像 `lint.sh` 数预印本那样数正文页数。
+
 生成的 `main.tex` 里的加载顺序：venue class，然后 `stys/stage`，然后 `compat`。`compat.sty` 里凡是 venue class 已经定义过的，一律用 `\providecommand`——绝不用 `\renewcommand` 盖掉一个 venue 的宏。
 
 ## 5. 生成 `main.tex`
@@ -93,15 +95,15 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 | `stage.cls` 命令 | 行号 | 变成 |
 |---|---|---|
-| `\affiliation[key]{...}` | 330 | venue 的单位宏 |
-| `\contribution[mark]{...}` | 335 | venue 的同等贡献 / 通讯作者说明，或一个 `\thanks` |
-| `\keywords{...}` | 341 | venue 的关键词宏；它没有就丢掉 |
-| `\code` `\project` `\dataset` | 351–354 | 用 venue 自己的写法排一行链接，或丢掉；匿名下要涂掉 |
-| `\correspondence{...}` | 355 | venue 的通讯作者说明 |
-| `\paperdate{...}` | 356 | 丢掉——venue class 自己给论文集标日期 |
-| `\paperstyle{...}` `\papercolor{...}` | 359、180 | **丢掉。** 它们驱动的是 `stage.cls` 的标题面板，没有 venue 等价物 |
-| `\beginappendix` | 617 | venue 的附录机制，通常是 `\appendix` |
-| `\metadata[label]{value}` | — | 一行链接，或丢掉 |
+| `\affiliation[key]{...}` | 336 | venue 的单位宏 |
+| `\contribution[mark]{...}` | 341 | venue 的同等贡献 / 通讯作者说明，或一个 `\thanks` |
+| `\keywords{...}` | 347 | venue 的关键词宏；它没有就丢掉 |
+| `\code` `\demo` `\project` `\dataset` | 357–360 | 用 venue 自己的写法排一行链接，或丢掉；匿名下要涂掉 |
+| `\correspondence{...}`、`\email{...}` | 361、356 | venue 的通讯作者说明；匿名下丢掉 |
+| `\paperdate{...}` | 362 | 丢掉——venue class 自己给论文集标日期 |
+| `\paperstyle{...}` `\papercolor{...}` | 365、180 | **丢掉。** 它们驱动的是 `stage.cls` 的标题面板，没有 venue 等价物 |
+| `\beginappendix` | 623 | venue 的附录机制，通常是 `\appendix` |
+| `\metadata[label]{value}` | 348 | 一行链接，或丢掉；匿名下要涂掉 |
 
 ### abstract 要搬家
 
@@ -115,12 +117,12 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 它不是一个单独的模式，而是跟着这次运行本来在做的事走：
 
-| 运行 | `venue.yml` | 副本 |
-|---|---|---|
-| `convert`，或送审包 | `anonymized: true` | 匿名：作者写 "Anonymous Author(s)"、单位写 "Anonymous Institution"，`\code`/`\project`/`\dataset` 的 URL 换成 "Link redacted for review"，打开模板包的匿名开关 |
-| `camera` 包 | `anonymized: false` | 完整元数据，打开模板包的 final-copy 开关 |
+| `.env` 的 `ANON` | 副本 |
+|---|---|
+| `true` | 匿名：作者写 "Anonymous Author(s)"、单位写 "Anonymous Institution"，`\code`/`\demo`/`\project`/`\dataset` 与裸 `\metadata` 的 URL 换成 "Link redacted for review"，`\correspondence`/`\email` 丢掉，打开模板包的匿名开关 |
+| `false` | 完整元数据，打开模板包的 final-copy 开关 |
 
-`.env` 的 `ANON` 与 `venue.yml` 的 `anonymized:` 不一致，在主工作流里本来就是一处停止（规约 §3.4）——转换绝不靠挑一个来把它化解掉。
+主工作流的第 1 步已经让 `ANON` 与模式对上，所以副本只跟着 `ANON` 走；`convert` 运行按 `ANON` 的现值来，所以为 camera-ready 做转换之前，先把 `ANON=false` 设好。
 
 ## 6. 构建、迭代、数页数
 
@@ -130,17 +132,17 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 bash execs/run.sh --main <copy>/main.tex
 ```
 
-它以副本自己的目录为工作目录、以副本的 `stys/` 上 TEXINPUTS 来编译，所以构建通过就证明了这份副本是自足的——那正是重点。产物落在 `<copy>/.build/`，绝不落在 `wkdrs/builds/`，于是 `lint.sh --no-build` 复用的那份手稿构建不会被覆盖。
+它以副本自己的目录为工作目录、以副本的 `stys/` 上 TEXINPUTS 来编译，所以构建通过就证明了这份副本是自足的——那正是重点。不带 `--outdir` 时，产物落在 `<copy>/.build/`，绝不落在 `wkdrs/builds/`，于是 `lint.sh --no-build` 复用的那份手稿构建不会被覆盖。打包运行会加上 `--outdir wkdrs/builds/<cycle>_<date>_check/`：它的副本就是包的源码目录，里面若有一个 `.build/`，就会把带着绝对路径的 `.log` 与 `.fls` 文件一起发出去。
 
 `--main` 是随本功能才有的，所以一个 `execs/run.sh` 早于它的论文仓库，会把这个参数当作未知选项一路传给 latexmk。构建之前先查一次：`bash execs/run.sh --help` 里有没有列出 `--main`。没有就停下——副本已经写好了，构建是那个跑不起来的步骤——并给出那一行修法：`bash execs/update.sh`，它会连同 skill 树与工作流文档一起同步这个入口脚本。若跑完它 `--main` 仍然不在，说明这个仓库的 `update.sh` 本身也早于这次改动，而它老到还不会自我更新——新版会装上自己的替代品，旧版不会——那就得手工从上游拷贝这两个入口脚本，把这一点说出来就是报告本身。绝不用一条裸 `latexmk` 命令把它糊过去：§3.3 让每一次构建都走入口脚本，好让引擎只有一个来源，而一份用别的命令构建出来的包，并不能证明 `execs/run.sh` 构建得了它。
 
 失败时，改 `compat.sty` 或生成的 `main.tex` 再重建。绝不给 venue 文件打补丁（契约第 3 条），也绝不为了让它编译通过而丢内容——映射不过去的内容是被报告的，不是被删掉的。
 
-**这次构建报出的页数才是算数的那个。** `lint.sh` 量的是预印本构建，那是另一个 class 下的另一份文档：作为写作期的代理指标有用，但不是"这篇论文放不放得下"的答案。拿这个页数去对 `page_limit_main`：
+**这次构建报出的页数才是算数的那个。** `lint.sh` 量的是预印本构建，那是另一个 class 下的另一份文档：作为写作期的代理指标有用，但不是"这篇论文放不放得下"的答案。照 `lint.sh` 数预印本的办法来数：除非 `venue.yml` 写着 `references_in_limit: true`，页数就是这次构建的 `main.aux` 里 `\newlabel{stage@refs}` 记下的那一页（`compat.sty` 的钩子，第 4 步；`.aux` 在构建的输出目录里），报成 `N content pages (through the page the references start on; M total)`。`references_in_limit: true`，或者没有这个 label——venue 的参考文献不是 `thebibliography` 环境——时，页数就是 PDF 的总页数，报告里要说明这一点。拿这个页数去对 `page_limit_main`：
 
 - **打包运行，超限**——硬阻断，路由给 `stage-copy-editor`。
 - **`convert` 运行，超限**——连同超出量一起报出来，不设关口。
-- **`venue.yml` 的 `confirmed:` 未设**——报出页数，并说明该上限尚未确认。未确认的上限不构成约束（规约 §9c）。
+- **`venue.yml` 的 `confirmed:` 未设或 `page_limit_main` 为空**——报出页数，并说明该上限尚未确认或为空。两者都不构成约束（规约 §9c）。
 
 ## 7. 报告
 
@@ -154,5 +156,7 @@ bash execs/run.sh --main <copy>/main.tex
 - 映射了什么：class 与选项、用到的标题元数据宏、bibliography style、匿名开关、`compat.sty` 不得不补的东西
 - **丢掉了什么**，一行一条——`\paperstyle`、`\papercolor`、`\paperdate`，以及其他一切没有 venue 等价物的东西
 - 什么需要人来处理：转换没有自动化的某条 venue 规则、模板包没提供而内容需要的某个宏包、任何没能一一对应映射过去的东西、附录顺序的选择
+
+模板包要求放进论文里的清单也是这类发现之一：`tasks/<cycle>_venue.md` 里的一条 `V<n>`，路由给 `stage-outl-planner`，由它安排附录那一行。
 
 绝不为了让报告显得干净而让一处缺口静默通过。一次靠悄悄丢掉关键词而编译通过的转换，是一次会在投稿系统那里给人惊喜的转换。

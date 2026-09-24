@@ -2,7 +2,7 @@
 
 The lookup behind the venue component in `source-policy.md` (Impact score). Deterministic: take the fetched record's venue field — the transcribed `booktitle` or `journal`, else the search record's venue string — strip braces, and match it case-insensitively against the rows below. An abbreviation matches only as a whole word (`ACL` does not hit `NAACL`); a name fragment matches as a substring, and any one of a row's fragments is enough — the dotted alternatives are there because DBLP's condensed journal forms abbreviate (`IEEE Trans. Pattern Anal. Mach. Intell.`). A hit in the checked-first list below scores 4 before any tier row is tried; otherwise the first tier with a hit wins; no hit and published → 4; preprint-only → 2.
 
-The lists are calibrated for CS/AI. A project in another field edits the lists, never the rule — and an unlisted venue that "obviously" deserves a tier gets a row added here, not an exception made mid-run. Judgment never enters a lookup.
+The lists are calibrated for CS/AI. A project in another field changes the lists, never the rule, and an unlisted venue that "obviously" deserves a tier gets a row added here, not an exception made mid-run — in the STAGE upstream or the fork `STAGE_REPOSITORY` names, then synced: `execs/update.sh` replaces this file, so a row added in a paper repository's copy is lost on the next update. Judgment never enters a lookup.
 
 ## Checked first — 4
 

@@ -2,11 +2,13 @@
 topic: <这个文献库覆盖什么>
 updated: YYYY-MM-DD
 model_id: <this session's model id, verbatim | unrecorded>
-model_trail:                    # append-only: one entry per write session, never rewritten
-  - { date: YYYY-MM-DD, model: <id | unrecorded>, skill: stage-refs-curator, scope: <what this session wrote> }
+model_trail:                    # append-only: one entry per run that writes it, never rewritten
+  - { date: YYYY-MM-DD, model: <id | unrecorded>, skill: stage-refs-curator, scope: <what this run wrote> }
 ---
 
 # Reference Index —— <主题>（<YYYY-MM-DD>）
+
+> 本文件是 `refs-index-template.md` 的中文对照版，随英文版同步维护，供人阅读；运行时装载的仍是英文版。两版冲突时，以 `refs-index-template.md` 为准。
 
 <!-- 由 stage-refs-curator 写出。本文件是 manus/bibs/reference.bib 的审计线索：每条条目的出处
      都记在这里，因此 bib 里的任何字段都能对照它来自的那条记录复查。第 4 节里没有行的条目，
@@ -55,7 +57,7 @@ model_trail:                    # append-only: one entry per write session, neve
 
 ## 5. 影响力评分
 
-<!-- 每条一行，算式与分档见 source-policy_zh.md"影响力分"一节：子指标带各自的抓取日期，然后是
+<!-- 每条一行，算式与分档见 source-policy.md"影响力分"一节：子指标带各自的抓取日期，然后是
      加权总分。`*` 标残缺总分（某分量没抓到，权重已归一化）；`new` 标发表 ≤18 个月的论文。星标
      只给论文自己页面挂出的仓库——unofficial 仓库在此登记，绝不计分。指标会漂移：日期说明新鲜
      度，stage-refs-curator score 重建整表。 -->
@@ -72,8 +74,9 @@ model_trail:                    # append-only: one entry per write session, neve
 
 ## 7. 自查
 
-<!-- 重抓并 diff 了哪些条目（随机 5 条；verify 模式下是全部）、结果如何、解析 / 括号 /
-     唯一性检查的结果、从登记子指标复算的 3 条影响力分，以及因此改正了哪些条目。 -->
+<!-- 重抓并 diff 了哪些条目（从本次运行抓回的条目里随机 5 条；verify 模式下按类别查全部——
+     抓回的、播种的、用户手工添加的分开计数）、结果如何、解析 / 括号 / 唯一性检查的结果，
+     以及因此改正了哪些条目。 -->
 
 ## 8. 下一步
 

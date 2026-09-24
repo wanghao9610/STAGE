@@ -2,8 +2,8 @@
 topic: <what this reference base covers>
 updated: YYYY-MM-DD
 model_id: <this session's model id, verbatim | unrecorded>
-model_trail:                    # append-only: one entry per write session, never rewritten
-  - { date: YYYY-MM-DD, model: <id | unrecorded>, skill: stage-refs-curator, scope: <what this session wrote> }
+model_trail:                    # append-only: one entry per run that writes it, never rewritten
+  - { date: YYYY-MM-DD, model: <id | unrecorded>, skill: stage-refs-curator, scope: <what this run wrote> }
 ---
 
 # Reference Index — <topic> (<YYYY-MM-DD>)
@@ -79,9 +79,9 @@ model_trail:                    # append-only: one entry per write session, neve
 
 ## 7. Self-audit
 
-<!-- Which entries were re-fetched and diffed (5 at random; all of them in verify mode), the
-     result, the parse / brace / uniqueness check, the 3 impact scores recomputed from their
-     logged sub-signals, and any entry corrected as a consequence. -->
+<!-- Which entries were re-fetched and diffed (5 of the entries this run fetched, at random; in
+     verify mode every entry by its kind — fetched, seeded, user-supplied, counted apart), the
+     result, the parse / brace / uniqueness check, and any entry corrected as a consequence. -->
 
 ## 8. Next actions
 

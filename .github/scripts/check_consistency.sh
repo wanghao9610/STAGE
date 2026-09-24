@@ -564,6 +564,14 @@ for root in "${SKILL_ROOTS[@]}"; do
     done < <(printf '%s\n' "${SKILLS}")
 done
 (( conv_ref_errors == 0 )) && note "every manifest names the conventions document"
+#    The three skills that never commit (conventions §1) pre-approve no git add or
+#    commit in the one tree whose frontmatter grants tools.
+for skill in stage-flow-status stage-evid-curator stage-proj-adopt; do
+    grep -qE 'Bash\(git (add|commit)' ".claude/skills/${skill}/SKILL.md" && {
+        fail ".claude/skills/${skill}/SKILL.md pre-approves git add/commit; conventions §1 says it never commits"
+        conv_ref_errors=1
+    }
+done
 
 # 7. Frontmatter advertises each harness's native invocation, while the generated
 #    body stays prefix-neutral so shared files can live under .agents.
@@ -584,7 +592,7 @@ while IFS= read -r skill; do
             fail "${path}: frontmatter does not advertise native invocation ${expected}"
             token_errors=1
         }
-        prefixed="$(grep -nE '(\$|/|/skill:)('"${SKILL_ALT}"')([^a-z-]|$)' <<<"${body}" || true)"
+        prefixed="$(grep -nE '(\$|/|/skill:)('"${SKILL_ALT}"'|stage-\*)([^a-z-]|$)' <<<"${body}" || true)"
         if [[ -n "${prefixed}" ]]; then
             fail "${path}: generated body contains a harness invocation prefix instead of a bare skill name:"
             printf '%s\n' "${prefixed}" | head -n 3 | sed 's/^/      /'
@@ -651,6 +659,11 @@ check_present .qwen/skills '`agent`'
 check_absent_vocab .qwen/skills 'AskUserQuestion' 'AskQuestion' 'stage_questionnaire' '`Agent`' '`Task`' '`subagent`' '`stage_subagent`'
 
 check_absent_vocab .agents/skills 'AskUserQuestion' 'AskQuestion' 'ask_user_question' 'stage_questionnaire' 'request_user_input' '`Agent`' '`Task`' '`subagent`' '`stage_subagent`'
+# The neutral source's role words, which claude.rules turns into Claude's tools;
+# one surviving in a named tree is a line the adapters never reached.
+for root in .claude/skills .cursor/skills .dsh/skills .kimi-code/skills .pi/skills .qwen/skills; do
+    check_absent_vocab "${root}" 'your question tool' '(shell)' 'one shell call' 'writing sub-agents'
+done
 
 for root in .dsh/skills .pi/skills; do
     foreign_types="$(grep -RnE --include='*.md' 'subagent_type|spawn_agent|agent_type' "${root}" 2>/dev/null || true)"
@@ -1172,6 +1185,12 @@ for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
     [[ -x "${f}" ]] || { fail "${f} is missing or not executable"; hook_errors=1; }
     [[ -f "${f}" ]] && ! bash -n "${f}" 2>/dev/null && { fail "${f} does not parse"; hook_errors=1; }
 done
+#     The entrypoints, the utilities, and the flow-status scan hold to the same bar.
+for f in execs/run.sh execs/update.sh execs/scpts/import.sh execs/scpts/lint.sh \
+         execs/scpts/fmt.sh .agents/skills/stage-flow-status/scripts/scan.sh; do
+    [[ -x "${f}" ]] || { fail "${f} is missing or not executable"; hook_errors=1; }
+    [[ -f "${f}" ]] && ! bash -n "${f}" 2>/dev/null && { fail "${f} does not parse"; hook_errors=1; }
+done
 
 for f in .claude/settings.json .codex/hooks.json .cursor/hooks.json .dsh/hooks.json \
          .kimi-code/hooks.example.toml .pi/extensions/stage-hooks/index.ts .qwen/settings.json; do
@@ -1318,6 +1337,7 @@ fi
 guard_dir="$(mktemp -d "${TMPDIR:-/tmp}/stage-commit-guard-check.XXXXXX")" || guard_dir=""
 if [[ -n "${guard_dir}" ]]; then
     git -C "${guard_dir}" init -q
+    head -c $((11 * 1024 * 1024)) /dev/zero > "${guard_dir}/big.pdf"
     GUARDS=(.claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh
             .cursor/hooks/stage_commit_guard.sh .dsh/hooks/stage_commit_guard.sh
             .kimi-code/hooks/stage_commit_guard.sh .pi/extensions/stage-hooks/stage_commit_guard.sh
@@ -1359,6 +1379,37 @@ pass|git commit -m "fix: -a is fine inside a message"
 pass|git commit -F- <<'EOF'\ngit add -A is declined now\nEOF
 pass|git commit -m "$(cat <<'EOF'\nfix: x\n\ngit rebase is declined too\nEOF\n)"
 deny|echo $(( 1 << EOF ))\ngit add -A\nEOF
+deny|GIT_SEQUENCE_EDITOR=: git rebase -i HEAD~2
+deny|GIT_EDITOR=true git commit --amend
+deny|FOO=bar git reset --hard
+deny|env git add -A
+deny|{ git add -A; }
+deny|if true; then git add -A; fi
+deny|bash -c "git add -A"
+pass|env git status
+pass|command -v git
+deny|git add big.pdf && git commit -m "stage-figs-designer: teaser"
+deny|git add -- big.pdf
+deny|git checkout -- .
+deny|git restore .
+pass|git restore --staged .
+deny|git clean -fd
+pass|git clean -n
+deny|git stash drop
+pass|git checkout -- notes/claims.md
+pass|git stash
+deny|git checkout -qf main
+deny|git switch -fc x
+deny|git add ./
+deny|git commit . -m msg
+deny|git commit -m x -- big.pdf
+pass|git commit -m x -- notes/claims.md
+pass|git checkout -b feat
+pass|git checkout --conflict=diff3 a.tex
+pass|git switch -c x
+deny|bash <<'EOF'\ngit add -A\nEOF
+deny|cat <<EOF | sh\ngit add -A\nEOF
+pass|bash execs/scpts/lint.sh && git commit -F- <<'EOF'\nstage-x: y\n\ngit add -A avoided\nEOF
 CASES
     (( guard_errors == 0 )) && note "all seven commit guards decline a blanket add however git is spelled, and pass a named one"
     rm -rf "${guard_dir}"
@@ -1761,6 +1812,61 @@ else
 fi
 rm -rf -- "${PROSE_TEST_DIR}"
 (( prose_lint_errors == 0 )) && note "chatbot, cluster, false-positive, comment, and caption fixtures pass"
+
+# 20a. The ANON=true identity scan (conventions §3.4) fails on identity in
+#      typeset text and on a \documentclass without anon, warns on a github.com
+#      link, and passes a density-suffixed file name, an anonymous placeholder,
+#      a commented-out block, and plain prose about acknowledging.
+section "Identity-leak lint (ANON=true)"
+anon_lint_errors=0
+ANON_TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stage-anon-lint.XXXXXX")"
+mkdir -p "${ANON_TEST_DIR}/execs/scpts" "${ANON_TEST_DIR}/manus/secs" "${ANON_TEST_DIR}/wkdrs/builds"
+cp execs/scpts/lint.sh "${ANON_TEST_DIR}/execs/scpts/lint.sh"
+printf '#!/usr/bin/env bash\nexit 0\n' > "${ANON_TEST_DIR}/execs/run.sh"
+: > "${ANON_TEST_DIR}/wkdrs/builds/main.log"
+: > "${ANON_TEST_DIR}/wkdrs/builds/main.pdf"
+cat > "${ANON_TEST_DIR}/manus/main.tex" <<'EOF'
+\documentclass[twocolumn]{stys/stage}
+EOF
+cat > "${ANON_TEST_DIR}/manus/secs/1_anon.tex" <<'EOF'
+\includegraphics{figs/teaser@2x.png}
+\includegraphics[width=\linewidth]{figs/model@3x.PDF}
+Contact jane.doe@cs.example.edu for the data.
+\includegraphics{figs/a@2x.png} and write to bob@uni.example.org
+\metadata[Code:]{https://janedoe.github.io/proj}
+\metadata[Code:]{https://anonymous.example.com/code}
+\email{anonymous@example.com}
+% \author{Jane Doe} \thanks{Supported by a grant.}
+We acknowledge that the benchmark has limits.
+\section*{Acknowledgments}
+Code at \url{https://github.com/facebookresearch/detectron2}.
+Funded work.\thanks{Supported by grant 42.}
+EOF
+
+if ANON_TEST_OUT="$(cd "${ANON_TEST_DIR}" && ANON=true bash execs/scpts/lint.sh 2>&1)"; then
+    fail "identity-leak lint fixture exited zero; its leaks must fail it"
+    anon_lint_errors=1
+fi
+for marker in \
+    'FAIL: ANON=true and 6 possible identity leak(s):' \
+    'manus/secs/1_anon.tex:3:' 'manus/secs/1_anon.tex:4:' 'manus/secs/1_anon.tex:5:' \
+    'manus/secs/1_anon.tex:10:' 'manus/secs/1_anon.tex:12:' \
+    'manus/main.tex:1: \documentclass without the anon option' \
+    'warn: ANON=true and 1 github.com link(s)' 'manus/secs/1_anon.tex:11:'; do
+    grep -qF -- "${marker}" <<< "${ANON_TEST_OUT}" || {
+        fail "identity-leak lint missed expected output: ${marker}"
+        anon_lint_errors=1
+    }
+done
+for ignored in 1 2 6 7 8 9; do
+    if grep -qF -- "manus/secs/1_anon.tex:${ignored}:" <<< "${ANON_TEST_OUT}"; then
+        fail "identity-leak lint flagged a line it must pass: manus/secs/1_anon.tex:${ignored}"
+        anon_lint_errors=1
+    fi
+done
+(( anon_lint_errors == 0 )) || printf '%s\n' "${ANON_TEST_OUT}" | sed 's/^/      /'
+rm -rf -- "${ANON_TEST_DIR}"
+(( anon_lint_errors == 0 )) && note "typeset identity fails, a github.com link warns, and file names, placeholders, and comments pass"
 
 # 21. The versioned memory store ships as its template. STAGE is the template
 #     every paper starts from — a clone or the GitHub template copies

@@ -1,3 +1,7 @@
-# Claude-specific wording is recorded in claude.overrides. This ordered table is
-# available for broad neutral-to-Claude vocabulary substitutions when one is
-# preferable to repeating the same anchored override.
+# Neutral-to-Claude vocabulary, applied in order before claude.overrides. A span
+# these substitutions cannot reach is recorded there as an anchored override.
+your question tool	AskUserQuestion
+\(shell\)	(Bash)
+one shell call	one Bash call
+writing sub-agents on the PLAN tier's model \(conventions §11\.6, where the harness can name one\)	`Agent` subagents (`subagent_type: general-purpose`, `model:` the PLAN tier value, omitted when empty)
+writing sub-agents on the EXEC tier's model \(conventions §11\.6, where the harness can name one\)	`Agent` subagents (`subagent_type: general-purpose`, `model:` the EXEC tier value, omitted when empty)

@@ -36,9 +36,9 @@ the meta-review writes `—`; the anchor stays mandatory in exchange.
 **Confidential by default:** a paper handed to a referee is under review until the user says
 it is public, so the citation-integrity contract's confidential mode is ON unless they do.
 **A different destination:** the report is `REFEREE_<date>.md` inside
-`wkdrs/reports/extern_<slug>_<date>/`, or at the path `out=<path>` names — `<slug>` is the
+`wkdrs/reports/extern_<slug>_<date>/`, or inside the directory `out=<path>` names — `<slug>` is the
 target's basename lowercased, each run of non-alphanumerics turned to `-`. Nothing under
-`manus/`, `notes/`, `cycls/`, `mates/`, or `tasks/` is read, created, or edited for it, and
+`manus/`, `notes/`, `cycls/`, `mates/`, or `tasks/` is read, created, or edited for it — an `out=` directory under any of them is refused before anything is written, and `out=` without `extern=` stops the run with that reason named — and
 writing an external review into `cycls/<cycle>/reviews/` is the one failure this path may
 never have: `stage-resp-writer` reads that directory as reviews of *this* paper and would
 draft a rebuttal to somebody else's.
@@ -58,8 +58,8 @@ English: a `references/*_zh.md` edition is for human readers and is never loaded
 criteria of the human-writing contract (conventions §7).
 
 **This skill's references.** `references/review-dimensions.md` — the five perspective briefs and
-the two contracts (citation-integrity, collector); `references/review-template.md` — the four
-artifact templates; `references/rubric-conference.md` — the six anchored bands, confidence, and
+the two contracts (citation-integrity, collector); `references/review-template.md` — the five
+artifact templates (the `extern=` referee report among them); `references/rubric-conference.md` — the six anchored bands, confidence, and
 the caps table; `references/rubric-journal.md` — decision tiers and the required-revisions
 discipline. Read the dimensions file and the rubric matching `scale:` in full every run, the
 template file before writing artifacts.
@@ -82,8 +82,8 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
    `references/review-dimensions.md` — novelty & related work, technical soundness, experimental
    rigor & reproducibility, clarity & presentation, devil's advocate — each dispatched as a
    delegate that fetches nothing but its own leads (§6.9), runs on the PLAN tier's model
-   (conventions §11.6, where the harness can name one), and writes exactly one file, its own
-   `review_<perspective>.md` in the run directory (§6.2, §6.4), carrying its brief and the two
+   (conventions §11.6, where the harness can name one), and writes one review file, its own
+   `review_<perspective>.md` in the run directory, plus the payload caches under its own prefix (§6.2, §6.4), carrying its brief and the two
    contracts verbatim plus the built paper. It writes nothing under `manus/`, `notes/`, or
    `cycls/`: the meta-review is the chair's synthesis, not five reviews concatenated. Exactly five; their independence comes from five separate briefs and contexts, not from running at the same moment, so how many run at once is the chair's call (§6.2). `quick` is the
    no-fan-out path: the chair walks all five perspectives itself in one sequential pass, and
@@ -96,12 +96,12 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
    and say which. The venue's own form gets the mapped value last — the mapping changes the
    number, never the argument.
 3. **References are whitelist or verified — never memory (§9b).** Every panelist carries the
-   citation-integrity contract: a named reference is either in `manus/bibs/reference.bib`
-   (whitelist) or backed by a record fetched this run with its query logged (verified); what
+   citation-integrity contract: a named reference is either in the reviewed paper's own bibliography
+   (whitelist: `manus/bibs/reference.bib`, or the target's reference list under `extern=`) or backed by a record fetched this run with its query logged (verified); what
    cannot be verified is phrased as a direction, and every search — empty ones included — is
    logged. **A panelist runs its own leads (§6.9).** The rate divides rather than the
    quota: each brief states, in seconds, the wait between that panelist's own requests to a
-   host — the host's interval times the most panelists the chair runs at once (§6.2) — so the panel as a whole asks
+   host — the host's interval (arXiv one request per 3 s; DBLP, Semantic Scholar, and paper pages one per second; Crossref three per second — the rates `stage-refs-curator`'s source policy fixes) times the most panelists the chair runs at once, a number fixed before the first dispatch and written into the decisions record (§6.2) — so the panel as a whole asks
    each host no faster than one agent would have. Every payload is cached under that
    panelist's own prefix in the run directory. What does not move is the discipline the leads
    were built on: a panelist writes `what_it_would_settle` into its return **before** it runs
@@ -112,7 +112,7 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
    searching ends when the last one is settled. Confidential mode is
    ON when `venue.yml` has `anonymized: true`, when `.env` sets `ANON=true`, and — by default —
    whenever the run carries `extern=` and the user has not said the paper is public: topic-term searches
-   only — never the title, author guesses, or verbatim sentences — and it now binds each
+   only — never the title, author guesses, or verbatim sentences — and it binds each
    panelist directly, because each one is the thing making the request.
 4. **Weaknesses attack claims by ID.** Panelists receive the ledger and fill `attacked_claims`
    per major weakness; the chair carries the IDs into the meta-review. Claims sitting at
@@ -128,6 +128,7 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
    return (§6.3). A `verified` reference is confirmed twice over, and this is the cost of
    Principle 3's fan-out rather than a formality: the chair opens the payload at the cache path
    the panelist returned, and re-applies the criterion that panelist wrote before its query.
+   That cache is the panelist's own transcription, so a `verified` reference a major weakness rests on is re-opened by the chair at its record URL before the weakness enters the meta-review.
    No path, no payload, or a record the criterion does not actually settle → the reference is
    demoted to a direction with no name attached, and the demotion is recorded in the citation
    audit.
@@ -156,9 +157,9 @@ to get it: switch the session's model — then continue here.
 ### Step 1: Load and resolve
 
 Read the conventions whole, then `notes/story.md` (active cycle), `cycls/<cycle>/venue.yml`
-(`scale:`, `anonymized:`, the venue's form), `notes/claims.md`, and this skill's `references/`
+(`scale:`, `anonymized:`, the venue's form), `notes/claims.md`, `notes/outline.md` (Sections status, the source map), and this skill's `references/`
 per the list above. Resolve the mode (default `panel`) and the involve level once (§7.7).
-Missing story, ledger, or venue profile → stop and route to `stage-stry-coach`. A manuscript
+Missing story, ledger, or venue profile → stop and route to `stage-stry-coach`; a missing outline → `stage-outl-planner`. A manuscript
 that is still skeletons → stop and route to `stage-sect-drafter`; a review of empty sections
 is noise. Under `extern=` none of that resolves and none of it is read: open the target
 instead, confirm it is readable, and ask the venue and scale. A target that cannot be opened
@@ -167,14 +168,14 @@ is reported, never reviewed from its filename.
 ### Step 2: Build
 
 `execs/run.sh` (§3.3). Success → note the PDF path and page count for every brief. Failure →
-Principle 7. Either way, record what the panel reviews — date, build state, `git log -1`
-commit — so staleness is later detectable by exact comparison (§8). Under `extern=` this step
+Principle 7. Either way, record what the panel reviews — date, build state, and the `git log -1`
+commit, written into the meta-review's `commit:` field (suffixed `+dirty` when `git status --porcelain -- manus/` was non-empty) — so staleness is later detectable by exact comparison (§8). Under `extern=` this step
 is skipped whole; record the target's path, its page or word count, and the date, which is all
 the identity an external file has.
 
 ### Step 3: Prepare the run directory and digest
 
-Create `wkdrs/reports/peer_<cycle>_<date>/` — `wkdrs/reports/extern_<slug>_<date>/` under
+Create `wkdrs/reports/peer_<cycle>_<date>/` — `wkdrs/reports/extern_<slug>_<date>/`, or the `out=` directory, under
 `extern=`. Write the chair's digest into it: paper location (PDF plus the source map from the
 outline), the claims table, the venue line (venue, scale, page limit), the confidential-mode
 flag. The digest is a map, not the territory — every panelist reads the paper itself, in full.
@@ -183,9 +184,9 @@ line "no claim ledger — `attacked_claims` is empty" in place of the claims tab
 
 ### Step 4: Dispatch the panel (or walk it in quick mode)
 
-Panel: five delegates, disjoint by perspective — writing sub-agents on the PLAN tier's model (conventions §11.6, where the harness can name one), all five dispatched concurrently or in turn as the chair judges, and those it runs at once go out in one message (§6.1, §6.2). No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
+Panel: five delegates, disjoint by perspective — writing sub-agents on the PLAN tier's model (conventions §11.6, where the harness can name one), all five dispatched concurrently or in turn as the chair judges, and those it runs at once go out in one message (§6.1, §6.2). No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and Synthesis Notes and the closing reply (Step 8, §6.1) name the fan-out that did not fire. Each brief contains
 its perspective section from `references/review-dimensions.md` verbatim, both contracts
-verbatim, the digest, and the scope line "ONLY this perspective; return the collector
+verbatim, the digest, the path of its `review_<perspective>.md` with that file's section of `references/review-template.md`, and the scope line "ONLY this perspective; return the collector
 contract's fields and nothing else". Each brief also carries the seconds that panelist waits
 between its own requests to a host and its own cache prefix under the run directory
 (Principle 3) — never a request quota, which is not what politeness is made of — and tells the
@@ -201,10 +202,9 @@ last.
 The chair's own confirming first: for every reference a panelist returned as `verified`, open
 the payload at the cache path it gave and settle the hit by the criterion that panelist wrote
 before running the query — a record meeting it keeps `verified` and carries its record, one
-that does not becomes a direction with no name attached. A lead nobody could run comes back
-unsettled; the chair runs it here, one request at a time. Then Principle 5 — anchors opened, unanchored items dropped and logged. The
-per-perspective files are already in the run directory, one written by each panelist; a `quick`
-run writes its own `review_quick.md` here. Consolidate the concern matrix (which perspectives raised what), dedupe the
+that does not becomes a direction with no name attached. Each one that keeps `verified` and that a major weakness rests on is then re-opened at its record URL, one request at a time at the host's own interval, and a page that does not show the cached title, year, and venue demotes it the same way. A lead nobody could run, or one raised after
+that panelist's first query, comes back unsettled; the chair runs it here, one request at a time. Then Principle 5 — anchors opened, unanchored items dropped and logged. The
+per-perspective files are already in the run directory, one written by each panelist. Consolidate the concern matrix (which perspectives raised what), dedupe the
 questions, and record panel disagreements for Synthesis Notes.
 
 ### Step 6: Score
@@ -216,7 +216,7 @@ each item anchored and carrying its satisfaction condition. Map to the venue's f
 
 ### Step 7: Write the artifacts
 
-Run directory: the perspective reviews and `citation_audit.md` — every named reference with its
+Run directory, beside the panelists' own reviews: `review_quick.md` in `quick` mode, and `citation_audit.md` — every named reference with its
 origin, query, and cache path, every lead with the criterion it was settled by and who ran it,
 every reference the chair demoted and why, searches with no result;
 OFFLINE degradation noted when the host had no network (§3.5). Durable:

@@ -8,8 +8,8 @@ description: >-
   and the ledger: problems are flagged and routed, never silently fixed.
 argument-hint: "[SECTION] [DESCRIPTION]"
 allowed-tools: >-
-  Read, Grep, Glob, Write, Edit, Agent, Bash(git status:*), Bash(git diff:*), Bash(git log:*),
-  Bash(git add:*), Bash(git commit:*)
+  Read, Grep, Glob, Write, Edit, Bash(date +%Y-%m-%d), Bash(date +%F), Agent,
+  Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # Citation Auditor — keys resolved, assertions checked, nothing patched
@@ -23,7 +23,8 @@ and say so in the reply's first line. A lone token that looks like a section and
 not a description: list the candidates and ask (§5.3). A description can steer which assertions
 get the closest read; it never narrows the key-resolution and bib-hygiene scans, which always run
 whole. An `involve=<level>` token is stripped before the section or the description is read
-(§7.7); this skill fixes nothing itself, so the level moves nothing here.
+(§7.7); this skill fixes nothing itself, so the level moves no finding; it still governs the
+commit offer (§1.6) and, at `high`, the fan-out announcement (§6.8).
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
 the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever
@@ -40,7 +41,7 @@ English: a `references/*_zh.md` edition is for human readers and is never loaded
 
 You are the family's citation skeptic: every sentence about someone else's paper is presumed
 unverifiable until a reading note backs it. `stage-refs-curator` builds the bib and the notes;
-`stage-sect-drafter` writes the sentences; you check the three against each other — keys against
+`stage-sect-drafter` writes the sentences and `stage-tabs-builder` the tables; you check the three against each other — keys against
 the bib, assertions against `## Citable facts`, prose against the papers it forgot to cite. You
 flag; you never fix: not a key, not a field, not a sentence — an audit that silently patches is
 an audit nobody can trust. Fully offline: nothing here fetches; whatever needs fetching or
@@ -50,13 +51,13 @@ re-reading routes to `stage-refs-curator`.
 
 1. **§9b is the charter.** An assertion about a cited work — what it does, shows, achieves, or
    fails at — is checkable only against a reading note: `notes/refs/<ABBREV>.md`, found via the
-   citekey rows of `refs_index.md` (§2 for notes, §4 for entries), or an imported note under `mates/<slug>/metds/refs/`. No note →
+   citekey rows of `refs_index.md` (index §2 for notes, index §4 for entries), or an imported note under `mates/<slug>/metds/refs/`. No note →
    `unverifiable`; a note that does not carry the fact → `unsupported`. Never bridge the gap from
-   memory: model recall of a paper is not a reading note (§9e). An empty or missing `notes/refs/`
+   memory: model recall of a paper is not a reading note (§9b). An empty or missing `notes/refs/`
    makes every assertion unverifiable — that is the finding, not an error. A note carrying `depth:`
    was converted from an upstream STAR note rather than read here: the verdict is still whatever its
    facts decide, but the Note cell names that depth, and `abstract-and-intro` means the assertion
-   rests on a read that stopped at the abstract — filed for a proper read either way.
+   rests on a read that stopped at the abstract — filed for a proper read whatever the verdict.
 2. **Flag, never fix.** Verdicts land in the report and `tasks/`; the manuscript, the bib, the
    notes, and the ledger leave this skill byte-identical. Even a one-character key typo is filed,
    not corrected — silent fixes are how wrong citations survive to camera-ready.
@@ -73,11 +74,13 @@ re-reading routes to `stage-refs-curator`.
 5. **Hygiene is reported with the entries quoted.** Duplicates (same title or DOI under two
    keys), missing required fields, inconsistent venue naming, arXiv entries where the note
    records a published version. The fix is `stage-refs-curator`'s.
-6. **Fan out the assertion audit (§6).** More than 20 in-scope citing sentences → split them one
-   delegate per cited key, on the EXEC tier's model (conventions §11.6), where the harness can name
+6. **Fan out the assertion audit (§6).** More than 20 in-scope citing sentences on keys that have a note → split them one
+   delegate per such key, on the EXEC tier's model (conventions §11.6), where the harness can name
    one, so every sentence about a given paper reaches the same reader with the
    same note in front of it, each returning one verdict per sentence — supported, unsupported, or
-   unverifiable, with the note line it turned on — and nothing else. Two checks stay whole because
+   unverifiable, with the note line it turned on — and nothing else. A key with no note never goes
+   out: Principle 1 already decides its sentences `unverifiable` and a delegate would have nothing
+   to read (§6.7), so they are verdicted here. Two checks stay whole because
    splitting them would blind them: key resolution greps the whole manuscript against the whole
    bib, and Principle 5's hygiene needs the entire bib in one view to see a duplicate at all.
    Nothing a delegate returns is fixed anywhere — Principle 2 binds it too (§6.4).
@@ -93,12 +96,16 @@ to get it: switch the session's model — then continue here.
    Principle 1 applies), the bib's keys and fields, and `notes/claims.md` — factual claims may
    name cited works; cross-reference their IDs, never flip them (this skill is not a ledger
    writer). Real date from the system clock (conventions §4).
-2. **Resolve scope (conventions §5).** Section argument → that `secs/` file plus its tables'
-   captions; none → all of `manus/secs/` and `manus/tabs/`.
-3. **Resolve keys.** Extract every citation command from all of `manus/` (`\cite`, `\citep`,
-   `\citet`, `\citealp`, starred and optioned forms; split multi-key arguments). Diff both ways
+2. **Resolve scope (conventions §5).** Section argument → that `secs/` file plus every table it
+   `\input`s or `\ref`s, captions and rows (as `stage-clms-auditor` scopes a section); none → all
+   of `manus/secs/` and `manus/tabs/`.
+3. **Resolve keys.** Extract every citation command from all of `manus/` (every natbib form the
+   class loads — any `\[Cc]ite[a-zA-Z]*` command, `\citealt`, `\citeauthor`, and `\citeyear` among
+   them, starred and optioned — plus `\nocite`, each line read after its comment is stripped from
+   the first unescaped `%` as conventions §9a's `\todo` count does; split multi-key arguments; a
+   `\nocite` key is resolved but carries no sentence to audit, and `\nocite{*}` names no key). Diff both ways
    against the bib: undefined key → failure with location; uncited entry → hygiene list.
-4. **Audit assertions.** Per in-scope citing sentence: extract the checkable content; find the
+4. **Audit assertions.** Per in-scope citing sentence, and per table data row carrying a `\cite`: extract the checkable content; find the
    note (index first, imported `mates/` notes second — say which kind backed each verdict, and a
    seeded note's `depth:` with it; an imported note is fingerprinted evidence); verdict per
    Principle 1, quoting the note line that supports or fails it.
@@ -106,17 +113,27 @@ to get it: switch the session's model — then continue here.
    borrowed numbers with no key — each with location, and the matching bib entry when one already
    exists.
 6. **Check hygiene.** Principle 5's classes over the whole bib, entries quoted.
-7. **File failures.** Append one `- [ ]` per undefined key, unsupported or unverifiable
-   assertion, missing citation, and hygiene defect to `tasks/cites_followups.md` under a
-   `## <date>` heading — location, quote, verdict, route: no note → `stage-refs-curator` reads
-   the paper into one; a seeded note marked `abstract-and-intro` → the same, read properly this
-   time; wrong sentence → `stage-sect-drafter`; bib repair → `stage-refs-curator`.
-   A re-run checks off items it can prove resolved.
+7. **File failures.** Append one `- [ ]` per undefined key, unsupported assertion, cited key
+   with no note (its unverifiable sentences listed under it), missing citation, and hygiene
+   defect, and each seeded note with `depth: abstract-and-intro` that backed a verdict this run,
+   supported ones included (one box per note, its sentences listed), to
+   `tasks/cites_followups.md` under a `## <date>` heading — location (with the claim ID when a
+   ledger claim states the sentence), quote, verdict, route: no note →
+   `stage-refs-curator <DOI | arXiv id>` of the entry reads the paper into one; a seeded note
+   marked `abstract-and-intro` → the same command, read properly this time; undefined key or
+   missing citation → `stage-sect-drafter <section>`, or `stage-tabs-builder <table>` when it
+   sits in `manus/tabs/`, sets the `\cite` when the work already has an entry, else
+   `stage-refs-curator <DOI | arXiv id | "title">` first, then that run; wrong sentence →
+   `stage-sect-drafter <section>`, or `stage-tabs-builder <table>` when it sits in `manus/tabs/`
+   (a caption, a cited row); bib repair → `stage-refs-curator tidy`, or
+   `stage-refs-curator <DOI | arXiv id>` for an arXiv entry whose note records a published
+   version. A re-run checks off items it can prove resolved and files only what has no open box
+   (conventions §8.12).
 8. **Report.** Write `wkdrs/reports/CITES_<date>.md` (`mkdir -p` first) per Output.
 9. **Digest in chat.** ≤300 words: counts per check, worst findings first, tasks filed, the one
    next action.
 10. **Commit (conventions §1).** One commit — `tasks/cites_followups.md` — subject naming this
-    skill; nothing filed → nothing to commit, say so. `wkdrs/` is never committed (conventions
+    skill; nothing filed and nothing checked off → nothing to commit, say so. `wkdrs/` is never committed (conventions
     §10).
 
 ## Output
@@ -125,10 +142,11 @@ to get it: switch the session's model — then continue here.
   ephemeral, date in filename. Frontmatter `date:`, `scope:`; sections: `## Verdict` (keys
   checked / undefined; assertions supported / unsupported / unverifiable; missing-citation and
   hygiene counts), `## Keys` (undefined with locations; uncited entries), `## Assertions` —
-  `| Where | Assertion | Key | Note | Verdict |` (the Note cell names the file and, for a seeded
-  note, its `depth:`), failures first, `## Missing citations`,
+  `| Where | Assertion | Key | Note | Verdict |` (the Where cell adds the claim ID when a ledger
+  claim states the sentence; the Note cell names the file and, for a seeded note, its `depth:`),
+  failures first, `## Missing citations`,
   `## Bib hygiene` (entries quoted), `## Tasks filed`.
-- `tasks/cites_followups.md` — one checkbox per failure under a dated heading: the durable
+- `tasks/cites_followups.md` — one checkbox per item Step 7 files, under a dated heading: the durable
   outcome.
 - The manuscript, `manus/bibs/reference.bib`, `notes/refs/`, and the ledger are read-only here —
   flags and routes are the entire product.
