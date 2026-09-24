@@ -68,7 +68,7 @@ Read `.env`. `STAR_HOME` set and pointing at a real repo → the star side is li
 
 1. Read the file in full — nothing is registered unread — and say in one line what it actually contains; that line seeds `covers:`.
 2. Outside `mates/manual/` → copy it in, the original untouched; a name collision is a question, never an overwrite.
-3. One question via AskUserQuestion for what no probe can know: `source` — where this came from (path, URL, or person) — and `covers`, skipped when the user's request already said both.
+3. One question via AskUserQuestion for what no probe can know: `source` — where this came from (path, URL, or person) — and `covers`, asked on every `register` (conventions §7.7): what the user's request already said is quoted as the proposed answer, and the entry waits for the user to confirm it.
 4. Compute `sha256`, write the `##` entry with `source-type: manual` and today's real date. Re-registering an existing file rewrites its entry in place — one entry per file, current state, not history.
 5. A request to register a number with no file behind it is declined (Principle 5): the file comes first, and when the number lives in the paired STAR repo the answer is `import`, not a hand copy that loses the stamp.
 

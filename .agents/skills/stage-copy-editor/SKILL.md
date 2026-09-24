@@ -17,15 +17,15 @@ outline order. The literal `style` runs the profile branch instead: it writes `n
 touches no prose; `style preset:<name>` starts from that preset, `style sample=<path>`
 (repeatable) measures those files, and an unrecognized token is asked about, never guessed.
 Anything left after that is a description (conventions §7.13): in your own words, what this run is
-for — a lead the pass may follow and may record, never an instruction that stands in for a
-confirmation point. Prose that resolves to no section and is not `style` is description alone:
-polish every section the outline lists as `drafted` or later, and say so first. A lone token that
-looks like a section and matches none is not a description: list the candidates and ask (§5.3). A
-description may say what this pass is for — cut for space, de-jargon, fix the tense drift — and it
-never licenses a change to meaning, to a number, or to a citation, which stay outside this skill
-whatever it says. An optional `involve=low|medium|high` token may accompany any argument: it sets
-this run's involve level (conventions §7.7), is part of neither the argument nor the description,
-and is stripped before either is read.
+for — a lead the pass may follow and may record; a clear request in it to perform a named operation
+answers that operation's question in advance (§7.13). Prose that resolves to no section and is not
+`style` is description alone: polish every section the outline lists as `drafted` or later, and say
+so first. A lone token that looks like a section and matches none is not a description: list the
+candidates and ask (§5.3). A description may say what this pass is for — cut for space, de-jargon,
+fix the tense drift — and it never licenses a change to meaning, to a number, or to a citation,
+which stay outside this skill whatever it says. An optional `involve=low|medium|high` token may
+accompany any argument: it sets this run's involve level (conventions §7.7), is part of neither the
+argument nor the description, and is stripped before either is read.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
 the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever

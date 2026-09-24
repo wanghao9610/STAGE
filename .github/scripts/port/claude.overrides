@@ -18,9 +18,9 @@
 2. A diff that rewrites already-registered entries is confirmed first with one question via AskUserQuestion, naming each entry and the numbers that move — a refreshed number can silently contradict a sentence the draft already typeset (Principle 6). New-only imports proceed without a question.
 ### stage-evid-curator/SKILL.md
 --- 1
-3. One question via your question tool for what no probe can know: `source` — where this came from (path, URL, or person) — and `covers`, skipped when the user's request already said both.
+3. One question via your question tool for what no probe can know: `source` — where this came from (path, URL, or person) — and `covers`, asked on every `register` (conventions §7.7): what the user's request already said is quoted as the proposed answer, and the entry waits for the user to confirm it.
 +++ 1
-3. One question via AskUserQuestion for what no probe can know: `source` — where this came from (path, URL, or person) — and `covers`, skipped when the user's request already said both.
+3. One question via AskUserQuestion for what no probe can know: `source` — where this came from (path, URL, or person) — and `covers`, asked on every `register` (conventions §7.7): what the user's request already said is quoted as the proposed answer, and the entry waits for the user to confirm it.
 ### stage-evid-curator/SKILL.md
 --- 1
 - Two asks exist — the import-rewrite confirmation (Step 1) and the registration provenance question (Step 2) — via your question tool, one question per call. If it is unavailable (headless / scripted), fall back to plain text and require an explicit answer before the write.

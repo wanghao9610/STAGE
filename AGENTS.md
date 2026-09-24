@@ -1,12 +1,13 @@
 # Agent Instructions
 
-Behavioral guidelines to reduce common LLM writing mistakes. They bias toward caution over speed; for trivial tasks, use judgment. This is a STAGE repository: one repo, one paper, and every number in the manuscript traces to evidence or is visibly marked as missing.
+Project constraints for completing the user's task with proportionate care. This is a STAGE repository: one repo, one paper, and every number in the manuscript traces to evidence or is visibly marked as missing.
 
 ## 1. Think Before Writing
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+**Resolve routine details. Surface consequential uncertainty.**
 
-- State your assumptions explicitly. When the target is ambiguous — which section, which figure, which claim, which cycle — stop, list the candidates, and ask. Never guess which one was meant.
+- Use project conventions for routine, reversible details and continue; state the assumptions that affect the result. A number, a citation, or a venue fact is never a routine detail (§2).
+- Ask when the answer would change a claim the paper makes, the evidence behind it, a venue fact, or authority; while waiting, continue independent work already authorized. When the target is ambiguous — which section, which figure, which claim, which cycle — list the candidates and ask. Never guess which one was meant.
 - If a result admits more than one reading, present them - don't pick silently.
 - If the evidence supports less than the sentence would claim, say so before writing it. Push back when warranted.
 
@@ -34,10 +35,10 @@ The test: every changed line traces to the user's request, and every number in i
 
 ## 4. Goal-Driven Execution
 
-**Define success criteria. Loop until verified.**
+**Define completion and carry the authorized task through verification.**
 
 - Turn the task into a check you can run: "draft the experiments section" -> the build passes and every number carries a `% src:` anchor or a `\todo`; "cut it to eight pages" -> `lint.sh` reports the page count under the active cycle's `page_limit_main`; "answer the reviewers" -> every point in the ledger has a response or a promise.
-- For multi-step tasks, state the steps and the check that closes each one.
+- For multi-step tasks, state the steps and the check that closes each one. Existing explicit approval stays valid within its scope; do not ask for the same approval again (conventions §7.2).
 
 ## 5. Writing Workflow
 
@@ -47,7 +48,7 @@ The test: every changed line traces to the user's request, and every number in i
 - Run `/stage-flow-status` first when you do not know where things stand — it reads the outline, the ledger, the manifest, and the cycle state, and names the single next action.
 - The rules every workflow skill follows are in `docs/mds/stage-workflow/writing-workflow-conventions.md`, read whole at the start of every run; the skill roster is its §11, and what each skill does is in `writing-workflow-skills.md`.
 - Commit once per skill run, at that skill's commit step, and not otherwise (conventions §1).
-- Do not hand-edit generated reports under `wkdrs/`, and do not edit `docs/mds/stage-workflow/`, the skill trees, or any script under `execs/` — the two entrypoints and the three utilities in `execs/scpts/` alike — `execs/update.sh` overwrites them, this file included.
+- Do not hand-edit generated reports under `wkdrs/`. In a paper repository, `execs/update.sh` replaces `docs/mds/stage-workflow/`, the skill trees, and every script under `execs/` — the two entrypoints and the three utilities in `execs/scpts/` alike — this file included; change them in the STAGE upstream, then sync.
 
 ## 6. Reply Language
 
