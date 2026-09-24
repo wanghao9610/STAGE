@@ -144,7 +144,7 @@ except Exception:
 }
 
 # ctx embeds a filesystem path, so encode it as JSON rather than assuming it is
-# quote-free; the last branch sanitizes instead, having no encoder to hand.
+# quote-free; the last branch escapes by hand instead, having no encoder to hand.
 emit_context() { # $1 = hook event name, $2 = the context text
     if command -v jq >/dev/null 2>&1; then
         jq -cn --arg e "$1" --arg c "$2" \
@@ -155,7 +155,7 @@ print(json.dumps({"hookSpecificOutput": {"hookEventName": sys.argv[1], "addition
             "$1" "$2"
     else
         printf '{"hookSpecificOutput":{"hookEventName":"%s","additionalContext":"%s"}}\n' \
-            "$1" "$(printf '%s' "$2" | tr -d '"\\')"
+            "$1" "$(printf '%s' "$2" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')"
     fi
 }
 

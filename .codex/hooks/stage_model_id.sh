@@ -152,7 +152,7 @@ printf -v model_arg '%q' "${model:-}"
 ctx="STAGE provenance: session_model_id = ${model:-unrecorded}. This is the exact id SessionStart reported, stated directly even when a rollout exists. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), run: bash ${self} --resolve ${transcript_arg} ${model_arg}. Copy its output verbatim; if it prints nothing, use session_model_id, and use 'unrecorded' only when both are absent. Never infer an id from a family description such as 'GPT-5 family'. After writing each file that section 8 requires to carry a model_id (never one under manus/ or mates/, a venue.yml, poster.tex, or a template kit), run: bash ${self} --check <artifact> ${transcript_arg} ${model_arg}, replacing <artifact> with its path. A nonzero result blocks reporting completion or committing."
 
 # ctx now embeds a filesystem path, so encode it as JSON rather than assuming it
-# is quote-free; the last branch sanitizes instead, having no encoder to hand.
+# is quote-free; the last branch escapes by hand instead, having no encoder to hand.
 if command -v jq >/dev/null 2>&1; then
   jq -cn --arg c "${ctx}" \
     '{hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $c}}'
@@ -161,5 +161,5 @@ elif command -v python3 >/dev/null 2>&1; then
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": sys.argv[1]}}))' "${ctx}"
 else
   printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' \
-    "$(printf '%s' "${ctx}" | tr -d '"\\')"
+    "$(printf '%s' "${ctx}" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')"
 fi

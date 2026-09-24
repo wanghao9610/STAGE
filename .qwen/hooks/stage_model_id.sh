@@ -110,7 +110,7 @@ else
 fi
 
 # ctx now embeds a filesystem path, so encode it as JSON rather than assuming it
-# is quote-free; the last branch sanitizes instead, having no encoder to hand.
+# is quote-free; the last branch escapes by hand instead, having no encoder to hand.
 if command -v jq >/dev/null 2>&1; then
     jq -cn --arg c "${ctx}" \
         '{hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $c}}'
@@ -119,5 +119,5 @@ elif command -v python3 >/dev/null 2>&1; then
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": sys.argv[1]}}))' "${ctx}"
 else
     printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' \
-        "$(printf '%s' "${ctx}" | tr -d '"\\')"
+        "$(printf '%s' "${ctx}" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')"
 fi
