@@ -884,7 +884,7 @@ CONV_HEADINGS=(
 )
 # section|numbered top-level items
 CONV_ITEMS=("1|6" "3|7" "4|4" "5|6" "6|10" "7|13" "10|5" "11|6")
-CONV_SUBHEADS=("8|11")    # ### 8.n subheadings
+CONV_SUBHEADS=("8|12")    # ### 8.n subheadings
 CONV_LETTERS=("9|5")      # **(a) ... **(e) rules
 
 # Every parser below skips fenced code blocks. §8.2 documents the manifest

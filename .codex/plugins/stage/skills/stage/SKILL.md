@@ -16,6 +16,6 @@ Adapt only its invocation spelling for Codex:
 
 Do not reproduce a selected skill's workflow from this router.
 For an unmarked skill, load and follow that `stage-*` skill from the current project's available skills.
-For a skill marked `†`, request the confirmation required by the roster, show the exact `$stage-<name> <argument>` invocation, and wait.
+For a skill marked `†`, show the exact `$stage-<name> <argument>` invocation and stop; the user typing it is the confirmation.
 
 If `.agents/commands/stage.md` is missing, report that the project does not contain the STAGE routing roster instead of guessing from the plugin package.
