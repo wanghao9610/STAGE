@@ -136,26 +136,6 @@ is_optional_path() {
 AGENT_DOCS=("AGENTS.md")
 AGENT_RULES_TREE=".cursor/rules"
 
-# STAGE files that upstream shipped under the synced paths and no longer does.
-# The extract below only adds and overwrites, so these are deleted by name, and
-# so is a SKILL_zh.md beside any SKILL.md upstream ships (retired_files below).
-# A file of the project's own under the same paths is never on this list, and
-# nothing outside the synced paths is — the two root files above included.
-RETIRED_FILES=(
-    ".agents/commands/stage.zh-CN.md"
-    ".claude/commands/stage.zh-CN.md"
-    ".cursor/commands/stage.zh-CN.md"
-    ".pi/prompts/stage.zh-CN.md"
-    ".qwen/commands/stage.zh-CN.md"
-    "docs/mds/stage-workflow/human-writing-guide.md"
-    "docs/mds/stage-workflow/human-writing-guide.zh-CN.md"
-    "docs/mds/stage-workflow/memory_spec.md"
-    "docs/mds/stage-workflow/memory_spec.zh-CN.md"
-    "docs/mds/stage-workflow/model_id_spec.md"
-    "docs/mds/stage-workflow/model_id_spec.zh-CN.md"
-    "docs/mds/stage-workflow/writing-workflow-conventions.zh-CN.md"
-)
-
 # Harness configuration a project may have edited: installed when it is missing
 # — by --adopt and by an update alike — and never overwritten unless --force
 # says so. A flat file list on purpose: an empty array expands to an unbound
@@ -375,29 +355,6 @@ report_unregistered_hooks() {
     done
 }
 
-# The retired STAGE files this run deletes, one project-relative path per line:
-# each RETIRED_FILES entry under a synced path, and the SKILL_zh.md beside every
-# SKILL.md the fetched ref ships under one. A file the fetched ref still carries
-# is not retired, so an older ref keeps it. Needs SYNCED and SOURCE_DIR.
-retired_files() {
-    local rel path
-    for rel in "${RETIRED_FILES[@]}"; do
-        for path in "${SYNCED[@]}"; do
-            [[ "${rel}" == "${path}" || "${rel}" == "${path}/"* ]] || continue
-            if [[ ( -e "${ROOT_DIR}/${rel}" || -L "${ROOT_DIR}/${rel}" ) && ! -e "${SOURCE_DIR}/${rel}" ]]; then
-                printf '%s\n' "${rel}"
-            fi
-            break
-        done
-    done
-    while IFS= read -r path; do
-        rel="$(dirname -- "${path}")/SKILL_zh.md"
-        if [[ ( -e "${ROOT_DIR}/${rel}" || -L "${ROOT_DIR}/${rel}" ) && ! -e "${SOURCE_DIR}/${rel}" ]]; then
-            printf '%s\n' "${rel}"
-        fi
-    done < <(cd "${SOURCE_DIR}" && find -L "${SYNCED[@]}" -type f -name SKILL.md 2>/dev/null | sort)
-}
-
 usage() {
     cat <<'EOF'
 Usage: bash execs/update.sh [ref] [--harnesses LIST] [--skill NAME] [--force]
@@ -412,10 +369,7 @@ hook, command, prompt, agent, extension, and Codex manifest paths,
 docs/mds/stage-workflow/,
 and every script under execs/ — the two entrypoints, run.sh and this one, and
 the three utilities in execs/scpts/:
-import.sh, lint.sh, fmt.sh — with files from upstream. The STAGE files upstream
-has retired (RETIRED_FILES, and a SKILL_zh.md beside any SKILL.md upstream
-ships) are deleted; every other local-only file, the project's own included, is
-kept.
+import.sh, lint.sh, fmt.sh — with files from upstream.
 The default ref is main; a branch or tag may be supplied instead. Local edits to
 selected managed paths are replaced, AGENTS.md included; the manuscript,
 evidence, notes, and the memory store under .stage/memory/ are never touched.
@@ -451,8 +405,7 @@ one discovery link under .agents/plugins follows the same selection.
 
 --diff previews an update without changing anything: it lists upstream files
 that are new or differ from the local copies, harness configuration that
-differs but would be kept, dropped STAGE files an update would delete, and
-project-local files an update would keep. It
+differs but would be kept, and project-local files an update would keep. It
 exits 0 when everything already matches, 2 when an update would change files,
 and 1 on error — so a script can tell "an update is available" from "the check
 itself failed".
@@ -460,8 +413,7 @@ itself failed".
 --force updates the same paths with both refusals lifted: uncommitted changes
 under them are overwritten instead of stopping the command, and the harness
 configuration above is overwritten instead of kept. It widens nothing — the
-path list is unchanged, and a file of the project's own that upstream does not
-have is still left alone.
+path list is unchanged, and a file upstream does not have is still left alone.
 Combined with --diff it previews that scope without changing anything.
 
 --adopt installs the STAGE skeleton into an already-started paper repo instead
@@ -815,7 +767,6 @@ if [[ "${ADOPT}" == false ]]; then
     if [[ "${DIFF}" == true ]]; then
         changed=0
         added=0
-        removed=0
         kept=0
 
         # Upstream files that an update would overwrite or add.
@@ -829,17 +780,9 @@ if [[ "${ADOPT}" == false ]]; then
             fi
         done < <(cd "${SOURCE_DIR}" && find -L "${SYNCED[@]}" -type f | sort)
 
-        # STAGE files upstream no longer ships; an update deletes them.
-        RETIRED="$(retired_files)"
-        while IFS= read -r rel; do
-            [[ -n "${rel}" ]] || continue
-            printf '  removes  %s (no longer shipped upstream)\n' "${rel}"
-            removed=$(( removed + 1 ))
-        done <<<"${RETIRED}"
-
         # Project-local files under the same paths; an update keeps them.
         while IFS= read -r rel; do
-            if [[ ! -e "${SOURCE_DIR}/${rel}" ]] && ! grep -qxF -- "${rel}" <<<"${RETIRED}"; then
+            if [[ ! -e "${SOURCE_DIR}/${rel}" ]]; then
                 printf '  extra    %s (not in upstream ref; update keeps it)\n' "${rel}"
                 kept=$(( kept + 1 ))
             fi
@@ -864,7 +807,7 @@ if [[ "${ADOPT}" == false ]]; then
             done < <(harness_rels)
         fi
 
-        if (( changed + added + removed > 0 )); then
+        if (( changed + added > 0 )); then
             hint="bash execs/update.sh"
             [[ "${REF_SET}" == false ]] || hint="${hint} ${STAGE_REF}"
             [[ -z "${SKILL_NAME}" ]] || hint="${hint} --skill ${SKILL_NAME}"
@@ -872,7 +815,7 @@ if [[ "${ADOPT}" == false ]]; then
             # command; only a one-run flag needs carrying into the hint.
             [[ -z "${HARNESSES_ARG}" ]] || hint="${hint} --harnesses ${HARNESSES_ARG}"
             [[ "${FORCE}" == false ]] || hint="${hint} --force"
-            log "${changed} differ, ${added} new upstream, ${removed} dropped upstream, ${kept} extra local."
+            log "${changed} differ, ${added} new upstream, ${kept} extra local."
             log "'differs' is direction-blind: it includes files you edited yourself."
             log "Run '${hint}' to apply the upstream versions."
             # 2, not 1: fail() uses 1 for every hard error, so a caller could not
@@ -936,13 +879,6 @@ if [[ "${ADOPT}" == false ]]; then
         tar -C "${ROOT_DIR}" -xf "${ARCHIVE_FILE}"
     fi
 
-    # The extract never deletes, so a file upstream dropped goes here, by name.
-    while IFS= read -r rel; do
-        [[ -n "${rel}" ]] || continue
-        rm -f -- "${ROOT_DIR}/${rel}"
-        log "Removed ${rel}: upstream no longer ships it."
-    done < <(retired_files)
-
     if [[ -z "${SKILL_NAME}" ]] && is_selected codex; then
         link_codex_marketplace
     fi
@@ -958,7 +894,7 @@ if [[ "${ADOPT}" == false ]]; then
         mv -f "${SELF_TMP}" "${ROOT_DIR}/${SELF_PATH}"
         SELF_TMP=""
         log "Replaced ${SELF_PATH} with upstream's copy."
-        log "      This run finishes on the old code; run it once more to receive any path the new one adds or retires."
+        log "      This run finishes on the old code; run it once more to receive any path the new updater adds."
     fi
 
     if [[ -z "${SKILL_NAME}" ]]; then

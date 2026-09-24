@@ -179,7 +179,7 @@ done < <(printf '%s\n' "${SKILLS}")
 (( guard_errors == 0 )) && note "$(printf '%s\n' "${SLASH_ONLY}" | wc -l | tr -d ' ') slash-only skills guarded identically in all seven trees"
 
 # 4a. The full /stage router is neutral content and lives once under .agents,
-#     English only: its Chinese reading edition is retired, and a run in Chinese
+#     English only: it has no Chinese reading edition, and a run in Chinese
 #     follows the English roster and replies in Chinese.
 #     Native command files adapt only their harness's argument syntax and skill
 #     mechanism. Copying the roster into those files creates four policy surfaces
@@ -212,7 +212,7 @@ for router in "${ROUTER}"; do
     fi
 done
 if [[ -e .agents/commands/stage.zh-CN.md ]]; then
-    fail ".agents/commands/stage.zh-CN.md is retired; the English router is the only copy"
+    fail ".agents/commands/stage.zh-CN.md: STAGE ships no Chinese edition of the router; the English one is the only copy"
     router_errors=1
 fi
 
@@ -1086,22 +1086,18 @@ for f in AGENTS.zh-CN.md CLAUDE.zh-CN.md; do
         doc_errors=1
     fi
 done
-# execs/update.sh deletes each RETIRED_FILES entry from a paper repository, so
-# an entry back in the upstream tree would ship and be deleted by the same
-# update. The list is read from update.sh itself; an empty read is a failure,
-# since it would pass every entry unseen.
-retired="$(sed -n '/^RETIRED_FILES=(/,/^)/p' execs/update.sh | sed -nE 's/^[[:space:]]*"([^"]+)"[[:space:]]*$/\1/p')"
-if [[ -z "${retired}" ]]; then
-    fail "execs/update.sh: no RETIRED_FILES entries could be read"
-    doc_errors=1
-fi
-while IFS= read -r f; do
-    [[ -n "${f}" ]] || continue
+# The router ships English only in every harness, and the three workflow side
+# specs stay folded into the conventions: none of these ships again.
+for f in .claude/commands/stage.zh-CN.md .cursor/commands/stage.zh-CN.md \
+         .pi/prompts/stage.zh-CN.md .qwen/commands/stage.zh-CN.md \
+         docs/mds/stage-workflow/human-writing-guide.md \
+         docs/mds/stage-workflow/memory_spec.md \
+         docs/mds/stage-workflow/model_id_spec.md; do
     if [[ -e "${f}" || -L "${f}" ]]; then
-        fail "${f}: listed in RETIRED_FILES in execs/update.sh, yet back in the tree"
+        fail "${f}: STAGE no longer ships this file; the English router or the conventions replace it"
         doc_errors=1
     fi
-done <<< "${retired}"
+done
 
 # Every relative link in the guides resolves.
 for guide in docs/mds/stage-workflow/writing-workflow-skills.md \
@@ -1117,7 +1113,7 @@ for guide in docs/mds/stage-workflow/writing-workflow-skills.md \
     done < <(grep -oE '\]\([^)#][^)]*\)' "${guide}" | sed 's/^](//; s/)$//; s/#.*$//' |
              grep -vE '^(https?|mailto):' | grep -v '^$' | sort -u)
 done
-(( doc_errors == 0 )) && note "guides and landing pages name every skill; only the skills guide is paired en/zh, and no retired Chinese edition or RETIRED_FILES entry is back; links resolve"
+(( doc_errors == 0 )) && note "guides and landing pages name every skill; only the skills guide is paired en/zh, and no stray Chinese edition ships; links resolve"
 
 # 16. Chinese text carries no space between two Chinese characters.
 #     Chinese is written in reference files, the skills guide,
