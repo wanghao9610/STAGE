@@ -8,13 +8,15 @@
 #
 #   - deletion: rm and its kin, find -delete / -exec, git rm, git clean, git
 #     worktree remove / prune;
-#   - an overwrite of a tracked file: a forced mv / cp / ln, one landing on a
-#     tracked file, a `>` redirection, a tee, a curl or wget download, or an
-#     rsync onto one, git checkout, a git restore of the working tree,
-#     execs/update.sh outside --diff;
+#   - an overwrite of a tracked file: a forced mv / cp / ln, an install, one
+#     landing on a tracked file or pouring a directory's contents over one, a
+#     `>` redirection in any spelling (`>|`, `>!`, `>&file`), a tee, a curl or
+#     wget download, or an rsync onto one, git checkout, a git restore of the
+#     working tree, execs/update.sh outside --diff;
 #   - a write, move, or delete naming mates/ other than through
-#     execs/scpts/import.sh, its sanctioned writer (§10.1); anything but a read
-#     naming a venue kit under cycls/*/template/ (§10.4) or .env;
+#     execs/scpts/import.sh, its sanctioned writer (§10.1), or run from inside
+#     it; anything but a read naming a venue kit under cycls/*/template/ (§10.4)
+#     or .env, or run from inside a kit;
 #   - git push and pull, git stash drop / clear, branch switches, every tag
 #     operation but listing (§1.4), reflog expiry and object pruning, and the
 #     commands stage_commit_guard.sh declines — history rewrites, blanket or
@@ -33,11 +35,12 @@
 # asks, not permission prompts a hook can answer. stage_commit_guard.sh runs
 # beside this gate on the same matcher and its deny outranks this allow.
 #
-# A floor, not a proof. It reads one shell line at a time and cannot resolve
-# quoting; a path reached through a variable, an alias, or a script's own code
-# is not seen, so `python3 x.py` that writes under mates/ passes when its
-# command line names no protected path, and an archive unpacked into the tree
-# (`unzip -o`, `tar -x`) can overwrite tracked files unseen. After a `cd` it
+# A floor, not a proof. It reads one shell line at a time and resolves quoting
+# only far enough to find a heredoc; a path reached through a variable, an
+# alias, or a script's own code is not seen, so `python3 x.py` that writes
+# under mates/ passes when its command line names no protected path, and an
+# archive unpacked into the tree (`unzip -o`, `tar -x`) can overwrite tracked
+# files unseen. After a `cd` it
 # cannot follow — into `$(…)`, a variable other than $CLAUDE_PROJECT_DIR, or
 # `-` — every relative path counts as tracked, so a redirection or a landing
 # there keeps its prompt. A heredoc body is data, but one that names a
@@ -94,27 +97,79 @@ base="$(payload cwd)"
 
 # A heredoc body is data, not commands — a commit-message line reading "rm old
 # code" is not the rm it spells. Drop each body through its delimiter before
-# the segments are read, keeping the bodies aside. Only a bare-word delimiter
-# (EOF-shaped) opens one, and a here-string's <<< is erased first, so an
-# arithmetic x<<2 cannot swallow the lines after it and hide a real command;
-# anything malformed falls back to reading every line, which errs toward the
+# the segments are read, keeping the bodies aside. Only a `<<` the shell would
+# read as an operator opens one: not inside quotes, not after a comment's `#`,
+# and not a here-string's <<<. Quotes are followed across lines and into a
+# `$(…)` inside double quotes, where a commit message's heredoc sits. Only a
+# bare-word delimiter (EOF-shaped) counts, so an arithmetic x<<2 cannot swallow
+# the lines after it and hide a real command, and a body that never meets its
+# delimiter is read again line by line; anything malformed errs toward the
 # prompt, never past it.
 bodies=""
 strip_heredocs() {
-    local line probe rest delim="" body=0 out=""
+    # st is a stack of quoting contexts, innermost last: n unquoted (the line,
+    # or a `$(…)` / `(…)` inside it), b a backtick substitution, d double
+    # quotes, s single quotes, a an ANSI-C $'…'.
+    local line rest delim="" body=0 out="" held="" st="n" found i n c
     while IFS= read -r line; do
         if (( body )); then
             if [[ "${line}" == "${delim}" || "${line//$'\t'/}" == "${delim}" ]]; then
                 body=0
+                bodies="${bodies}${held}"
+                held=""
             else
-                bodies="${bodies}${line}"$'\n'
+                held="${held}${line}"$'\n'
             fi
             continue
         fi
         out="${out}${line}"$'\n'
-        probe="${line//<<</ }"
-        [[ "${probe}" == *'<<'* ]] || continue
-        rest="${probe##*<<}"
+        found=0
+        rest=""
+        n=${#line}
+        for ((i = 0; i < n; i++)); do
+            c="${line:i:1}"
+            case "${st: -1}" in
+                s)
+                    [[ "${c}" == "'" ]] && st="${st%?}" ;;
+                a)
+                    if [[ "${c}" == '\' ]]; then i=$((i + 1))
+                    elif [[ "${c}" == "'" ]]; then st="${st%?}"; fi ;;
+                d)
+                    case "${c}" in
+                        '\') i=$((i + 1)) ;;
+                        '"') st="${st%?}" ;;
+                        '`') st="${st}b" ;;
+                        '$') [[ "${line:i+1:1}" == '(' ]] && { st="${st}n"; i=$((i + 1)); } ;;
+                    esac ;;
+                *)
+                    case "${c}" in
+                        '\') i=$((i + 1)) ;;
+                        "'") st="${st}s" ;;
+                        '"') st="${st}d" ;;
+                        '`') if [[ "${st: -1}" == b ]]; then st="${st%?}"; else st="${st}b"; fi ;;
+                        '$')
+                            case "${line:i+1:1}" in
+                                '(') st="${st}n"; i=$((i + 1)) ;;
+                                "'") st="${st}a"; i=$((i + 1)) ;;
+                            esac ;;
+                        '(') st="${st}n" ;;
+                        ')') [[ ${#st} -gt 1 && "${st: -1}" == n ]] && st="${st%?}" ;;
+                        '#')
+                            # A comment runs to the end of the line.
+                            (( i == 0 )) && break
+                            case "${line:i-1:1}" in [[:space:]]|';'|'&'|'|'|'('|')'|'<'|'>') break ;; esac ;;
+                        '<')
+                            if [[ "${line:i+1:1}" == '<' ]]; then
+                                if [[ "${line:i+2:1}" == '<' ]]; then
+                                    i=$((i + 2))
+                                else
+                                    found=1; rest="${line:i+2}"; i=$((i + 1))
+                                fi
+                            fi ;;
+                    esac ;;
+            esac
+        done
+        (( found )) || continue
         rest="${rest#-}"
         read -r delim rest <<< "${rest}" || delim=""
         delim="${delim#\'}"; delim="${delim%\'}"; delim="${delim#\"}"; delim="${delim%\"}"
@@ -123,7 +178,7 @@ strip_heredocs() {
             [A-Za-z_]*) body=1 ;;
         esac
     done <<< "${cmd}"
-    cmd="${out}"
+    cmd="${out}${held}"
 }
 strip_heredocs
 # A backslash-newline continues the line, so `git \⏎ push` is one push. Joined
@@ -131,6 +186,14 @@ strip_heredocs
 bsnl=$'\\\n'
 cmd="${cmd//"${bsnl}"/ }"
 [[ -n "${cmd//[[:space:]]/}" ]] || exit 0
+# The overwriting redirections the segment split below would tear apart: `>|`
+# (past noclobber) and zsh's `>!` are a plain `>`, and `>&` keeps a marker in
+# place of its `&`, so `>&file` is read as the write it is while `2>&1` stays a
+# descriptor.
+dup=$'\x1f'
+cmd="${cmd//'>|'/>}"
+cmd="${cmd//'>!'/>}"
+cmd="${cmd//'>&'/>${dup}}"
 
 # The protected paths: the evidence under mates/ (§10.1), a venue kit under
 # cycls/<cycle>/template/ (§10.4), and .env. A word counts from after its last
@@ -178,18 +241,24 @@ writes_over() { # $1 = curl's -o or wget's -O path
     protected "$1" || tracked_file "$1"
 }
 
-# Where a mv, cp, or ln lands, one path per line: the last operand, or -t's
-# directory, and inside a directory each source under its own name.
-landing() { # $@ = the command's words after its name
-    local a dest="" want_t=0 opts=1 d n last
+# Where a mv, cp, ln, install, or rsync lands, one path per line: the last
+# operand, or -t's directory, and inside a directory each source under its own
+# name. A copy's source ending in `/` (or naming `.`) pours its contents into
+# the directory — rsync's rule, and BSD cp -R's — so the directory itself is
+# where it lands, and any tracked file in it may be overwritten.
+landing() { # $1 = entry | contents | install, then the command's words after its name
+    local mode="$1" a dest="" want_t=0 want_v=0 opts=1 d n last
     local -a ops=()
+    shift
     for a in "$@"; do
         if (( want_t )); then dest="${a}"; want_t=0; continue; fi
+        if (( want_v )); then want_v=0; continue; fi
         if (( opts )); then
             case "${a}" in
                 --) opts=0; continue ;;
                 -t|--target-directory) want_t=1; continue ;;
                 --target-directory=*) dest="${a#*=}"; continue ;;
+                -m|-o|-g) [[ "${mode}" == install ]] && want_v=1; continue ;;
                 -*) continue ;;
             esac
         fi
@@ -206,6 +275,9 @@ landing() { # $@ = the command's words after its name
     [[ "${d}" == /* || -z "${base}" ]] || d="${base}/${d}"
     if [[ -d "${d}" ]]; then
         for a in ${ops[@]+"${ops[@]}"}; do
+            if [[ "${mode}" == contents ]]; then
+                case "${a}" in */|.|..|*/.|*/..) printf '%s\n' "${dest}"; continue ;; esac
+            fi
             a="${a%/}"
             printf '%s\n' "${dest%/}/${a##*/}"
         done
@@ -238,7 +310,28 @@ reads_only() { # $1 = command name, then its words
     return 1
 }
 
-in_protected=0   # a `cd` earlier on the line entered a protected directory
+# A directory inside a protected path, read against the project root — the
+# logical path first, then the physical one, since the payload's cwd and
+# $CLAUDE_PROJECT_DIR need not spell the root alike.
+root_p="$(cd "${root}" 2>/dev/null && pwd -P)" || root_p="${root}"
+dir_protected() { # $1 = a directory a command runs in
+    local d="$1"
+    [[ -n "${d}" ]] || return 1
+    case "${d}" in
+        "${root}"/*) protected "${d#"${root}"/}" && return 0 ;;
+    esac
+    d="$(cd "${d}" 2>/dev/null && pwd -P)" || return 1
+    case "${d}" in
+        "${root_p}"/*) protected "${d#"${root_p}"/}" ;;
+        *) return 1 ;;
+    esac
+}
+
+# The command runs inside a protected directory: the session's cwd is one (a
+# Claude shell keeps the directory an earlier call moved it to), or a `cd`
+# earlier on the line entered one. Every relative path then lands there.
+in_protected=0
+dir_protected "${base}" && in_protected=1
 
 # One shell line can carry several commands, so each is read on its own:
 # `cd x && sudo make install` is the sudo it looks like, and a `$(…)` or
@@ -263,13 +356,18 @@ while IFS= read -r segment; do
         rest="${w#*>}"
         append=0
         [[ "${rest}" == '>'* ]] && { append=1; rest="${rest#>}"; }
-        [[ "${rest}" == '&'* ]] && continue
+        to_fd=0
+        [[ "${rest}" == "${dup}"* ]] && { to_fd=1; rest="${rest#"${dup}"}"; }
         if [[ -z "${rest}" ]]; then
             rest="${word[k + 1]:-}"
             k=$((k + 1))
         fi
         [[ -n "${rest}" ]] || continue
+        # `>&2`, `>&-`, `>&3-` duplicate or close a descriptor; any other word
+        # after `>&` is a file.
+        (( to_fd )) && [[ "${rest}" =~ ^[0-9]*-?$ ]] && continue
         protected "${rest}" && exit 0
+        (( in_protected )) && [[ "${rest}" != /* ]] && exit 0
         (( append )) || ! tracked_file "${rest}" || exit 0
     done
 
@@ -284,7 +382,7 @@ while IFS= read -r segment; do
     while [[ ${i} -lt ${#word[@]} ]]; do
         t="${word[i]}"
         case "${t}" in
-            '<'|'>'|'>>'|'<<<'|[0-9]'>'|[0-9]'>>'|[0-9]'<')
+            '<'|'>'|'>>'|'<<<'|[0-9]'>'|[0-9]'>>'|[0-9]'<'|">${dup}"|[0-9]">${dup}")
                 i=$((i + 2)); continue ;;
             '<'*|'>'*|'')
                 # An empty word — the `)"` closing a substitution, once its
@@ -320,9 +418,11 @@ while IFS= read -r segment; do
     name="${t##*/}"
     args=("${word[@]:i+1}")
 
+    # Every word counts, the command's own included: interpreter code split at
+    # its parentheses leaves `'mates/x','w'` as the first word of a segment.
     touches=$(( in_protected || body_names || (via_xargs && line_names) ))
-    for a in ${args[@]+"${args[@]}"}; do
-        protected "${a}" && { touches=1; break; }
+    for a in "${word[@]}"; do
+        [[ "${a}" =~ ${protected_re} ]] && { touches=1; break; }
     done
 
     case "${name}" in
@@ -374,7 +474,7 @@ while IFS= read -r segment; do
                 [[ -n "${a}" ]] || continue
                 protected "${a}" && exit 0
                 tracked "${a}" && exit 0
-            done < <(landing ${args[@]+"${args[@]}"})
+            done < <(landing contents ${args[@]+"${args[@]}"})
             ;;
         curl)
             # A GET — stage-refs-curator's DOI content negotiation — only reads,
@@ -445,6 +545,7 @@ while IFS= read -r segment; do
                 /*) base="${dir}" ;;
                 *) [[ -n "${base}" ]] && base="${base}/${dir}" ;;
             esac
+            dir_protected "${base}" && in_protected=1
             continue
             ;;
         find)
@@ -464,10 +565,11 @@ while IFS= read -r segment; do
                 case "${a}" in -*) ;; *) (( append )) || ! tracked_file "${a}" || exit 0 ;; esac
             done
             ;;
-        mv|cp|ln)
+        mv|cp|ln|install)
             # The forced form, and one landing on a tracked file, overwrite it.
             # A plain move or copy stays open: stage-proj-adopt's confirmed moves
             # and stage-subm-packer's copies into its generated tree run as them.
+            # install copies as cp -f does.
             for a in ${args[@]+"${args[@]}"}; do
                 case "${a}" in
                     --) break ;;
@@ -476,13 +578,14 @@ while IFS= read -r segment; do
                     -*f*) exit 0 ;;
                 esac
             done
+            case "${name}" in cp) lmode=contents ;; install) lmode=install ;; *) lmode=entry ;; esac
             while IFS= read -r a; do
                 [[ -n "${a}" ]] || continue
                 protected "${a}" && exit 0
                 tracked "${a}" && exit 0
-            done < <(landing ${args[@]+"${args[@]}"})
+            done < <(landing "${lmode}" ${args[@]+"${args[@]}"})
             # A copy reads its sources: out of mates/ or a kit is not a write there.
-            if [[ "${name}" == cp ]]; then
+            if [[ "${name}" == cp || "${name}" == install ]]; then
                 (( in_protected || (via_xargs && line_names) )) && exit 0
                 continue
             fi

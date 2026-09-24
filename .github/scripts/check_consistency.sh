@@ -1262,7 +1262,8 @@ grep -qF 'involve="$(stage_involve_level "${input}" "${root}")"' .claude/hooks/s
 # reading of a wrapper's option values, backticks, continuations, and a commit
 # message's heredoc, are STAGE's own and absent from STAR's gate, so a re-port
 # could drop them with every existence check above still green. A case reads
-# through %b, so \n in it is a newline.
+# through %b, so \n in it is a newline, and `prompt@mates|…` runs it with the
+# payload's cwd in that directory of the fixture.
 grep -qF stage_bash_gate.sh .claude/settings.json || \
     { fail ".claude/settings.json does not register stage_bash_gate.sh"; hook_errors=1; }
 grep -qF 'involve="$(stage_involve_level "${input}" "${root}")"' .claude/hooks/stage_bash_gate.sh || \
@@ -1274,12 +1275,13 @@ gate_dir="$(mktemp -d "${TMPDIR:-/tmp}/stage-bash-gate-check.XXXXXX")" || {
 }
 if [[ -n "${gate_dir}" ]]; then
     printf 'INVOLVE=low\n' > "${gate_dir}/.env"
-    mkdir -p "${gate_dir}/notes"
+    mkdir -p "${gate_dir}/notes" "${gate_dir}/mates" "${gate_dir}/wkdrs"
     printf 'x\n' > "${gate_dir}/notes/claims.md"
-    git -C "${gate_dir}" init -q && git -C "${gate_dir}" add notes/claims.md
-    gate_verdict() { # $1 = shell command; prints allow, prompt, or what came back
+    printf 'x\n' > "${gate_dir}/mates/MANIFEST.md"
+    git -C "${gate_dir}" init -q && git -C "${gate_dir}" add notes/claims.md mates/MANIFEST.md
+    gate_verdict() { # $1 = shell command, $2 = cwd; prints allow, prompt, or what came back
         local out
-        out="$(python3 -c 'import json, sys; print(json.dumps({"tool_name": "Bash", "tool_input": {"command": sys.argv[1]}, "cwd": sys.argv[2]}))' "$1" "${gate_dir}" \
+        out="$(python3 -c 'import json, sys; print(json.dumps({"tool_name": "Bash", "tool_input": {"command": sys.argv[1]}, "cwd": sys.argv[2]}))' "$1" "$2" \
             | CLAUDE_PROJECT_DIR="${gate_dir}" bash .claude/hooks/stage_bash_gate.sh 2>&1)"
         if [[ "${out}" == *'"permissionDecision":"allow"'* ]]; then printf 'allow'
         elif [[ -z "${out}" ]]; then printf 'prompt'
@@ -1287,8 +1289,13 @@ if [[ -n "${gate_dir}" ]]; then
     }
     gate_errors=0
     while IFS='|' read -r gate_want gate_cmd; do
+        gate_cwd="${gate_dir}"
+        if [[ "${gate_want}" == *@* ]]; then
+            gate_cwd="${gate_dir}/${gate_want#*@}"
+            gate_want="${gate_want%@*}"
+        fi
         gate_cmd="$(printf '%b' "${gate_cmd}")"
-        gate_got="$(gate_verdict "${gate_cmd}")"
+        gate_got="$(gate_verdict "${gate_cmd}" "${gate_cwd}")"
         [[ "${gate_got}" == "${gate_want}" ]] || \
             { fail "stage_bash_gate.sh: expected ${gate_want}, got ${gate_got}, for: ${gate_cmd}"; gate_errors=1; hook_errors=1; }
     done <<'CASES'
@@ -1311,6 +1318,17 @@ prompt|tlmgr install booktabs
 prompt|cp draft.md notes/claims.md
 prompt|curl -sL https://x -o notes/claims.md
 prompt|scp main.pdf host:/tmp/
+allow|bash execs/scpts/lint.sh 2>&1 | tail -5
+prompt|echo '<<EOF'\ngit push\nEOF
+prompt|echo x # <<EOF\nrm x\nEOF
+prompt@mates|touch x
+prompt@mates|sed -i s/a/b/ MANIFEST.md
+prompt|echo x >| notes/claims.md
+prompt|echo x >&notes/claims.md
+prompt|mkdir -p x && cp -R x/ notes/
+prompt|python3 -c "open('mates/x','w')"
+prompt|perl -e 'unlink q(mates/x)'
+prompt|install x notes/claims.md
 CASES
     (( gate_errors == 0 )) && note "bash gate allows ordinary commands at involve=low and leaves STAGE's red lines to the prompt"
     rm -rf "${gate_dir}"
