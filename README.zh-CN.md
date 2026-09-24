@@ -341,7 +341,7 @@ dsh --profile YOUR_PROFILE --dump-config
 
 不带参数的 `/stage` 显示当前论文状态，也可以传入描述，例如 `/stage 审计实验章节中的每个数字`。命令会从共享的 `.agents/commands/stage.md` 名册发起一个后续轮次，因此 DSH 与其他宿主始终从同一来源分流。
 
-每次运行都以同样的方式结束：给出报告和下一条要运行的准确命令；除非你要求它接着做，它不会再启动别的运行。`/stage-auto <目标> [involve=<level>]` 追求一个写明的目标，而不是处理单个请求——Codex 里写作 `$stage-auto`；Kimi Code 与 DSH 里它随 `/stage` 所在的同一个插件或 bundle 一起提供。例如 `/stage-auto 方法章节起草完成且其中数字审计完毕` 会先运行 `stage-flow-status`，再逐个启动目标需要的下一个未标记 skill，每次只做一个工作单元。目标的检查通过时它就停下；遇到任何标 † 的 skill 时也停下（打印准确命令，由你来敲）；遇到红线动作、只有你能回答的问题、尚未经你确认的 venue 数值、只剩等你处理的工作（待导入的证据、待勾选的承诺框）、同一次启动的重复，或一整轮没有任何改动时同样停下。它从不导入证据、不录入 venue 事实，自己也不提交；它启动的每个 skill 保留各自的提交步骤。流程只在 `.agents/commands/stage-auto.md` 保存一份，各宿主的入口都委托给它（[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 第 5 条）。
+每次运行都以同样的方式结束：给出报告和下一条要运行的准确命令；除非你要求它接着做，它不会再启动别的运行。`/stage-auto <目标> [involve=<level>]` 追求一个写明的目标，而不是处理单个请求——Codex 里写作 `$stage-auto`；Kimi Code 与 DSH 里它随 `/stage` 所在的同一个插件或 bundle 一起提供。例如 `/stage-auto 方法章节起草完成且其中数字审计完毕` 会先运行 `stage-flow-status`，再逐个启动目标需要的下一个未标记 skill，每次只做一个工作单元。目标的检查通过时它就停下；遇到任何标 † 的 skill 时也停下（打印准确命令，由你来敲）；遇到专为留给你做选择的模式（`stage-refs-curator discover` 或 `position`、`stage-copy-editor style`、`stage-peer-reviewer extern=`）、红线动作、只有你能回答的问题、尚未经你确认的 venue 数值、只剩等你处理的工作（待导入的证据、待勾选的承诺框）、同一次启动的重复、一整轮没有任何改动，或一个失败动作的修复也失败时同样停下。它从不导入证据、不录入 venue 事实，自己也不提交；它启动的每个 skill 保留各自的提交步骤。流程只在 `.agents/commands/stage-auto.md` 保存一份，各宿主的入口都委托给它（[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 第 5 条）。
 
 六个 skill（下表以 † 标注）仅限显式调用（slash-only）：接入、故事、提纲、回复、投稿与海报选择。六套具名 harness 的 manifest 使用 `disable-model-invocation: true`；Codex 在 `.codex/skills/` 中使用 `allow_implicit_invocation: false`，再链接到共用根。CI 会把七套实现都与[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 核对。
 
