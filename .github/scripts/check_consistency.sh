@@ -1484,6 +1484,9 @@ prompt|r''m x
 prompt|coproc rm x
 prompt|install -d mates/x
 allow|install -d wkdrs/x
+prompt|echo $(( 1 << EOF ))\nrm x\nEOF
+prompt|echo ${x#<<EOF }\nrm x\nEOF
+allow|echo $(( 1 << 2 )); cat <<EOF\nrm x\nEOF
 CASES
     (( gate_errors == 0 )) && note "bash gate allows ordinary commands at involve=low and leaves STAGE's red lines to the prompt"
     rm -rf "${gate_dir}"

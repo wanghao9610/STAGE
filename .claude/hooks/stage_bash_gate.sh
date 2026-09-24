@@ -99,17 +99,20 @@ base="$(payload cwd)"
 # code" is not the rm it spells. Drop each body through its delimiter before
 # the segments are read, keeping the bodies aside. Only a `<<` the shell would
 # read as an operator opens one: not inside quotes, not after a comment's `#`,
-# and not a here-string's <<<. Quotes are followed across lines and into a
-# `$(…)` inside double quotes, where a commit message's heredoc sits. Only a
-# bare-word delimiter (EOF-shaped) counts, so an arithmetic x<<2 cannot swallow
+# not a here-string's <<<, and not inside `$((…))`, `((…))`, or `${…}`, where
+# `<<` is a shift or part of a pattern. Quotes are followed across lines and into
+# a `$(…)` inside double quotes, where a commit message's heredoc sits. Only a
+# bare-word delimiter (EOF-shaped) counts, so an unbraced x<<2 cannot swallow
 # the lines after it and hide a real command, and a body that never meets its
 # delimiter is read again line by line; anything malformed errs toward the
-# prompt, never past it.
+# prompt, never past it: a `((` read as arithmetic that was two subshells only
+# leaves a body to be read as commands.
 bodies=""
 strip_heredocs() {
     # st is a stack of quoting contexts, innermost last: n unquoted (the line,
     # or a `$(…)` / `(…)` inside it), b a backtick substitution, d double
-    # quotes, s single quotes, a an ANSI-C $'…'.
+    # quotes, s single quotes, a an ANSI-C $'…', m arithmetic (`$((…))` or
+    # `((…))`), r a parenthesis inside it, p a parameter expansion `${…}`.
     local line rest delim="" body=0 out="" held="" st="n" found i n c
     while IFS= read -r line; do
         if (( body )); then
@@ -139,7 +142,34 @@ strip_heredocs() {
                         '\') i=$((i + 1)) ;;
                         '"') st="${st%?}" ;;
                         '`') st="${st}b" ;;
-                        '$') [[ "${line:i+1:1}" == '(' ]] && { st="${st}n"; i=$((i + 1)); } ;;
+                        '$')
+                            case "${line:i+1:2}" in
+                                '((') st="${st}m"; i=$((i + 2)) ;;
+                                '('*) st="${st}n"; i=$((i + 1)) ;;
+                                '{'*) st="${st}p"; i=$((i + 1)) ;;
+                            esac ;;
+                    esac ;;
+                m|r|p)
+                    # A `<<` in here is a shift or a pattern: it opens nothing.
+                    case "${c}" in
+                        '\') i=$((i + 1)) ;;
+                        "'") st="${st}s" ;;
+                        '"') st="${st}d" ;;
+                        '`') st="${st}b" ;;
+                        '$')
+                            case "${line:i+1:2}" in
+                                '((') st="${st}m"; i=$((i + 2)) ;;
+                                '('*) st="${st}n"; i=$((i + 1)) ;;
+                                '{'*) st="${st}p"; i=$((i + 1)) ;;
+                                "'"*) st="${st}a"; i=$((i + 1)) ;;
+                            esac ;;
+                        '(') [[ "${st: -1}" == p ]] || st="${st}r" ;;
+                        ')')
+                            case "${st: -1}" in
+                                r) st="${st%?}" ;;
+                                m) [[ "${line:i+1:1}" == ')' ]] && { st="${st%?}"; i=$((i + 1)); } ;;
+                            esac ;;
+                        '}') [[ "${st: -1}" == p ]] && st="${st%?}" ;;
                     esac ;;
                 *)
                     case "${c}" in
@@ -148,11 +178,14 @@ strip_heredocs() {
                         '"') st="${st}d" ;;
                         '`') if [[ "${st: -1}" == b ]]; then st="${st%?}"; else st="${st}b"; fi ;;
                         '$')
-                            case "${line:i+1:1}" in
-                                '(') st="${st}n"; i=$((i + 1)) ;;
-                                "'") st="${st}a"; i=$((i + 1)) ;;
+                            case "${line:i+1:2}" in
+                                '((') st="${st}m"; i=$((i + 2)) ;;
+                                '('*) st="${st}n"; i=$((i + 1)) ;;
+                                '{'*) st="${st}p"; i=$((i + 1)) ;;
+                                "'"*) st="${st}a"; i=$((i + 1)) ;;
                             esac ;;
-                        '(') st="${st}n" ;;
+                        '(')
+                            if [[ "${line:i+1:1}" == '(' ]]; then st="${st}m"; i=$((i + 1)); else st="${st}n"; fi ;;
                         ')') [[ ${#st} -gt 1 && "${st: -1}" == n ]] && st="${st%?}" ;;
                         '#')
                             # A comment runs to the end of the line.
