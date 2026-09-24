@@ -406,8 +406,9 @@ Usage: bash execs/update.sh [ref] [--harnesses LIST] [--skill NAME] [--force]
 
 Overwrite the STAGE-managed content — the shared agent instructions (AGENTS.md),
 the shared skill store plus six named harness skill trees
-(.agents, .claude, .cursor, .dsh, .kimi-code, .pi, .qwen), the Codex $stage
-plugin, their hook, command, prompt, agent, extension, and Codex manifest paths,
+(.agents, .claude, .cursor, .dsh, .kimi-code, .pi, .qwen), the Codex $stage /
+$stage-auto plugin, the Kimi and DSH /stage and /stage-auto entries, their
+hook, command, prompt, agent, extension, and Codex manifest paths,
 docs/mds/stage-workflow/,
 and every script under execs/ — the two entrypoints, run.sh and this one, and
 the three utilities in execs/scpts/:

@@ -448,10 +448,10 @@ bash execs/update.sh
 
 - `AGENTS.md` 始终更新，选择 Cursor 时再更新 `.cursor/rules/`——它们分别是共享 agent 指令与 Cursor 的运行时镜像；所选路径中的本地改动会被替换，而包含 Cursor 的运行会让两份运行时副本一起移动
 - `.agents/skills/` 与 `.agents/commands/` 优先，随后是 `.claude/skills/`、`.cursor/skills/`、`.dsh/skills/`、`.kimi-code/skills/`、`.pi/skills/` 与 `.qwen/skills/`——共用技能根和路由器，加六套原生技能树；安装进论文实例时会解引用链接
-- `.codex/plugins/`——Codex 专属的 `$stage` 分流插件与 marketplace 实体；`.agents/plugins/marketplace.json` 只是一条指向该 marketplace 的文件链接，绝不链接整个目录
-- `.dsh/commands/` 与 `.kimi-code/plugins/`——DSH 和 Kimi 的 `/stage` 分流包，各自只在选中对应宿主时更新
+- `.codex/plugins/`——Codex 专属的 `$stage` 分流与 `$stage-auto` 目标运行插件，以及 marketplace 实体；`.agents/plugins/marketplace.json` 只是一条指向该 marketplace 的文件链接，绝不链接整个目录
+- `.dsh/commands/` 与 `.kimi-code/plugins/`——DSH 和 Kimi 的 `/stage` 与 `/stage-auto` 包，各自只在选中对应宿主时更新
 - 对应的钩子、command、prompt、agent 与 extension 目录，以及保存 Codex 逐 skill UI manifest 的 `.codex/skills/`；`.stage/memory/` 下的记忆库属于论文自己，从不同步
-- `docs/mds/stage-workflow/`——工作流规约、skill 指南及其中文版、记忆规范与模型 id 规范
+- `docs/mds/stage-workflow/`——工作流规约（项目记忆是其 §12，宿主钩子与模型溯源是其 §13）、skill 指南及其中文版
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
 - `execs/scpts/import.sh`、`execs/scpts/lint.sh`、`execs/scpts/fmt.sh`——三个工具脚本，理由同上：skill 按名字和参数调用 `import.sh --diff` 与 `lint.sh --no-build`，而读退出码的调用方，认的是它自己那一版写明的那套码。比某个工具脚本更老的 ref 会打印一行跳过它
 - `execs/update.sh`——更新脚本自己，为的是不让任何仓库卡在一个老到取不回后继版本的更新机制上。它用重命名装上：执行更新的那一次仍读旧文件跑完，下一次调用才用上新的

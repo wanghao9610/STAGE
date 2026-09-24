@@ -448,10 +448,10 @@ By default, the command updates these paths from STAGE's `main` branch:
 
 - `AGENTS.md` always, and `.cursor/rules/` when Cursor is selected — the shared agent instructions and Cursor's mirrored runtime copy; your own edits to selected paths are replaced, and a run that includes Cursor moves the runtime copies together
 - `.agents/skills/` and `.agents/commands/` first, then `.claude/skills/`, `.cursor/skills/`, `.dsh/skills/`, `.kimi-code/skills/`, `.pi/skills/`, and `.qwen/skills/` — the shared store and router plus every native harness copy; links are dereferenced when installed into a paper instance
-- `.codex/plugins/` — the Codex-only `$stage` router plugin and canonical marketplace; `.agents/plugins/marketplace.json` is only a file link to that marketplace, never a link over the directory
-- `.dsh/commands/` and `.kimi-code/plugins/` — the DSH and Kimi `/stage` router packages, updated only when their respective harness is selected
+- `.codex/plugins/` — the Codex-only `$stage` router and `$stage-auto` goal-run plugin and canonical marketplace; `.agents/plugins/marketplace.json` is only a file link to that marketplace, never a link over the directory
+- `.dsh/commands/` and `.kimi-code/plugins/` — the DSH and Kimi `/stage` and `/stage-auto` packages, updated only when their respective harness is selected
 - the corresponding hook, command, prompt, agent, and extension trees, plus `.codex/skills/` for Codex's per-skill UI manifests; the paper-owned memory store under `.stage/memory/` is never synced
-- `docs/mds/stage-workflow/` — the workflow conventions, the skill guide and its Chinese edition, the memory spec, and the model-id spec
+- `docs/mds/stage-workflow/` — the workflow conventions (project memory is its §12, harness hooks and model provenance its §13), the skill guide and its Chinese edition
 - `execs/run.sh` — the build entrypoint; your own edits to it are replaced, and the skills call it by name and by flag, so a repository that syncs a skill while keeping an older `run.sh` gets a run that fails at its build step
 - `execs/scpts/import.sh`, `execs/scpts/lint.sh`, `execs/scpts/fmt.sh` — the utilities, for the same reason: skills call `import.sh --diff` and `lint.sh --no-build` by name and flag, and a caller reading an exit code means the one its own version documents. A ref older than a utility simply skips it with a printed line
 - `execs/update.sh` — the updater itself, so that no repository strands on an update mechanism too old to fetch its successor. It is installed by rename: the run doing the update finishes on the old file, and the next invocation uses the new one
