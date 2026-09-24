@@ -186,16 +186,22 @@ if [ "${event}" = "SubagentStart" ]; then
         */subagents/*agent-*.jsonl) agent_transcript="${transcript}" ;;
         *) agent_transcript="$(dirname "${transcript}")/${session_id}/subagents/agent-${agent_id}.jsonl" ;;
     esac
-    ctx="STAGE provenance: this run is a delegate; the model id you record is this delegate's, not the session's. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), run: bash ${self} --resolve ${agent_transcript} — at the moment you write, not earlier — then copy what it prints verbatim. Write 'unrecorded' only if it prints nothing, and do not guess."
+    printf -v agent_arg '%q' "${agent_transcript}"
+    ctx="STAGE provenance: this run is a delegate; the model id you record is this delegate's, not the session's. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), run: bash ${self} --resolve ${agent_arg} — at the moment you write, not earlier — then copy what it prints verbatim. Write 'unrecorded' only if it prints nothing, and do not guess."
     emit_context "${event}" "${ctx}"
     exit 0
 fi
 
 model=$(payload_field model)
 transcript=$(payload_field transcript_path)
+# The command runs in the user's shell, and zsh reads an unquoted
+# `claude-opus-5[1m]` as a glob that matches nothing: the call then fails
+# instead of printing the id. Both arguments go in shell-quoted.
+printf -v transcript_arg '%q' "${transcript:-}"
+printf -v model_arg '%q' "${model:-}"
 
 if [ -n "${transcript:-}" ]; then
-    ctx="STAGE provenance: read this session's model id when you record it, not from memory — the runtime states it at session start only, and /model changes it afterwards without saying so. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), run: bash ${self} --resolve ${transcript}${model:+ ${model}} — then copy what it prints verbatim. Write 'unrecorded' only if it prints nothing, and do not guess."
+    ctx="STAGE provenance: read this session's model id when you record it, not from memory — the runtime states it at session start only, and /model changes it afterwards without saying so. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), run: bash ${self} --resolve ${transcript_arg}${model:+ ${model_arg}} — then copy what it prints verbatim. Write 'unrecorded' only if it prints nothing, and do not guess."
 elif [ -n "${model:-}" ]; then
     ctx="STAGE provenance: this session's runtime-reported model id is ${model}, and the runtime named no transcript to check it against later. When a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), copy this exact string verbatim; do not write 'unrecorded'. If you switch models mid-session, this string is the one you started with, not the one writing."
 else
