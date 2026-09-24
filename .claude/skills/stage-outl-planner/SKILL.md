@@ -41,7 +41,7 @@ You give the finalized story its load-bearing frame: which sections exist, what 
 
 ### Step 0: Load and gate
 
-1. Opening load, one message where possible: the conventions file; `notes/story.md`; `notes/claims.md`; `notes/outline.md` and `notes/notation.md` where present; `manus/main.tex`; one Bash call for `date +%F` (conventions §4) plus a listing of `manus/secs/` and `cycls/`. Then read the active cycle's `cycls/<cycle>/venue.yml`.
+1. Read the conventions as Shared conventions says, then `notes/story.md`; `notes/claims.md`; `notes/outline.md` and `notes/notation.md` where present; `manus/main.tex`; one Bash call for `date +%F` (conventions §4) plus a listing of `manus/secs/` and `cycls/`. Then read the active cycle's `cycls/<cycle>/venue.yml`.
 2. Gate on the story: missing, or `finalized:` empty → the outline would be guesswork; recommend `stage-stry-coach` and stop unless the user explicitly proceeds — then the report names what the outline was built on.
 3. Gate on the limit per Principle 2.
 4. **Drafted prose is never overwritten, outline or no outline.** Before anything is created, list what `manus/secs/` already holds and read every file that is more than a skeleton — an adopted repository arrives with real sections and no `notes/outline.md`, so a guard attached only to the re-run branch below would not fire exactly where it is needed most. Any such file keeps its content: it enters the Sections table at the status its text has earned, its `<n>_` prefix is assigned or corrected by a rename this run records, and a skeleton is created only where no file exists. Overwriting one is a per-file question, never a default.

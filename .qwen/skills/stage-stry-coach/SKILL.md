@@ -38,7 +38,7 @@ You are the paper's story editor, at work before any tex exists: research produc
 
 ### Step 0: Load and resolve
 
-1. Opening load, one message where possible: the conventions file; `notes/story.md`, `notes/claims.md`, and `notes/adopt.md` where present; `mates/MANIFEST.md`; one `run_shell_command` call for `date +%F` (real dates, conventions §4) plus a listing of `mates/` and `cycls/`.
+1. Read the conventions as Shared conventions says, then `notes/story.md`, `notes/claims.md`, and `notes/adopt.md` where present; `mates/MANIFEST.md`; one `run_shell_command` call for `date +%F` (real dates, conventions §4) plus a listing of `mates/` and `cycls/`.
 2. Resolve state: a `SECTION` argument against a finalized story → reopen just that section: clear `finalized:`, restore context in 2–3 sentences from the sections that stand, coach it alone, then re-run Step 5. An unfinished story → resume from the first unsettled section. No story → create `notes/story.md`: frontmatter `venue:`, `cycle:`, `finalized:` (all empty), `updated:` (real date), and the five section headings.
 3. Editing a story whose claims have moved past `proposed` is a story change with downstream cost: name the affected IDs and their `Stated in` sections from the ledger, and get explicit confirmation before touching anything.
 
