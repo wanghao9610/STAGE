@@ -50,7 +50,7 @@ entries() { # $1 = store directory -> one index line per memory file, newest fir
   awk -v cutoff="${cutoff}" '
     # A memory is its frontmatter: the line is built from type, scope, verified
     # and summary. A file with no summary is listed by its first body line — the
-    # sentence the spec asks the body to open with — so a memory written before
+    # sentence conventions §12 asks the body to open with — so a memory written before
     # the field existed still reaches the session.
     FNR == 1 { if (pending) emit(); cur = FILENAME; infm = 0; pending = 0; split("", f) }
     /^---$/ { if (infm < 2) { infm++; if (infm == 2) { if (f["summary"] != "") emit(); else pending = 1 } }; next }
