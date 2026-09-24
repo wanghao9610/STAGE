@@ -338,7 +338,7 @@ Use `/stage` with no argument for the current paper status, or pass a request su
 Six skills (marked † below) are slash-only: adoption, story, outline, response, submission, and poster selection. Named harness manifests use `disable-model-invocation: true`; Codex uses `allow_implicit_invocation: false` in `.codex/skills/`, linked into the shared root. CI checks all seven against [conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 <div align="center">
-  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE writing workflow: sixteen skills in five phase bands — set up, plan, write, polish and audit, submission cycle — what each one writes, and how the drafting loop and the rejection loop close" width="100%">
+  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE writing workflow: fifteen skills in the order they run in plus one that reads across them, what each one writes, and how the drafting loop and the rejection loop close" width="100%">
 </div>
 
 | Skill | Purpose | Main output |

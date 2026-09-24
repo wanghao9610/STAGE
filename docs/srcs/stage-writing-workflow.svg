@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 1386" width="1360" height="1386" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
-  <title>STAGE writing workflow — sixteen skills in five bands, what each one writes, and how the loops close</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330 1350" width="1330" height="1350" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>STAGE writing workflow — fifteen skills in order, one that reads across them, and what each one writes</title>
 
-  <!-- Layout: five phase bands, three columns. Four bands hold three skills
-       each; the submission cycle holds four and wraps onto a second row, so the
-       grid is three wide and six deep with one box on the last row. Bands
-       alternate direction (boustrophedon) so that every band-to-band handoff is
-       a single short drop in the same column instead of a full-width return
-       sweep — including the wrap, which drops in column three.
+  <!-- Layout, after STAR's diagram: three columns around one hub. The left
+       column is the one-time chain from adoption to the reference base; the
+       right column is the drafting loop, run once per unit of work; flow-status
+       sits between them at the top, reads what the left column wrote, and hands
+       the right column its next unit. The loop closes back into the hub through
+       the middle column. The submission cycle takes the bottom row and runs it
+       right to left, so the packer ends beside the left margin, and the poster
+       hangs under the packer because only an accepted cycle reaches it.
+
+       Loops, after STAR's diagram: every way back that can be drawn without
+       crossing another edge is a dashed line, so the page reads as loops and
+       not as a list. The ring through the hub is the drafting loop; a failed
+       claim audit re-enters it through the corridor between the middle and
+       right columns; the rejection loop leaves the packer and climbs the left
+       margin into the story coach, where a new cycle begins. Only jumps that
+       would cross the page stay numbered stubs.
 
        Arrowheads are explicit triangles, not <marker> elements: several SVG
        rasterisers (macOS sips among them) silently drop markers, which would
@@ -33,28 +43,18 @@
       .ahv { fill: #7048e8; }
       .jn { font-family: Menlo, ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px; font-weight: 700; fill: #7048e8; text-anchor: middle; }
       .lh { font-size: 8.5px; font-weight: 700; fill: #94a3b8; letter-spacing: 0.09em; }
-      .bl { font-size: 8.5px; font-weight: 700; fill: #94a3b8; letter-spacing: 0.09em; text-anchor: middle; }
       .ef { font-size: 9px; fill: #94a3b8; }
       .cb { font-size: 11px; fill: #475569; }
     </style>
   </defs>
 
-  <rect x="0" y="0" width="1360" height="1386" fill="#ffffff"/>
+  <rect x="0" y="0" width="1330" height="1350" fill="#ffffff"/>
 
   <!-- title -->
   <text x="60" y="52" font-size="21" font-weight="700" fill="#0f172a">STAGE writing workflow</text>
-  <text x="60" y="76" font-size="12" fill="#64748b">Sixteen skills in five bands · fifteen in order and one that reads across them · what each one writes · how the loops close</text>
+  <text x="60" y="76" font-size="12" fill="#64748b">Sixteen skills · fifteen in order and one that reads across them · what each one writes · how the loops close</text>
 
-  <!-- ============================ BAND LABELS ============================ -->
-  <text class="bl" x="34" y="146" transform="rotate(-90 34 146)">SET UP</text>
-  <text class="bl" x="34" y="314" transform="rotate(-90 34 314)">PLAN</text>
-  <text class="bl" x="34" y="482" transform="rotate(-90 34 482)">WRITE</text>
-  <text class="bl" x="34" y="650" transform="rotate(-90 34 650)">POLISH &amp; AUDIT</text>
-  <text class="bl" x="34" y="902" transform="rotate(-90 34 902)">SUBMISSION CYCLE</text>
-
-  <!-- ============================== BAND 1 =============================== -->
-  <!-- SET UP, left to right. flow-status shares the band without being a step
-       in it: it reads every artifact the other fourteen write. -->
+  <!-- ============ LEFT COLUMN — once per paper ============ -->
 
   <!-- 0 proj-adopt (SETUP) -->
   <rect x="60" y="100" width="340" height="92" rx="10" fill="#fff4e6" stroke="#fed7aa" stroke-width="1.5"/>
@@ -67,380 +67,382 @@
   <text class="no" x="78" y="178">notes/adopt.md · .env · cycls/&lt;cycle&gt;/venue.yml</text>
 
   <!-- 1 evid-curator (SETUP) -->
-  <rect x="520" y="100" width="340" height="92" rx="10" fill="#fff4e6" stroke="#fed7aa" stroke-width="1.5"/>
-  <circle cx="548" cy="126" r="13" fill="#f76707"/>
-  <text class="bn" x="548" y="130.5">1</text>
-  <text class="nt" x="570" y="131">/stage-evid-curator</text>
-  <text class="np" x="538" y="156">Results snapshotted read-only, fingerprint per file</text>
-  <text class="no" x="538" y="178">mates/** · mates/MANIFEST.md</text>
-
-  <!-- flow-status (READ) — deliberately unnumbered: not a stage in the order but
-       a reader of all of them. The ring is drawn as nested circles rather than a
-       ◎ glyph, which rasterisers may not have in the monospace stack. -->
-  <rect x="960" y="100" width="340" height="92" rx="10" fill="#e6fcf5" stroke="#a7f3d0" stroke-width="1.5"/>
-  <circle cx="988" cy="126" r="13" fill="#0ca678"/>
-  <circle cx="988" cy="126" r="7.5" fill="#e6fcf5"/>
-  <circle cx="988" cy="126" r="3.5" fill="#0ca678"/>
-  <text class="nt" x="1010" y="131">/stage-flow-status</text>
-  <rect x="1222" y="112" width="58" height="18" rx="9" fill="#ffffff" stroke="#a7f3d0"/>
-  <text class="tag" x="1251" y="124.5">any time</text>
-  <text class="np" x="978" y="156">Where the paper stands, and the one next action</text>
-  <text class="no" x="978" y="178">read-only — writes nothing</text>
-
-  <!-- ============================== BAND 2 =============================== -->
-  <!-- PLAN, right to left: story, then skeleton, then the reference base. -->
+  <rect x="60" y="224" width="340" height="92" rx="10" fill="#fff4e6" stroke="#fed7aa" stroke-width="1.5"/>
+  <circle cx="88" cy="250" r="13" fill="#f76707"/>
+  <text class="bn" x="88" y="254.5">1</text>
+  <text class="nt" x="110" y="255">/stage-evid-curator</text>
+  <text class="np" x="78" y="280">Results snapshotted read-only, fingerprint per file</text>
+  <text class="no" x="78" y="302">mates/** · mates/MANIFEST.md</text>
 
   <!-- 2 stry-coach (PLAN) -->
-  <rect x="960" y="268" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
-  <circle cx="988" cy="294" r="13" fill="#4c6ef5"/>
-  <text class="bn" x="988" y="298.5">2</text>
-  <text class="nt" x="1010" y="299">/stage-stry-coach</text>
-  <rect x="1206" y="280" width="74" height="18" rx="9" fill="#ffffff" stroke="#c7d2fe"/>
-  <text class="tag" x="1243" y="292.5">slash-only</text>
-  <text class="np" x="978" y="324">A story that holds; contributions become claims</text>
-  <text class="no" x="978" y="346">notes/story.md · notes/claims.md · venue.yml</text>
+  <rect x="60" y="348" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+  <circle cx="88" cy="374" r="13" fill="#4c6ef5"/>
+  <text class="bn" x="88" y="378.5">2</text>
+  <text class="nt" x="110" y="379">/stage-stry-coach</text>
+  <rect x="306" y="360" width="74" height="18" rx="9" fill="#ffffff" stroke="#c7d2fe"/>
+  <text class="tag" x="343" y="372.5">slash-only</text>
+  <text class="np" x="78" y="404">A story that holds; contributions become claims</text>
+  <text class="no" x="78" y="426">notes/story.md · notes/claims.md · venue.yml</text>
 
   <!-- 3 outl-planner (PLAN) -->
-  <rect x="520" y="268" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
-  <circle cx="548" cy="294" r="13" fill="#4c6ef5"/>
-  <text class="bn" x="548" y="298.5">3</text>
-  <text class="nt" x="570" y="299">/stage-outl-planner</text>
-  <rect x="766" y="280" width="74" height="18" rx="9" fill="#ffffff" stroke="#c7d2fe"/>
-  <text class="tag" x="803" y="292.5">slash-only</text>
-  <text class="np" x="538" y="324">The skeleton: page budgets, claims per section</text>
-  <text class="no" x="538" y="346">notes/outline.md · manus/secs/*.tex · notation.md</text>
+  <rect x="60" y="472" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+  <circle cx="88" cy="498" r="13" fill="#4c6ef5"/>
+  <text class="bn" x="88" y="502.5">3</text>
+  <text class="nt" x="110" y="503">/stage-outl-planner</text>
+  <rect x="306" y="484" width="74" height="18" rx="9" fill="#ffffff" stroke="#c7d2fe"/>
+  <text class="tag" x="343" y="496.5">slash-only</text>
+  <text class="np" x="78" y="528">The skeleton: page budgets, claims per section</text>
+  <text class="no" x="78" y="550">notes/outline.md · manus/secs/*.tex · notation.md</text>
 
   <!-- 4 refs-curator (PLAN) -->
-  <rect x="60" y="268" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
-  <circle cx="88" cy="294" r="13" fill="#4c6ef5"/>
-  <text class="bn" x="88" y="298.5">4</text>
-  <text class="nt" x="110" y="299">/stage-refs-curator</text>
-  <text class="np" x="78" y="324">Reading notes and a bib from fetched records</text>
-  <text class="no" x="78" y="346">manus/bibs/reference.bib · notes/refs/*.md</text>
+  <rect x="60" y="596" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+  <circle cx="88" cy="622" r="13" fill="#4c6ef5"/>
+  <text class="bn" x="88" y="626.5">4</text>
+  <text class="nt" x="110" y="627">/stage-refs-curator</text>
+  <text class="np" x="78" y="652">Reading notes and a bib from fetched records</text>
+  <text class="no" x="78" y="674">manus/bibs/reference.bib · notes/refs/*.md</text>
 
-  <!-- ============================== BAND 3 =============================== -->
-  <!-- WRITE, left to right: the drafting loop, re-entered per section. -->
+  <!-- ============ MIDDLE COLUMN — the hub and the loop's exit ============ -->
+
+  <!-- flow-status (READ) — deliberately unnumbered: it is not a stage in the
+       order, it reads every stage and can be run at any point. The ring is
+       drawn as nested circles rather than a ◎ glyph, which rasterisers may
+       not have in the monospace stack. -->
+  <rect x="520" y="100" width="340" height="92" rx="10" fill="#e6fcf5" stroke="#a7f3d0" stroke-width="1.5"/>
+  <circle cx="548" cy="126" r="13" fill="#0ca678"/>
+  <circle cx="548" cy="126" r="7.5" fill="#e6fcf5"/>
+  <circle cx="548" cy="126" r="3.5" fill="#0ca678"/>
+  <text class="nt" x="570" y="131">/stage-flow-status</text>
+  <rect x="782" y="112" width="58" height="18" rx="9" fill="#ffffff" stroke="#a7f3d0"/>
+  <text class="tag" x="811" y="124.5">any time</text>
+  <text class="np" x="538" y="156">Where the paper stands, and the one next action</text>
+  <text class="no" x="538" y="178">read-only — writes nothing</text>
+
+  <!-- 10 cite-auditor (READ) — the loop's last step and its exit: up to the hub
+       for the next unit, or down to the cycle once the whole draft is audited. -->
+  <rect x="520" y="596" width="340" height="92" rx="10" fill="#e6fcf5" stroke="#a7f3d0" stroke-width="1.5"/>
+  <circle cx="548" cy="622" r="13" fill="#0ca678"/>
+  <text class="bn" x="548" y="626.5">10</text>
+  <text class="nt" x="570" y="627">/stage-cite-auditor</text>
+  <text class="np" x="538" y="652">Every \cite key and claim checked against a note</text>
+  <text class="no" x="538" y="674">wkdrs/reports/CITES_&lt;date&gt;.md</text>
+
+  <!-- ============ RIGHT COLUMN — the drafting loop, once per unit ============ -->
 
   <!-- 5 sect-drafter (PLAN) -->
-  <rect x="60" y="436" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
-  <circle cx="88" cy="462" r="13" fill="#4c6ef5"/>
-  <text class="bn" x="88" y="466.5">5</text>
-  <text class="nt" x="110" y="467">/stage-sect-drafter</text>
-  <rect x="310" y="448" width="70" height="18" rx="9" fill="#ffffff" stroke="#c7d2fe"/>
-  <text class="tag" x="345" y="460.5">one per run</text>
-  <text class="np" x="78" y="492">One section drafted; unsourced numbers → \todo</text>
-  <text class="no" x="78" y="514">manus/secs/&lt;n&gt;_&lt;slug&gt;.tex</text>
+  <rect x="960" y="100" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+  <circle cx="988" cy="126" r="13" fill="#4c6ef5"/>
+  <text class="bn" x="988" y="130.5">5</text>
+  <text class="nt" x="1010" y="131">/stage-sect-drafter</text>
+  <rect x="1210" y="112" width="70" height="18" rx="9" fill="#ffffff" stroke="#c7d2fe"/>
+  <text class="tag" x="1245" y="124.5">one per run</text>
+  <text class="np" x="978" y="156">One section drafted; unsourced numbers → \todo</text>
+  <text class="no" x="978" y="178">manus/secs/&lt;n&gt;_&lt;slug&gt;.tex</text>
 
   <!-- 6 tabs-builder (PLAN) -->
-  <rect x="520" y="436" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
-  <circle cx="548" cy="462" r="13" fill="#4c6ef5"/>
-  <text class="bn" x="548" y="466.5">6</text>
-  <text class="nt" x="570" y="467">/stage-tabs-builder</text>
-  <text class="np" x="538" y="492">Tables built from evidence, never typed</text>
-  <text class="no" x="538" y="514">manus/tabs/&lt;slug&gt;.tex · % src: per data row</text>
+  <rect x="960" y="224" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+  <circle cx="988" cy="250" r="13" fill="#4c6ef5"/>
+  <text class="bn" x="988" y="254.5">6</text>
+  <text class="nt" x="1010" y="255">/stage-tabs-builder</text>
+  <text class="np" x="978" y="280">Tables built from evidence, never typed</text>
+  <text class="no" x="978" y="302">manus/tabs/&lt;slug&gt;.tex · % src: per data row</text>
 
   <!-- 7 figs-designer (PLAN) -->
-  <rect x="960" y="436" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
-  <circle cx="988" cy="462" r="13" fill="#4c6ef5"/>
-  <text class="bn" x="988" y="466.5">7</text>
-  <text class="nt" x="1010" y="467">/stage-figs-designer</text>
-  <text class="np" x="978" y="492">Every figure: a purpose, a source, a rendered PDF</text>
-  <text class="no" x="978" y="514">manus/figs/&lt;slug&gt;.pdf · figs/srcs/&lt;slug&gt;.*</text>
+  <rect x="960" y="348" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+  <circle cx="988" cy="374" r="13" fill="#4c6ef5"/>
+  <text class="bn" x="988" y="378.5">7</text>
+  <text class="nt" x="1010" y="379">/stage-figs-designer</text>
+  <text class="np" x="978" y="404">Every figure: a purpose, a source, a rendered PDF</text>
+  <text class="no" x="978" y="426">manus/figs/&lt;slug&gt;.pdf · figs/srcs/&lt;slug&gt;.*</text>
 
-  <!-- ============================== BAND 4 =============================== -->
-  <!-- POLISH & AUDIT, right to left: polish the prose, then check the numbers,
-       then the citations. Neither auditor may touch the file it grades. -->
-
-  <!-- 8 copy-editor (PLAN) -->
-  <rect x="960" y="604" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
-  <circle cx="988" cy="630" r="13" fill="#4c6ef5"/>
-  <text class="bn" x="988" y="634.5">8</text>
-  <text class="nt" x="1010" y="635">/stage-copy-editor</text>
-  <text class="np" x="978" y="660">Prose polished — never meaning, never a number</text>
-  <text class="no" x="978" y="682">wkdrs/reports/POLISH_&lt;date&gt;.md</text>
+  <!-- 8 copy-editor (PLAN) — also where the author's voice is recorded: a style
+       run writes notes/style.md, which the drafter reads. -->
+  <rect x="960" y="472" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+  <circle cx="988" cy="498" r="13" fill="#4c6ef5"/>
+  <text class="bn" x="988" y="502.5">8</text>
+  <text class="nt" x="1010" y="503">/stage-copy-editor</text>
+  <text class="np" x="978" y="528">Prose polished — never meaning, never a number</text>
+  <text class="no" x="978" y="550">wkdrs/reports/POLISH_&lt;date&gt;.md · notes/style.md</text>
 
   <!-- 9 clms-auditor (READ) -->
-  <rect x="520" y="604" width="340" height="92" rx="10" fill="#e6fcf5" stroke="#a7f3d0" stroke-width="1.5"/>
-  <circle cx="548" cy="630" r="13" fill="#0ca678"/>
-  <text class="bn" x="548" y="634.5">9</text>
-  <text class="nt" x="570" y="635">/stage-clms-auditor</text>
-  <text class="np" x="538" y="660">Every number traced to a fingerprint, or flagged</text>
-  <text class="no" x="538" y="682">wkdrs/reports/CLAIMS_&lt;date&gt;.md · ledger statuses</text>
+  <rect x="960" y="596" width="340" height="92" rx="10" fill="#e6fcf5" stroke="#a7f3d0" stroke-width="1.5"/>
+  <circle cx="988" cy="622" r="13" fill="#0ca678"/>
+  <text class="bn" x="988" y="626.5">9</text>
+  <text class="nt" x="1010" y="627">/stage-clms-auditor</text>
+  <text class="np" x="978" y="652">Every number traced to a fingerprint, or flagged</text>
+  <text class="no" x="978" y="674">wkdrs/reports/CLAIMS_&lt;date&gt;.md · ledger statuses</text>
 
-  <!-- 10 cite-auditor (READ) -->
-  <rect x="60" y="604" width="340" height="92" rx="10" fill="#e6fcf5" stroke="#a7f3d0" stroke-width="1.5"/>
-  <circle cx="88" cy="630" r="13" fill="#0ca678"/>
-  <text class="bn" x="88" y="634.5">10</text>
-  <text class="nt" x="110" y="635">/stage-cite-auditor</text>
-  <text class="np" x="78" y="660">Every \cite key and claim checked against a note</text>
-  <text class="no" x="78" y="682">wkdrs/reports/CITES_&lt;date&gt;.md</text>
-
-  <!-- ============================== BAND 5 =============================== -->
-  <!-- SUBMISSION CYCLE, left to right, one venue attempt per cycls/ directory. -->
+  <!-- ============ BOTTOM ROWS — the submission cycle ============ -->
+  <!-- One venue attempt per cycls/<venue>_<year>/ directory. The row runs right
+       to left — panel, response, packer — so the packer sits in the left
+       column, one margin away from the story coach a rejection returns to. -->
 
   <!-- 11 peer-reviewer (READ) -->
-  <rect x="60" y="772" width="340" height="92" rx="10" fill="#e6fcf5" stroke="#a7f3d0" stroke-width="1.5"/>
-  <circle cx="88" cy="798" r="13" fill="#0ca678"/>
-  <text class="bn" x="88" y="802.5">11</text>
-  <text class="nt" x="110" y="803">/stage-peer-reviewer</text>
-  <rect x="310" y="784" width="70" height="18" rx="9" fill="#ffffff" stroke="#a7f3d0"/>
-  <text class="tag" x="345" y="796.5">never edits</text>
-  <text class="np" x="78" y="828">Five perspectives, one venue-shaped meta-review</text>
-  <text class="no" x="78" y="850">cycls/&lt;cycle&gt;/reviews/SIM_REVIEW_&lt;date&gt;.md</text>
+  <rect x="960" y="764" width="340" height="92" rx="10" fill="#e6fcf5" stroke="#a7f3d0" stroke-width="1.5"/>
+  <circle cx="988" cy="790" r="13" fill="#0ca678"/>
+  <text class="bn" x="988" y="794.5">11</text>
+  <text class="nt" x="1010" y="795">/stage-peer-reviewer</text>
+  <rect x="1210" y="776" width="70" height="18" rx="9" fill="#ffffff" stroke="#a7f3d0"/>
+  <text class="tag" x="1245" y="788.5">never edits</text>
+  <text class="np" x="978" y="820">Five perspectives, one venue-shaped meta-review</text>
+  <text class="no" x="978" y="842">cycls/&lt;cycle&gt;/reviews/SIM_REVIEW_&lt;date&gt;.md</text>
 
   <!-- 12 resp-writer (CYCLE) -->
-  <rect x="520" y="772" width="340" height="92" rx="10" fill="#fff0f6" stroke="#fcc2d7" stroke-width="1.5"/>
-  <circle cx="548" cy="798" r="13" fill="#e64980"/>
-  <text class="bn" x="548" y="802.5">12</text>
-  <text class="nt" x="570" y="803">/stage-resp-writer</text>
-  <rect x="766" y="784" width="74" height="18" rx="9" fill="#ffffff" stroke="#fcc2d7"/>
-  <text class="tag" x="803" y="796.5">slash-only</text>
-  <text class="np" x="538" y="828">Every reviewer point answered; promises tracked</text>
-  <text class="no" x="538" y="850">cycls/&lt;cycle&gt;/response/RESPONSE_&lt;date&gt;.md · tasks/</text>
+  <rect x="520" y="764" width="340" height="92" rx="10" fill="#fff0f6" stroke="#fcc2d7" stroke-width="1.5"/>
+  <circle cx="548" cy="790" r="13" fill="#e64980"/>
+  <text class="bn" x="548" y="794.5">12</text>
+  <text class="nt" x="570" y="795">/stage-resp-writer</text>
+  <rect x="766" y="776" width="74" height="18" rx="9" fill="#ffffff" stroke="#fcc2d7"/>
+  <text class="tag" x="803" y="788.5">slash-only</text>
+  <text class="np" x="538" y="820">Every reviewer point answered; promises tracked</text>
+  <text class="no" x="538" y="842">cycls/&lt;cycle&gt;/response/ · tasks/*_promises.md</text>
 
-  <!-- 13 subm-packer (CYCLE) — the terminal node, and the only place a freeze tag
-       comes from. What follows a rejection is not this box again but a new cycle
-       directory against the same ledger. -->
-  <rect x="960" y="772" width="340" height="92" rx="10" fill="#fff0f6" stroke="#fcc2d7" stroke-width="1.5"/>
-  <circle cx="988" cy="798" r="13" fill="#e64980"/>
-  <text class="bn" x="988" y="802.5">13</text>
-  <text class="nt" x="1010" y="803">/stage-subm-packer</text>
-  <rect x="1206" y="784" width="74" height="18" rx="9" fill="#ffffff" stroke="#fcc2d7"/>
-  <text class="tag" x="1243" y="796.5">slash-only</text>
-  <text class="np" x="978" y="828">Build and lint gate, package, record, freeze</text>
-  <text class="no" x="978" y="850">cycls/&lt;cycle&gt;/SUBMISSION_&lt;date&gt;.md · freeze tag</text>
+  <!-- 13 subm-packer (CYCLE) — the only place a freeze tag comes from. It
+       packages and never uploads: the venue's verdict comes back through the
+       user, and it forks here — accepted goes down to the poster, rejected
+       opens a new cycle against the same ledger. -->
+  <rect x="60" y="764" width="340" height="92" rx="10" fill="#fff0f6" stroke="#fcc2d7" stroke-width="1.5"/>
+  <circle cx="88" cy="790" r="13" fill="#e64980"/>
+  <text class="bn" x="88" y="794.5">13</text>
+  <text class="nt" x="110" y="795">/stage-subm-packer</text>
+  <rect x="306" y="776" width="74" height="18" rx="9" fill="#ffffff" stroke="#fcc2d7"/>
+  <text class="tag" x="343" y="788.5">slash-only</text>
+  <text class="np" x="78" y="820">Build and lint gate, package, record, freeze</text>
+  <text class="no" x="78" y="842">cycls/&lt;cycle&gt;/SUBMISSION_&lt;date&gt;.md · freeze tag</text>
 
-  <!-- 14 pstr-builder (CYCLE) — the accepted path. It wraps onto a second row
-       of the same band rather than starting a new one: a poster belongs to the
-       cycle it was accepted into, and it is the only box that does not inherit
-       ANON, which is why it writes under cycls/ and never under manus/. -->
-  <!-- The band's second row carries one node, so the two columns it leaves are
-       given to the thing the thin loop line above can only gesture at: what a
-       rejection actually does. Styled as a rule card, not a node — no number,
-       no arrows in or out — so the row still reads as one skill plus a note. -->
-  <rect x="60" y="940" width="620" height="92" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text class="lh" x="78" y="966">THE CYCLE REPEATS · THE LEDGER DOES NOT RESET</text>
-  <text class="cb" x="78" y="990">Rejected → a new cycls/&lt;venue&gt;_&lt;year&gt;/ against the same claim ledger, where the weakened</text>
-  <text class="cb" x="78" y="1008">and unsourced claims are the first things the next attempt fixes. Accepted → the poster.</text>
-  <text class="ef" x="78" y="1026">one attempt per directory · conventions §5</text>
+  <!-- 14 pstr-builder (CYCLE) — the accepted path, and the terminal node. It is
+       the only box that does not inherit ANON, which is why it writes under
+       cycls/ and never under manus/. -->
+  <rect x="60" y="940" width="340" height="92" rx="10" fill="#fff0f6" stroke="#fcc2d7" stroke-width="1.5"/>
+  <circle cx="88" cy="966" r="13" fill="#e64980"/>
+  <text class="bn" x="88" y="970.5">14</text>
+  <text class="nt" x="110" y="971">/stage-pstr-builder</text>
+  <rect x="306" y="952" width="74" height="18" rx="9" fill="#ffffff" stroke="#fcc2d7"/>
+  <text class="tag" x="343" y="964.5">slash-only</text>
+  <text class="np" x="78" y="996">One takeaway, verified claims, figures reused</text>
+  <text class="no" x="78" y="1018">cycls/&lt;cycle&gt;/poster/POSTER_PLAN.md · poster.tex</text>
 
-  <rect x="960" y="940" width="340" height="92" rx="10" fill="#fff0f6" stroke="#fcc2d7" stroke-width="1.5"/>
-  <circle cx="988" cy="966" r="13" fill="#e64980"/>
-  <text class="bn" x="988" y="970.5">14</text>
-  <text class="nt" x="1010" y="971">/stage-pstr-builder</text>
-  <rect x="1206" y="952" width="74" height="18" rx="9" fill="#ffffff" stroke="#fcc2d7"/>
-  <text class="tag" x="1243" y="964.5">slash-only</text>
-  <text class="np" x="978" y="996">One takeaway, verified claims, figures reused</text>
-  <text class="no" x="978" y="1018">cycls/&lt;cycle&gt;/poster/POSTER_PLAN.md · poster.tex</text>
+  <!-- The poster's row has one node, so the two columns it leaves carry what
+       the rejection loop's line cannot say: which claims the next attempt fixes
+       first. Styled as a rule card, not a node: no number, no arrows in or out. -->
+  <rect x="680" y="940" width="620" height="92" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lh" x="698" y="966">THE CYCLE REPEATS · THE LEDGER DOES NOT RESET</text>
+  <text class="cb" x="698" y="990">Rejected → a new cycls/&lt;venue&gt;_&lt;year&gt;/ against the same claim ledger, where the weakened</text>
+  <text class="cb" x="698" y="1008">and unsourced claims are the first things the next attempt fixes. Accepted → the poster.</text>
+  <text class="ef" x="698" y="1026">one attempt per directory · conventions §5</text>
 
-  <!-- ============================ WITHIN BANDS ============================ -->
+  <!-- ============ SPINE EDGES ============ -->
 
-  <!-- 0 -> 1 -->
-  <path class="spine" d="M400,146 L516,146"/>
-  <path class="ah" d="M516,146 L507,141.5 L507,150.5 Z"/>
-  <text class="elc" x="458" y="138">the paired STAR repo</text>
+  <!-- 0 -> 1 -> 2 -> 3 -> 4 -->
+  <path class="spine" d="M230,192 L230,220"/>
+  <path class="ah" d="M230,220 L225.5,211 L234.5,211 Z"/>
+  <text class="el" x="248" y="210">the paired STAR repo</text>
 
-  <!-- 1 -> flow-status : a read, not a handoff. Nothing is passed here —
-       flow-status goes and reads the ledger, the outline, the manifest and the
-       cycle whenever it is invoked, which is why it is drawn .read. -->
-  <path class="read" d="M860,146 L956,146"/>
-  <path class="ahr" d="M956,146 L947,141.5 L947,150.5 Z"/>
-  <text class="elc" x="908" y="138">reads every artifact</text>
+  <path class="spine" d="M230,316 L230,344"/>
+  <path class="ah" d="M230,344 L225.5,335 L234.5,335 Z"/>
+  <text class="el" x="248" y="334">fingerprinted evidence</text>
 
-  <!-- 2 -> 3 -> 4 -->
-  <path class="spine" d="M960,314 L864,314"/>
-  <path class="ah" d="M864,314 L873,309.5 L873,318.5 Z"/>
-  <text class="elc" x="912" y="306">the finalized story</text>
+  <path class="spine" d="M230,440 L230,468"/>
+  <path class="ah" d="M230,468 L225.5,459 L234.5,459 Z"/>
+  <text class="el" x="248" y="458">the finalized story</text>
 
-  <path class="spine" d="M520,314 L404,314"/>
-  <path class="ah" d="M404,314 L413,309.5 L413,318.5 Z"/>
-  <text class="elc" x="462" y="306">what to position</text>
+  <path class="spine" d="M230,564 L230,592"/>
+  <path class="ah" d="M230,592 L225.5,583 L234.5,583 Z"/>
+  <text class="el" x="248" y="582">what to position</text>
 
-  <!-- 5 -> 6 -> 7 -->
-  <path class="spine" d="M400,482 L516,482"/>
-  <path class="ah" d="M516,482 L507,477.5 L507,486.5 Z"/>
-  <text class="elc" x="458" y="474">the numbers it states</text>
+  <!-- 4 -> flow-status : a read, not a handoff. Drawn in the .read style
+       because nothing is passed here — flow-status goes and reads the outline,
+       the ledger, the manifest and the cycle whenever it is invoked. -->
+  <path class="read" d="M400,616 L458,616 L458,142 L516,142"/>
+  <path class="ahr" d="M516,142 L507,137.5 L507,146.5 Z"/>
+  <text class="elc" x="450" y="380" transform="rotate(-90 450 380)">reads the outline and the ledger — and every other artifact</text>
 
-  <path class="spine" d="M860,482 L956,482"/>
-  <path class="ah" d="M956,482 L947,477.5 L947,486.5 Z"/>
-  <text class="elc" x="908" y="474">what a table can’t show</text>
+  <!-- flow-status -> 5 -->
+  <path class="spine" d="M860,146 L956,146"/>
+  <path class="ah" d="M956,146 L947,141.5 L947,150.5 Z"/>
+  <text class="elc" x="908" y="138">the next unit</text>
 
-  <!-- 8 -> 9 -> 10 -->
-  <path class="spine" d="M960,650 L864,650"/>
-  <path class="ah" d="M864,650 L873,645.5 L873,654.5 Z"/>
-  <text class="elc" x="912" y="642">the polished draft</text>
+  <!-- 5 -> 6 -> 7 -> 8 -> 9 -->
+  <path class="spine" d="M1130,192 L1130,220"/>
+  <path class="ah" d="M1130,220 L1125.5,211 L1134.5,211 Z"/>
+  <text class="el" x="1142" y="210">the numbers it states</text>
 
-  <path class="spine" d="M520,650 L404,650"/>
-  <path class="ah" d="M404,650 L413,645.5 L413,654.5 Z"/>
-  <text class="elc" x="462" y="642">then the citations</text>
+  <path class="spine" d="M1130,316 L1130,344"/>
+  <path class="ah" d="M1130,344 L1125.5,335 L1134.5,335 Z"/>
+  <text class="el" x="1142" y="334">what a table can’t show</text>
 
-  <!-- 11 -> 12 -> 13 -->
-  <path class="spine" d="M400,818 L516,818"/>
-  <path class="ah" d="M516,818 L507,813.5 L507,822.5 Z"/>
-  <text class="elc" x="458" y="810">the meta-review</text>
+  <path class="spine" d="M1130,440 L1130,468"/>
+  <path class="ah" d="M1130,468 L1125.5,459 L1134.5,459 Z"/>
+  <text class="el" x="1142" y="458">the section, complete</text>
 
-  <path class="spine" d="M860,818 L956,818"/>
-  <path class="ah" d="M956,818 L947,813.5 L947,822.5 Z"/>
-  <text class="elc" x="908" y="810">the response</text>
+  <path class="spine" d="M1130,564 L1130,592"/>
+  <path class="ah" d="M1130,592 L1125.5,583 L1134.5,583 Z"/>
+  <text class="el" x="1142" y="582">the polished draft</text>
 
-  <!-- ============================ BETWEEN BANDS =========================== -->
-  <!-- Each band ends in the column the next band starts in, so every handoff is
-       one short drop. The single exception is 1 -> 2, which steps across. -->
+  <!-- 9 -> 10 -->
+  <path class="spine" d="M960,642 L864,642"/>
+  <path class="ah" d="M864,642 L873,637.5 L873,646.5 Z"/>
+  <text class="elc" x="910" y="634">then the citations</text>
 
-  <!-- 1 -> 2 -->
-  <path class="spine" d="M690,192 L690,230 L1130,230 L1130,264"/>
-  <path class="ah" d="M1130,264 L1125.5,255 L1134.5,255 Z"/>
-  <text class="elc" x="910" y="222">fingerprinted evidence</text>
+  <!-- 10 -> flow-status : close the unit, ask for the next -->
+  <path class="spine" d="M690,596 L690,196"/>
+  <path class="ah" d="M690,196 L685.5,205 L694.5,205 Z"/>
+  <text class="el" x="704" y="388">unit closed —</text>
+  <text class="el" x="704" y="404">ask for the next</text>
 
-  <!-- 4 -> 5 -->
-  <path class="spine" d="M230,360 L230,432"/>
-  <path class="ah" d="M230,432 L225.5,423 L234.5,423 Z"/>
-  <text class="el" x="248" y="402">the reference base</text>
+  <!-- 10 -> 11 : the whole draft, audited, goes to the panel -->
+  <path class="spine" d="M800,688 L800,726 L1130,726 L1130,760"/>
+  <path class="ah" d="M1130,760 L1125.5,751 L1134.5,751 Z"/>
+  <text class="elc" x="965" y="718">the full draft, audited</text>
 
-  <!-- 7 -> 8 -->
-  <path class="spine" d="M1130,528 L1130,600"/>
-  <path class="ah" d="M1130,600 L1125.5,591 L1134.5,591 Z"/>
-  <text class="el" x="1148" y="570">the section, complete</text>
+  <!-- 11 -> 12 -> 13, right to left -->
+  <path class="spine" d="M960,810 L864,810"/>
+  <path class="ah" d="M864,810 L873,805.5 L873,814.5 Z"/>
+  <text class="elc" x="910" y="802">the meta-review</text>
 
-  <!-- 10 -> 11 -->
-  <path class="spine" d="M230,696 L230,768"/>
-  <path class="ah" d="M230,768 L225.5,759 L234.5,759 Z"/>
-  <text class="el" x="248" y="738">audits clean</text>
+  <path class="spine" d="M520,810 L404,810"/>
+  <path class="ah" d="M404,810 L413,805.5 L413,814.5 Z"/>
+  <text class="elc" x="462" y="802">the response</text>
 
   <!-- real reviews enter from outside the flow: the user drops them in, and
        resp-writer reads simulated and real reviews identically -->
-  <path class="read" d="M580,900 L580,868"/>
-  <path class="ahr" d="M580,868 L575.5,877 L584.5,877 Z"/>
-  <text class="el" x="520" y="916">real reviews → cycls/&lt;cycle&gt;/reviews/</text>
+  <path class="read" d="M580,892 L580,860"/>
+  <path class="ahr" d="M580,860 L575.5,869 L584.5,869 Z"/>
+  <text class="el" x="520" y="908">real reviews → cycls/&lt;cycle&gt;/reviews/</text>
 
-  <!-- 13 -> 14 : the accepted path leaves the packer downwards, while the
-       rejected one leaves it rightwards into the loop lane. A poster exists
-       only for a cycle that was accepted. -->
-  <path class="spine" d="M1130,864 L1130,936"/>
-  <path class="ah" d="M1130,936 L1125.5,927 L1134.5,927 Z"/>
-  <text class="el" x="1148" y="906">accepted</text>
+  <!-- 13 -> 14 : accepted -->
+  <path class="spine" d="M230,856 L230,936"/>
+  <path class="ah" d="M230,936 L225.5,927 L234.5,927 Z"/>
+  <text class="el" x="242" y="900">accepted</text>
 
-  <!-- ============================== LOOP-BACK ============================= -->
+  <!-- ============ LOOP-BACK EDGES ============ -->
 
-  <!-- 13 -> 2 : the outer loop. A rejection does not re-run the packer, it opens
-       a new cycls/<venue>_<year>/ against the same claim ledger. Both nodes sit
-       in the last column, so the loop is a short lane down the right margin. -->
-  <path class="loop" d="M1300,818 L1330,818 L1330,282 L1304,282"/>
-  <path class="ahv" d="M1304,282 L1313,277.5 L1313,286.5 Z"/>
-  <text class="lvc" x="1322" y="550" transform="rotate(-90 1322 550)">rejected → a new cycle</text>
+  <!-- 9 -> 5 : a mismatched number is repaired in the prose or the table that
+       states it — the auditor only grades. Runs up the corridor between the
+       middle and right columns, inside the ring. -->
+  <path class="loop" d="M960,616 L900,616 L900,170 L956,170"/>
+  <path class="ahv" d="M956,170 L947,165.5 L947,174.5 Z"/>
+  <text class="lvc" x="892" y="393" transform="rotate(-90 892 393)">mismatch → repair the prose or the table</text>
 
-  <!-- ============================== JUMP STUBS ============================ -->
+  <!-- 10 -> 4 : an assertion no reading note supports sends you back to the
+       paper. Same row, so it is drawn straight across, like STAR's re-decompose. -->
+  <path class="loop" d="M520,664 L404,664"/>
+  <path class="ahv" d="M404,664 L413,659.5 L413,668.5 Z"/>
+  <text class="lvc" x="462" y="656">unsupported</text>
+  <text class="lvc" x="462" y="680">read the paper</text>
 
-  <!-- 8 -> 5 : the drafting loop is re-entered per section, per table, per figure -->
-  <path class="stub" d="M1130,696 L1130,722"/>
-  <circle cx="1130" cy="736" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
-  <text class="jn" x="1130" y="740">5</text>
-  <text class="lv" x="1148" y="740">the next section · table · figure</text>
+  <!-- 13 -> 2 : the rejection loop. A rejection does not re-run the packer, it
+       opens a new cycls/<venue>_<year>/ — a new venue profile — against the
+       same ledger. The line leaves the packer sideways (the poster sits under
+       it) and climbs the left margin, like STAR's work-inventory edge. -->
+  <path class="loop" d="M60,830 L36,830 L36,394 L56,394"/>
+  <path class="ahv" d="M56,394 L47,389.5 L47,398.5 Z"/>
+  <text class="lvc" x="28" y="612" transform="rotate(-90 28 612)">rejected → a new cycle against the same ledger</text>
+
+  <!-- ============ JUMP STUBS ============ -->
+  <!-- Only the ways back that would cross the page stay numbered stubs. -->
 
   <!-- 9 -> 1 : a stale or mismatched number is fixed upstream and re-imported,
        never edited here -->
-  <path class="stub" d="M690,696 L690,722"/>
-  <circle cx="690" cy="736" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
-  <text class="jn" x="690" y="740">1</text>
-  <text class="lv" x="708" y="740">stale → re-import</text>
-
-  <!-- 10 -> 4 : an assertion no reading note supports sends you back to the paper -->
-  <path class="stub" d="M340,696 L340,722"/>
-  <circle cx="340" cy="736" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
-  <text class="jn" x="340" y="740">4</text>
-  <text class="lv" x="358" y="740">unsupported → read the paper</text>
+  <path class="stub" d="M1270,688 L1270,714"/>
+  <circle cx="1270" cy="728" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
+  <text class="jn" x="1270" y="732">1</text>
+  <text class="lv" x="1252" y="732" text-anchor="end">stale → re-import</text>
 
   <!-- 11 -> 5 -->
-  <path class="stub" d="M230,864 L230,890"/>
-  <circle cx="230" cy="904" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
-  <text class="jn" x="230" y="908">5</text>
-  <text class="lv" x="248" y="908">weaknesses → redraft</text>
+  <path class="stub" d="M1130,856 L1130,882"/>
+  <circle cx="1130" cy="896" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
+  <text class="jn" x="1130" y="900">5</text>
+  <text class="lv" x="1148" y="900">weaknesses → redraft</text>
 
   <!-- 12 -> 5 -->
-  <path class="stub" d="M800,864 L800,890"/>
-  <circle cx="800" cy="904" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
-  <text class="jn" x="800" y="908">5</text>
-  <text class="lv" x="818" y="908">promises → the drafting loop</text>
+  <path class="stub" d="M800,856 L800,882"/>
+  <circle cx="800" cy="896" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
+  <text class="jn" x="800" y="900">5</text>
+  <text class="lv" x="818" y="900">promises → the drafting loop</text>
 
   <!-- 14 -> 7 : the poster reuses figures unmodified, so one that will not hold
        up at print size is the figure skill's problem, never a redraw here. It
-       leaves the box sideways — the last row has nothing under it, so hanging a
-       stub there would buy 50px of height for one line of text. -->
-  <path class="stub" d="M960,986 L930,986"/>
-  <circle cx="918" cy="986" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
-  <text class="jn" x="918" y="990">7</text>
-  <text class="lv" x="900" y="990" text-anchor="end">fails at poster size → the figure</text>
+       leaves the box sideways — the last row has nothing under it. -->
+  <path class="stub" d="M400,986 L430,986"/>
+  <circle cx="442" cy="986" r="11" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
+  <text class="jn" x="442" y="990">7</text>
+  <text class="lv" x="460" y="990">fails at poster size → the figure</text>
 
-  <!-- ============================== RULE CARDS ============================ -->
+  <!-- ============ RULE CARDS ============ -->
   <!-- The three rules that decide what every box above is allowed to write. -->
 
-  <rect x="60" y="1096" width="340" height="92" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text class="lh" x="78" y="1120">EVIDENCE FLOWS ONE WAY</text>
-  <text class="cb" x="78" y="1142">Numbers live upstream. To fix one, fix it in STAR</text>
-  <text class="cb" x="78" y="1160">and re-import — mates/ is never edited in place.</text>
-  <text class="ef" x="78" y="1180">principle A · conventions §9d</text>
+  <rect x="60" y="1068" width="340" height="92" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lh" x="78" y="1092">EVIDENCE FLOWS ONE WAY</text>
+  <text class="cb" x="78" y="1114">Numbers live upstream. To fix one, fix it in STAR</text>
+  <text class="cb" x="78" y="1132">and re-import — mates/ is never edited in place.</text>
+  <text class="ef" x="78" y="1152">principle A · conventions §9d</text>
 
-  <rect x="520" y="1096" width="340" height="92" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text class="lh" x="538" y="1120">THE CLAIM LEDGER IS THE HUB</text>
-  <text class="cb" x="538" y="1142">Every claim’s statements, evidence and status sit</text>
-  <text class="cb" x="538" y="1160">in notes/claims.md: proposed → drafted → verified.</text>
-  <text class="ef" x="538" y="1180">principle B · conventions §8.1</text>
+  <rect x="520" y="1068" width="340" height="92" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lh" x="538" y="1092">THE CLAIM LEDGER IS THE HUB</text>
+  <text class="cb" x="538" y="1114">Every claim’s statements, evidence and status sit</text>
+  <text class="cb" x="538" y="1132">in notes/claims.md: proposed → drafted → verified.</text>
+  <text class="ef" x="538" y="1152">principle B · conventions §8.1</text>
 
-  <rect x="960" y="1096" width="340" height="92" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text class="lh" x="978" y="1120">NOTHING PRETENDS TO BE SOURCED</text>
-  <text class="cb" x="978" y="1142">Every number in manus/ traces to a fingerprinted</text>
-  <text class="cb" x="978" y="1160">mates/ entry, or is written as \todo{…}.</text>
-  <text class="ef" x="978" y="1180">no third state · conventions §9a</text>
+  <rect x="960" y="1068" width="340" height="92" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lh" x="978" y="1092">NOTHING PRETENDS TO BE SOURCED</text>
+  <text class="cb" x="978" y="1114">Every number in manus/ traces to a fingerprinted</text>
+  <text class="cb" x="978" y="1132">mates/ entry, or is written as \todo{…}.</text>
+  <text class="ef" x="978" y="1152">no third state · conventions §9a</text>
 
-  <!-- ================================ LEGEND ============================== -->
+  <!-- ============ LEGEND ============ -->
+  <!-- Three cards on the diagram's own column grid, so the legend reads as one
+       more row of the same table rather than a bar bolted to the bottom. -->
 
   <!-- EDGES -->
-  <rect x="60" y="1220" width="340" height="122" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text class="lh" x="78" y="1244">EDGES</text>
+  <rect x="60" y="1188" width="340" height="134" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lh" x="78" y="1210">EDGES</text>
 
-  <path class="spine" d="M78,1264 L106,1264"/>
-  <path class="ah" d="M106,1264 L97,1259.5 L97,1268.5 Z"/>
-  <text class="el" x="116" y="1267.5">the usual order</text>
+  <path class="spine" d="M78,1230.5 L106,1230.5"/>
+  <path class="ah" d="M106,1230.5 L97,1226 L97,1235 Z"/>
+  <text class="el" x="116" y="1234">the usual order</text>
 
-  <path class="read" d="M78,1284 L106,1284"/>
-  <path class="ahr" d="M106,1284 L97,1279.5 L97,1288.5 Z"/>
-  <text class="el" x="116" y="1287.5">reads, does not consume</text>
+  <path class="read" d="M78,1250.5 L106,1250.5"/>
+  <path class="ahr" d="M106,1250.5 L97,1246 L97,1255 Z"/>
+  <text class="el" x="116" y="1254">reads, does not consume</text>
 
-  <path class="loop" d="M78,1304 L106,1304"/>
-  <path class="ahv" d="M106,1304 L97,1299.5 L97,1308.5 Z"/>
-  <text class="el" x="116" y="1307.5">routes back / re-entry</text>
+  <path class="loop" d="M78,1270.5 L106,1270.5"/>
+  <path class="ahv" d="M106,1270.5 L97,1266 L97,1275 Z"/>
+  <text class="el" x="116" y="1274">routes back / re-entry</text>
 
-  <text class="ef" x="78" y="1330">/stage-… in Claude Code · $stage-… in Codex</text>
+  <text class="ef" x="78" y="1296">/stage-… in Claude Code, Cursor, Pi, Qwen Code</text>
+  <text class="ef" x="78" y="1310">$stage-… in Codex · /skill:stage-… in DSH, Kimi Code</text>
 
   <!-- NODE KINDS -->
-  <rect x="520" y="1220" width="340" height="122" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text class="lh" x="538" y="1244">NODE KINDS</text>
+  <rect x="520" y="1188" width="340" height="134" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lh" x="538" y="1210">NODE KINDS</text>
 
-  <rect x="538" y="1254" width="12" height="12" rx="3" fill="#f76707"/>
-  <text class="el" x="556" y="1264">setup &amp; evidence</text>
-  <rect x="538" y="1274" width="12" height="12" rx="3" fill="#4c6ef5"/>
-  <text class="el" x="556" y="1284">plans &amp; prose</text>
-  <rect x="538" y="1294" width="12" height="12" rx="3" fill="#0ca678"/>
-  <text class="el" x="556" y="1304">reads &amp; audits</text>
-  <rect x="538" y="1314" width="12" height="12" rx="3" fill="#e64980"/>
-  <text class="el" x="556" y="1324">the submission cycle</text>
+  <rect x="538" y="1224" width="12" height="12" rx="3" fill="#f76707"/>
+  <text class="el" x="556" y="1234">setup &amp; evidence</text>
+  <rect x="538" y="1244" width="12" height="12" rx="3" fill="#4c6ef5"/>
+  <text class="el" x="556" y="1254">plans &amp; prose</text>
+  <rect x="538" y="1264" width="12" height="12" rx="3" fill="#0ca678"/>
+  <text class="el" x="556" y="1274">reads &amp; audits</text>
+  <rect x="538" y="1284" width="12" height="12" rx="3" fill="#e64980"/>
+  <text class="el" x="556" y="1294">the submission cycle</text>
 
   <!-- READING THE FLOW -->
-  <rect x="960" y="1220" width="340" height="122" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text class="lh" x="978" y="1244">READING THE FLOW</text>
+  <rect x="960" y="1188" width="340" height="134" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text class="lh" x="978" y="1210">READING THE FLOW</text>
 
-  <circle cx="987" cy="1264" r="8" fill="#0ca678"/>
-  <circle cx="987" cy="1264" r="4.5" fill="#f8fafc"/>
-  <circle cx="987" cy="1264" r="2.2" fill="#0ca678"/>
-  <text class="el" x="1004" y="1267.5">reads every stage · run it any time</text>
+  <circle cx="987" cy="1230.5" r="8" fill="#0ca678"/>
+  <circle cx="987" cy="1230.5" r="4.5" fill="#f8fafc"/>
+  <circle cx="987" cy="1230.5" r="2.2" fill="#0ca678"/>
+  <text class="el" x="1004" y="1234">reads every stage · run it any time</text>
 
-  <circle cx="987" cy="1286" r="8" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
-  <text class="jn" x="987" y="1289.5" style="font-size:8.5px">N</text>
-  <text class="el" x="1004" y="1289.5">continues at skill N</text>
+  <circle cx="987" cy="1252.5" r="8" fill="#ffffff" stroke="#7048e8" stroke-width="1.5"/>
+  <text class="jn" x="987" y="1256" style="font-size:8.5px">N</text>
+  <text class="el" x="1004" y="1256">continues at skill N</text>
 
-  <rect x="978" y="1300" width="62" height="16" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
-  <text class="tag" x="1009" y="1311.5">slash-only</text>
-  <text class="el" x="1050" y="1312">runs only when you name it</text>
+  <rect x="978" y="1266" width="62" height="16" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="tag" x="1009" y="1277.5">slash-only</text>
+  <text class="el" x="1050" y="1278">runs only when you name it</text>
 
-  <text class="ef" x="978" y="1334">bands alternate direction — follow the arrows</text>
+  <text class="ef" x="978" y="1296">the ring through flow-status is the drafting loop, once per unit</text>
+  <text class="ef" x="978" y="1310">9 and 10 re-run after any change to numbers or citations</text>
 </svg>

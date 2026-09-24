@@ -338,7 +338,7 @@ dsh --profile YOUR_PROFILE --dump-config
 六个 skill（下表以 † 标注）仅限显式调用（slash-only）：接入、故事、提纲、回复、投稿与海报选择。六套具名 harness 的 manifest 使用 `disable-model-invocation: true`；Codex 在 `.codex/skills/` 中使用 `allow_implicit_invocation: false`，再链接到共用根。CI 会把七套实现都与[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 核对。
 
 <div align="center">
-  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE 写作工作流：十六个 skill 分成五条相位带——建仓、规划、写作、润色与审计、投稿周期——各自写出什么，以及起草循环与拒稿回流如何闭合" width="100%">
+  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE 写作工作流：十五个 skill 的调用顺序与一个横向通读的 skill、各自写出什么，以及起草循环与拒稿回流如何闭合" width="100%">
 </div>
 
 | Skill | 用途 | 主要产出 |
