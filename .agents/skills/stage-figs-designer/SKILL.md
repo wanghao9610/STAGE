@@ -104,7 +104,7 @@ Fails become the figure's todo list; the teaser row stays short of `final` while
 
 1. Flip Status honestly: `planned` before a source exists; `sketch` while evidence or the source map is incomplete; `draft` when PPTX and PDF exist but any render, provenance, visual, build, lint, or teaser check remains; `final` only when all applicable checks pass. Fill Source with the PPTX or registered `mates/` path and update the outline provenance fields (§8).
 2. Report rows changed; PPTX, asset, source-map, render-record, and PDF paths; `% src:` anchors used; Image Gen prompts/assets created; render hashes; visual, build, lint, checklist, or audit verdicts; and the exact route for anything unresolved.
-3. Offer once to commit only this run's files, with a subject beginning `stage-figs-designer:` (§1). Never stage a path that was dirty when the run began, never stage `wkdrs/`, and never commit without the user's explicit answer.
+3. Commit once for the working session, subject naming this skill (§1).
 
 ## Output
 
