@@ -59,9 +59,9 @@ if [ -f "$cfg" ]; then
 fi
 
 if [ -n "${model:-}" ]; then
-  ctx="STAGE provenance: this Kimi session has configured default model ${model} (from config.toml; the active model may differ if it was overridden with kimi -m or /model). When a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), record the model actually answering — normally ${model} — verbatim; do not write 'unrecorded'."
+  ctx="STAGE provenance: this Kimi session has configured default model ${model} (from config.toml; the active model may differ if it was overridden with kimi -m or /model, which this hook cannot see). When a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), record ${model} verbatim, the configured value; do not infer another id from behavior, and do not write 'unrecorded'."
 else
-  ctx="STAGE provenance: no Kimi default model could be read from config.toml. When a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), record the model you are running if known, otherwise write 'unrecorded'; do not guess."
+  ctx="STAGE provenance: no Kimi default model could be read from config.toml. When a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), write 'unrecorded'; do not guess or infer an id from behavior."
 fi
 
 printf '%s\n' "$ctx"
