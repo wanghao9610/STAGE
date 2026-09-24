@@ -691,44 +691,30 @@ while IFS= read -r skill; do
 done < <(printf '%s\n' "${SKILLS}")
 (( section_errors == 0 )) && note ".claude manifests carry the same ## sections as the authored .agents source"
 
-# 13. Opening-load invariants.
-#     Every run is supposed to start the same way: resolve STAGE_LANG from .env,
-#     load the whole conventions file through the harness's file-reading tool,
-#     and skip the re-read only when the text is still verbatim in context.
-#     Nothing above guards any of it — a manifest could drop the language probe,
-#     lose the conventions block, or cat the conventions into a shell command
-#     (guaranteeing the >30 KB result the one-message shape exists to avoid), and
-#     every check stayed green. The literals pinned here are the strings that
-#     discipline rides on; rewording one centrally means updating this check in
-#     the same commit.
-section "Opening-load invariants"
-open_errors=0
-PROBE_LINE="grep -sE '^STAGE_LANG=' .env"
+# 13. Every manifest carries one Shared conventions paragraph naming the shared
+#     .env controls — STAGE_LANG under conventions §7.6, INVOLVE under §7.7 —
+#     and prescribes no tool-call itinerary: which reader, how many calls and
+#     what output budget are the host's. A manifest that drops the paragraph,
+#     or never names .env, STAGE_LANG or INVOLVE, runs without the controls
+#     every other skill resolves.
+section "Shared environment and language controls"
+control_errors=0
 for root in "${SKILL_ROOTS[@]}"; do
     while IFS= read -r skill; do
         path="${root}/${skill}/SKILL.md"
         [[ -f "${path}" ]] || continue   # check 2 owns missing files
 
-        n="$(grep -cF -- "${PROBE_LINE}" "${path}")"
-        if (( n != 1 )); then
-            fail "${path}: ${n} STAGE_LANG probe lines, expected exactly 1"
-            open_errors=1
-        fi
-
         n="$(grep -cE '^\*\*Shared conventions\.' "${path}")"
-        (( n == 1 )) || { fail "${path}: ${n} shared-conventions blocks, expected exactly 1"; open_errors=1; }
-        n="$(grep -cE '^\*\*Reusing an earlier load\.\*\*' "${path}")"
-        (( n == 1 )) || { fail "${path}: ${n} reuse-an-earlier-load paragraphs, expected exactly 1"; open_errors=1; }
-
-        hits="$(grep -n 'cat docs/mds/stage-workflow/writing-workflow-conventions' "${path}" || true)"
-        if [[ -n "${hits}" ]]; then
-            fail "${path}: cats the whole conventions file through the shell; it spills and costs the round trip the one-message load avoids:"
-            printf '%s\n' "${hits}" | sed 's/^/      /'
-            open_errors=1
-        fi
+        (( n == 1 )) || { fail "${path}: ${n} shared-conventions paragraphs, expected exactly 1"; control_errors=1; }
+        for key in .env STAGE_LANG INVOLVE '§7.6' '§7.7'; do
+            if ! grep -Fq -- "${key}" "${path}"; then
+                fail "${path}: missing shared environment control ${key}"
+                control_errors=1
+            fi
+        done
     done < <(printf '%s\n' "${SKILLS}")
 done
-(( open_errors == 0 )) && note "opening loads hold: one language probe, one conventions block, one reuse paragraph, no conventions cat"
+(( control_errors == 0 )) && note "all manifests carry one Shared conventions paragraph naming .env, STAGE_LANG and INVOLVE under §7.6 and §7.7"
 
 # 14. The conventions document's numbered structure is pinned, and every
 #     citation of it resolves.

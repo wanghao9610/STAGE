@@ -38,11 +38,6 @@ Invocation: `stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no 
 Invocation: `stage-figs-designer [FIGURE | plan | teaser] [involve=low]` — no argument audits the Figures table in `notes/outline.md` against the files on disk and proposes one next action; `plan` creates or revises the Figures table from the story and section briefs; `teaser` resolves to the teaser figure and runs its checklist; anything else names one figure, resolved by outline ID (`F1`), file slug, or purpose/section text against `notes/outline.md` (conventions §5 — ambiguity is asked about, never guessed). Build work is one figure per invocation. There is no separate description slot here: free text is already the figure's own description — that is how a figure resolves by purpose or section text, and how one with no Figures row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the figure is for; it never supplies a plotted number, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}` in the caption. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
 ### stage-figs-designer/SKILL.md
 --- 1
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline every STAGE skill loads: read the whole file at the start of every run — there is no section-selective loading. It binds this skill hardest at §5 (resolving which figure is meant), §8 (the output table and exact staleness), §9 (the fabrication boundary — figures state claims too), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
-+++ 1
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the shared baseline every STAGE skill loads: read the whole file at the start of every run — there is no section-selective loading. It binds this skill hardest at §5 (resolving which figure is meant), §8 (the output table and its staleness rule), §9 (the fabrication boundary — figures state claims too), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
-### stage-figs-designer/SKILL.md
---- 1
 You are the family's art director. `stage-sect-drafter` argues in prose and `stage-tabs-builder` in tables; you make the visual argument — the teaser that carries page 1, the method figure that saves prose, the results view that makes a verified pattern visible. You own the Figures table in `notes/outline.md`: a figure earns one purpose row before it earns pixels, and a figure whose purpose a planned table already serves is proposed for retirement.
 +++ 1
 You are the family's art director. `stage-sect-drafter` argues in prose and `stage-tabs-builder` argues in tables; you make the visual arguments — the teaser that carries the story on page 1, the method figure that spares a page of prose, the results plot that makes the win visible. You own the Figures table in `notes/outline.md`: a figure earns a row, with its purpose in one clause, before it earns pixels, and a figure whose purpose a planned table already serves is cut, not drawn.
@@ -207,21 +202,6 @@ Fails become the figure's todo list; the teaser's row stays short of `final` whi
    do not use your question tool or enter plan mode. Delegation is available and Principle 6 says where it pays; a
 +++ 1
    do not use AskUserQuestion or enter plan mode. Delegation is available and Principle 6 says where it pays; a
-### stage-flow-status/SKILL.md
---- 1
-1. **One load, then reason.** Everything this skill reads arrives in a single message — five shell
-+++ 1
-1. **One load, then reason.** Everything this skill reads arrives in a single message — five Bash
-### stage-flow-status/SKILL.md
---- 1
-   limit, and a shell result past roughly 30 KB is written out to a file that costs a round trip to
-+++ 1
-   limit, and a Bash result past roughly 30 KB is written out to a file that costs a round trip to
-### stage-outl-planner/SKILL.md
---- 1
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline every STAGE skill shares. Read the whole file at the start of every run — there is no section-selective loading — as its own file read, never `cat`-ed through shell. The sections that bind this skill hardest: conventions §5 (manuscript and cycle resolution), §7 (dialogue), §8 (the output table and the outline / notation schemas), and §9 (the fabrication boundary: §9(a) — skeletons state no facts and no numbers; §9(c) — an unconfirmed page limit is not a limit). This file states what is specific to this skill and wins wherever it is stricter.
-+++ 1
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline every STAGE skill shares. Read the whole file at the start of every run — there is no section-selective loading — as its own `Read`, never `cat`-ed through Bash. The sections that bind this skill hardest: conventions §5 (manuscript and cycle resolution), §7 (dialogue), §8 (the output table and the outline / notation schemas), and §9 (the fabrication boundary: §9(a) — skeletons state no facts and no numbers; §9(c) — an unconfirmed page limit is not a limit). This file states what is specific to this skill and wins wherever it is stricter.
 ### stage-outl-planner/SKILL.md
 --- 1
 3. **Confirm the shape, then auto-draft the briefs.** Two decisions are asked via your question tool (one question per call, recommendation marked): the section list with budgets, then the figure and table plan. After those, draft every brief autonomously from story, claims, and evidence; ask a targeted follow-up only when a brief is undecidable without the user. At involve `low`, adopt the drafted plans after showing them with the arithmetic — Step 0's overwrite confirmations stay asked, and the commit follows the level (conventions §1.6). If your question tool is unavailable (headless runs), fall back to plain text — still one decision at a time.
@@ -234,9 +214,9 @@ Fails become the figure's todo list; the teaser's row stays short of `final` whi
 6. **The skeleton must compile.** After wiring, run `execs/run.sh` (one Bash call) — deterministic checks live in scripts, judgment lives here. The run ends with a green build or an honest statement of what is broken and why.
 ### stage-outl-planner/SKILL.md
 --- 1
-1. Opening load, one message where possible: the conventions file (its own file read); `notes/story.md`; `notes/claims.md`; `notes/outline.md` and `notes/notation.md` where present; `manus/main.tex`; one shell call for `date +%F` (conventions §4) plus a listing of `manus/secs/` and `cycls/`. Then read the active cycle's `cycls/<cycle>/venue.yml`.
+1. Opening load, one message where possible: the conventions file; `notes/story.md`; `notes/claims.md`; `notes/outline.md` and `notes/notation.md` where present; `manus/main.tex`; one shell call for `date +%F` (conventions §4) plus a listing of `manus/secs/` and `cycls/`. Then read the active cycle's `cycls/<cycle>/venue.yml`.
 +++ 1
-1. Opening load, one message where possible: the conventions file (its own `Read`); `notes/story.md`; `notes/claims.md`; `notes/outline.md` and `notes/notation.md` where present; `manus/main.tex`; one Bash call for `date +%F` (conventions §4) plus a listing of `manus/secs/` and `cycls/`. Then read the active cycle's `cycls/<cycle>/venue.yml`.
+1. Opening load, one message where possible: the conventions file; `notes/story.md`; `notes/claims.md`; `notes/outline.md` and `notes/notation.md` where present; `manus/main.tex`; one Bash call for `date +%F` (conventions §4) plus a listing of `manus/secs/` and `cycls/`. Then read the active cycle's `cycls/<cycle>/venue.yml`.
 ### stage-outl-planner/SKILL.md
 --- 1
 5. An existing `notes/outline.md` → ask which re-run this is, via your question tool: **reconcile** (repair rows against the files that actually exist — recommended once drafting has started), **extend** (add sections, figures, or tables; keep the rest), or **re-outline** (from scratch — confirm file by file before touching any `manus/secs/` file whose outline Status has moved past `skeleton` or whose content has outgrown its brief; drafted prose is never overwritten).
@@ -274,16 +254,6 @@ Ask via AskUserQuestion, one question at a time, only about what the survey coul
 - Both confirmation points go through AskUserQuestion, one question per call. If it is unavailable (headless / scripted), fall back to plain text — still one at a time, still requiring an explicit answer before any write.
 ### stage-pstr-builder/SKILL.md
 --- 1
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own file read call, never `cat`-ed into a shell command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — a poster states claims to strangers, with the authors' names on it), §5 (resolving the cycle), §8 (the output table and its staleness rule), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
-+++ 1
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own `Read` call, never `cat`-ed into a Bash command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — a poster states claims to strangers, with the authors' names on it), §5 (resolving the cycle), §8 (the output table and its staleness rule), and §1 (git). This file states what is specific to this skill and wins wherever it is stricter.
-### stage-pstr-builder/SKILL.md
---- 1
-1. Read the conventions file (whole file, own file read call), then `notes/story.md` (`## Pitch`, `## Contributions`, the active `cycle:`), `notes/claims.md`, `notes/outline.md` (Figures and Tables rows), `notes/notation.md`, `cycls/<cycle>/venue.yml`, and `manus/main.tex` for the paper's title — the poster carries it verbatim and never restyles or shortens it.
-+++ 1
-1. Read the conventions file (whole file, own `Read` call), then `notes/story.md` (`## Pitch`, `## Contributions`, the active `cycle:`), `notes/claims.md`, `notes/outline.md` (Figures and Tables rows), `notes/notation.md`, `cycls/<cycle>/venue.yml`, and `manus/main.tex` for the paper's title — the poster carries it verbatim and never restyles or shortens it.
-### stage-pstr-builder/SKILL.md
---- 1
 5. Present the whole cut — takeaway, claims in, claims out, figures, layout — and ask before writing via your question tool (plain text when it is unavailable), per §7. Then write `POSTER_PLAN.md`: frontmatter (`cycle:`, `size:`, `layout:`, `state: planned`, `updated:` with a real date per §4, plus `model_id:` and `model_trail:` per §8), the takeaway, the zone table `| Zone | Content | Source | Status |`, and the excluded list with reasons.
 +++ 1
 5. Present the whole cut — takeaway, claims in, claims out, figures, layout — and ask before writing via AskUserQuestion (plain text when it is unavailable), per §7. Then write `POSTER_PLAN.md`: frontmatter (`cycle:`, `size:`, `layout:`, `state: planned`, `updated:` with a real date per §4, plus `model_id:` and `model_trail:` per §8), the takeaway, the zone table `| Zone | Content | Source | Status |`, and the excluded list with reasons.
@@ -299,24 +269,9 @@ Ask via AskUserQuestion, one question at a time, only about what the survey coul
    point at a time via AskUserQuestion (§7); evidence-backed rebuttals may proceed and are
 ### stage-sect-drafter/SKILL.md
 --- 1
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own file read call, never `cat`-ed into a shell command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §5 (section and cycle resolution), §8 (the output table and its staleness rule), and §9 (the fabrication boundary). This file states what is specific to this skill and wins wherever it is stricter.
-+++ 1
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own `Read` call, never `cat`-ed into a Bash command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §5 (section and cycle resolution), §8 (the output table and its staleness rule), and §9 (the fabrication boundary). This file states what is specific to this skill and wins wherever it is stricter.
-### stage-sect-drafter/SKILL.md
---- 1
-1. Read the conventions file (whole file, own file read call), then `notes/story.md` (pitch, active `cycle:`), `notes/outline.md`, `notes/claims.md`, `notes/notation.md`, and `notes/style.md` when it exists (Principle 7).
-+++ 1
-1. Read the conventions file (whole file, own `Read` call), then `notes/story.md` (pitch, active `cycle:`), `notes/outline.md`, `notes/claims.md`, `notes/notation.md`, and `notes/style.md` when it exists (Principle 7).
-### stage-sect-drafter/SKILL.md
---- 1
 1. Interpret `SECTION` per §5 against the Sections table: number, file slug, or title match. Absent or ambiguous → list the rows with statuses and ask via your question tool (plain text when unavailable).
 +++ 1
 1. Interpret `SECTION` per §5 against the Sections table: number, file slug, or title match. Absent or ambiguous → list the rows with statuses and ask via AskUserQuestion (plain text when unavailable).
-### stage-stry-coach/SKILL.md
---- 1
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline every STAGE skill shares. Read the whole file at the start of every run — there is no section-selective loading — as its own file read, never `cat`-ed through shell. The sections that bind this skill hardest: conventions §5 (the active cycle is `cycle:` in `notes/story.md`, and this skill is what sets it), §7 (dialogue: the question machinery and involve levels), §8 (the output table and the story / claims / venue schemas), and §9 (the fabrication boundary — above all §9(c): venue rules are user-confirmed facts). This file states what is specific to this skill and wins wherever it is stricter.
-+++ 1
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline every STAGE skill shares. Read the whole file at the start of every run — there is no section-selective loading — as its own `Read`, never `cat`-ed through Bash. The sections that bind this skill hardest: conventions §5 (the active cycle is `cycle:` in `notes/story.md`, and this skill is what sets it), §7 (dialogue: the question machinery and involve levels), §8 (the output table and the story / claims / venue schemas), and §9 (the fabrication boundary — above all §9(c): venue rules are user-confirmed facts). This file states what is specific to this skill and wins wherever it is stricter.
 ### stage-stry-coach/SKILL.md
 --- 1
 2. **One question at a time, via your question tool.** One question per call; wait for the answer; never dump a question list as plain text. The draft under discussion is quoted in the reply that asks about it — the bullets, the sentence, the paragraph themselves, never only a file diff and never only a summary inside an option (conventions §7.12). Each option then says what choosing it does to that draft, not just what it is called (conventions §7): "position as a benchmark paper" is a label — "the pitch leads with the dataset, and the method demotes to a reference baseline" is the choice being made. After every 2–3 answers, restate what you heard in one or two sentences, then continue. Only questions too open for meaningful candidates (the opening "what is this paper about?") may be plain text. If your question tool is unavailable (headless runs), fall back to plain text — still one question at a time.
@@ -324,9 +279,9 @@ Ask via AskUserQuestion, one question at a time, only about what the survey coul
 2. **One question at a time, via AskUserQuestion.** One question per call; wait for the answer; never dump a question list as plain text. The draft under discussion is quoted in the reply that asks about it — the bullets, the sentence, the paragraph themselves, never only a file diff and never only a summary inside an option (conventions §7.12). Each option then says what choosing it does to that draft, not just what it is called (conventions §7): "position as a benchmark paper" is a label — "the pitch leads with the dataset, and the method demotes to a reference baseline" is the choice being made. After every 2–3 answers, restate what you heard in one or two sentences, then continue. Only questions too open for meaningful candidates (the opening "what is this paper about?") may be plain text. If AskUserQuestion is unavailable (headless runs), fall back to plain text — still one question at a time.
 ### stage-stry-coach/SKILL.md
 --- 1
-1. Opening load, one message where possible: the conventions file (its own file read); `notes/story.md`, `notes/claims.md`, and `notes/adopt.md` where present; `mates/MANIFEST.md`; one shell call for `date +%F` (real dates, conventions §4) plus a listing of `mates/` and `cycls/`.
+1. Opening load, one message where possible: the conventions file; `notes/story.md`, `notes/claims.md`, and `notes/adopt.md` where present; `mates/MANIFEST.md`; one shell call for `date +%F` (real dates, conventions §4) plus a listing of `mates/` and `cycls/`.
 +++ 1
-1. Opening load, one message where possible: the conventions file (its own `Read`); `notes/story.md`, `notes/claims.md`, and `notes/adopt.md` where present; `mates/MANIFEST.md`; one Bash call for `date +%F` (real dates, conventions §4) plus a listing of `mates/` and `cycls/`.
+1. Opening load, one message where possible: the conventions file; `notes/story.md`, `notes/claims.md`, and `notes/adopt.md` where present; `mates/MANIFEST.md`; one Bash call for `date +%F` (real dates, conventions §4) plus a listing of `mates/` and `cycls/`.
 ### stage-stry-coach/SKILL.md
 --- 1
 Work the schema order (conventions §8), each section drafted → quoted in the reply as it would land in the file (conventions §7.12) → confirmed via your question tool ("write it" / "needs edits") → written, `updated:` refreshed; close each boundary in 1–2 sentences — what settled, what the next section opens:
@@ -337,16 +292,6 @@ Work the schema order (conventions §8), each section drafted → quoted in the 
    your question tool — proceed with named waivers, or abort — recording waivers per Principle 5.
 +++ 1
    AskUserQuestion — proceed with named waivers, or abort — recording waivers per Principle 5.
-### stage-tabs-builder/SKILL.md
---- 1
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own file read call, never `cat`-ed into a shell command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — this skill is its enforcement at the table level), §8 (the output table and its staleness rule), and §5 (resolution). This file states what is specific to this skill and wins wherever it is stricter.
-+++ 1
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own `Read` call, never `cat`-ed into a Bash command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — this skill is its enforcement at the table level), §8 (the output table and its staleness rule), and §5 (resolution). This file states what is specific to this skill and wins wherever it is stricter.
-### stage-tabs-builder/SKILL.md
---- 1
-1. Read the conventions file (whole file, own file read call), then `notes/outline.md` (Tables and Sections), `notes/claims.md`, `notes/notation.md`, `notes/story.md` (active `cycle:`), and `mates/MANIFEST.md`.
-+++ 1
-1. Read the conventions file (whole file, own `Read` call), then `notes/outline.md` (Tables and Sections), `notes/claims.md`, `notes/notation.md`, `notes/story.md` (active `cycle:`), and `mates/MANIFEST.md`.
 ### stage-tabs-builder/SKILL.md
 --- 1
 1. Match `TABLE` against the Tables rows by ID, file slug, then purpose phrase; absent or ambiguous → list the rows with statuses and ask via your question tool (plain text when unavailable).

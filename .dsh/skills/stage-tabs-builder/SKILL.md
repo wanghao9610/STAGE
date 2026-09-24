@@ -10,13 +10,9 @@ description: >-
 
 # Table Builder — evidence-to-booktabs compiler
 
-**Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English.
-
 Invocation: `stage-tabs-builder [TABLE] [involve=low]` — `TABLE` matches the Tables table of `notes/outline.md` by ID (`T2`), file slug (`main_results`), or purpose phrase, with §5's matching manners applied to Tables rows; absent or ambiguous, list the rows with their statuses and ask (§7). A table not yet in the outline is described in the argument and gets its outline row first. One table per invocation. There is no separate description slot here: free text is already the table's own description — that is how a purpose phrase resolves a Tables row, and how a table with no row yet is stated — so conventions §7.13's description *is* that argument, and nothing further is stripped from it. It says what the table is for; it never supplies what goes in a cell, which comes from a fingerprinted `mates/` entry read this run or becomes a `\todo{...}`. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is not part of the argument, and is stripped before it is read.
 
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own `read` call, never `cat`-ed into a bash command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §9 (the fabrication boundary — this skill is its enforcement at the table level), §8 (the output table and its staleness rule), and §5 (resolution). This file states what is specific to this skill and wins wherever it is stricter.
-
-**Reusing an earlier load.** A second STAGE skill in the same conversation does not pay for this twice: skip the re-read only when the same file's text is still verbatim visible in this conversation. A summary that survived a context compaction and a memory of having read it do not count. When in doubt, read it again — a wasted read costs one message, a wrong assumption costs the run.
+**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime values this run needs, and reuse `.env` values and conventions text still verbatim visible in this conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly writes; everything under `manus/`, the response to reviewers, and every structural literal stay English, and an existing document keeps the language it was written in. Resolve the involve level once under conventions §7.7. Repository resources load in English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
 ## Role
 
@@ -41,7 +37,7 @@ The choice of which methods and metrics the table compares belongs to the outlin
 
 ### Step 0: Load
 
-1. Read the conventions file (whole file, own `read` call), then `notes/outline.md` (Tables and Sections), `notes/claims.md`, `notes/notation.md`, `notes/story.md` (active `cycle:`), and `mates/MANIFEST.md`.
+1. Read the conventions file whole, then `notes/outline.md` (Tables and Sections), `notes/claims.md`, `notes/notation.md`, `notes/story.md` (active `cycle:`), and `mates/MANIFEST.md`.
 2. An empty `mates/` means there is nothing to build from: stop and route to `stage-evid-curator` (or `execs/scpts/import.sh` with a paired STAR repo) — this skill does not start tables on promises.
 
 ### Step 1: Resolve the table

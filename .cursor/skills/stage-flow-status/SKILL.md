@@ -10,14 +10,6 @@ description: >-
 
 # Writing Flow Status — read-only overview
 
-**Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the
-Markdown this run writes; resolve it once at the start of the run — the probe is the first of the
-five calls step 1 sends together. Unset or empty → follow the user's dialogue
-language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request
-wins. English whatever it says: everything under `manus/`, the response to reviewers, and every
-structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric
-names. Repo resources (the conventions, this skill) are loaded as-is in English.
-
 Invocation: `stage-flow-status [SECTION] [DESCRIPTION]` — no argument reports the whole flow; a
 section argument, resolved per conventions §5 by number, file slug, or title against
 `notes/outline.md`, narrows the outline board and claim detail to that section. An
@@ -30,29 +22,16 @@ reads hardest — which unknown is worth a second look, which line is worth quot
 counting — but it drops nothing the report owes, and it never moves the next action, which the
 priority order fixes down to the tie-break.
 
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
-every STAGE skill shares; this file states what is specific to this one and wins wherever it is
-stricter. Step 1 loads eight of its twelve sections — §0 vocabulary, §3 the `.env` runtime, §5
-section and cycle resolution, §6 delegation, §7 dialogue's reporting rules, §8 the artifact
-output table with its staleness rule, §9 the fabrication boundary, §11 the skill roster — and that is
-the whole read: this is the most-run skill in the flow, and the four it leaves out are a fifth of
-the file that no read-only report can use.
-
-**The four left out, and why each is safe to leave.** §1 git: its only sentence about this skill is
-that this skill never commits, which Principle 1 states here in stronger terms, and the read-only
-`status` / `log` / `tag -l` the scan runs need no rule to permit them. §2 the STOP line: it draws
-the line between light and heavy work, and the only two commands this skill may run — `import.sh
---diff` and `lint.sh --no-build` — are named on the light side of it and bounded again by
-Principle 3. §4 real dates: every date reported is read from a file or printed by the scan, which
-stamps its own `# today:` line from the clock; this skill writes no date anywhere. §10 project
-layout: it says where a skill puts what it writes, and this one writes nothing — every path it
-reads is named in step 1 or printed by the scan. Read a left-out section in full the moment a run
-needs it; the saving is in not reading it by default, not in refusing to.
-
-**Reusing an earlier load.** Skip the re-read only when those excerpts' own text is still verbatim
-visible in this conversation. A summary that survived a context compaction and a memory of having
-read it both fail that test — when in doubt, read them again; a wasted read costs one message, a
-wrong assumption costs the run.
+**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
+the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever
+it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime values this run
+needs, and reuse `.env` values and conventions text still verbatim visible in this conversation.
+Resolve the language once under conventions §7.6 — an explicit request first, then a valid
+`STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly
+writes; everything under `manus/`, the response to reviewers, and every structural literal stay
+English, and an existing document keeps the language it was written in. Resolve the involve level
+once under conventions §7.7. Repository resources load in English: a `references/*_zh.md` edition
+is for human readers and is never loaded at runtime.
 
 ## Role
 
@@ -101,37 +80,18 @@ writes, and never present a guess as a state.
 
 ## Workflow
 
-1. **One load, then reason.** Everything this skill reads arrives in a single message — five Shell
-   calls sent together, which cost one round trip between them rather than one each. Steps 2–8
-   work from what came back, and a file the digest already printed is never re-opened. This is
-   the most-run skill in the flow, and the round trips are the whole of what makes it slow.
+1. **One load, then reason.** The conventions and `.env` are read as Shared conventions says. The
+   two calls below — the scan and the two script signals — go out together in a single message,
+   which costs one round trip between them rather than one each. Steps 2–8 work from what came
+   back, and a file the digest already printed is never re-opened. This is the most-run skill in
+   the flow, and the round trips are the whole of what makes it slow.
 
-   ```bash
-   grep -sE '^STAGE_LANG=' .env || true    # reply language (§7.6)
-   sed -n '/^## 0\./,/^## 1\./p; /^## 3\./,/^## 4\./p; /^## 5\./,/^## 8\./p' docs/mds/stage-workflow/writing-workflow-conventions.md
-   ```
-   ```bash
-   sed -n '/^## 8\./,/^## 9\./p; /^## 11\./,$p' docs/mds/stage-workflow/writing-workflow-conventions.md
-   ```
-   ```bash
-   sed -n '/^## 9\./,/^## 10\./p' docs/mds/stage-workflow/writing-workflow-conventions.md
-   ```
    ```bash
    bash <this skill's directory>/scripts/scan.sh
    ```
    ```bash
    bash execs/scpts/lint.sh --no-build; bash execs/scpts/import.sh --diff
    ```
-
-   The conventions ride in three calls rather than one because each tool result has its own size
-   limit, and a Shell result past roughly 30 KB is written out to a file that costs a round trip to
-   read back — the exact round trip the single message exists to avoid. The eight loaded sections
-   are 60 KB together, so they cannot share one result; split this way each is comfortably under,
-   the digest gets a result to itself since it is the one part that grows with the paper, and the
-   two script signals get a fifth because their few lines would otherwise ride on whichever
-   result is closest to spilling. If an extraction prints nothing — a synced conventions copy may
-   number its sections differently — load the whole file with `sed -n '/^## 0\./,$p'` and say in
-   the reply that the excerpts fell back.
 
    The digest is the output table (§8) in one pass: the frontmatter and table rows of `notes/story.md`,
    `outline.md`, `claims.md`, `notation.md`, `style.md` and `adopt.md`; `mates/MANIFEST.md`

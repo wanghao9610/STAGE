@@ -10,15 +10,11 @@ description: >-
 
 # Section Drafter — evidence-bound prose
 
-**Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English.
-
 Invocation: `stage-sect-drafter SECTION [DESCRIPTION] [involve=low]` — `SECTION` resolves per conventions §5 against the Sections table of `notes/outline.md`: a number (`3`), a file slug (`3_method` or `method`), or a title match; absent or ambiguous, list the sections with their statuses and ask (§7). One section per invocation — a request naming several sections is one run per section, in outline order, each with its own ledger and outline updates. Anything left after `SECTION` is a description (conventions §7.13): in your own words, what this run is for — which argument the section has to carry, what the last draft got wrong. It is a lead the draft may follow, never an instruction that stands in for a confirmation point, and it is never evidence: a number stated in a description is still a number with no fingerprint, so it is written as `\todo{...}` (§9a). Prose that resolves to no section is description alone, not a missing target — but this skill requires a section, so list the sections with their statuses and ask. An optional `involve=low|medium|high` token may accompany the argument: it sets this run's involve level (conventions §7.7), is part of neither the section nor the description, and is stripped before either is read.
 
-**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` before acting — the whole file, at the start of every run; there is no section-selective loading. It arrives through its own `Read` call, never `cat`-ed into a Shell command. It is the baseline every STAGE skill shares; the sections that bind this skill hardest are §5 (section and cycle resolution), §8 (the output table and its staleness rule), and §9 (the fabrication boundary). This file states what is specific to this skill and wins wherever it is stricter.
+**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime values this run needs, and reuse `.env` values and conventions text still verbatim visible in this conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly writes; everything under `manus/`, the response to reviewers, and every structural literal stay English, and an existing document keeps the language it was written in. Resolve the involve level once under conventions §7.7. Repository resources load in English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
-**Human-writing guide.** Also read `docs/mds/stage-workflow/human-writing-guide.md` whole, through its own file read call, at the start of every run. It defines the evidence-bound natural-writing pass used here; this skill's stricter evidence and ledger rules still win.
-
-**Reusing an earlier load.** A second STAGE skill in the same conversation does not pay for this twice: skip the re-read only when the same file's text is still verbatim visible in this conversation. A summary that survived a context compaction and a memory of having read it do not count. When in doubt, read it again — a wasted read costs one message, a wrong assumption costs the run.
+**Human-writing guide.** Also read `docs/mds/stage-workflow/human-writing-guide.md` whole at the start of every run. It defines the evidence-bound natural-writing pass used here; this skill's stricter evidence and ledger rules still win.
 
 ## Role
 
@@ -44,8 +40,8 @@ Re-scoping is upstream's, not yours: a brief that cannot be drafted as written g
 
 ### Step 0: Load
 
-1. Read the conventions file (whole file, own `Read` call), then `notes/story.md` (pitch, active `cycle:`), `notes/outline.md`, `notes/claims.md`, `notes/notation.md`, and `notes/style.md` when it exists (Principle 7).
-2. Read the human-writing guide whole, in its own file read call.
+1. Read the conventions file whole, then `notes/story.md` (pitch, active `cycle:`), `notes/outline.md`, `notes/claims.md`, `notes/notation.md`, and `notes/style.md` when it exists (Principle 7).
+2. Read the human-writing guide whole.
 3. Missing story or outline means the pipeline is not ready for drafting: stop and route to `stage-stry-coach` or `stage-outl-planner` rather than improvising a structure.
 
 ### Step 1: Resolve the section

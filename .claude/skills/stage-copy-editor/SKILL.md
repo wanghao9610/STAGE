@@ -14,8 +14,6 @@ allowed-tools: >-
 
 # Manuscript Copy Editor — prose polish that changes no fact
 
-**Reply language (conventions §7.6).** `.env` `STAGE_LANG=en|zh` sets chat replies and the Markdown this run writes; resolve it once at the start of the run — `grep -sE '^STAGE_LANG=' .env || true`, folded into the opening load call. Unset or empty → follow the user's dialogue language, so a Chinese conversation gets Chinese replies; an explicit in-conversation request wins. English whatever it says: everything under `manus/`, the response to reviewers, and every structural literal — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names. Repo resources (the conventions, this skill) are loaded as-is in English.
-
 Invocation: `stage-copy-editor [SECTION | style] [DESCRIPTION] [involve=low]` — a section
 argument resolves by number, file slug, or title against `notes/outline.md` (conventions §5;
 ambiguity → ask); no argument polishes every section the outline lists as `drafted` or later, in
@@ -33,17 +31,20 @@ whatever it says. An optional `involve=low|medium|high` token may accompany any 
 this run's involve level (conventions §7.7), is part of neither the argument nor the description,
 and is stripped before either is read.
 
-**Shared conventions.** `docs/mds/stage-workflow/writing-workflow-conventions.md` is the baseline
-every STAGE skill shares, and `docs/mds/stage-workflow/human-writing-guide.md` defines the
-evidence-bound natural-writing pass — read both whole files at the start of every run (there is no
-section-selective loading). The sections that bind this skill hardest: §5 section resolution, §9
-the fabrication boundary (numbers are not prose), §1 git, §7 dialogue. This file states what is
-specific to this skill and wins wherever it is stricter.
+**Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
+the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever
+it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime values this run
+needs, and reuse `.env` values and conventions text still verbatim visible in this conversation.
+Resolve the language once under conventions §7.6 — an explicit request first, then a valid
+`STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly
+writes; everything under `manus/`, the response to reviewers, and every structural literal stay
+English, and an existing document keeps the language it was written in. Resolve the involve level
+once under conventions §7.7. Repository resources load in English: a `references/*_zh.md` edition
+is for human readers and is never loaded at runtime.
 
-**Reusing an earlier load.** Skip the re-read only when the same conventions file's text is still
-verbatim visible in this conversation. A summary that survived a compaction, or a memory of
-having read it, does not count. When in doubt, read it again — a wasted read costs one message, a
-wrong assumption costs the run.
+**Human-writing guide.** Also read `docs/mds/stage-workflow/human-writing-guide.md` whole at the
+start of every run. It defines the evidence-bound natural-writing pass used here; this skill's
+stricter rules on meaning, numbers, and citations still win.
 
 ## Role
 
@@ -112,7 +113,7 @@ from the same ones instead of each session inventing a voice.
 
 ## Workflow
 
-1. **Load.** Read the conventions and human-writing guide whole, in separate file reads; then `notes/notation.md`, `notes/outline.md`
+1. **Load.** Read the conventions and human-writing guide whole; then `notes/notation.md`, `notes/outline.md`
    (section rows and budgets), and `notes/claims.md` (know which sentences carry claims), plus
    `notes/style.md` when it exists (Principle 7). Real date from the system clock (conventions §4).
 2. **Resolve scope (conventions §5).** The literal `style` → the profile branch below, and
