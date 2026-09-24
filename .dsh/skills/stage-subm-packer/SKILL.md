@@ -82,8 +82,9 @@ third-party file nobody here is allowed to edit.
    writing, and a camera-ready that silently drops one is a broken commitment. List the open
    boxes with the skill that closes each; never check a box yourself.
 5. **Soft findings are waived only on the record.** Outline rows short of final, evidence drift
-   from `import.sh --diff`, a missing supplementary — present the list, ask, and write the user's
-   waivers into the SUBMISSION record. A waiver that is not recorded did not happen.
+   from `import.sh --diff`, a claim the latest audit did not verify, a missing supplementary —
+   present the list, ask, and write the user's waivers into the SUBMISSION record. A waiver that
+   is not recorded did not happen.
 6. **The package leaks nothing.** The bundle holds what compiles the paper — sources, figures,
    styles, bibliography — and nothing else: no `mates/`, no `notes/`, no `tasks/`, no `.env`;
    under an anonymized cycle, nothing lint's anon families flag. `wkdrs/` is never committed
@@ -158,9 +159,25 @@ to get it: switch the session's model — then continue here.
    `mates/MANIFEST.md` entry; no claim stated in the manuscript sits at `unsourced` **or
    `weakened`** in `notes/claims.md` — `weakened` means a response conceded it in writing, so a
    manuscript still asserting it ships a claim its own authors have withdrawn, which reads worse
-   to a reviewer than the original overclaim; `import.sh --diff` reports no drift (skip with a note when `STAR_HOME` is
+   to a reviewer than the original overclaim; no `performance` or `factual` claim stated in the
+   manuscript sits at `drafted`, which means the latest claims audit did not verify it
+   (`contribution` rows are outside this check: each measurable promise in one is a
+   `performance` row of its own); no `verified` row is stated in a file revised after the audit
+   that last covered it, because a `verified` row keeps its status when a later revision changes
+   its number — for each `manus/secs/` or `manus/tabs/` file a `verified` row's `Stated in` names
+   (`1_intro` → `manus/secs/1_intro.tex`, `tabs/main` → `manus/tabs/main.tex`),
+   `git log -1 --format=%cs -- <file>` is no later than the date of the newest
+   `wkdrs/reports/CLAIMS_<date>.md` whose `scope:` took that file in (resolved as
+   `stage-clms-auditor` step 2 resolves a scope; a whole-manuscript report covers every file),
+   and with no report on disk say those dates cannot be checked — `wkdrs/` is never committed;
+   `import.sh --diff` reports no drift (skip with a note when `STAR_HOME` is
    unset). Each miss is a soft finding: present the list with a recommendation and ask via
    ask_user_question — proceed with named waivers, or abort — recording waivers per Principle 5.
+   Claims the latest audit did not verify route to `stage-clms-auditor` and are listed by ID with
+   their waivers in the SUBMISSION record, and in the reply whether the author waives or aborts;
+   they never block the pack. A `factual` row about a cited work is handed by the claims audit to
+   `stage-cite-auditor`, which never flips a status, so it can stay `drafted` and return at every
+   pack until waived — route it there and say so beside it.
 6. **Checklist walk.** Per `venue.yml` `checklist:` — `none` skips; otherwise walk the family's
    items, asking the user for any fact the repo cannot answer (§9c: answers are the user's, never
    invented), and record pass / fail / waived per item.
@@ -209,10 +226,11 @@ Output-table row (conventions §8): Submission — `cycls/<cycle>/SUBMISSION_<da
 
 `SUBMISSION_<date>.md` frontmatter: `cycle:`, `date:`, `frozen:` (the tag name), `package:` (the
 path under `wkdrs/builds/`), `template:` (the venue template the package was formatted in, or
-`arxiv`). Body: the lint summary, the checklist outcome with waivers, page counts against
-`page_limit_main` — **the converted copy's count, with the preprint build's beside it when they
-differ** — what the conversion dropped or left for a human, and what was submitted where, as the
-user states it, since the upload is theirs.
+`arxiv`). Body: the lint summary, the checklist outcome with waivers, the claims the latest
+audit did not verify with their waivers, page counts against `page_limit_main` — **the converted
+copy's count, with the preprint build's beside it when they differ** — what the conversion
+dropped or left for a human, and what was submitted where, as the user states it, since the
+upload is theirs.
 
 `convert`'s durable outputs are the registered kit and `tasks/<cycle>_venue.md`; the copy itself
 is regenerable and `wkdrs/` is never committed (§1).
@@ -230,7 +248,8 @@ Ids are `V<n>`, assigned in order and never reused. New findings append with the
 item that no longer applies is checked with its reason rather than deleted, so the list stays a
 record of everything the conversion has ever asked for.
 
-Chat digest, verdict first: **packed** — package path, tag name, what awaits the user — or
+Chat digest, verdict first: **packed** — package path, tag name, the claims the latest audit did
+not verify, what awaits the user — or
 **converted** — copy path, page count against the limit with its confirmation state, what was
 mapped, what was dropped, what needs a human — or **blocked (n)** with each blocker and the
 /stage-* skill that clears it.

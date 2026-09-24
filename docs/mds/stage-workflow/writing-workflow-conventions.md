@@ -339,7 +339,7 @@ Frontmatter: `adopted:`, `backfilled:`. Sections: paired sources (STAR repos + s
 
 ### 8.10 `cycls/<cycle>/SUBMISSION_<date>.md`
 
-Frontmatter: `cycle:`, `date:`, `frozen:` (tag name), `package:` (path under `wkdrs/builds/`), `template:` (the venue template the package was formatted in, or `arxiv`). Body: lint summary, checklist outcome, page counts — the converted copy's, with the preprint build's beside it when they differ — what the conversion dropped or left for a human, and what was submitted where.
+Frontmatter: `cycle:`, `date:`, `frozen:` (tag name), `package:` (path under `wkdrs/builds/`), `template:` (the venue template the package was formatted in, or `arxiv`). Body: lint summary, checklist outcome, the claims the latest audit did not verify with their waivers, page counts — the converted copy's, with the preprint build's beside it when they differ — what the conversion dropped or left for a human, and what was submitted where.
 
 The same producer's other durable artifact is `tasks/<cycle>_venue.md`, the venue follow-up list a `convert` run maintains. Frontmatter: `cycle:`, `template:`, `updated:`. Body: one `- [ ]` line per finding, each carrying a stable `V<n>` id and the skill that owns the fix. It is updated, never regenerated — a checked item stays checked and is never re-raised, new findings append with the next free id, and an item that no longer applies is checked with its reason rather than deleted. These are findings, not promises: an open box never blocks a pack, which is what separates this list from `tasks/<cycle>_promises.md`.
 
