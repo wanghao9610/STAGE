@@ -1,5 +1,5 @@
 ---
-description: Plan, build, or audit one manuscript figure
+description: Audit or plan the figure inventory; build or revise one manuscript figure or the teaser
 argument-hint: "[TARGET] [DESCRIPTION] [involve=low|medium|high]"
 ---
 Read `.pi/skills/stage-figs-designer/SKILL.md` in full and follow it as this run's instructions. This command is the skill's Pi entry point; apply its target resolution, language, evidence, confirmation, and verification rules unchanged.

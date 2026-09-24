@@ -7,19 +7,19 @@
 | Skill | | 用途 |
 | --- | --- | --- |
 | `stage-proj-adopt` | † | 接入已有论文仓库 |
-| `stage-evid-curator` | | 导入并登记证据 |
-| `stage-stry-coach` | † | 塑造论文故事并建立初始论断 |
+| `stage-evid-curator` | | 导入并登记证据；对照 manifest 核查磁盘上的证据文件（`check`，默认） |
+| `stage-stry-coach` | † | 塑造论文故事并建立初始论断；选定 venue 并开启一个投稿周期 |
 | `stage-outl-planner` | † | 规划章节、篇幅、图、表与记号 |
-| `stage-sect-drafter` | | 起草一个章节 |
+| `stage-sect-drafter` | | 起草或修订一个章节 |
 | `stage-tabs-builder` | | 构建一张可追溯证据的表格 |
-| `stage-figs-designer` | | 规划、构建或审计一张图 |
-| `stage-refs-curator` | | 整理参考文献记录与阅读笔记 |
-| `stage-copy-editor` | | 在不改变论断或证据的前提下恢复自然的学术表达 |
+| `stage-figs-designer` | | 审计图的清单；规划清单（`plan`）；构建或修订一张图或 teaser 图（`teaser`） |
+| `stage-refs-curator` | | 整理参考文献记录与阅读笔记；查找值得引用的工作（`discover`）；为相关工作对文献库聚类（`position`）；重新抓取每个 bib 条目并逐字段比对（`verify`） |
+| `stage-copy-editor` | | 在不改变论断或证据的前提下恢复自然的学术表达；记录作者的文风档案（`style`） |
 | `stage-clms-auditor` | | 追溯手稿中的每个数字 |
 | `stage-cite-auditor` | | 核验每条引用断言 |
-| `stage-peer-reviewer` | | 模拟五种视角的评审 |
+| `stage-peer-reviewer` | | 模拟五种视角的评审，或单遍评审（`quick`）；评审一篇外部论文（`extern=<path>`） |
 | `stage-resp-writer` | † | 起草回复与承诺清单 |
-| `stage-subm-packer` | † | 预检并打包投稿材料 |
+| `stage-subm-packer` | † | 预检并打包投稿材料或 camera-ready（`camera`）；把论文转换为 venue 模板（`convert`） |
 | `stage-pstr-builder` | † | 规划、制作或检查海报 |
 | `stage-flow-status` | | 汇报状态与唯一的下一步行动 |
 
