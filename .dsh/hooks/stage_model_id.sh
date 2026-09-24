@@ -121,11 +121,15 @@ transcript=$(payload_field transcript_path)
 # With the bridge's variable set it is absolute, so it resolves from any
 # directory the shell has moved to.
 self="${CLAUDE_PROJECT_DIR:-.}/.dsh/hooks/stage_model_id.sh"
+# The command runs in the user's shell, where a project path with a space would
+# split into two words, so both arguments go in shell-quoted.
+printf -v self_arg '%q' "${self}"
+printf -v transcript_arg '%q' "${transcript:-}"
 
 if [ -n "${transcript:-}" ]; then
-    ctx="STAGE provenance: read this session's model id when you record it, not from memory — DSH states no model at session start, and the route can change afterwards without saying so. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), run: bash ${self} --resolve ${transcript} — then copy what it prints verbatim. Write 'unrecorded' only if it prints nothing, and do not guess."
+    ctx="STAGE provenance: read this session's model id when you record it, not from memory — DSH states no model at session start, and the route can change afterwards without saying so. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), run: bash ${self_arg} --resolve ${transcript_arg} — then copy what it prints verbatim. Write 'unrecorded' only if it prints nothing, and do not guess."
 else
-    ctx="STAGE provenance: DSH named no session log for this session, so the model id cannot be recovered from it. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), try: bash ${self} --resolve — with no argument it reads DSH_SESSION_JSONL from the shell environment. Write 'unrecorded' if it prints nothing, and do not guess."
+    ctx="STAGE provenance: DSH named no session log for this session, so the model id cannot be recovered from it. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), try: bash ${self_arg} --resolve — with no argument it reads DSH_SESSION_JSONL from the shell environment. Write 'unrecorded' if it prints nothing, and do not guess."
 fi
 
 # ctx embeds a filesystem path, so encode it as JSON rather than assuming it is

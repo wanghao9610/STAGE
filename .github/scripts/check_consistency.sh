@@ -1500,6 +1500,34 @@ if [[ -n "${model_check_dir}" ]]; then
 
     rm -rf "${model_check_dir}"
 fi
+
+#     Claude, DSH, and Qwen Code inject a resolver command the session later runs
+#     in the user's shell, and two of them name it by an absolute path. Every
+#     argument is shell-quoted, so a project under a directory with a space runs
+#     the command instead of failing at `bash .../My` and recording unrecorded.
+space_dir="$(mktemp -d "${TMPDIR:-/tmp}/stage-model-id-space.XXXXXX")" || space_dir=""
+if [[ -n "${space_dir}" ]]; then
+    space_proj="${space_dir}/My Papers/p1"
+    mkdir -p "${space_proj}"
+    printf '%s\n' '{"type":"assistant","model":"m"}' > "${space_proj}/t.jsonl"
+    for space_tree in claude dsh qwen; do
+        mkdir -p "${space_proj}/.${space_tree}/hooks"
+        cp ".${space_tree}/hooks/stage_model_id.sh" "${space_proj}/.${space_tree}/hooks/"
+        space_cmd="$(python3 -c 'import json, sys; print(json.dumps({"hook_event_name": "SessionStart", "session_id": "s", "model": "m", "transcript_path": sys.argv[1]}))' "${space_proj}/t.jsonl" \
+            | (cd "${space_proj}" && CLAUDE_PROJECT_DIR="${space_proj}" QWEN_PROJECT_DIR="${space_proj}" bash ".${space_tree}/hooks/stage_model_id.sh" 2>/dev/null) \
+            | python3 -c 'import json, re, sys
+m = re.search(r"(?:run|try): (bash .*?) \u2014 ", json.load(sys.stdin)["hookSpecificOutput"]["additionalContext"])
+print(m.group(1) if m else "")' 2>/dev/null)"
+        if [[ -z "${space_cmd}" ]]; then
+            fail ".${space_tree}/hooks/stage_model_id.sh injected no resolver command for a project path with a space"
+            hook_errors=1
+        elif ! (cd "${space_proj}" && bash -c "${space_cmd}" >/dev/null 2>&1); then
+            fail ".${space_tree}/hooks/stage_model_id.sh: its resolver command does not run from a project path with a space: ${space_cmd}"
+            hook_errors=1
+        fi
+    done
+    rm -rf "${space_dir}"
+fi
 (( hook_errors == 0 )) && note "hooks ship, parse, and register natively in all seven harnesses; the memory hooks index a fixture store; the commit guard declines the same commands in every tree"
 
 # 18. The provenance line is stated in the same skills in all seven trees.
