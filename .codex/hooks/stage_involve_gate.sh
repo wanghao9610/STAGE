@@ -58,8 +58,9 @@ path_ok() { # $1 = path as the header writes it, relative to cwd or absolute
                 *) return 1 ;;
             esac ;;
     esac
+    # A doubled slash hides mates/ from the patterns (`<root>//mates/x`).
     case "${rel}" in
-        .*|mates|mates/*|*/..|*/../*) return 1 ;;
+        .*|mates|mates/*|*/..|*/../*|/*|*//*) return 1 ;;
     esac
     return 0
 }

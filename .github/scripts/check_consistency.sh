@@ -1255,6 +1255,43 @@ done
 # involve= token reaches it (conventions §7.7); a gate back on .env alone drops it.
 grep -qF 'involve="$(stage_involve_level "${input}" "${root}")"' .claude/hooks/stage_involve_gate.sh || \
     { fail ".claude/hooks/stage_involve_gate.sh no longer takes its level from stage_involve_level.sh"; hook_errors=1; }
+# The three edit gates allow an edit at involve=low and keep the prompt for
+# mates/, however the path spells it: a `..` climbing back in, or a doubled
+# slash that a plain `mates/*` test misses.
+edit_dir="$(mktemp -d "${TMPDIR:-/tmp}/stage-edit-gate-check.XXXXXX")" || edit_dir=""
+# Physical and slash-clean, as a hook's own cwd is: TMPDIR may end in a slash.
+[[ -n "${edit_dir}" ]] && edit_dir="$(cd "${edit_dir}" && pwd -P)"
+if [[ -n "${edit_dir}" ]]; then
+    printf 'INVOLVE=low\n' > "${edit_dir}/.env"
+    edit_verdict() { # $1 = gate, $2 = edited path; prints allow or prompt
+        local out
+        case "$1" in
+            claude|qwen)
+                out="$(python3 -c 'import json, sys; print(json.dumps({"tool_name": "Write", "tool_input": {"file_path": sys.argv[1]}}))' "$2" \
+                    | CLAUDE_PROJECT_DIR="${edit_dir}" QWEN_PROJECT_DIR="${edit_dir}" bash ".$1/hooks/stage_involve_gate.sh" 2>/dev/null)" ;;
+            codex)
+                out="$(python3 -c 'import json, sys; print(json.dumps({"tool_name": "apply_patch", "tool_input": {"command": "*** Begin Patch\n*** Update File: " + sys.argv[1] + "\n*** End Patch\n"}}))' "$2" \
+                    | (cd "${edit_dir}" && bash "${ROOT_DIR}/.codex/hooks/stage_involve_gate.sh") 2>/dev/null)" ;;
+        esac
+        [[ "${out}" == *'allow'* ]] && printf 'allow' || printf 'prompt'
+    }
+    edit_errors=0
+    for edit_gate in claude qwen codex; do
+        while IFS='|' read -r edit_want edit_path; do
+            edit_got="$(edit_verdict "${edit_gate}" "${edit_dir}${edit_path}")"
+            [[ "${edit_got}" == "${edit_want}" ]] || \
+                { fail ".${edit_gate}/hooks/stage_involve_gate.sh: expected ${edit_want}, got ${edit_got}, for <root>${edit_path}"; edit_errors=1; hook_errors=1; }
+        done <<'CASES'
+allow|/notes/claims.md
+prompt|/mates/a.csv
+prompt|//mates/a.csv
+prompt|/notes/../mates/a.csv
+prompt|/.env
+CASES
+    done
+    (( edit_errors == 0 )) && note "the claude, qwen, and codex edit gates allow notes/ at involve=low and keep the prompt for mates/ however it is spelled"
+    rm -rf "${edit_dir}"
+fi
 
 # Claude's bash gate answers a shell prompt at involve=low and stays silent on
 # STAGE's red lines (conventions §7.7). Fixed commands pin both halves: the
