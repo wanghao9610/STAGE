@@ -38,13 +38,14 @@ DOCS_TREE="docs/mds/stage-workflow"
 # STAGE-owned hook assets. Two inject at the start of a session: the script that
 # puts the project-memory index (.stage/memory/) in front of the agent, and the
 # one that states the runtime's model id so an artifact records who wrote it
-# (conventions §8). Two decide instead: the commit guard that declines the git
-# commands conventions §1 forbids, in every tree, and the involve gate that
-# answers a file-edit permission prompt at involve=low (§7.7), in the three trees
-# whose harness lets a hook decide one. One copy of each per harness, because
-# every runtime spells the event and the output field differently. Overwritten
-# on update like the skills — the memory store itself is the paper's and is
-# never synced.
+# (conventions §8). Three decide instead: the commit guard that declines the git
+# commands conventions §1 forbids, in every tree; the involve gate that answers
+# a file-edit permission prompt at involve=low (§7.7), in the three trees whose
+# harness lets a hook decide one; and, in Claude's tree alone, the bash gate
+# that answers a shell-command prompt at involve=low outside the red lines. One
+# copy of each per harness that carries it, because every runtime spells the
+# event and the output field differently. Overwritten on update like the
+# skills — the memory store itself is the paper's and is never synced.
 HOOK_TREES=(
     ".claude/hooks"
     ".codex/hooks"
@@ -310,13 +311,16 @@ report_unregistered_hooks() {
         # harness can express — Claude, Codex, and Qwen on PreToolUse, Cursor on
         # beforeShellExecution — so every registration carries it. The involve gate
         # answers a permission prompt, so it applies only where a hook can
-        # decide one: Cursor has no event that gates a file edit.
+        # decide one: Cursor has no event that gates a file edit. The bash gate
+        # ships in Claude's tree alone.
         hooks=("stage_memory.sh|project-memory" "stage_model_id.sh|model-id provenance"
                "stage_commit_guard.sh|commit guard")
         case "${cfg}" in
             .claude/settings.json|.codex/hooks.json|.qwen/settings.json)
                 hooks+=("stage_involve_gate.sh|involve gate") ;;
         esac
+        [[ "${cfg}" == ".claude/settings.json" ]] && \
+            hooks+=("stage_bash_gate.sh|bash gate")
         # A delegate starts with none of the context the two session hooks
         # inject, and SessionStart does not fire for one. Claude Code is the
         # only harness here with an event that does — SubagentStart — so it is

@@ -943,6 +943,7 @@ for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
          .kimi-code/hooks/stage_commit_guard.sh .pi/extensions/stage-hooks/stage_commit_guard.sh \
          .qwen/hooks/stage_commit_guard.sh \
          .claude/hooks/stage_involve_gate.sh .claude/hooks/stage_involve_level.sh \
+         .claude/hooks/stage_bash_gate.sh \
          .codex/hooks/stage_involve_gate.sh .qwen/hooks/stage_involve_gate.sh \
          .dsh/hooks/install.sh .kimi-code/hooks/install.sh; do
     [[ -x "${f}" ]] || { fail "${f} is missing or not executable"; hook_errors=1; }
@@ -1023,6 +1024,66 @@ done
 # involve= token reaches it (conventions §7.7); a gate back on .env alone drops it.
 grep -qF 'involve="$(stage_involve_level "${input}" "${root}")"' .claude/hooks/stage_involve_gate.sh || \
     { fail ".claude/hooks/stage_involve_gate.sh no longer takes its level from stage_involve_level.sh"; hook_errors=1; }
+
+# Claude's bash gate answers a shell prompt at involve=low and stays silent on
+# STAGE's red lines (conventions §7.7). Fixed commands pin both halves: the
+# mates/, kit, .env, tlmgr, tracked-overwrite, and outward-send arms, and the
+# reading of a wrapper's option values, backticks, continuations, and a commit
+# message's heredoc, are STAGE's own and absent from STAR's gate, so a re-port
+# could drop them with every existence check above still green. A case reads
+# through %b, so \n in it is a newline.
+grep -qF stage_bash_gate.sh .claude/settings.json || \
+    { fail ".claude/settings.json does not register stage_bash_gate.sh"; hook_errors=1; }
+grep -qF 'involve="$(stage_involve_level "${input}" "${root}")"' .claude/hooks/stage_bash_gate.sh || \
+    { fail ".claude/hooks/stage_bash_gate.sh no longer takes its level from stage_involve_level.sh"; hook_errors=1; }
+gate_dir="$(mktemp -d "${TMPDIR:-/tmp}/stage-bash-gate-check.XXXXXX")" || {
+    fail "could not create the bash-gate check fixture directory"
+    hook_errors=1
+    gate_dir=""
+}
+if [[ -n "${gate_dir}" ]]; then
+    printf 'INVOLVE=low\n' > "${gate_dir}/.env"
+    mkdir -p "${gate_dir}/notes"
+    printf 'x\n' > "${gate_dir}/notes/claims.md"
+    git -C "${gate_dir}" init -q && git -C "${gate_dir}" add notes/claims.md
+    gate_verdict() { # $1 = shell command; prints allow, prompt, or what came back
+        local out
+        out="$(python3 -c 'import json, sys; print(json.dumps({"tool_name": "Bash", "tool_input": {"command": sys.argv[1]}, "cwd": sys.argv[2]}))' "$1" "${gate_dir}" \
+            | CLAUDE_PROJECT_DIR="${gate_dir}" bash .claude/hooks/stage_bash_gate.sh 2>&1)"
+        if [[ "${out}" == *'"permissionDecision":"allow"'* ]]; then printf 'allow'
+        elif [[ -z "${out}" ]]; then printf 'prompt'
+        else printf '%s' "${out}"; fi
+    }
+    gate_errors=0
+    while IFS='|' read -r gate_want gate_cmd; do
+        gate_cmd="$(printf '%b' "${gate_cmd}")"
+        gate_got="$(gate_verdict "${gate_cmd}")"
+        [[ "${gate_got}" == "${gate_want}" ]] || \
+            { fail "stage_bash_gate.sh: expected ${gate_want}, got ${gate_got}, for: ${gate_cmd}"; gate_errors=1; hook_errors=1; }
+    done <<'CASES'
+allow|bash execs/scpts/lint.sh && git add notes/claims.md
+allow|grep -c acc mates/MANIFEST.md
+allow|bash execs/scpts/import.sh --source ../proj
+allow|curl -LH "Accept: application/x-bibtex" https://doi.org/10.1000/x
+allow|git commit -m "$(cat <<'EOF'\nfix: read INVOLVE from .env\nEOF\n)"
+prompt|rm -f wkdrs/builds/main.pdf
+prompt|ls wkdrs/*.log | xargs -I {} rm {}
+prompt|echo `rm -rf manus`
+prompt|git \\\n  push origin main
+prompt|git push
+prompt|git clean -fdx
+prompt|git tag freeze/neurips_2026_2026-09-23
+prompt|cp results.csv mates/manual/results.csv
+prompt|unzip kit.zip -d cycls/neurips_2026/template
+prompt|echo INVOLVE=low >> .env
+prompt|tlmgr install booktabs
+prompt|cp draft.md notes/claims.md
+prompt|curl -sL https://x -o notes/claims.md
+prompt|scp main.pdf host:/tmp/
+CASES
+    (( gate_errors == 0 )) && note "bash gate allows ordinary commands at involve=low and leaves STAGE's red lines to the prompt"
+    rm -rf "${gate_dir}"
+fi
 
 for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
          .cursor/hooks/stage_model_id.sh .dsh/hooks/stage_model_id.sh \

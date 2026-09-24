@@ -4,8 +4,8 @@
 # invocation carried none, or `medium` when .env sets no valid level either
 # (writing workflow conventions §7.7, §7.13).
 #
-# Sourced by stage_involve_gate.sh; it decides nothing itself. Prints one of
-# low / medium / high, and the caller acts only on low.
+# Sourced by stage_involve_gate.sh and stage_bash_gate.sh; it decides nothing
+# itself. Prints one of low / medium / high, and the caller acts only on low.
 #
 # Why the transcript. The token rides in the invocation the user typed, which
 # reaches the model and not the hook: a hook is a separate process, and its

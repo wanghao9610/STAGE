@@ -102,8 +102,8 @@ STAGE/
 │   └── plugins/            # Codex marketplace 发现入口：仅一个指向 .codex/plugins/ 的文件链接
 ├── .claude/
 │   ├── skills/             # Claude Code 使用的写作工作流 skill
-│   ├── hooks/              # 钩子：项目记忆索引、本次会话的模型 id、参与度放行、提交守卫
-│   └── settings.json       # 注册这四个钩子
+│   ├── hooks/              # 钩子：项目记忆索引、本次会话的模型 id、参与度放行与 shell 放行、提交守卫
+│   └── settings.json       # 注册这五个钩子
 ├── .codex/                 # Codex 的钩子、逐 skill manifest 与 $stage 分流插件
 ├── .cursor/
 │   ├── skills/             # Cursor 使用的写作工作流 skill
@@ -239,7 +239,7 @@ STAGE_LANG=
 
 `STAR_HOME` 决定你走哪条快速开始路径。本地 `.env` 已被 Git 忽略。
 
-`INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code、Codex 与 Qwen Code 里，文件编辑前的权限提示也会被跳过。`medium`（默认）按文档所写发问，`high` 逐条确认。硬门槛任何档位都要问：红线、删除与覆盖、以及每一个以"已确认"身份进入 `venue.yml` 的取值。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 3_method involve=low`——在 Claude Code 里这个 token 连权限提示一并作数：钩子从会话里最近一条 STAGE 命令读它，一直有效到下一条命令为止；别的宿主的权限提示只认 `.env`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md)。
+`INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code、Codex 与 Qwen Code 里，文件编辑前的权限提示也会被跳过；在 Claude Code 里，shell 命令前的权限提示同样跳过，除非该命令删除、覆盖已跟踪文件、安装、推送，或写入 `mates/`、venue 模板包或 `.env`。`medium`（默认）按文档所写发问，`high` 逐条确认。硬门槛任何档位都要问：红线、删除与覆盖、以及每一个以"已确认"身份进入 `venue.yml` 的取值。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 3_method involve=low`——在 Claude Code 里这个 token 连权限提示一并作数：钩子从会话里最近一条 STAGE 命令读它，一直有效到下一条命令为止；别的宿主的权限提示只认 `.env`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
 `STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
@@ -288,7 +288,7 @@ bash execs/scpts/fmt.sh    # 一句一行；--check 只报告偏离，不写入
 
 **两个会话钩子。** 一个在每次会话开头提供[项目记忆](#项目记忆)索引；另一个报出运行时模型 id，让产物记录 `model_id` 与追加的 `model_trail`（工作流规约 §8）。在 Claude Code 里，子代理启动时这两个钩子会再跑一次，因为会话钩子不会为子代理触发：溯源钩子把解析该子代理自己转录的命令交给它，于是子代理写出的产物记录的是真正写下它的模型，而不是会话的模型；记忆钩子也为它再给一遍索引。Claude、Codex、Cursor、Pi 和 Qwen 从项目内注册；Kimi 与 DSH 因为把钩子注册放在项目外，需要各运行一次 `.kimi-code/hooks/install.sh` 与 `.dsh/hooks/install.sh`。Codex 项目钩子仍需通过 `/hooks` 批准。
 
-**另外两个钩子做决定而非注入。** Claude、Codex 与 Qwen 带 `INVOLVE=low` 的编辑权限放行钩子。七套 harness 都带 `stage_commit_guard.sh`，用于拒绝[规约 §1](docs/mds/stage-workflow/writing-workflow-conventions.md) 禁止的 git 命令；Pi 从项目扩展注册，DSH 与 Kimi 通过各自的钩子桥接注册。
+**另外三个钩子做决定而非注入。** Claude、Codex 与 Qwen 带 `INVOLVE=low` 的编辑权限放行钩子。Claude 还带它在 shell 一侧的对应物 `stage_bash_gate.sh`：在 `low` 档，它放行普通的本地命令——构建、lint、grep、脚本、按名暂存与提交——而删除、覆盖已跟踪文件、除经 `execs/scpts/import.sh` 之外对 `mates/` 的任何写入、对 venue 模板包或 `.env` 除读取之外的任何操作、安装（`sudo`、`tlmgr`、包管理器）、`git push` 及其他外发、`git pull`、作业提交、历史改写与清理、切换分支、除列出之外的 tag 操作以及进程或系统控制，仍走宿主的常规权限提示；提交守卫的拒绝仍优先于它的放行。七套 harness 都带 `stage_commit_guard.sh`，用于拒绝[规约 §1](docs/mds/stage-workflow/writing-workflow-conventions.md) 禁止的 git 命令；Pi 从项目扩展注册，DSH 与 Kimi 通过各自的钩子桥接注册。
 
 ## 写作工作流
 
