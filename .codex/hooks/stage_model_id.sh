@@ -9,12 +9,12 @@
 # still holding the name of another.
 #
 # Codex also keeps a rollout file per session and stamps a `turn_context` record
-# with the model of each turn. Where the payload names that file in
-# `transcript_path`, the injected line hands the skill a command that reads it at
-# the moment the value is recorded, which is the moment it is true. Where it does
-# not, the session-start field is all there is, and is injected as before. When
-# `model` is absent too, the honest value per writing-workflow-conventions §8 is
-# "unrecorded". Registered under [hooks.SessionStart] in .codex/hooks.json.
+# with the model of each turn. The injected context always states SessionStart's
+# exact id directly, including when that rollout exists, and also hands the skill
+# commands that resolve the live value before a write and verify the artifact
+# afterwards. When `model` is absent, the honest SessionStart fallback per
+# writing-workflow-conventions §8 is "unrecorded". Registered under
+# [hooks.SessionStart] in .codex/hooks.json.
 
 # --resolve <transcript_path> [session_model]: print the model of the last turn
 # recorded in a rollout, or nothing at all. Run on demand by skills, per the line
@@ -66,6 +66,63 @@ PY
   exit 0
 fi
 
+# --check <artifact> <transcript_path> <session_model>: verify that the
+# artifact's model_id matches what --resolve prints for the same rollout and
+# session model, that is the rollout's last recorded model, falling back to
+# SessionStart's exact id and finally to "unrecorded". A mismatch is a hard
+# failure: producer skills must not report completion or commit the artifact.
+# The check filters nothing, so skills run it only on a file that
+# writing-workflow-conventions §8 requires to carry model_id in its frontmatter.
+# A file under manus/ or mates/, a venue.yml, poster.tex or a template kit carries
+# none, and a failure on one is never fixed by adding it.
+if [ "${1:-}" = "--check" ]; then
+  if [ "$#" -ne 4 ]; then
+    printf '%s\n' \
+      "usage: $0 --check <artifact> <transcript_path> <session_model>" >&2
+    exit 2
+  fi
+
+  artifact="${2}"
+  transcript="${3}"
+  session_model="${4}"
+  if [ ! -r "${artifact}" ]; then
+    printf '%s\n' "stage_model_id.sh: cannot read artifact: ${artifact}" >&2
+    exit 1
+  fi
+
+  # The session model goes along so the check expects exactly what the resolver
+  # told the skill to write, suffix included.
+  expected=$(bash "$0" --resolve "${transcript}" "${session_model}")
+  [ -n "${expected}" ] || expected="${session_model}"
+  [ -n "${expected}" ] || expected="unrecorded"
+
+  # STAGE artifacts carry model_id in one registered shape, a YAML frontmatter
+  # key; refs_index.md gains a frontmatter block for it. Read only that block so
+  # prose mentioning model_id cannot masquerade as metadata.
+  actual=$(awk '
+NR == 1 { if ($0 !~ /^---[[:space:]]*$/) exit; next }
+/^---[[:space:]]*$/ { exit }
+/^[[:space:]]*model_id[[:space:]]*:/ {
+  line = $0
+  sub(/^[[:space:]]*model_id[[:space:]]*:[[:space:]]*/, "", line)
+  split(line, fields, /[[:space:]]+/)
+  value = fields[1]
+  gsub(/^[<"\047`]+/, "", value)
+  gsub(/[>"\047`),.;]+$/, "", value)
+  print value
+  exit
+}
+' "${artifact}")
+
+  if [ "${actual}" != "${expected}" ]; then
+    [ -n "${actual}" ] || actual="<missing>"
+    printf '%s\n' \
+      "stage_model_id.sh: model_id mismatch in ${artifact}: expected '${expected}', found '${actual}'" >&2
+    exit 1
+  fi
+  exit 0
+fi
+
 input=$(cat)
 
 # Read one top-level string field from the payload.
@@ -90,14 +147,9 @@ transcript=$(payload_field transcript_path)
 # Codex offers no project-directory variable, and registers this hook by the same
 # relative path, which resolves from the project root a skill also runs in.
 self=".codex/hooks/stage_model_id.sh"
-
-if [ -n "${transcript:-}" ]; then
-  ctx="STAGE provenance: read this session's model id when you record it, not from memory — the runtime states it at session start only, and /model changes it afterwards without saying so. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), run: bash ${self} --resolve ${transcript}${model:+ ${model}} — then copy what it prints verbatim. Write 'unrecorded' only if it prints nothing, and do not guess."
-elif [ -n "${model:-}" ]; then
-  ctx="STAGE provenance: this session's runtime-reported model id is ${model}, and the runtime named no rollout to check it against later. When a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), copy this exact string verbatim; do not write 'unrecorded'. If you switch models mid-session, this string is the one you started with, not the one writing."
-else
-  ctx="STAGE provenance: the runtime stated no model id for this session. When a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), write 'unrecorded' and do not guess."
-fi
+printf -v transcript_arg '%q' "${transcript:-}"
+printf -v model_arg '%q' "${model:-}"
+ctx="STAGE provenance: session_model_id = ${model:-unrecorded}. This is the exact id SessionStart reported, stated directly even when a rollout exists. Before a STAGE skill records a model_id or a model_trail entry (writing-workflow-conventions section 8), run: bash ${self} --resolve ${transcript_arg} ${model_arg}. Copy its output verbatim; if it prints nothing, use session_model_id, and use 'unrecorded' only when both are absent. Never infer an id from a family description such as 'GPT-5 family'. After writing each file that section 8 requires to carry a model_id (never one under manus/ or mates/, a venue.yml, poster.tex, or a template kit), run: bash ${self} --check <artifact> ${transcript_arg} ${model_arg}, replacing <artifact> with its path. A nonzero result blocks reporting completion or committing."
 
 # ctx now embeds a filesystem path, so encode it as JSON rather than assuming it
 # is quote-free; the last branch sanitizes instead, having no encoder to hand.

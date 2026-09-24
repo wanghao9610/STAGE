@@ -1026,6 +1026,67 @@ for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
         { fail "${f} no longer points at writing-workflow-conventions section 8"; hook_errors=1; }
 done
 [[ -f docs/mds/stage-workflow/model_id_spec.md ]] || { fail "docs/mds/stage-workflow/model_id_spec.md is missing"; hook_errors=1; }
+
+#     Codex closes provenance with a write-after check. Four cases pin its
+#     precedence, its failure boundary, and that it expects exactly what the
+#     resolver told the skill to write; more cases would duplicate the
+#     resolver's own simple contract rather than protect another behavior.
+model_check_dir="$(mktemp -d "${TMPDIR:-/tmp}/stage-model-id-check.XXXXXX")" || {
+    fail "could not create the model-id check fixture directory"
+    hook_errors=1
+    model_check_dir=""
+}
+if [[ -n "${model_check_dir}" ]]; then
+    model_rollout="${model_check_dir}/rollout.jsonl"
+    model_artifact="${model_check_dir}/report.md"
+    printf '%s\n' '{"type":"turn_context","payload":{"model":"gpt-5.6-sol"}}' > "${model_rollout}"
+
+    # 1. Exact rollout, degraded artifact: must fail.
+    printf '%s\n' '---' 'model_id: gpt-5' '---' > "${model_artifact}"
+    model_check_output="$(bash .codex/hooks/stage_model_id.sh --check \
+        "${model_artifact}" "${model_rollout}" "gpt-5.6-sol" 2>&1)"
+    model_check_rc=$?
+    if (( model_check_rc == 0 )); then
+        fail "model-id check accepted gpt-5 against rollout gpt-5.6-sol"
+        hook_errors=1
+    elif ! grep -qF "expected 'gpt-5.6-sol', found 'gpt-5'" <<< "${model_check_output}"; then
+        fail "model-id mismatch failed without the expected diagnostic: ${model_check_output}"
+        hook_errors=1
+    else
+        note "model-id check rejects gpt-5 against rollout gpt-5.6-sol"
+    fi
+
+    # 2. Exact rollout, exact artifact: must pass.
+    printf '%s\n' '---' 'model_id: gpt-5.6-sol' '---' > "${model_artifact}"
+    if bash .codex/hooks/stage_model_id.sh --check \
+        "${model_artifact}" "${model_rollout}" "gpt-5.6-sol"; then
+        note "model-id check accepts gpt-5.6-sol against rollout gpt-5.6-sol"
+    else
+        fail "model-id check rejected gpt-5.6-sol against rollout gpt-5.6-sol"
+        hook_errors=1
+    fi
+
+    # 3. No rollout and no SessionStart model: unrecorded must pass.
+    printf '%s\n' '---' 'model_id: unrecorded' '---' > "${model_artifact}"
+    if bash .codex/hooks/stage_model_id.sh --check "${model_artifact}" "" ""; then
+        note "model-id check accepts unrecorded when rollout and session model are absent"
+    else
+        fail "model-id check rejected unrecorded with no rollout or session model"
+        hook_errors=1
+    fi
+
+    # 4. The session model keeps a suffix the rollout drops, as --resolve does.
+    printf '%s\n' '---' 'model_id: gpt-5.6-sol[1m]' '---' > "${model_artifact}"
+    if bash .codex/hooks/stage_model_id.sh --check \
+        "${model_artifact}" "${model_rollout}" "gpt-5.6-sol[1m]"; then
+        note "model-id check expects the resolver's suffixed id gpt-5.6-sol[1m]"
+    else
+        fail "model-id check rejected gpt-5.6-sol[1m], the id --resolve prints for that rollout and session model"
+        hook_errors=1
+    fi
+
+    rm -rf "${model_check_dir}"
+fi
 (( hook_errors == 0 )) && note "hooks ship, parse, and register natively in all seven harnesses; the commit guard declines the same commands in every tree"
 
 # 18. The provenance line is stated in the same skills in all seven trees.
