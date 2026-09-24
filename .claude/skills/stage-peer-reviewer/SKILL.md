@@ -2,10 +2,11 @@
 name: stage-peer-reviewer
 description: >-
   Simulate a program committee: a five-perspective panel scores the paper on an anchored rubric, cites
-  only verified references, logs every search, and writes a SIM_REVIEW report whose weaknesses name
-  the claims they attack. Use when the user runs /stage-peer-reviewer, or asks for a mock review, a
-  review panel, a pre-submission attack, or to referee an external paper. Never edits the manuscript
-  or the ledger; an external paper's title and text stay out of searches unless it is public.
+  only verified references, and writes a SIM_REVIEW report whose weaknesses name the claims they
+  attack. Use when the user runs /stage-peer-reviewer, /stage-auto starts it, or asks for a mock
+  review, a review panel, a pre-submission attack, or to referee an external paper. Never edits the
+  manuscript or the ledger; an external paper's title and text stay out of searches unless it is
+  public.
 argument-hint: "[panel | quick] [extern=<path>] [out=<path>] [DESCRIPTION]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*), Agent,
