@@ -1302,6 +1302,56 @@ for f in .claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh 
     grep -qF 'a freeze tag is the immutable record of what was submitted' "${f}" || \
         { fail "${f}: freeze-tag protection (conventions §1.4) is missing from the commit guard"; hook_errors=1; }
 done
+#     Parity shows the seven rule bodies agree, not what they decide, and each
+#     prelude still filters and parses on its own. Every copy runs, in a scratch
+#     repository at its own depth and fed the way its harness feeds it, over
+#     fixed commands: a spelling the shell reads as git is git. A case reads
+#     through %b, so \n in it is a newline.
+guard_dir="$(mktemp -d "${TMPDIR:-/tmp}/stage-commit-guard-check.XXXXXX")" || guard_dir=""
+if [[ -n "${guard_dir}" ]]; then
+    git -C "${guard_dir}" init -q
+    GUARDS=(.claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh
+            .cursor/hooks/stage_commit_guard.sh .dsh/hooks/stage_commit_guard.sh
+            .kimi-code/hooks/stage_commit_guard.sh .pi/extensions/stage-hooks/stage_commit_guard.sh
+            .qwen/hooks/stage_commit_guard.sh)
+    for f in "${GUARDS[@]}"; do
+        mkdir -p "${guard_dir}/$(dirname "${f}")"
+        cp "${f}" "${guard_dir}/${f}"
+    done
+    guard_verdict() { # $1 = guard path, $2 = shell command; prints deny or pass
+        local out rc
+        case "$1" in
+            .pi/*)
+                out="$(cd "${guard_dir}" && bash "$1" "$2" </dev/null 2>&1)"; rc=$? ;;
+            .cursor/*)
+                out="$(python3 -c 'import json, sys; print(json.dumps({"command": sys.argv[1]}))' "$2" \
+                    | (cd "${guard_dir}" && bash "$1") 2>&1)"; rc=$? ;;
+            *)
+                out="$(python3 -c 'import json, sys; print(json.dumps({"tool_name": "Bash", "tool_input": {"command": sys.argv[1]}}))' "$2" \
+                    | (cd "${guard_dir}" && bash "$1") 2>&1)"; rc=$? ;;
+        esac
+        if [[ "${out}" == *deny* || "${out}" == *declined* || ${rc} -ne 0 ]]; then printf 'deny'; else printf 'pass'; fi
+    }
+    guard_errors=0
+    while IFS='|' read -r guard_want guard_cmd; do
+        guard_cmd="$(printf '%b' "${guard_cmd}")"
+        for f in "${GUARDS[@]}"; do
+            guard_got="$(guard_verdict "${f}" "${guard_cmd}")"
+            [[ "${guard_got}" == "${guard_want}" ]] || \
+                { fail "${f}: expected ${guard_want}, got ${guard_got}, for: ${guard_cmd}"; guard_errors=1; hook_errors=1; }
+        done
+    done <<'CASES'
+deny|git add -A
+deny|\\git add -A
+deny|g''it add -A
+deny|git add "."
+deny|git commit --amend
+pass|git add notes/claims.md
+pass|git commit -m "fix: -a is fine inside a message"
+CASES
+    (( guard_errors == 0 )) && note "all seven commit guards decline a blanket add however git is spelled, and pass a named one"
+    rm -rf "${guard_dir}"
+fi
 
 for f in .claude/settings.json .codex/hooks.json .qwen/settings.json; do
     grep -qF stage_involve_gate.sh "${f}" || { fail "${f} does not register stage_involve_gate.sh"; hook_errors=1; }
@@ -1428,6 +1478,10 @@ prompt|mkdir -p x && cp -R x/ notes/
 prompt|python3 -c "open('mates/x','w')"
 prompt|perl -e 'unlink q(mates/x)'
 prompt|install x notes/claims.md
+prompt|\\rm x
+prompt|\\git push
+prompt|r''m x
+prompt|coproc rm x
 CASES
     (( gate_errors == 0 )) && note "bash gate allows ordinary commands at involve=low and leaves STAGE's red lines to the prompt"
     rm -rf "${gate_dir}"

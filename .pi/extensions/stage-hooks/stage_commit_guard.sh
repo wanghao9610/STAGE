@@ -45,8 +45,10 @@ root="$(cd -- "$(dirname -- "$0")/../../.." 2>/dev/null && pwd -P)" || exit 0
 # to parse a payload out of: .pi/extensions/stage-hooks/index.ts reads the bash tool's
 # own input object and hands the command straight over.
 cmd="${1:-}"
+# A quote or backslash may sit inside the word (`g''it`), so the letters are
+# matched apart.
 case "${cmd}" in
-    *git*) ;;
+    *g*i*t*) ;;
     *) exit 0 ;;
 esac
 
@@ -79,6 +81,14 @@ staged_oversize() {
 while IFS= read -r segment; do
     read -ra tok <<< "${segment}"
     [[ ${#tok[@]} -gt 0 ]] || continue
+    # The shell drops every quote and backslash before it runs a word: `\git`
+    # (the usual way past an alias), `g''it`, and `"git"` are all git, and
+    # `add "."` is the add `add .` is. Each word sheds them, and the `$` of a
+    # `$'…'` with them.
+    for ((k = 0; k < ${#tok[@]}; k++)); do
+        tok[k]="${tok[k]//\$\'/\'}"; tok[k]="${tok[k]//\$\"/\"}"
+        tok[k]="${tok[k]//[\'\"\\]/}"
+    done
     case "${tok[0]}" in
         git|*/git) ;;
         *) continue ;;
@@ -98,12 +108,7 @@ while IFS= read -r segment; do
     case "${tok[i]}" in
         add)
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
-                # `git add "."` is the instruction `git add .` is; word splitting
-                # keeps the quotes, so one pair comes off before matching.
                 arg="${tok[j]}"
-                case "${arg}" in
-                    \'*\'|\"*\") arg="${arg#?}"; arg="${arg%?}" ;;
-                esac
                 case "${arg}" in
                     -A|--all|-u|--update|--no-ignore-removal|.|:/|:/*|'*')
                         deny "STAGE conventions §1.1: a blanket add stages work this run did not do, and it sweeps in build litter, half-registered evidence, and the user's own uncommitted edits. Stage the paths this run wrote, by name." ;;
@@ -118,9 +123,6 @@ while IFS= read -r segment; do
         commit)
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
                 arg="${tok[j]}"
-                case "${arg}" in
-                    \'*\'|\"*\") arg="${arg#?}"; arg="${arg%?}" ;;
-                esac
                 case "${arg}" in
                     -m|--message|-F|--file|-t|--template|--fixup|--squash|-C|--reuse-message|--reedit-message|-m*|--message=*|--file=*)
                         break ;;
@@ -151,9 +153,6 @@ while IFS= read -r segment; do
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
                 arg="${tok[j]}"
                 case "${arg}" in
-                    \'*\'|\"*\") arg="${arg#?}"; arg="${arg%?}" ;;
-                esac
-                case "${arg}" in
                     -d|--delete)
                         deny "STAGE conventions §1.4: a freeze tag is the immutable record of what was submitted — no skill deletes one." ;;
                     -f|--force)
@@ -167,9 +166,6 @@ while IFS= read -r segment; do
         branch)
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
                 arg="${tok[j]}"
-                case "${arg}" in
-                    \'*\'|\"*\") arg="${arg#?}"; arg="${arg%?}" ;;
-                esac
                 case "${arg}" in
                     -D|--delete-force)
                         deny "STAGE conventions §1.3: a force-deleted branch takes its unmerged commits with it, and the branch is the user's. A merged branch deletes with -d." ;;
@@ -185,9 +181,6 @@ while IFS= read -r segment; do
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
                 arg="${tok[j]}"
                 case "${arg}" in
-                    \'*\'|\"*\") arg="${arg#?}"; arg="${arg%?}" ;;
-                esac
-                case "${arg}" in
                     -C|--force-create)
                         deny "STAGE conventions §1.3: switch -C resets an existing branch to another commit — a history rewrite in effect. Pick a fresh branch name." ;;
                     -f|--force|--discard-changes)
@@ -198,9 +191,6 @@ while IFS= read -r segment; do
         checkout)
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
                 arg="${tok[j]}"
-                case "${arg}" in
-                    \'*\'|\"*\") arg="${arg#?}"; arg="${arg%?}" ;;
-                esac
                 case "${arg}" in
                     --) break ;;
                     -B)

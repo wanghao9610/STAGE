@@ -340,10 +340,13 @@ while IFS= read -r segment; do
     read -ra tok <<< "${segment}"
     [[ ${#tok[@]} -gt 0 ]] || continue
     # Quotes cling to the words they open and close (`bash -c "rm x"` splits as
-    # `"rm x"`), so each word read below sheds them first, each side on its own.
+    # `"rm x"`), and the shell drops every quote and backslash before it runs a
+    # word: `\rm` (the usual way past an alias), `r''m`, and `"r"m` are all rm.
+    # So each word read below sheds them all, and the `$` of a `$'…'` with them.
     word=()
     for w in "${tok[@]}"; do
-        w="${w#\'}"; w="${w#\"}"; w="${w%\'}"; w="${w%\"}"
+        w="${w//\$\'/\'}"; w="${w//\$\"/\"}"
+        w="${w//[\'\"\\]/}"
         word+=("${w}")
     done
 
@@ -402,6 +405,10 @@ while IFS= read -r segment; do
                 via_xargs=1; prev=xargs; i=$((i + 1)) ;;
             env|command|exec|eval|nohup|time|nice|caffeinate|stdbuf|timeout|if|then|else|elif|do|while|until|'!'|'{')
                 prev="${t##*/}"; i=$((i + 1)) ;;
+            coproc)
+                # `coproc NAME { …; }` names the coprocess before its command.
+                prev=coproc; i=$((i + 1))
+                [[ "${word[i + 1]:-}" == '{' ]] && i=$((i + 1)) ;;
             *=*|-*|[0-9]*)
                 i=$((i + 1)) ;;
             *)
