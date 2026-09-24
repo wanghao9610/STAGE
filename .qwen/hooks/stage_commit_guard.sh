@@ -6,16 +6,19 @@
 # rewrites are what turn a cheap local commit into one that needs surgery to
 # unpick.
 #
-# Declined: blanket or forced staging (add -A / . / * / :/ / -u / -f, commit -a),
-# the history rewrites §1.3 names (commit --amend, rebase, reset --hard,
-# filter-branch, filter-repo), the forced branch operations §1.3 makes costly
-# (branch -D / -f, switch -C / -f / --discard-changes, checkout -B / -f), any
+# Declined: blanket or forced staging (add -A / . / ./ / * / :/ / -u / -f,
+# commit -a / .), the history rewrites §1.3 names (commit --amend, rebase,
+# reset --hard, filter-branch, filter-repo), the forced branch operations §1.3
+# makes costly (branch -D / -f, switch -C / -f / --discard-changes,
+# checkout -B / -f), the whole-tree discards that lose the same uncommitted work
+# (checkout or restore of . / :/ / *, clean -f, stash drop / clear), any
 # deletion or move of a tag (§1.4 — a freeze tag is the immutable record of what
-# was submitted, and exactly one skill creates one), and a commit whose staged
-# files exceed 10 MB — a build PDF, a raw figure export, or an evidence blob in
-# history is a paper repository's one costly mistake, since clearing it back out
-# needs exactly those rewrites. `push` is deliberately absent: no rule here makes
-# a skill likelier to push, and a user who asks for one directly should get it.
+# was submitted, and exactly one skill creates one), and an add or a commit that
+# would stage a file over 10 MB — a build PDF, a raw figure export, or an
+# evidence blob in history is a paper repository's one costly mistake, since
+# clearing it back out needs exactly those rewrites. `push` is deliberately
+# absent: no rule here makes a skill likelier to push, and a user who asks for
+# one directly should get it.
 #
 # Registered under PreToolUse matching run_shell_command in .qwen/settings.json —
 # the matcher names the tool identifier, not the display name, so `Shell` there
@@ -29,7 +32,13 @@
 # quoting, so a flag written after a commit message (`commit -m x --amend`) is
 # past where it stops reading. Silence means "no decision", so that case, an
 # unfamiliar spelling, and a payload no branch below can read all fall through to
-# the normal permission flow. What it declines is the user's to run.
+# the normal permission flow. The other way, a `;`, `&`, `|`, or parenthesis
+# inside a quoted message still ends a segment, so a message quoting a declined
+# command after one is declined with the line; a heredoc message
+# (`git commit -F- <<'EOF'`) is read as data. The size check resolves pathspecs
+# against the project root, so `cd manus && git add figs/x.pdf` is not sized, and
+# reads a commit's `-- <paths>` only on the commit's own segment, which a `$(…)`
+# message ends before them. What it declines is the user's to run.
 set -uo pipefail
 
 # Every harness registers this script by its own path inside the project, so the
@@ -79,7 +88,11 @@ deny() { # $1 = one-line reason
 # raw figure export clears it easily.
 size_limit=$((10 * 1024 * 1024))
 
-# Staged paths over the limit, as a printable list. Empty when none are.
+# Paths over the limit, as a printable list; empty when none are. With no
+# argument, the staged paths; with pathspecs, the files `git add` would stage
+# for them, read before the line runs, since this hook fires first — a superset
+# of what a commit naming those paths takes from the working tree, which leaves
+# untracked files out. Pathspecs resolve against the project root.
 staged_oversize() {
     local f size out=""
     while IFS= read -r -d '' f; do
@@ -88,7 +101,11 @@ staged_oversize() {
         size="${size//[[:space:]]/}"
         case "${size}" in ''|*[!0-9]*) continue ;; esac
         (( size > size_limit )) && out="${out:+${out}, }${f} ($((size / 1024 / 1024)) MB)"
-    done < <(git -C "${root}" diff --cached --name-only -z 2>/dev/null)
+    done < <(if [[ $# -gt 0 ]]; then
+                 git -C "${root}" ls-files -z --others --modified --exclude-standard -- "$@"
+             else
+                 git -C "${root}" diff --cached --name-only -z
+             fi 2>/dev/null)
     printf '%s' "${out}"
 }
 
@@ -204,6 +221,11 @@ strip_heredocs() {
     cmd="${out}${held}"
 }
 strip_heredocs
+# A body fed to a shell (`bash <<'EOF'`, `cat <<EOF | sh`) is that shell's
+# commands, not data: when a shell stands in command position with no script to
+# run, the bodies are read as commands too.
+feeds_shell='(^|[;&|(])[[:space:]]*([^[:space:];&|()]*/)?(ba|z)?sh([[:space:]]+-[A-Za-z]+)*[[:space:]]*(<<|[;&|)]|$)'
+[[ "${cmd//$'\n'/;}" =~ ${feeds_shell} ]] && cmd="${cmd}"$'\n'"${bodies}"
 
 # One shell line can carry several commands, so each is read on its own: `cd x &&
 # git add -A` is the add it looks like.
@@ -218,6 +240,27 @@ while IFS= read -r segment; do
         tok[k]="${tok[k]//\$\'/\'}"; tok[k]="${tok[k]//\$\"/\"}"
         tok[k]="${tok[k]//[\'\"\\]/}"
     done
+    # Walk past what runs a command without being one — an assignment
+    # (`GIT_SEQUENCE_EDITOR=: git rebase -i`, the usual non-interactive
+    # spelling), a wrapper and the value its option takes, a shell keyword — as
+    # stage_bash_gate.sh does, so `env git add -A` is the add it carries.
+    w=0
+    prev=""
+    while [[ ${w} -lt ${#tok[@]} ]]; do
+        case "${prev}:${tok[w]}" in
+            env:-u|env:-C|nice:-n|exec:-a|time:-f|time:-o) w=$((w + 2)); continue ;;
+        esac
+        case "${tok[w]}" in
+            *=*|-*) w=$((w + 1)); continue ;;
+        esac
+        case "${tok[w]##*/}" in
+            env|command|exec|nohup|time|nice|sh|bash|zsh|if|then|else|elif|do|while|until|'!'|'{')
+                prev="${tok[w]##*/}"; w=$((w + 1)) ;;
+            *) break ;;
+        esac
+    done
+    tok=("${tok[@]:w}")
+    [[ ${#tok[@]} -gt 0 ]] || continue
     case "${tok[0]}" in
         git|*/git) ;;
         *) continue ;;
@@ -239,7 +282,7 @@ while IFS= read -r segment; do
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
                 arg="${tok[j]}"
                 case "${arg}" in
-                    -A|--all|-u|--update|--no-ignore-removal|.|:/|:/*|'*')
+                    -A|--all|-u|--update|--no-ignore-removal|.|./|:/|:/*|'*')
                         deny "STAGE conventions §1.1: a blanket add stages work this run did not do, and it sweeps in build litter, half-registered evidence, and the user's own uncommitted edits. Stage the paths this run wrote, by name." ;;
                     -f|--force)
                         deny "STAGE conventions §1.2: a force-add puts a git-ignored path — .env, a build under wkdrs/ — into history. Stage a tracked path instead." ;;
@@ -248,6 +291,11 @@ while IFS= read -r segment; do
                         deny "STAGE conventions §1.1 and §1.2: this flag cluster carries a blanket or forced add. Stage the paths this run wrote, by name." ;;
                 esac
             done
+            if [[ ${#tok[@]} -gt $((i + 1)) ]]; then
+                big="$(staged_oversize "${tok[@]:i+1}")"
+                [[ -n "${big}" ]] && \
+                    deny "STAGE conventions §1.2: over 10 MB — ${big}. Builds and large assets belong in wkdrs/ or in mates/ by import, and clearing one back out of history needs a rewrite §1.3 forbids, so leave it unstaged."
+            fi
             ;;
         commit)
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
@@ -255,6 +303,8 @@ while IFS= read -r segment; do
                 case "${arg}" in
                     -m|--message|-F|--file|-t|--template|--fixup|--squash|-C|--reuse-message|--reedit-message|-m*|--message=*|--file=*)
                         break ;;
+                    .|./|:/)
+                        deny "STAGE conventions §1.1: a commit naming the whole tree commits every tracked modification under it, including work this run did not do. Stage the paths this run wrote, by name, then commit without it." ;;
                     --amend)
                         deny "STAGE conventions §1.3: no history rewrites — the user owns the branch and the remote, and a freeze tag points at a commit that must not move. Make a new commit instead." ;;
                     --all)
@@ -267,6 +317,18 @@ while IFS= read -r segment; do
             big="$(staged_oversize)"
             [[ -n "${big}" ]] && \
                 deny "STAGE conventions §1.2: staged over 10 MB — ${big}. Builds and large assets belong in wkdrs/ or in mates/ by import, and clearing one back out of history needs a rewrite §1.3 forbids, so unstage it first."
+            # A commit naming its paths (`commit -m x -- <paths>`, the form §1.5
+            # asks for) takes them from the working tree, staged or not, so the
+            # index alone does not show what it commits.
+            for ((j = i + 1; j < ${#tok[@]}; j++)); do
+                [[ "${tok[j]}" == -- ]] || continue
+                if [[ ${#tok[@]} -gt $((j + 1)) ]]; then
+                    big="$(staged_oversize "${tok[@]:j+1}")"
+                    [[ -n "${big}" ]] && \
+                        deny "STAGE conventions §1.2: over 10 MB — ${big}. A commit naming a path takes it from the working tree, staged or not. Builds and large assets belong in wkdrs/ or in mates/ by import, and clearing one back out of history needs a rewrite §1.3 forbids, so leave it out of the commit."
+                fi
+                break
+            done
             ;;
         rebase)
             deny "STAGE conventions §1.3: no history rewrites — the user owns the branch and the remote." ;;
@@ -314,20 +376,66 @@ while IFS= read -r segment; do
                         deny "STAGE conventions §1.3: switch -C resets an existing branch to another commit — a history rewrite in effect. Pick a fresh branch name." ;;
                     -f|--force|--discard-changes)
                         deny "STAGE conventions §1.3: a forced switch discards uncommitted work, including anything the user had in the tree." ;;
+                    --*) ;;
+                    -*[Cf]*)
+                        deny "STAGE conventions §1.3: this flag cluster carries a forced switch or a branch reset. The user owns the branch." ;;
                 esac
             done
             ;;
         checkout)
+            paths=0
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
                 arg="${tok[j]}"
                 case "${arg}" in
-                    --) break ;;
+                    .|./|:/|'*')
+                        deny "STAGE conventions §1.3: a checkout of the whole tree discards uncommitted work, including anything the user had in the tree. Name the paths to restore." ;;
+                esac
+                # After `--` every word is a path, never a flag.
+                [[ ${paths} -eq 1 ]] && continue
+                case "${arg}" in
+                    --) paths=1 ;;
                     -B)
                         deny "STAGE conventions §1.3: checkout -B resets an existing branch to another commit — a history rewrite in effect. Pick a fresh branch name." ;;
                     -f|--force)
                         deny "STAGE conventions §1.3: a forced checkout discards uncommitted work, including anything the user had in the tree." ;;
+                    --*) ;;
+                    -*[fB]*)
+                        deny "STAGE conventions §1.3: this flag cluster carries a forced checkout or a branch reset. The user owns the branch." ;;
                 esac
             done
+            ;;
+        restore)
+            # Only unstaging (--staged without --worktree) leaves the tree alone.
+            staged=0; worktree=0; paths=0
+            for ((j = i + 1; j < ${#tok[@]}; j++)); do
+                arg="${tok[j]}"
+                case "${arg}" in
+                    .|./|:/|'*') paths=1 ;;
+                    -S|--staged) staged=1 ;;
+                    -W|--worktree) worktree=1 ;;
+                    --*) ;;
+                    -*) [[ "${arg}" == *S* ]] && staged=1; [[ "${arg}" == *W* ]] && worktree=1 ;;
+                esac
+            done
+            [[ ${paths} -eq 1 && ( ${worktree} -eq 1 || ${staged} -eq 0 ) ]] && \
+                deny "STAGE conventions §1.3: restoring the whole working tree discards uncommitted work, including anything the user had in the tree. Name the paths to restore; restore --staged alone only unstages."
+            ;;
+        clean)
+            for ((j = i + 1; j < ${#tok[@]}; j++)); do
+                case "${tok[j]}" in
+                    --force)
+                        deny "STAGE conventions §2: git clean deletes untracked files for good — mates/ imports stage-evid-curator leaves uncommitted for the user (§1), and with -x .env." ;;
+                    --*) ;;
+                    -*f*)
+                        deny "STAGE conventions §2: git clean deletes untracked files for good — mates/ imports stage-evid-curator leaves uncommitted for the user (§1), and with -x .env." ;;
+                esac
+            done
+            ;;
+        stash)
+            case "${tok[i + 1]:-}" in
+                drop|clear)
+                    deny "STAGE conventions §1.5: a dropped stash is gone for good, and the user's own uncommitted work is what §1.5 sends there." ;;
+            esac
             ;;
     esac
 done < <(printf '%s\n' "${cmd}" | tr ';&|()' '\n\n\n\n\n')

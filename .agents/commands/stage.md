@@ -11,7 +11,7 @@ Use the roster below to route a paper-writing request to exactly one workflow sk
 | `stage-sect-drafter` | | Draft or revise one section |
 | `stage-tabs-builder` | | Build one evidence-traced table |
 | `stage-figs-designer` | | Audit the figure inventory; plan it (`plan`); build or revise one figure, or the teaser (`teaser`) |
-| `stage-refs-curator` | | Curate bibliography records and reading notes; find work worth citing (`discover`); cluster the base for related work (`position`); re-fetch every bib entry and diff it (`verify`) |
+| `stage-refs-curator` | | Curate bibliography records and reading notes; find work worth citing (`discover`); cluster the base for related work (`position`); re-check every bib entry against its source and diff it (`verify`) |
 | `stage-copy-editor` | | Restore natural scholarly prose without changing claims or evidence; record the author's style profile (`style`) |
 | `stage-clms-auditor` | | Trace every manuscript number |
 | `stage-cite-auditor` | | Verify every citation assertion |
@@ -21,7 +21,7 @@ Use the roster below to route a paper-writing request to exactly one workflow sk
 | `stage-pstr-builder` | † | Plan, build, or check the poster |
 | `stage-flow-status` | | Report status and the single next action |
 
-The six skills marked † are explicit-only because each controls an author-owned decision. This generic `/stage` router never starts one: ask for explicit confirmation, give the exact `/stage-<name> <argument>` command, and wait. The other ten may be selected when the request plainly matches; selection authorizes only what the user requested.
+The six skills marked † are slash-only because each controls an author-owned decision. This generic `/stage` router never starts one: give the exact `/stage-<name> <argument>` command and stop; the author typing it is the confirmation (conventions §11.4). The other ten may be selected when the request plainly matches; selection authorizes only what the user requested.
 
 A request to pursue a goal across several steps, running whatever the paper needs next until something is reached, is not routed to one skill: give the exact `/stage-auto <goal>` command and stop. Typing it is what authorizes a goal run (conventions §11.5), and even then a skill marked † is never started: the goal run stops at it and prints its command.
 

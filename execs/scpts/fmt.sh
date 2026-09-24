@@ -15,6 +15,7 @@ set -euo pipefail
 #   1  --check: at least one file would be reformatted
 #   2  at least one file was refused — the rewrite would have altered the text
 #   3  cannot run: no latexindent, no config, or a path this script may not touch
+#   4  latexindent failed on at least one file, which was left unchecked
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 ROOT_DIR="$(cd -- "${SCRIPT_DIR}/../.." && pwd -P)"
@@ -52,8 +53,8 @@ to a single space, so a reformat that only moves line breaks leaves the typeset
 text identical; the file is compared before and after under exactly that
 normalization, and a file that fails is reported and left untouched. It needs a
 hand fix — usually a sentence latexindent misread, such as a lowercase
-abbreviation ("std.", "et al.") that ends a line and is better written with a
-tie or an escaped space.
+abbreviation ("std.", "et al.") that ends a line; write it with a tie
+("et al.~we", "Fig.~\ref{...}"), because an escaped space is split all the same.
 
 Options:
   --check       Report what would change; write nothing. Exit 1 on drift.
@@ -187,6 +188,12 @@ normalized() {
     ' "$1"
 }
 
+# Each line trimmed, with every whitespace run inside it collapsed to one space:
+# where the lines break, and nothing else.
+line_shape() {
+    perl -pe 's/\r$//; s/^[ \t]+//; s/[ \t]+$//; s/[ \t]+/ /g' "$1"
+}
+
 WORK="$(mktemp -d)"
 trap 'rm -rf "${WORK}"' EXIT
 
@@ -211,7 +218,9 @@ while IFS= read -r rel; do
         continue
     fi
 
-    if cmp -s "${src}" "${cand}"; then
+    # Indentation and column padding are not line breaks: a file whose lines
+    # break where the rule wants them is clean, and keeps its bytes.
+    if cmp -s "${src}" "${cand}" || [[ "$(line_shape "${src}")" == "$(line_shape "${cand}")" ]]; then
         CLEAN=$(( CLEAN + 1 ))
         continue
     fi
@@ -246,12 +255,13 @@ if [[ -n "${BROKE}" ]]; then
     log "warn: latexindent failed on $(count "${BROKE}") file(s), left untouched:"
     show "${BROKE}"
     log "      reproduce with: latexindent -m -l=.latexindent.yaml -s <file>"
+    STATUS=4
 fi
 
 if [[ -n "${UNSAFE}" ]]; then
     log "REFUSED: $(count "${UNSAFE}") file(s) whose reformat would have changed the typeset text — left untouched:"
     show "${UNSAFE}"
-    log "      fix the sentence latexindent misread (a lowercase abbreviation before a capital is the usual one: write 'et al.\\ ' or 'Fig.~'), then run again."
+    log "      fix what latexindent misread: a lowercase abbreviation before a word (write 'et al.~' or 'Fig.~'; 'et al.\\ ' is split too) or a % comment in mid-sentence (move it to its own line above the sentence), then run again."
     STATUS=2
 fi
 

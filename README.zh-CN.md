@@ -30,7 +30,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
   - [5. 构建与检查](#5-构建与检查)
   - [6. 启动写作工作流](#6-启动写作工作流)
 - [写作工作流](#写作工作流)
-- [通往投稿的十步路径](#通往投稿的十步路径)
+- [通往投稿的路径](#通往投稿的路径)
 - [证据、指纹与论断记录表](#证据指纹与论断记录表)
 - [项目记忆](#项目记忆)
 - [更新 STAGE 的 skill 与工作流文档](#更新-stage-的-skill-与工作流文档)
@@ -74,7 +74,7 @@ STAGE/
 │   ├── figs/               # 渲染好的图（PDF）；figs/srcs/ 存放每张图的源文件
 │   ├── tabs/               # 表格，由证据生成
 │   ├── bibs/               # reference.bib
-│   └── stys/               # stage.cls（版式）+ stage.sty（\todo 与写作宏）
+│   └── stys/               # stage.cls（版式）+ stage.bst（参考文献表）+ stage.sty（\todo 与写作宏）
 ├── mates/                  # 导入的证据——只读
 │   ├── <source-slug>/      # 按上游 STAR 路径镜像的快照
 │   ├── manual/             # 人工登记的证据文件
@@ -134,7 +134,7 @@ STAGE/
 | `figs/` | Figures | 渲染好的 PDF；`srcs/` 存放可编辑的源文件 |
 | `tabs/` | Tables | 表格 `.tex` 文件，由证据生成 |
 | `bibs/` | Bibliographies | `reference.bib` |
-| `stys/` | Styles | `stage.cls` 与 `stage.sty`——venue 模板包放在 `cycls/<cycle>/template/`，不在这里 |
+| `stys/` | Styles | `stage.cls`、`stage.bst` 与 `stage.sty`——venue 模板包放在 `cycls/<cycle>/template/`，不在这里 |
 | `mates/` | Materials | 导入的证据快照——只读 |
 | `cycls/` | Cycles | 每次投稿尝试一个目录 |
 | `execs/` | Executions | 入口脚本；工具脚本放在 `scpts/` |
@@ -156,7 +156,7 @@ STAGE/
 
 `stage.bst` 是 `plainnat` 掐掉了四个字段，CVPR 自己的样式就是这么做的：DOI 或 URL 仍留在 `reference.bib` 里——那是该条目的来源凭据，也是 `/stage-refs-curator` 重新取记录的依据——只是不排版出来，于是参考文献表读起来像一篇会议论文，而不像一份数据库导出。
 
-扩展 class 或 package 时请守住这条分界：章节或表格文件里会出现的东西放进 package，只有页面外观需要的东西放进 class。项目自己的宏（`\newcommand{\method}{...}`）写在 `main.tex` 里，不要写进 `stys/`——这三个模板文件都会被替换或更新。
+扩展 class 或 package 时请守住这条分界：章节或表格文件里会出现的东西放进 package，只有页面外观需要的东西放进 class。项目自己的宏（`\newcommand{\method}{...}`）写在 `main.tex` 里，不要写进 `stys/`——这三个都是模板文件，venue 副本会替换其中两个。
 
 **怎么转成会议模板。** 不是就地换 class。`manus/main.tex` 永远编译成预印本；venue 版式是一份**生成出来的副本**：
 
@@ -181,7 +181,7 @@ STAGE/
 
 **写作宏**来自 `stage.sty`，在任何 class 下都可用：`\todo{...}`（`lint.sh` 统计的未溯源标记）、`\parahead{...}` 与 `\headbf{...}`、`\cmark` / `\xmark`、`\tablestyle{sep}{stretch}`、定宽列 `x{}` `y{}` `z{}` `P{}` 与 `tabularx` 的 `Y` 列、`Light*` 行底色，以及 `\figref` `\tabref` `\eqnref` `\algref`——让每类浮动体在全文只有一种写法。
 
-**匿名有两半，两半都要。** class 的 `anon` 选项负责 PDF 那一半：面板只印 "Anonymous Authors"，并隐去单位、贡献说明和链接行。`.env` 里的 `ANON=true` 负责源文件那一半：`lint.sh` 会对 `manus/` 下任何身份信息报错——包括注释，因为上传源码时注释会一起交上去。仓库自带的 `main.tex` 连占位符都是匿名的，所以新仓库第一天就能通过源文件这一半。
+**匿名有两半，两半都要。** class 的 `anon` 选项负责 PDF 那一半：面板只印 "Anonymous Authors"，并隐去单位、贡献说明和链接行。`.env` 里的 `ANON=true` 负责源文件那一半：`lint.sh` 会对 `manus/` 下排版出来的身份信息、以及不带 `anon` 的 `\documentclass` 行报错，并对每个 `github.com/` 链接给出警告；注释不在扫描之列，但上传源码时注释会一起交上去，注释里的真实姓名要你自己删掉。仓库自带的 `main.tex` 连占位符都是匿名的，所以新仓库只要在 `\documentclass` 行加上 `anon`，就能通过源文件这一半。
 
 **环境要求**——较完整的 TeX Live（2022+）：class 使用 `tcolorbox`、`titlesec`、`cleveref`、`natbib`、`nicematrix`、`siunitx`。`fontawesome5` 可选，缺失时链接行退回纯文字标签。
 
@@ -245,7 +245,7 @@ STAGE_READ_MODEL=
 
 `INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code、Codex 与 Qwen Code 里，文件编辑前的权限提示也会被跳过；在 Claude Code 里，shell 命令前的权限提示同样跳过，除非该命令删除、覆盖已跟踪文件、安装、推送，或写入 `mates/`、venue 模板包或 `.env`。`medium`（默认）按文档所写发问，`high` 逐条确认。任何档位都不会收回你已经给出的批准，也不会替你给出你没给的批准：你已经批准过的事——之前的一次回答，或调用时一句明确的请求，比如 `and commit it`——在其范围内不会再问第二次。硬门槛任何档位都要问，之前的批准也替代不了它：红线、删除与覆盖、每一个以"已确认"身份进入 `venue.yml` 的取值、登记证据时它的来源，以及六个 slash-only skill 各自的决定点。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 3_method involve=low`——在 Claude Code 里这个 token 连权限提示一并作数：钩子从会话里最近一条 STAGE 命令读它，一直有效到下一条命令为止；别的宿主的权限提示只认 `.env`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
-`STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、模拟评审、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md)。
+`STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
 `STAGE_PLAN_MODEL`、`STAGE_EXEC_MODEL` 与 `STAGE_READ_MODEL`（可选）分别指定论文判断——故事、提纲、起草、模拟评审、回复——所用的模型，产出与核查所用的模型，以及只读状态报告、检查模式与只做收集的委派所用的模型；规约 §11 的 skill 名单写明每个 skill 属于哪一档。每个键写一个模型名，或逗号分隔、按 `STAGE_HARNESSES` 标签写的 `<harness>:<model>` 条目：运行先取本树的条目，再取无标签的条目，两者都没有就沿用 harness 的默认模型。只有派发工具能逐次指定模型的 harness 才读取这三个键——Claude Code，以及子代理接口接受模型参数时的 Codex；Cursor、DSH、Kimi Code、Pi 与 Qwen Code 忽略它们。你敲下的 skill 留在你会话的模型上，它那一档指定了别的模型时会用一行说明；拿到那个模型的唯一办法是切换会话的模型。留空时它们什么都不改变。完整规则见[规约 §11.6](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
@@ -257,17 +257,17 @@ STAGE_READ_MODEL=
 bash execs/scpts/import.sh
 ```
 
-导入会把 STAR 中与写作相关的产物——方法文档（`metds/overview.md`、`framework.md`、`dataset.md`、`training.md`、`evaluation.md`，加上 `adopt.md` 和 `codearc.md`）、选题陈述、参考文献笔记与 `reference.bib`、结果表、实验小结——按相同的相对路径快照进 `mates/<slug>/`，并在 `mates/MANIFEST.md` 里为每个文件记录来源、来源 commit 和内容指纹。当稿件还没有参考文献库时，STAR 的 `reference.bib` 会被播种到 `manus/bibs/`。新实验落地后重新运行即可；先用下面的命令检查漂移：
+导入会把 STAR 中与写作相关的产物——方法文档（`metds/overview.md`、`framework.md`、`dataset.md`、`training.md`、`evaluation.md`，加上 `adopt.md` 和 `codearc.md`）、选题陈述、参考文献笔记与 `reference.bib`、结果表、实验小结——按相同的相对路径快照进 `mates/<slug>/`，并在 `mates/MANIFEST.md` 里为每个文件记录来源、来源 commit 和内容指纹。新实验落地后重新运行即可；先用下面的命令检查漂移：
 
 ```bash
-bash execs/scpts/import.sh --diff   # 只读的过期检查报告；有漂移以退出码 2 结束，硬错误为 1
+bash execs/scpts/import.sh --diff   # 只读的过期检查报告；有漂移以退出码 2 结束，硬错误或来源不可达为 1
 ```
 
-多个 STAR 仓库可以喂同一篇论文：`import.sh --source PATH --slug NAME` 可以用独立的 slug 导入任何一个符合 STAR 布局的本地检出。
+多个 STAR 仓库可以喂同一篇论文：`import.sh --source PATH --slug NAME` 可以用独立的 slug 导入任何一个符合 STAR 布局的本地检出。不带参数的 `import.sh --diff` 会把 `mates/MANIFEST.md` 里每个导入的 STAR slug 与它记录的来源逐一比对。
 
 ### 4. 路径 B：独立使用
 
-让 `STAR_HOME` 保持为空。把证据文件——结果导出、合作者发来的数字、一份 wandb CSV——放到 `mates/manual/` 下的任意位置，然后运行 `/stage-evid-curator`，把每个文件登记进 `mates/MANIFEST.md`，登记为 `manual` 条目，来源用自由文本写明（如 "results emailed by X, 2026-08-01"）。它还会规整杂乱的文件（一份 CSV 会在旁边生成一份结果格式的 `.md`，标注 `normalized-from:`），并提出论断⇄证据的映射建议。下游的一切——起草、表格、审计——完全相同：登记过的手工文件和导入的 STAR 文件同样可以被引用，而未登记的文件对写作 skill 来说等于不存在。
+让 `STAR_HOME` 保持为空。把证据文件——结果导出、合作者发来的数字、一份 wandb CSV——放到 `mates/manual/` 下的任意位置，然后运行 `/stage-evid-curator`，把每个文件登记进 `mates/MANIFEST.md`，登记为 `manual` 条目，来源用自由文本写明（如 "results emailed by X, 2026-08-01"）。下游的一切——起草、表格、审计——完全相同：登记过的手工文件和导入的 STAR 文件同样可以被引用，而未登记的文件对写作 skill 来说等于不存在。
 
 ### 5. 构建与检查
 
@@ -341,7 +341,7 @@ dsh --profile YOUR_PROFILE --dump-config
 
 不带参数的 `/stage` 显示当前论文状态，也可以传入描述，例如 `/stage 审计实验章节中的每个数字`。命令会从共享的 `.agents/commands/stage.md` 名册发起一个后续轮次，因此 DSH 与其他宿主始终从同一来源分流。
 
-每次运行都以同样的方式结束：给出报告和下一条要运行的准确命令；除非你要求它接着做，它不会再启动别的运行。`/stage-auto <目标> [involve=<level>]` 追求一个写明的目标，而不是处理单个请求——Codex 里写作 `$stage-auto`；Kimi Code 与 DSH 里它随 `/stage` 所在的同一个插件或 bundle 一起提供。例如 `/stage-auto 方法章节起草完成且其中数字审计完毕` 会先运行 `stage-flow-status`，再逐个启动目标需要的下一个未标记 skill，每次只做一个工作单元。目标的检查通过时它就停下；遇到任何标 † 的 skill 时也停下（打印准确命令，由你来敲）；遇到专为留给你做选择的模式（`stage-refs-curator discover` 或 `position`、`stage-copy-editor style`、`stage-peer-reviewer extern=`）、红线动作、只有你能回答的问题、尚未经你确认的 venue 数值、只剩等你处理的工作（待导入的证据、待勾选的承诺框）、同一次启动的重复、一整轮没有任何改动，或一个失败动作的修复也失败时同样停下。它从不导入证据、不录入 venue 事实，自己也不提交；它启动的每个 skill 保留各自的提交步骤。流程只在 `.agents/commands/stage-auto.md` 保存一份，各宿主的入口都委托给它（[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 第 5 条）。
+每次运行都以同样的方式结束：给出报告和下一条要运行的准确命令；除非你要求它接着做，它不会再启动别的运行。`/stage-auto <目标> [involve=<level>]` 追求一个写明的目标，而不是处理单个请求——Codex 里写作 `$stage-auto`；Kimi Code 与 DSH 里它随 `/stage` 所在的同一个插件或 bundle 一起提供。例如 `/stage-auto 方法章节起草完成且其中数字审计完毕` 会先运行 `stage-flow-status`，再逐个启动目标需要的下一个未标记 skill，每次只做一个工作单元。目标的检查通过时它就停下；遇到任何标 † 的 skill 时也停下（打印准确命令，由你来敲）；遇到专为留给你做选择的模式（`stage-refs-curator discover` 或 `position`、`stage-copy-editor style`、`stage-peer-reviewer extern=`）、红线动作、只有你能回答的问题、尚未经你确认的 venue 数值、只剩等你处理的工作（待导入的证据、你尚未确认兑现的承诺）、下一次运行要写本次调用中更早的运行留成未提交的文件（先提交，再敲同一条命令）、同一次启动的重复、一整轮没有任何改动，或一个失败动作的修复也失败时同样停下。它从不导入证据、不录入 venue 事实，自己也不提交；它启动的每个 skill 保留各自的提交步骤。流程只在 `.agents/commands/stage-auto.md` 保存一份，各宿主的入口都委托给它（[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 第 5 条）。
 
 六个 skill（下表以 † 标注）仅限显式调用（slash-only）：接入、故事、提纲、回复、投稿与海报选择。六套具名 harness 的 manifest 使用 `disable-model-invocation: true`；Codex 在 `.codex/skills/` 中使用 `allow_implicit_invocation: false`，再链接到共用根。CI 会把七套实现都与[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 核对。
 
@@ -352,14 +352,14 @@ dsh --profile YOUR_PROFILE --dump-config
 | Skill | 用途 | 主要产出 |
 | --- | --- | --- |
 | `stage-proj-adopt` † | 把新的或已有的论文仓库接进 STAGE：把配对 STAR 仓库写进 `.env`、确定目标 venue、盘点并映射已有 tex 树，把草稿里已有的数字转为 `unsourced` 论断进入审计待办 | `notes/adopt.md` |
-| `stage-evid-curator` | 证据接收与映射：运行 `import.sh`、登记 `mates/manual/` 下的手工文件、规整杂乱导出、提出论断⇄证据映射、暴露过期——绝不就地修改证据 | `mates/<slug>/**`、`mates/manual/**`、`mates/MANIFEST.md` 条目 |
+| `stage-evid-curator` | 证据接收：运行 `import.sh`、登记 `mates/manual/` 下的手工文件、暴露过期——绝不就地修改证据 | `mates/<slug>/**`、`mates/manual/**`、`mates/MANIFEST.md` 条目 |
 | `stage-stry-coach` † | 对话优先的故事打磨：pitch、问题、核心想法、带论断编号的贡献列表、venue 理由；播种论断记录表和经用户确认的 venue 档案 | `notes/story.md`、播种的 `notes/claims.md`、`cycls/<cycle>/venue.yml` |
 | `stage-outl-planner` † | 故事 → 骨架：页数预算合计不超 venue 上限的章节表、图和表的计划、论断→章节分配、骨架 `.tex` 文件、记号表种子 | `notes/outline.md`、`manus/secs/*.tex` 骨架、`notes/notation.md` |
 | `stage-sect-drafter` | 每次调用起草或修改一个章节，依据章节简报、映射的证据、论断和记号规范；没有指纹的数字一律写成 `\todo{}` | `manus/secs/<n>_<slug>.tex` |
 | `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<slug>.tex` |
 | `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<slug>.pdf` + 源文件 |
 | `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子，没有时用 `discover` 按主题检索并提议候选 | `manus/bibs/reference.bib`、`notes/refs/<ABBREV>.md`、`notes/refs/refs_index.md` |
-| `stage-copy-editor` | 打磨一节或整篇手稿：清晰度、流畅度、自然的学术表达、记号一致性与篇幅收紧——段落级改写不改变技术含义、数字、引用、归属或主张强度；`style` 模式改为记录作者的散文档位 | `manus/` 中编辑后的散文、`wkdrs/reports/POLISH_<date>.md`、`tasks/` 条目、`notes/style.md` |
+| `stage-copy-editor` | 打磨一节或整篇手稿：清晰度、流畅度、自然的学术表达、记号一致性与篇幅收紧——段落级改写不改变技术含义、数字、引用、归属或论断强度；`style` 模式改为记录作者的散文档位 | `manus/` 中编辑后的散文、`wkdrs/reports/POLISH_<date>.md`、`tasks/` 条目、`notes/style.md` |
 | `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转记录表状态，检查证据过期 | `notes/claims.md` 的状态翻转、`wkdrs/reports/CLAIMS_<date>.md`、`tasks/` 条目 |
 | `stage-cite-auditor` | 每个 `\cite` key 都能解析；关于被引论文的每个断言都能对上一份阅读笔记——对不上的断言被标记，绝不悄悄改掉 | `wkdrs/reports/CITES_<date>.md`、`tasks/` 条目 |
 | `stage-peer-reviewer` | 模拟程序委员会：五视角评审团（新颖性与相关工作、技术正确性、实验严谨性、清晰度、魔鬼代言人），引用只认 whitelist/verified，按锚定评分带 + 封顶规则打分；`quick` 为单遍精简模式；绝不修改稿件 | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` |
@@ -376,9 +376,9 @@ dsh --profile YOUR_PROFILE --dump-config
 
 并行时有两件事要知道。`notes/outline.md` 只有一套页数预算，所以只能照着某一个 venue 的限制来规划——另一个靠 `convert` 报出来的页数来判断，这正是转换跳过所有关口、可以随便重跑的原因。另外 `.env` 的 `ANON` 是一个全局开关，而 `anonymized:` 是每个 cycle 各自的，切换时记得翻；忘了不会产出版式错误的包——运行会停下来，并告诉你该改哪一行。
 
-## 通往投稿的十步路径
+## 通往投稿的路径
 
-这些 skill 串成一条从证据到冻结投稿的路径。第 5–7 步逐章节循环；第 8 步成本低，可随时重复；`/stage-flow-status` 在任何时点通读全局。
+这些 skill 串成一条从证据到冻结投稿的路径。第 6–7 步逐章节循环；第 8 步成本低，可随时重复；`/stage-flow-status` 在任何时点通读全局。
 
 1. **接线仓库** —— `/stage-proj-adopt`（新克隆的模板也可以只填 `.env`）：STAR 配对、目标 venue、已有内容盘点 → `notes/adopt.md`。
 2. **引入证据** —— STAR 来源用 `bash execs/scpts/import.sh`，手工文件用 `/stage-evid-curator`：`mates/` 下的带指纹快照，每个文件一条 `MANIFEST.md` 记录。
@@ -388,7 +388,7 @@ dsh --profile YOUR_PROFILE --dump-config
 6. **起草** —— `/stage-sect-drafter` 每次一个章节，依据简报、证据和论断；`/stage-tabs-builder` 从证据生成表格；`/stage-figs-designer` 把每张图从源文件做到渲染 PDF。记录表状态翻到 `drafted`。
 7. **润色** —— `/stage-copy-editor`：清晰度、流畅度、自然的学术表达与记号一致性，含义、证据、数字、引用和归属不可触碰。它判断共同出现的模式并在段落尺度重写，不靠禁词表机械换词。需要时先用 `/stage-copy-editor style` 把论文文风记成 `notes/style.md` 里的可量档位。
 8. **审计** —— `/stage-clms-auditor` 把每个数字追溯到指纹；`/stage-cite-auditor` 核查每条引用和断言；每个失败都变成一条 `tasks/` 条目和一个记录表状态，而不是埋在报告里的一行。
-9. **评审与回复** —— `/stage-peer-reviewer` 召集五视角模拟评审团（或用 `quick` 单遍模式），把 meta-review 写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点记录表、一份不超 venue 限制的回复，以及 `tasks/` 里的承诺复选框。
+9. **评审与回复** —— `/stage-peer-reviewer` 召集五视角模拟评审团（或用 `quick` 单遍模式），把 meta-review 写进 `cycls/<cycle>/reviews/`；真实评审以 `received_<id>.md` 放进同一目录；`/stage-resp-writer` 把它们全部整理成逐点记录表、一份不超 venue 限制的回复（真实评审一到就只回答真实评审），以及 `tasks/` 里的承诺复选框。
 10. **打包冻结** —— `/stage-subm-packer`：build 和 lint 必须通过、走查检查单、依已注册的模板包把论文转成 venue 自己的版式、包放到 `wkdrs/builds/` 下、写出 `SUBMISSION_<date>.md`、打出标签 `freeze/<cycle>_<date>`。camera-ready 模式在 `tasks/<cycle>_promises.md` 还有未勾选项时拒绝打包。先跑 `/stage-subm-packer convert kit=<path>`，并按需要跑很多次——单独的转换跳过所有冻结关口，所以在论文还在压页数时照样能用。
 11. **做海报** —— `/stage-pstr-builder`，录用之后：`plan` 挑出那一句核心结论和挣到墙面的 `verified` 论断，并记下砍掉了什么；`render` 生成 `cycls/<cycle>/poster/poster.tex` 并编译；闸按纸张已确认的物理尺寸核对有效字号，并拒绝 `\todo`。图从 `manus/figs/` 原样取用——要新图就退回 `/stage-figs-designer`。
 
@@ -404,12 +404,13 @@ dsh --profile YOUR_PROFILE --dump-config
 - source-type: star
 - source: $STAR_HOME/wkdrs/results/results.md
 - source-commit: 3f2a91c
-- source-stamp: updated: 2026-07-28
+- source-stamp: 2026-07-28
+- sha256: <checksum of the file as it landed>
 - imported: 2026-08-02
 - covers: main COCO and LVIS results for Tables 1–2
 ```
 
-`source-stamp` 就是指纹：上游文件自己的 `generated:`/`updated:`/`finalized:` 日期。过期检测靠与上游当前值的精确比对（`import.sh --diff`），从不看文件 mtime——于是"论文脚下的数字变了"是一次机械检查，而不是一段记忆。
+`source-stamp` 是指纹的上游那一半：上游文件自己的 `generated:`/`updated:`/`finalized:` 日期。过期检测靠与上游当前值的精确比对（`import.sh --diff`），从不看文件 mtime——于是"论文脚下的数字变了"是一次机械检查，而不是一段记忆。`sha256` 是本地那一半：即使上游不可达，它也能发现 `mates/` 下的就地修改（规约 §8.2）。
 
 **B. 论断记录表是枢纽。** `notes/claims.md` 把每条论断的陈述位置 ⇄ 证据 ⇄ 状态连在一起：
 
@@ -423,15 +424,15 @@ dsh --profile YOUR_PROFILE --dump-config
 
 **C. 确定性检查放在脚本里，判断放在 skill 里。** grep 能抓的——未定义引用、`\todo` 标记、页数上限、匿名泄漏、过期的 stamp——由 `lint.sh` 和 `import.sh --diff` 抓，并可作为投稿闸门。散文模式扫描在约束力上是明确的例外：它用确定性规则定位高置信度残留或集中信号，但只给建议性警告，必须由人判断。需要判断的——这条论断真的成立吗、这张表是不是说明这个点的最佳方式、一个段落在上下文里是否公式化——住在 skill 里。
 
-编造红线（规范 §9）把环闭上：`manus/` 里的每一个数字，要么可追溯到一条带指纹的 `mates/` 记录，要么写成 `\todo{...}`——没有第三种状态；关于被引论文的每个断言都必须能对上一份阅读笔记；venue 规则只以用户确认的事实录入；任何 skill 都不得"为了帮忙"而放松这些规则。
+编造边界（规约 §9）把环闭上：`manus/` 里的每一个数字，要么可追溯到一条带指纹的 `mates/` 记录，要么写成 `\todo{...}`——没有第三种状态；关于被引论文的每个断言都必须能对上一份阅读笔记；venue 规则只以用户确认的事实录入；任何 skill 都不得"为了帮忙"而放松这些规则。
 
 ## 项目记忆
 
 一次会话学到、又没有任何仓库文件认领的事实——某种构建引擎只在这台机器上能工作、你的某项长期偏好、模拟评审已经否决过的一种论述方式——记在论文的 `.stage/memory/`，而不是你当时在用的那个工具里。一事一文件；会话钩子从这些文件生成每条一行的索引，在每个受支持宿主的会话开头交给 agent。
 
-记忆分四类：`env`（通常从失败中得知的机器或 TeX 工具链事实）、`pref`（你希望怎样写作）、`insight`（产生它的那次运行结束后仍然有效的判断）和 `deadend`（已经尝试、否决、不值得重试的路径——跨投稿周期尤其重要）。两条规则防止记忆库变成仓库事实的第二份漂移副本：
+记忆分四类：`env`（通常从失败中得知的机器或 TeX 工具链事实）、`pref`（你希望工作怎样推进、怎样评审；文风偏好属于 `notes/style.md`）、`insight`（产生它的那次运行结束后仍然有效的判断）和 `deadend`（已经尝试、否决、不值得重试的路径——跨投稿周期尤其重要）。两条规则防止记忆库变成仓库事实的第二份漂移副本：
 
-- **只有当没有任何文件已经认领这条事实时，才把它记进记忆。** 数字属于带指纹的 `mates/` 条目，论断属于 `notes/claims.md`，页数限制属于对应周期的 `venue.yml`，论文内容属于 `notes/refs/`，承诺属于 `tasks/`。记忆只装剩余信息。
+- **只有当没有任何文件已经认领这条事实时，才把它记进记忆。** 数字属于带指纹的 `mates/` 条目，论断属于 `notes/claims.md`，页数限制属于对应周期的 `venue.yml`，论文内容属于 `notes/refs/`，承诺属于 `tasks/`，文风偏好属于 `notes/style.md`。记忆只装剩余信息。
 - **记忆永远不是来源。** 它不能支撑 `manus/` 里的数字、venue 规则或关于被引工作的断言；记忆记得某个值，并不会放松禁止编造的边界。记忆与仓库文件冲突时，以文件为准。
 
 只在本机成立的事实，以及你不想入库的记忆，放进 `.stage/memory/local/`，git 像忽略 `.env` 一样忽略它；其余记忆都受版本管理，随克隆一起走。`env` 条目超过 180 天未重新确认时，会在会话里标为过期。任何内容都先由 agent 提议、再由你决定是否记录；`.env` 设为 `INVOLVE=low` 时改为先记下再说明。文件格式、钩子生成的索引行以及记忆如何退场，见[项目记忆](docs/mds/stage-workflow/writing-workflow-conventions.md#12-project-memory)。
@@ -460,7 +461,7 @@ bash execs/update.sh
 
 要更新哪些 harness 树由 `STAGE_HARNESSES` 指定，取值顺序为环境变量、`.env`、默认 `all`。写 `STAGE_HARNESSES=codex` 就只维护 Codex 的 `.codex/`，也可从 `claude`、`codex`、`cursor`、`dsh`、`kimi`、`pi`、`qwen` 中任选多个并用逗号分隔；`none` 表示只更新共享骨架。未选中的树既不安装、不更新，也不删除；共享的 `.agents/skills/` 与 `.agents/commands/`、agent 指令、工作流文档和 `execs/` 脚本始终更新。
 
-harness 配置——`.cursorignore`、`.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json`、`.pi/settings.json` 与 `.qwen/settings.json`——仅在缺失时安装，除非加 `--force`，否则绝不覆盖：论文仓库可能往这些文件里加过自己的设置。若保留下来的文件与上游有差异，命令会打印提示；若保留下来的钩子注册没有某个 STAGE 钩子，也会点名说明。
+harness 配置——`.cursorignore`、`.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json`、`.pi/settings.json` 与 `.qwen/settings.json`——仅在缺失时安装，除非加 `--force`，否则绝不覆盖。若保留下来的文件与上游有差异，命令会打印提示；若保留下来的钩子注册没有某个 STAGE 钩子，也会点名说明。
 
 早于子代理钩子保留下来的 `.claude/settings.json` 缺两处，命令会逐一提示：一是 `SubagentStart` 块，提示里点名为缺失的 `SubagentStart delegate context` 钩子；二是模型 id 解析命令的放行规则，缺了它，子代理因为没法回答权限弹窗，`model_id` 只能记成 `unrecorded`。把两处都从上游文件抄进你自己的配置：那个块里的两条钩子命令，以及 `permissions.allow` 下的 `"Bash(bash .claude/hooks/stage_model_id.sh --resolve:*)"`。
 
@@ -491,7 +492,7 @@ bash execs/update.sh --skill stage-flow-status
 
 上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。为避免误删自定义内容，上游已删除的文件不会在本地自动删除。STAGE 已不再提供下列文件，而更新会保留你仓库里已有的副本，所以凡来自 STAGE 的请逐一删除：`AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md`；每个 skill 与分流插件旁的 `SKILL_zh.md`；`.agents/commands/` 下的 `stage.zh-CN.md` 路由器，以及它在 `.claude/commands/`、`.cursor/commands/`、`.pi/prompts/` 与 `.qwen/commands/` 下的四个原生包装，每个都会在所属 harness 的命令菜单里多出一条重复的 `/stage.zh-CN`；以及 `docs/mds/stage-workflow/` 下除 skill 指南之外的所有 `*.zh-CN.md` 中文版，连同 `human-writing-guide.md`、`memory_spec.md` 与 `model_id_spec.md`——它们的规则如今由规约 §7、§12 与 §13 承载。记忆钩子改为从每条记忆的 frontmatter 生成索引之前就建好的论文仓库，会留着它的 `.stage/memory/MEMORY.md` 与 `MEMORY.zh-CN.md`：已没有钩子读取它们，可以删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
-如果你改的是 STAGE 本身而不是某篇论文：只编辑 `.agents/skills/` 下工具中立的作者源，再用 `bash .github/scripts/port.sh --write` 重新生成六套 harness 技能树。仅属于某个 harness 的行为写进该树的 rules 或带锚点的 overrides。随后用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七个根目录的语义约束。后两项检查都在 CI 中运行；这些命令只属于上游维护工具，`.github/` 不会同步进论文仓库。STAGE 自己的记忆无论作用域，一律放 git 忽略的 `.stage/memory/local/`：克隆或 GitHub 模板会原样复制受版本管理的 `.stage/memory/`，关于开发 STAGE 的记忆就会作为论文自己的事实出现在每个论文仓库里。`check_consistency.sh` 发现那里有模板所带 `.gitkeep` 之外的被跟踪文件就会失败。
+如果你改的是 STAGE 本身而不是某篇论文：只编辑 `.agents/skills/` 下工具中立的作者源，再用 `bash .github/scripts/port.sh --write` 重新生成六套 harness 技能树。仅属于某个 harness 的行为写进该树的 rules 或带锚点的 overrides。随后用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七个根目录的语义约束。后两项检查都在 CI 中运行。STAGE 自己的记忆无论作用域，一律放 git 忽略的 `.stage/memory/local/`：克隆或 GitHub 模板会原样复制受版本管理的 `.stage/memory/`，关于开发 STAGE 的记忆就会作为论文自己的事实出现在每个论文仓库里。`check_consistency.sh` 发现那里有模板所带 `.gitkeep` 之外的被跟踪文件就会失败。
 
 ## 项目约定
 
@@ -502,7 +503,7 @@ bash execs/update.sh --skill stage-flow-status
 5. 构建产物与临时报告放在 `wkdrs/`，永不提交；可留存的结论以 `notes/claims.md` 的状态翻转和 `tasks/` 条目写进文件，而不是报告文件。
 6. 用 `execs/run.sh` 作为唯一构建入口，工具脚本放 `execs/scpts/`；运行环境路径从 `.env` 读取，不要在脚本里硬编码本机路径。
 7. `manus/` 里的每个数字，要么可追溯到一条带指纹的 `mates/` 记录，要么写成 `\todo{...}`——没有第三种状态；写进文档的日期一律取自系统时钟。
-8. 一次会话学到、而上面这些文件都不认领的东西，记进 `.stage/memory/`——先提议再写入，只对本机成立的和你不想入库的放 git 忽略的 `.stage/memory/local/`；记忆永远不为某个数字、某条会场规则、某句关于被引论文的断言充当来源。
+8. 一次会话学到、而上面这些文件都不认领的东西，记进 `.stage/memory/`——先提议再写入，只对本机成立的和你不想入库的放 git 忽略的 `.stage/memory/local/`；记忆永远不为某个数字、某条 venue 规则、某句关于被引论文的断言充当来源。
 
 完整的协作与写作规范见 [`AGENTS.md`](AGENTS.md) 与 [`docs/mds/stage-workflow/writing-workflow-conventions.md`](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
@@ -510,13 +511,13 @@ bash execs/update.sh --skill stage-flow-status
 
 基于 STAGE 开始写一篇新论文时，建议完成以下调整：
 
-- 把 `manus/main.tex` 里的标题、作者、机构换成真实信息。双盲周期内保持匿名占位——`.env` 里 `ANON=true` 会让 `lint.sh` 在 `manus/` 下搜身份泄漏，注释也算。
+- 把 `manus/main.tex` 里的标题、作者、机构换成真实信息。双盲周期内保持匿名占位，并在 `\documentclass` 行加上 `anon`——`.env` 里 `ANON=true` 会让 `lint.sh` 在 `manus/` 下搜注释之外的身份泄漏，不带 `anon` 的 class 行也算一处；注释会随源码一起上传，其中的真实姓名要自己删掉。
 - 复制 `.env.example` 为 `.env`，设好 `STAR_HOME`（不与 STAR 配对就留空）、`LATEX_ENGINE`、`ANON` 与可选的 `INVOLVE`、`STAGE_LANG` 以及模型键 `STAGE_PLAN_MODEL`、`STAGE_EXEC_MODEL`、`STAGE_READ_MODEL`。
 - 用 `/stage-stry-coach` 建立第一个投稿周期和它的 `venue.yml`；页数上限、截止日期与检查单只以你确认的事实录入，绝不臆造。
 - venue 官方模板包整包解压到 `cycls/<cycle>/template/`，不要放进 `manus/`——那是 `lint.sh` 扫描的目录树，模板包自带的示例 `.tex` 会污染 `\todo` 计数和身份扫描。
 - 更新 `LICENSE` 中的年份和版权所有者。
 - 替换 `docs/htmls/stage.html`、`docs/htmls/stage_zh.html` 与 `docs/srcs/`——它们是 STAGE 自己的落地页和图片，不属于你的论文。`docs/index.html` 和 `docs/index_zh.html` 是把这两个页面挂到站点根目录的软链接。两个页面之间的中英切换用的是绝对链接（`/STAGE/index_zh.html`），要把其中的 `/STAGE` 前缀改成你自己的仓库名，否则语言切换会失效。`docs/mds/stage-workflow/` 保持不动，`execs/update.sh` 会负责更新它。
-- 安装进论文实例后，每个所选宿主都是自包含的。直接检出模板时，具名目录可能把共用文件链接到 `.agents/skills/`，所以删除共享根目录前要先把准备保留的目录实体化；使用 Codex 时必须同时保留 `.agents/`，每个宿主自己的钩子和配置文件也要随它的 skill 一起保留。`execs/update.sh` 安装时会自动写成实体文件。
+- 安装进论文实例后，每个所选宿主都是自包含的。直接检出模板时，具名目录可能把共用文件链接到 `.agents/skills/`，所以删除共享根目录前要先把准备保留的目录实体化；使用 Codex 时必须同时保留 `.agents/`，每个宿主自己的钩子和配置文件也要随它的 skill 一起保留。
 
 骨架本身可独立使用：目录布局、`.env`、`execs/run.sh` 与 `execs/scpts/lint.sh` 在完全不装任何 skill 的情况下也能工作，因此删掉全部工具目录同样是受支持的用法。一篇论文一个仓库——第二篇论文是模板的第二个实例，而不是这里的第二棵目录树。
 

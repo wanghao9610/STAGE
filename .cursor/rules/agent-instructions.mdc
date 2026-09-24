@@ -49,7 +49,7 @@ The test: every changed line traces to the user's request, and every number in i
 **This project uses the STAGE writing workflow. Its records are files, not chat history.**
 
 - Evidence lives read-only under `mates/`, fingerprinted in `mates/MANIFEST.md`; every claim's statements, evidence, and status are one row in `notes/claims.md`.
-- Run `/stage-flow-status` first when you do not know where things stand — it reads the outline, the ledger, the manifest, and the cycle state, and names the single next action.
+- Run `stage-flow-status` first when you do not know where things stand — it reads the outline, the ledger, the manifest, and the cycle state, and names the single next action.
 - A typed `stage-auto <goal>` pursues a stated goal across the ten unmarked skills and stops at any skill marked †, printing its command; its limits are conventions §11.5.
 - The rules every workflow skill follows are in `docs/mds/stage-workflow/writing-workflow-conventions.md`, read whole at the start of every run; the skill roster is its §11, and what each skill does is in `writing-workflow-skills.md`.
 - `.env` `STAGE_PLAN_MODEL`, `STAGE_EXEC_MODEL` and `STAGE_READ_MODEL` name the model a skill run, and each delegate it dispatches, belongs on — the paper's judgment, production and checking, read-only status and gathering; the roster's Tier column says which a skill takes. Each key holds one model name, or comma-separated `<harness>:<model>` entries; a run takes its own tree's entry, else an untagged one, and reads the key as empty when it has neither, and only a harness that can name a delegate's model reads them at all. A run stays in the session that started it: when its tier names a model the session is not on, it says so in one line at the head of its Workflow, and the one way to get that model is to switch the session's model. An empty key changes nothing. Full rule: conventions §11.6.
@@ -58,7 +58,7 @@ The test: every changed line traces to the user's request, and every number in i
 
 ## 6. Reply Language
 
-**`.env` `STAGE_LANG` sets the language of chat replies and of the Markdown a run writes** — `notes/`, `tasks/`, simulated reviews, `wkdrs/` reports. Full rule: conventions §7.6.
+**`.env` `STAGE_LANG` sets the language of chat replies and of the Markdown a run writes** — `notes/`, `tasks/`, `wkdrs/` reports. Full rule: conventions §7.6.
 
 - Set (`en` or `zh`) → use it, whatever the chat's language. Unset or empty → follow the user's dialogue language; an explicit in-conversation request wins over both. Resolve it once per run, in the one `.env` read that takes the other controls with it (conventions §7.6): `grep -sE '^(STAGE_LANG|INVOLVE|STAGE_(PLAN|EXEC|READ)_MODEL)=' .env || true`.
 - Always English whatever it says: everything under `manus/` — prose, captions, `% src:` comments, `\todo{}` text — and the response to reviewers under `cycls/<cycle>/response/`. Both are read by people outside this repository.
@@ -72,7 +72,7 @@ The test: every changed line traces to the user's request, and every number in i
 - A name that must appear brings its meaning with it, in the same sentence.
 - Exception: strings matched literally — ledger statuses, IDs, field names, paths — stay verbatim. Explain beside one, never in place of it.
 - A pointer that says nothing on its own — `§9`, `C4`, `R2.W1`, a cycle name — stays verbatim and takes a few words of what it points at, in parentheses: `C4 (the zero-shot transfer claim)`. First use in every reply, not once per conversation; the reader does not scroll back.
-- A reply that closes an execution ends by naming the next command to run, exact and runnable — the `/stage-*` invocation or the shell line, verbatim — or by saying plainly that nothing is left to run. The reader should never have to ask "what do I run now?" (conventions §7.5).
+- A reply that closes an execution ends by naming the next command to run, exact and runnable — the skill invocation in this harness's own syntax (conventions §11) or the shell line, verbatim — or by saying plainly that nothing is left to run. The reader should never have to ask "what do I run now?" (conventions §7.5).
 - Technical prose, no filler and no emoji. Plain does not mean chatty.
 
 ## 8. Project Layout
@@ -81,7 +81,7 @@ The test: every changed line traces to the user's request, and every number in i
 
 - Manuscript under `manus/`: entry `main.tex`; sections `secs/<n>_<slug>.tex`; figures `figs/` with sources in `figs/srcs/`; tables `tabs/`; bibliography `bibs/reference.bib`; template layers `stys/`.
 - The manuscript always compiles as the preprint, and a venue's format is a generated copy: the official kit unpacks whole into `cycls/<cycle>/template/`, never under `manus/`, which `lint.sh` scans (conventions §10.4).
-- Evidence under `mates/` — read-only. `execs/scpts/import.sh` and `/stage-evid-curator` are its only writers, and they only add or replace whole files with fingerprints.
+- Evidence under `mates/` — read-only. `execs/scpts/import.sh` and `stage-evid-curator` are its only writers, and they only add or replace whole files with fingerprints.
 - Writing metadata under `notes/`: `story.md`, `claims.md`, `outline.md`, `notation.md`, `style.md`, `adopt.md`, and reading notes in `notes/refs/`.
 - Submission cycles under `cycls/<venue>_<year>/`. Revision scratch, promise lists, and venue follow-ups in `tasks/`: `<cycle>_promises.md` blocks a camera-ready until every box is kept; `<cycle>_venue.md` blocks nothing.
 - Builds and ephemeral reports under `wkdrs/` — gitignored and regenerable. Durable outcomes go to the ledger and `tasks/`, not to reports.
@@ -101,7 +101,7 @@ The test: every changed line traces to the user's request, and every number in i
 
 **What a session learns goes to `.stage/memory/` in the project, not to your own memory store.**
 
-- Record a fact there only when no file in the repository already owns it — a number belongs to `mates/`, a claim to `notes/claims.md`, a page limit to the cycle's `venue.yml`, what a paper says to `notes/refs/`, a promise to `tasks/`. Memory holds the residue.
+- Record a fact there only when no file in the repository already owns it — a number belongs to `mates/`, a claim to `notes/claims.md`, a page limit to the cycle's `venue.yml`, what a paper says to `notes/refs/`, a promise to `tasks/`, a prose preference to `notes/style.md`. Memory holds the residue.
 - A memory is never a source: it can never back a number in `manus/`, a venue rule, or an assertion about a cited work (§2 stands whatever a memory says).
 - Offer, never assume: at most two offers per session, counting every skill a `stage-auto` goal run starts, and write only after the user agrees. `INVOLVE=low` records unasked and says so.
 - What travels with the repository goes to the versioned `.stage/memory/`; a `machine:` scoped fact, true only here, goes to the git-ignored `.stage/memory/local/`, as does any memory the user keeps off the repository. Where a memory disagrees with a file in the repository, the file wins.

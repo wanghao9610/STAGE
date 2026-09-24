@@ -58,7 +58,7 @@ compressed to Summary-less form (one shared Summary at the top), followed direct
 meta-review sections below in the same file. Open with: "Quick mode — single sequential pass;
 perspectives are not independent."
 
-## meta_review.md
+## SIM_REVIEW_<date>.md (the meta-review)
 
 ```markdown
 ---
@@ -68,6 +68,7 @@ cycle: <venue>_<year>
 scale: <conference-6 | journal>
 mode: <panel | quick>
 generated: <YYYY-MM-DD>
+commit: <git log -1 sha, +dirty when manus/ had uncommitted edits>
 recommendation: "<4 — Borderline Accept (confidence 3) | Major Revision>"
 ---
 
@@ -123,11 +124,11 @@ resolved, or "none">. Perspectives missing: <dropped panelist, or "none">.
 
 ## REFEREE_<date>.md
 
-The report an `extern=` run writes. The body is `meta_review.md` above with four changes and
+The report an `extern=` run writes. The body is the meta-review above with four changes and
 no others:
 
 - Frontmatter reads `type: referee_report`, `target: <the path extern= was given>`, `venue:`,
-  `scale:`, `mode:`, `generated:`, `recommendation:` — and no `cycle:`, because there is none.
+  `scale:`, `mode:`, `generated:`, `recommendation:` — and no `cycle:` or `commit:`, because there is none.
 - `## Major Weaknesses` drops the "attacks <claim IDs>" clause from every line. The anchor and
   the raised-by list stay; there is no ledger to name, not a licence to skip the location.
 - `## Action List` is omitted. It is the self-review section, and this paper is not ours to fix.

@@ -30,7 +30,7 @@ STAGE is double-layered: this repository is the **template**; one paper = one **
   - [5. Build and lint](#5-build-and-lint)
   - [6. Start the writing workflow](#6-start-the-writing-workflow)
 - [Writing workflow](#writing-workflow)
-- [The ten-step path to a submission](#the-ten-step-path-to-a-submission)
+- [The path to a submission](#the-path-to-a-submission)
 - [Evidence, fingerprints, and the claim ledger](#evidence-fingerprints-and-the-claim-ledger)
 - [Project memory](#project-memory)
 - [Updating STAGE skills and workflow docs](#updating-stage-skills-and-workflow-docs)
@@ -74,7 +74,7 @@ STAGE/
 │   ├── figs/               # Rendered figures (PDF); figs/srcs/ holds every figure's source
 │   ├── tabs/               # Tables, generated from evidence
 │   ├── bibs/               # reference.bib
-│   └── stys/               # stage.cls (the look) + stage.sty (\todo and authoring macros)
+│   └── stys/               # stage.cls (the look) + stage.bst (the reference list) + stage.sty (\todo and authoring macros)
 ├── mates/                  # Imported evidence — read-only
 │   ├── <source-slug>/      # Snapshots mirroring upstream STAR paths
 │   ├── manual/             # Hand-registered evidence drops
@@ -134,7 +134,7 @@ The abbreviated directory names follow STAR's convention:
 | `figs/` | Figures | Rendered PDFs; `srcs/` their editable sources |
 | `tabs/` | Tables | Table `.tex` files, generated from evidence |
 | `bibs/` | Bibliographies | `reference.bib` |
-| `stys/` | Styles | `stage.cls` and `stage.sty` — venue kits live in `cycls/<cycle>/template/`, not here |
+| `stys/` | Styles | `stage.cls`, `stage.bst`, and `stage.sty` — venue kits live in `cycls/<cycle>/template/`, not here |
 | `mates/` | Materials | Imported evidence snapshots — read-only |
 | `cycls/` | Cycles | One directory per submission attempt |
 | `execs/` | Executions | Entrypoint scripts; `scpts/` the utilities |
@@ -156,7 +156,7 @@ Three rules the tree alone does not carry: `mates/` is read-only (`import.sh` an
 
 `stage.bst` is `plainnat` with four fields silenced, which is the arrangement CVPR's own style makes: a DOI or URL stays in `reference.bib`, where it is the entry's provenance and what `/stage-refs-curator` re-fetches from, and is simply not typeset — so the reference list reads like a conference paper's rather than like a database export.
 
-Keep that split when you extend the class or the package: anything a section or table file writes belongs in the package; anything only the page look needs belongs in the class. Project-specific macros (`\newcommand{\method}{...}`) go in `main.tex`, never in `stys/` — all three template files get replaced or updated under you.
+Keep that split when you extend the class or the package: anything a section or table file writes belongs in the package; anything only the page look needs belongs in the class. Project-specific macros (`\newcommand{\method}{...}`) go in `main.tex`, never in `stys/` — all three are template files, and the venue copy replaces two of them.
 
 **Getting into a conference template.** You do not swap the class in place. `manus/main.tex` always compiles as the preprint; the venue's format is a **generated copy**:
 
@@ -181,7 +181,7 @@ Keep that split when you extend the class or the package: anything a section or 
 
 **Authoring macros** from `stage.sty`, available under any class: `\todo{...}` (the unsourced-value marker `lint.sh` counts), `\parahead{...}` and `\headbf{...}`, `\cmark` / `\xmark`, `\tablestyle{sep}{stretch}`, the fixed-width columns `x{}` `y{}` `z{}` `P{}` and the `tabularx` column `Y`, the `Light*` row-highlight colors, and `\figref` `\tabref` `\eqnref` `\algref` so one spelling per float type holds across the manuscript.
 
-**Anonymity has two halves, and you want both.** The `anon` class option is the PDF half: the panel prints "Anonymous Authors" and drops affiliations, contribution notes, and the links row. `ANON=true` in `.env` is the source half: `lint.sh` then fails on identity anywhere under `manus/` — comments included, because comments ship with a source upload. The stock `main.tex` is anonymous by construction, placeholders included, so a fresh repo passes the source half on day one.
+**Anonymity has two halves, and you want both.** The `anon` class option is the PDF half: the panel prints "Anonymous Authors" and drops affiliations, contribution notes, and the links row. `ANON=true` in `.env` is the source half: `lint.sh` then fails on identity in the text LaTeX typesets anywhere under `manus/` and on a `\documentclass` line without `anon`, and warns on each `github.com/` link; comments are not scanned, yet they ship with a source upload, so a real name left in one is yours to delete. The stock `main.tex` keeps its placeholders anonymous, so a fresh repo passes the source half as soon as `anon` is on its `\documentclass` line.
 
 **Requirements** — a reasonably complete TeX Live (2022+): the class uses `tcolorbox`, `titlesec`, `cleveref`, `natbib`, `nicematrix`, and `siunitx`. `fontawesome5` is optional; without it the links row falls back to plain text labels.
 
@@ -245,7 +245,7 @@ STAGE_READ_MODEL=
 
 `INVOLVE` (optional, `low` | `medium` | `high`) sets how much the skills ask before they decide. At `low` a skill takes the recommended option on judgment calls and logs that it did, commits what its run wrote without asking and names each commit in its reply, and — in Claude Code, Codex, and Qwen Code — the permission prompt before each file edit is skipped, in Claude Code also the one before a shell command that does not delete, overwrite a tracked file, install, push, or write to `mates/`, a venue kit, or `.env`; `medium` (the default) asks as documented; `high` confirms item by item. No level revokes an approval you already gave or grants one you did not: what you already approved — an earlier answer, or a clear request such as `and commit it` in the invocation — is not asked again within its scope. Hard gates are asked at every level, and no earlier approval stands in for one: the STOP line, deletions and overwrites, every `venue.yml` value entering as confirmed, the provenance of evidence being registered, and the decision points of the six slash-only skills. To change the level for one run, add the same token when you call a skill: `/stage-sect-drafter 3_method involve=low` — in Claude Code that token reaches the permission prompts too, since the hooks read it off the session's most recent STAGE command and it holds until the next one; elsewhere the prompts follow `.env` alone. Full rule: [conventions §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
-`STAGE_LANG` (optional, `en` | `zh`) sets the language of chat replies and of the Markdown the workflow writes — `notes/`, `tasks/`, simulated reviews, `wkdrs/` reports. Left empty, everything follows the conversation's own language. Two things stay English whatever it says, because people outside the repository read them: the manuscript under `manus/`, and the response to reviewers. So do structural literals in any document — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names — which is what keeps a Chinese note machine-readable. Full rule: [conventions §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md).
+`STAGE_LANG` (optional, `en` | `zh`) sets the language of chat replies and of the Markdown the workflow writes — `notes/`, `tasks/`, `wkdrs/` reports. Left empty, everything follows the conversation's own language. Two things stay English whatever it says, because people outside the repository read them: the manuscript under `manus/`, and the response to reviewers. So do structural literals in any document — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names — which is what keeps a Chinese note machine-readable. Full rule: [conventions §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 `STAGE_PLAN_MODEL`, `STAGE_EXEC_MODEL` and `STAGE_READ_MODEL` (optional) select the model for the paper's judgment — story, outline, drafting, simulated review, response — for production and checking, and for read-only status, the check modes, and delegates that only gather; the roster in conventions §11 gives each skill its tier. Each takes one model name, or comma-separated `<harness>:<model>` entries using the `STAGE_HARNESSES` tags: a run uses its own tree's entry, then an untagged one, and with neither keeps the harness default. Only a harness whose dispatch tool takes a model per call reads the keys — Claude Code, and Codex where its subagent interface accepts one; Cursor, DSH, Kimi Code, Pi, and Qwen Code ignore them. A skill you type stays on your session's model and says in one line when its tier names another; switching the session's model is the one way to get it. Empty, they change nothing. Full rule: [conventions §11.6](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
@@ -257,17 +257,17 @@ Point `STAR_HOME` at your STAR project and import:
 bash execs/scpts/import.sh
 ```
 
-The import snapshots the writing-relevant STAR artifacts — the method documents (`metds/overview.md`, `framework.md`, `dataset.md`, `training.md`, `evaluation.md`, plus `adopt.md` and `codearc.md`), idea statements, reference notes and `reference.bib`, results tables, and experiment digests — into `mates/<slug>/` under the same relative paths, and records each file in `mates/MANIFEST.md` with its source, source commit, and content fingerprint. When your manuscript has no bibliography yet, the STAR `reference.bib` is seeded into `manus/bibs/`. Re-run it after new experiments land; check for drift first with:
+The import snapshots the writing-relevant STAR artifacts — the method documents (`metds/overview.md`, `framework.md`, `dataset.md`, `training.md`, `evaluation.md`, plus `adopt.md` and `codearc.md`), idea statements, reference notes and `reference.bib`, results tables, and experiment digests — into `mates/<slug>/` under the same relative paths, and records each file in `mates/MANIFEST.md` with its source, source commit, and content fingerprint. Re-run it after new experiments land; check for drift first with:
 
 ```bash
-bash execs/scpts/import.sh --diff   # read-only staleness report; exit 2 when anything drifted, 1 on a hard error
+bash execs/scpts/import.sh --diff   # read-only staleness report; exit 2 when anything drifted, 1 on a hard error or an unreachable source
 ```
 
-Several STAR repos can feed one paper: `import.sh --source PATH --slug NAME` imports any additional STAR-shaped checkout under its own slug.
+Several STAR repos can feed one paper: `import.sh --source PATH --slug NAME` imports any additional STAR-shaped checkout under its own slug. A bare `import.sh --diff` checks every imported STAR slug in `mates/MANIFEST.md` against its recorded source.
 
 ### 4. Path B: standalone
 
-Leave `STAR_HOME` empty. Drop evidence files — results exports, a collaborator's numbers, a wandb CSV — anywhere under `mates/manual/`, then run `/stage-evid-curator` to register each one in `mates/MANIFEST.md` as a `manual` entry whose source is stated in free text ("results emailed by X, 2026-08-01"). The curator also normalizes messy drops (a CSV becomes a results-shaped `.md` beside it, marked `normalized-from:`) and proposes claim⇄evidence mappings. Everything downstream — drafting, tables, audits — is identical: a registered manual drop is exactly as citable as an imported STAR file, and an unregistered file does not exist as far as the writing skills are concerned.
+Leave `STAR_HOME` empty. Drop evidence files — results exports, a collaborator's numbers, a wandb CSV — anywhere under `mates/manual/`, then run `/stage-evid-curator` to register each one in `mates/MANIFEST.md` as a `manual` entry whose source is stated in free text ("results emailed by X, 2026-08-01"). Everything downstream — drafting, tables, audits — is identical: a registered manual drop is exactly as citable as an imported STAR file, and an unregistered file does not exist as far as the writing skills are concerned.
 
 ### 5. Build and lint
 
@@ -312,7 +312,7 @@ STAGE includes sixteen complementary skills that turn imported evidence and a st
 | Pi | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 | Qwen Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
 
-Claude Code, Cursor, Pi, and Qwen Code expose `/stage [what you want to do]` directly from project files. The command sends the request through `.agents/commands/stage.md`; an empty request selects `stage-flow-status`, and a match to one of the six explicit-only skills returns the exact `/stage-<name> <argument>` command and waits.
+Claude Code, Cursor, Pi, and Qwen Code expose `/stage [what you want to do]` directly from project files. The command sends the request through `.agents/commands/stage.md`; an empty request selects `stage-flow-status`, and a match to one of the six slash-only skills returns the exact `/stage-<name> <argument>` command and waits.
 
 Codex packages the shared router as the repo-local `stage` plugin. Register and install it once from the repository root, then start a new session:
 
@@ -341,7 +341,7 @@ dsh --profile YOUR_PROFILE --dump-config
 
 Use `/stage` with no argument for the current paper status, or pass a request such as `/stage audit every number in the experiments section`. The command starts one follow-up turn against the shared `.agents/commands/stage.md` roster, so DSH and the other harnesses route from the same source.
 
-Every run ends the same way, with its report and the exact command to run next, and starts nothing further unless you ask it to keep going. `/stage-auto <goal> [involve=<level>]` pursues a stated goal rather than one request — `$stage-auto` in Codex; in Kimi Code and DSH it arrives with the same plugin or bundle as `/stage`. For example, `/stage-auto the method section drafted and its numbers audited` runs `stage-flow-status` first, then starts each next unmarked skill the goal needs, one unit of work at a time. It stops when the goal's check passes, at any skill marked † (printing the exact command for you to type), at a mode that exists to take your choice (`stage-refs-curator discover` or `position`, `stage-copy-editor style`, `stage-peer-reviewer extern=`), at a STOP-line action, at a question only you can answer, at a venue value you have not confirmed, when only work waiting on you is left (evidence to import, a promise box to tick), at a repeat of the same start, after a pass that changed nothing, or when a failed action's fix fails too. It never imports evidence, enters a venue fact, or commits on its own; each skill it starts keeps its own commit step. The procedure lives once in `.agents/commands/stage-auto.md`, and every harness's entry point delegates to it ([conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md), item 5).
+Every run ends the same way, with its report and the exact command to run next, and starts nothing further unless you ask it to keep going. `/stage-auto <goal> [involve=<level>]` pursues a stated goal rather than one request — `$stage-auto` in Codex; in Kimi Code and DSH it arrives with the same plugin or bundle as `/stage`. For example, `/stage-auto the method section drafted and its numbers audited` runs `stage-flow-status` first, then starts each next unmarked skill the goal needs, one unit of work at a time. It stops when the goal's check passes, at any skill marked † (printing the exact command for you to type), at a mode that exists to take your choice (`stage-refs-curator discover` or `position`, `stage-copy-editor style`, `stage-peer-reviewer extern=`), at a STOP-line action, at a question only you can answer, at a venue value you have not confirmed, when only work waiting on you is left (evidence to import, a promise you have not confirmed kept), when the next run would write a file an earlier run of this invocation left uncommitted (commit it, then type the same command again), at a repeat of the same start, after a pass that changed nothing, or when a failed action's fix fails too. It never imports evidence, enters a venue fact, or commits on its own; each skill it starts keeps its own commit step. The procedure lives once in `.agents/commands/stage-auto.md`, and every harness's entry point delegates to it ([conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md), item 5).
 
 Six skills (marked † below) are slash-only: adoption, story, outline, response, submission, and poster selection. Named harness manifests use `disable-model-invocation: true`; Codex uses `allow_implicit_invocation: false` in `.codex/skills/`, linked into the shared root. CI checks all seven against [conventions §11](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
@@ -352,7 +352,7 @@ Six skills (marked † below) are slash-only: adoption, story, outline, response
 | Skill | Purpose | Main output |
 | --- | --- | --- |
 | `stage-proj-adopt` † | Wire a new or existing paper repo into STAGE: pair STAR repo(s) into `.env`, set the target venue, inventory and map an existing tex tree, and turn pre-existing draft numbers into `unsourced` claims for the audit backlog | `notes/adopt.md` |
-| `stage-evid-curator` | Evidence intake and mapping: run `import.sh`, register hand-dropped files under `mates/manual/`, normalize messy exports, propose claim⇄evidence mappings, surface staleness — never edit evidence in place | `mates/<slug>/**`, `mates/manual/**`, entries in `mates/MANIFEST.md` |
+| `stage-evid-curator` | Evidence intake: run `import.sh`, register hand-dropped files under `mates/manual/`, surface staleness — never edit evidence in place | `mates/<slug>/**`, `mates/manual/**`, entries in `mates/MANIFEST.md` |
 | `stage-stry-coach` † | Dialogue-first story shaping: pitch, problem, key idea, contributions with claim IDs, venue rationale; seeds the claim ledger and the user-confirmed venue profile | `notes/story.md`, seeded `notes/claims.md`, `cycls/<cycle>/venue.yml` |
 | `stage-outl-planner` † | Story → skeleton: section table with page budgets that sum within the venue limit, figure and table plans, claim→section assignment, skeleton `.tex` files, notation seed | `notes/outline.md`, `manus/secs/*.tex` skeletons, `notes/notation.md` |
 | `stage-sect-drafter` | Draft or revise one section per invocation from its brief, mapped evidence, claims, and the notation canon; numbers without a fingerprint become `\todo{}` | `manus/secs/<n>_<slug>.tex` |
@@ -376,9 +376,9 @@ Six skills (marked † below) are slash-only: adoption, story, outline, response
 
 Two things to know when venues run in parallel. `notes/outline.md` carries one set of page budgets, so it can only be planned against one venue's limit — for the other, the page count `convert` reports is the check, which is exactly why conversion skips every gate and can be re-run at will. And `.env`'s `ANON` is one global flag while `anonymized:` is per cycle, so flip it when you switch; forgetting does not produce a wrongly formatted package, the run stops and names the line to change.
 
-## The ten-step path to a submission
+## The path to a submission
 
-The skills chain into one path from evidence to a frozen submission. Steps 5–7 loop per section; step 8 repeats cheaply as often as you like; `/stage-flow-status` reads across all of it at any point.
+The skills chain into one path from evidence to a frozen submission. Steps 6–7 loop per section; step 8 repeats cheaply as often as you like; `/stage-flow-status` reads across all of it at any point.
 
 1. **Wire the repo** — `/stage-proj-adopt` (or just fill `.env` on a fresh clone): STAR pairing, target venue, inventory of anything already written → `notes/adopt.md`.
 2. **Bring in evidence** — `bash execs/scpts/import.sh` for STAR sources, `/stage-evid-curator` for hand-dropped files: fingerprinted snapshots under `mates/`, one `MANIFEST.md` entry each.
@@ -388,7 +388,7 @@ The skills chain into one path from evidence to a frozen submission. Steps 5–7
 6. **Draft** — `/stage-sect-drafter`, one section per run, from the brief, evidence, and claims; `/stage-tabs-builder` generates the tables from evidence; `/stage-figs-designer` takes each figure from source to rendered PDF. Ledger statuses flip to `drafted`.
 7. **Polish** — `/stage-copy-editor`: clarity, flow, natural scholarly prose, and notation consistency, with meaning, evidence, numbers, citations, and attribution untouchable. It diagnoses pattern clusters and rewrites at paragraph scale instead of replacing forbidden words. `/stage-copy-editor style` records the paper's writing style as measurable dials in `notes/style.md` first, if you want one.
 8. **Audit** — `/stage-clms-auditor` traces every number to a fingerprint; `/stage-cite-auditor` checks every citation and assertion; each failure becomes a `tasks/` item and a ledger status, not a buried report line.
-9. **Review and respond** — `/stage-peer-reviewer` convenes a five-perspective simulated panel (or a `quick` single pass) and writes its meta-review into `cycls/<cycle>/reviews/`; real reviews are dropped there as `received_<id>.md`; `/stage-resp-writer` turns them all into a point ledger, a response within the venue's limit, and promise checkboxes in `tasks/`.
+9. **Review and respond** — `/stage-peer-reviewer` convenes a five-perspective simulated panel (or a `quick` single pass) and writes its meta-review into `cycls/<cycle>/reviews/`; real reviews are dropped there as `received_<id>.md`; `/stage-resp-writer` turns them all into a point ledger, a response within the venue's limit that answers the real reviews alone once they arrive, and promise checkboxes in `tasks/`.
 10. **Pack and freeze** — `/stage-subm-packer`: build and lint must pass, checklist walked, the paper converted into the venue's own template from the registered kit, package under `wkdrs/builds/`, `SUBMISSION_<date>.md` written, tag `freeze/<cycle>_<date>` created. Camera-ready mode refuses to pack while `tasks/<cycle>_promises.md` has unchecked boxes. Run `/stage-subm-packer convert kit=<path>` first, and as often as you need — conversion alone skips every freeze gate, so it works while the paper is still being trimmed to the page limit.
 11. **Poster** — `/stage-pstr-builder`, after acceptance: `plan` picks the one takeaway and the `verified` claims that earn wall space and records what was cut; `render` emits `cycls/<cycle>/poster/poster.tex` and compiles it; the gate checks effective point size against the sheet's confirmed physical size and refuses a `\todo`. Figures come from `manus/figs/` unmodified — new artwork routes back to `/stage-figs-designer`.
 
@@ -404,12 +404,13 @@ Three principles carry the whole design:
 - source-type: star
 - source: $STAR_HOME/wkdrs/results/results.md
 - source-commit: 3f2a91c
-- source-stamp: updated: 2026-07-28
+- source-stamp: 2026-07-28
+- sha256: <checksum of the file as it landed>
 - imported: 2026-08-02
 - covers: main COCO and LVIS results for Tables 1–2
 ```
 
-The `source-stamp` is the fingerprint: the upstream file's own `generated:`/`updated:`/`finalized:` date. Staleness is detected by exact comparison against the current upstream value (`import.sh --diff`), never by file mtimes — so "the numbers changed under the paper" is a mechanical check, not a memory.
+The `source-stamp` is the upstream half of the fingerprint: the upstream file's own `generated:`/`updated:`/`finalized:` date. Staleness is detected by exact comparison against the current upstream value (`import.sh --diff`), never by file mtimes — so "the numbers changed under the paper" is a mechanical check, not a memory. `sha256` is the local half: it catches an in-place edit under `mates/` with no upstream reachable (conventions §8.2).
 
 **B. The claim ledger is the hub.** `notes/claims.md` links every claim's statements ⇄ evidence ⇄ status:
 
@@ -429,9 +430,9 @@ The fabrication boundary (conventions §9) closes the loop: every number in `man
 
 What a session learns that no file in the repository owns — a build that only works under one engine on this machine, a standing preference of yours, a framing the simulated panel already rejected — is recorded in the paper at `.stage/memory/`, not in whichever tool you happened to be driving. One file per fact; a session hook builds a one-line-per-fact index from those files and puts it in front of the agent in every supported harness.
 
-Four kinds: `env` (a machine or TeX-toolchain fact, usually learned by failing), `pref` (how you want the writing done), `insight` (a judgment that outlived the run that produced it), and `deadend` (tried, rejected, not worth retrying — the one a paper needs most between cycles). Two rules keep the store from becoming a second, drifting copy of the repository:
+Four kinds: `env` (a machine or TeX-toolchain fact, usually learned by failing), `pref` (how you want the work paced and reviewed; prose style belongs to `notes/style.md`), `insight` (a judgment that outlived the run that produced it), and `deadend` (tried, rejected, not worth retrying — the one a paper needs most between cycles). Two rules keep the store from becoming a second, drifting copy of the repository:
 
-- **A fact is recorded there only when no file already owns it.** A number belongs to a fingerprinted `mates/` entry, a claim to `notes/claims.md`, a page limit to the cycle's `venue.yml`, what a paper says to `notes/refs/`, a promise to `tasks/`. Memory holds the residue.
+- **A fact is recorded there only when no file already owns it.** A number belongs to a fingerprinted `mates/` entry, a claim to `notes/claims.md`, a page limit to the cycle's `venue.yml`, what a paper says to `notes/refs/`, a promise to `tasks/`, a prose preference to `notes/style.md`. Memory holds the residue.
 - **A memory is never a source.** It can never back a number in `manus/`, a venue rule, or an assertion about a cited work — the fabrication boundary does not soften because a memory recalls the value. Where a memory disagrees with a file in the repository, the file wins.
 
 Facts that hold only on this machine, and anything you would rather keep off the repository, go to `.stage/memory/local/`, which git ignores the way it ignores `.env`; every other memory is versioned and travels with a clone. An `env` entry whose last confirmation is over 180 days old is flagged stale where the session sees it, since a machine changes under a fact recorded about it. Nothing is recorded without your say-so: the agent offers, you decide — and `INVOLVE=low` in `.env` turns that into record-and-tell. The file format, the index line the hooks build, and how a memory is retired are in [Project Memory](docs/mds/stage-workflow/writing-workflow-conventions.md#12-project-memory).
@@ -510,7 +511,7 @@ The full collaboration and writing conventions are in [`AGENTS.md`](AGENTS.md) a
 
 When you start a paper from STAGE, these are the adjustments worth making:
 
-- Replace the title, authors, and affiliations in `manus/main.tex` with the real ones. Keep the anonymous placeholders during a double-blind cycle — `ANON=true` in `.env` makes `lint.sh` hunt identity leaks anywhere under `manus/`, comments included.
+- Replace the title, authors, and affiliations in `manus/main.tex` with the real ones. Keep the anonymous placeholders, and put `anon` on the `\documentclass` line, during a double-blind cycle — `ANON=true` in `.env` makes `lint.sh` hunt identity leaks anywhere under `manus/` outside comments, a class line without `anon` among them; comments ship with a source upload, so delete a real name from one yourself.
 - Copy `.env.example` to `.env` and set `STAR_HOME` (empty when you are not pairing with a STAR repository), `LATEX_ENGINE`, `ANON`, and the optional `INVOLVE`, `STAGE_LANG`, and model keys `STAGE_PLAN_MODEL`, `STAGE_EXEC_MODEL`, `STAGE_READ_MODEL`.
 - Create the first submission cycle and its `venue.yml` with `/stage-stry-coach`. Page limits, deadlines, and checklist requirements are entered only as facts you confirmed — never invented.
 - Unpack the venue's official kit whole into `cycls/<cycle>/template/`, not into `manus/`: that tree is the namespace `lint.sh` scans, and a kit's example `.tex` would trip its `\todo` count and its identity scan.

@@ -136,6 +136,11 @@ none of them. `compat.sty` closes exactly that gap:
 get manufactured: the venue class has usually loaded its own hyperref, geometry,
 and caption setup with options that a bare second load will fight.
 
+One line goes into every `compat.sty`, whatever the body uses:
+`\ifdefined\AddToHook \AddToHook{env/thebibliography/before}{\label{stage@refs}}\fi`, the hook `stage.cls`
+carries, so the copy's `.aux` records the page its reference list starts on and
+§6 counts content pages the way `lint.sh` counts the preprint's.
+
 Load order in the generated `main.tex`: the venue class, then `stys/stage`, then
 `compat`. Anything `compat.sty` defines that the venue class already defines uses
 `\providecommand` — never `\renewcommand` over a venue macro.
@@ -170,15 +175,15 @@ venue class each one is either re-expressed through a native equivalent or dropp
 
 | `stage.cls` command | Line | Becomes |
 |---|---|---|
-| `\affiliation[key]{...}` | 330 | the venue's affiliation macro |
-| `\contribution[mark]{...}` | 335 | the venue's equal-contribution / corresponding-author note, or a `\thanks` |
-| `\keywords{...}` | 341 | the venue's keywords macro, or dropped when it has none |
-| `\code` `\project` `\dataset` | 351–354 | a links line in the venue's own idiom, or dropped; redacted under anonymity |
-| `\correspondence{...}` | 355 | the venue's corresponding-author note |
-| `\paperdate{...}` | 356 | dropped — venue classes date the proceedings themselves |
-| `\paperstyle{...}` `\papercolor{...}` | 359, 180 | **dropped.** These drive `stage.cls`'s title panel and have no venue equivalent |
-| `\beginappendix` | 617 | the venue's appendix mechanism, usually `\appendix` |
-| `\metadata[label]{value}` | — | a links line, or dropped |
+| `\affiliation[key]{...}` | 336 | the venue's affiliation macro |
+| `\contribution[mark]{...}` | 341 | the venue's equal-contribution / corresponding-author note, or a `\thanks` |
+| `\keywords{...}` | 347 | the venue's keywords macro, or dropped when it has none |
+| `\code` `\demo` `\project` `\dataset` | 357–360 | a links line in the venue's own idiom, or dropped; redacted under anonymity |
+| `\correspondence{...}`, `\email{...}` | 361, 356 | the venue's corresponding-author note; dropped under anonymity |
+| `\paperdate{...}` | 362 | dropped — venue classes date the proceedings themselves |
+| `\paperstyle{...}` `\papercolor{...}` | 365, 180 | **dropped.** These drive `stage.cls`'s title panel and have no venue equivalent |
+| `\beginappendix` | 623 | the venue's appendix mechanism, usually `\appendix` |
+| `\metadata[label]{value}` | 348 | a links line, or dropped; redacted under anonymity |
 
 ### The abstract moves
 
@@ -200,14 +205,14 @@ or defines an incompatible one (silently wrong output). The rest of `secs/` is
 
 Not a separate mode — it follows what the run is already doing:
 
-| Run | `venue.yml` | The copy |
-|---|---|---|
-| `convert`, or a review pack | `anonymized: true` | anonymous: authors "Anonymous Author(s)", affiliations "Anonymous Institution", `\code`/`\project`/`\dataset` URLs replaced with "Link redacted for review", the kit's anonymity switch on |
-| `camera` pack | `anonymized: false` | full metadata, the kit's final-copy switch on |
+| `.env` `ANON` | The copy |
+|---|---|
+| `true` | anonymous: authors "Anonymous Author(s)", affiliations "Anonymous Institution", `\code`/`\demo`/`\project`/`\dataset` and bare `\metadata` URLs replaced with "Link redacted for review", `\correspondence`/`\email` dropped, the kit's anonymity switch on |
+| `false` | full metadata, the kit's final-copy switch on |
 
-`.env`'s `ANON` and `venue.yml`'s `anonymized:` disagreeing is already a stop in
-the main workflow (conventions §3.4) — the conversion never resolves it by picking
-one.
+Step 1 of the main workflow has already matched `ANON` to the mode, so the copy
+follows `ANON` alone; a `convert` run takes it as set, so set `ANON=false` before
+converting for the camera-ready.
 
 ## 6. Build, iterate, count pages
 
@@ -219,8 +224,11 @@ bash execs/run.sh --main <copy>/main.tex
 
 It compiles with the copy's own directory as the working directory and the copy's
 `stys/` on TEXINPUTS, so a build that passes proves the copy is self-contained —
-which is the point. Products land in `<copy>/.build/`, never in `wkdrs/builds/`,
-so the manuscript build that `lint.sh --no-build` reuses is not clobbered.
+which is the point. Without `--outdir`, products land in `<copy>/.build/`, never in
+`wkdrs/builds/`, so the manuscript build that `lint.sh --no-build` reuses is not
+clobbered. A pack run adds `--outdir wkdrs/builds/<cycle>_<date>_check/`: its copy
+is the package's source directory, and a `.build/` inside it would ship `.log` and
+`.fls` files carrying absolute paths.
 
 `--main` arrived with this feature, so a paper repository whose `execs/run.sh`
 predates it would pass the flag to latexmk as an unknown option. Check once, before
@@ -241,13 +249,20 @@ that cannot be mapped is reported, not deleted.
 
 **The page count from this build is the one that counts.** `lint.sh` measures the
 preprint build, which is a different document in a different class: useful as a
-drafting proxy, not as the answer to whether the paper fits. Compare this count
-against `page_limit_main`:
+drafting proxy, not as the answer to whether the paper fits. Count it the way
+`lint.sh` counts the preprint: unless `venue.yml` has `references_in_limit: true`,
+the count is the page `\newlabel{stage@refs}` records in this build's `main.aux`
+(`compat.sty`'s hook, §4; the `.aux` sits in the build's output directory), reported
+as `N content pages (through the page the references start on; M total)`. With
+`references_in_limit: true`, or with no such label — a venue bibliography that is
+not a `thebibliography` environment — the count is the PDF's total pages, and the
+report says so. Compare this count against `page_limit_main`:
 
 - **pack run, over the limit** — a hard block, routed to `stage-copy-editor`.
 - **`convert` run, over the limit** — reported with the overflow, no gate.
-- **`confirmed:` unset in `venue.yml`** — report the count and say the limit is
-  unconfirmed. An unconfirmed limit binds nothing (conventions §9c).
+- **`confirmed:` unset or `page_limit_main` blank in `venue.yml`** — report the
+  count and say the limit is unconfirmed or blank. Neither binds anything
+  (conventions §9c).
 
 ## 7. Report
 
@@ -274,6 +289,10 @@ list the user has already worked through.
 - what needs a human: a venue rule the conversion does not automate, a package the
   kit does not provide that the content needs, anything that could not be mapped
   one-to-one, the appendix ordering choice
+
+A checklist the kit expects inside the paper is one of those findings: a `V<n>`
+item in `tasks/<cycle>_venue.md`, routed to `stage-outl-planner` for its appendix
+row.
 
 Never let a gap pass silently to make the report look clean. A conversion that
 compiled by quietly dropping the keywords is a conversion that will surprise

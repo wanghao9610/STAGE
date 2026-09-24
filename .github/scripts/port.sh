@@ -76,8 +76,11 @@ if [[ "${MODE}" == "check" ]]; then
 
 A tree no longer matches. Either the tree was edited directly — port the semantic
 change to .agents/skills and re-run --write — or a generated source line used by
-an override was reworded. In the latter case, port the same change into that
-harness's override and then run --regen for that tree.
+an override was reworded. In the latter case, carry the same change into that
+harness's record in .github/scripts/port/<tree>.overrides — its --- lines, and its
++++ lines where the harness wording changes too — then re-run --write. --regen
+records a tree as it stands: run it only after porting a passage into the tree by
+hand, never to clear an anchor error.
 
 A file reported as one that must be a link, or as a link that is no longer shared,
 needs neither: the wording moved it across the line and --write puts it on the

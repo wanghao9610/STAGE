@@ -38,7 +38,7 @@ English: a `references/*_zh.md` edition is for human readers and is never loaded
 
 You are the defense counsel after the objections are filed. `stage-peer-reviewer` simulates the
 attack early; the venue's real reviews land in `cycls/<cycle>/reviews/` as `received_<id>.md`;
-you answer both through one pipeline — every point, from the evidence record, inside the venue's
+both enter one pipeline — every point, from the evidence record, inside the venue's
 format and length. What to concede is the user's decision, and a concession goes on the record
 in the ledger, not buried in polite wording. You never edit the manuscript — promised edits
 route to the drafting skills — never edit review files, never argue past what `mates/` can
@@ -48,14 +48,18 @@ prove.
 
 1. **Every point gets a row.** Parse everything in `reviews/` — free-form `received_*.md` and
    `SIM_REVIEW_*` alike, one pipeline — into the point ledger. A point without a row is an
-   unanswered reviewer, and venues notice unanswered reviewers.
+   unanswered reviewer, and venues notice unanswered reviewers. Once any `received_*` file exists,
+   `## Draft response` answers received reviews only. SIM points stay in the ledger under reviewer
+   `SIM-<date>`, for preparation, and open a promise or a concession only when the user names that
+   point.
 2. **Attacks map to claims and evidence.** Match each point against `notes/claims.md`: which
    claim is under attack, which fingerprinted `mates/` entry defends it. SIM reviews name claim
    IDs already; free-form reviews are mapped here, and an uncertain mapping is called uncertain
    in the ledger row rather than silently guessed.
 3. **Three dispositions; the costly ones are user-owned.** rebut — evidence in hand, cite it;
    promise — the paper will change, a checkbox is born; concede — the claim cannot be defended,
-   its status drops to `weakened`. Concessions and promises always go through the user, one
+   its status drops to `weakened`, and each section or table still stating it gets a box too.
+   Concessions and promises always go through the user, one
    point at a time via AskUserQuestion (§7); evidence-backed rebuttals may proceed and are
    listed for review afterwards. The question quotes the reviewer's point and the wording
    you would send, neither of them summarized (§7.12).
@@ -64,18 +68,22 @@ prove.
    promise to produce them — never a figure minted mid-rebuttal.
 5. **A promise is a debt.** Every "we will …" in the draft has a matching `- [ ]` in
    `tasks/<cycle>_promises.md` naming its point and target; `stage-subm-packer` refuses to pack
-   camera-ready while a box is unchecked. Promise nothing the user has not confirmed the team
-   will actually do.
+   camera-ready while a box is unchecked; for `response_type: response-letter` it refuses the
+   revision's review pack too, so those boxes are due before the revision is packed. Promise
+   nothing the user has not confirmed the team will actually do.
 6. **Venue response rules are user-confirmed facts (§9c).** `response_type` and `response_limit`
    come from `cycls/<cycle>/venue.yml`; missing or unconfirmed values are asked for, never
-   invented. `response_type: none` → build the point ledger and promises for the revision, skip
-   the draft, and say why.
+   invented. An answered value binds this run only: this skill never writes `venue.yml`, and the
+   closing line names `stage-stry-coach` to record it: on a finalized story, that bare run
+   completes the cycle's `venue.yml` alone. `response_type: none` → build the point ledger and
+   promises for the revision, skip the draft, and say why.
 
 7. **Fan out the parse (§6).** More than two files in `cycls/<cycle>/reviews/` → one delegate per
    review file, on the READ tier's model (conventions §11.6), where the harness can name one, each
    returning that review's points as ledger rows — point ID, the verbatim quote, the severity
-   the review states, and the claim IDs a SIM review names, each copied and none judged; a
-   free-form review's attacks are mapped here, in Step 3 — and nothing else. What does not split is everything
+   the review states (working data for Step 3; the ledger has no column for it), and the claim
+   IDs a SIM review names, each copied and none judged; a free-form review's attacks are mapped
+   here, in Step 3 — and nothing else. What does not split is everything
    after it: a disposition is decided against the whole point set, the costly ones are the user's
    call and stay at a confirmation point (§6.5), and the response is one document written to one
    limit. Every number quoted to a reviewer enters under Principle 4 whoever writes it (§6.4).
@@ -90,7 +98,12 @@ to get it: switch the session's model — then continue here.
 ### Step 1: Load
 
 Read the conventions file whole. `notes/story.md` → active cycle; `cycls/<cycle>/venue.yml` →
-`response_type`, `response_limit`; `notes/claims.md`; then list `cycls/<cycle>/reviews/`. An
+`response_type`, `response_limit`, `anonymized`; `notes/claims.md`; `mates/MANIFEST.md`;
+`tasks/<cycle>_promises.md`; then list `cycls/<cycle>/reviews/` and `cycls/<cycle>/response/`,
+reading the newest `RESPONSE_*` and the `sources:` of every one. The draft answers the
+`received_*` files no `RESPONSE_*` lists in `sources:` (a new round), or, when every `received_*`
+file is listed, the newest `RESPONSE_*`'s `sources:` again (a re-draft). With no `received_*` yet,
+it answers the `SIM_REVIEW_*` files. Say which set in one line before Step 3. An
 empty `reviews/` → stop: name the drop path (`cycls/<cycle>/reviews/received_<id>.md`) and note
 that `stage-peer-reviewer` can simulate a panel meanwhile. The parse that follows fans out per
 review file (Principle 7).
@@ -100,13 +113,19 @@ review file (Principle 7).
 Per file: fix the reviewer label — `received_R2.md` → R2, `SIM_REVIEW_<date>.md` →
 SIM-<date> — then split the text into atomic points: one weakness, question, or request each.
 Point IDs reuse the reviewer's own numbering where present (`R2.W1`), else number in reading
-order. Quote or tightly paraphrase; never soften a reviewer's words while carrying them into
+order. Quote verbatim; never soften a reviewer's words while carrying them into
 the ledger.
 
 ### Step 3: Map and disposition
 
 Per point: attacked claim IDs (SIM reviews carry them; free-form is inferred against the
-ledger), then defending evidence from the ledger's Evidence column down to its `mates/` anchor.
+ledger), then defending evidence from the ledger's Evidence column: open each cited `mates/` file
+at its anchor, confirm its MANIFEST entry, and note the claim's Status. A number drawn from a
+claim not at `verified` is named with that status wherever the point is shown to the user (its
+approval question, or the list of rebuttals shown for review afterwards). A point the newest
+`RESPONSE_*` already settled keeps its disposition when its text is unchanged and no MANIFEST
+entry it cites was `imported:` after that file's `date:`. A claim already at `weakened` is its
+concession on record. Only new points, changed points, and points whose evidence moved are walked.
 Propose rebut / promise / concede with a one-line rationale each, then walk Principle 3's
 approvals in point order, keeping a running record of what was decided so late answers can see
 early ones.
@@ -114,39 +133,55 @@ early ones.
 ### Step 4: Draft within the limit
 
 Point-by-point, grouped by reviewer, register matching `response_type` (rebuttal vs
-response-letter). Every answer cites its evidence by anchor ("Table 2; mates/<slug>/…") or
+response-letter). Every answer cites its evidence by anchor ("Table 2", "§4.3": the manuscript's
+own anchors, while the `mates/` anchor stays in the Point ledger's Evidence column) or
 states its promise ("we will add the ablation — see revision"). `response_limit` is the venue's
 own wording; measure the draft against it, report the measurement, and trim until it fits.
+Before Step 5 writes, re-read every number the draft quotes at its `mates/` anchor and compare,
+as `stage-tabs-builder`'s re-read does. A mismatch or a missing MANIFEST entry turns that answer
+into a promise or takes the number out. When `anonymized: true` or `.env` sets `ANON=true`, check
+`## Draft response` for URLs, names and self-identifying phrasing ("our previous work"), because
+`lint.sh` scans only `manus/`.
 
 ### Step 5: Write the artifacts
 
 - `cycls/<cycle>/response/RESPONSE_<date>.md` — real date (§4); create `response/` when absent;
+  a same-day file already on disk is overwritten only on its own confirmation (§7.7), with an
+  option that keeps its `## Draft response` as it stands and rewrites the Point ledger alone;
   shape below. **Always English, whatever `STAGE_LANG` says (§7.6)** — a program committee reads
   it. The chat report still follows the language resolved under §7.6; only the artifact is fixed.
-- `tasks/<cycle>_promises.md` — one `- [ ]` per promise. Merge on re-runs: never uncheck,
-  reword, or delete an existing box; append new ones.
+- `tasks/<cycle>_promises.md` — one `- [ ]` per promise, led by its point ID, and, for each
+  conceded claim the manuscript still states, one per section its `Stated in` names —
+  `- [ ] <point>: restate C<n> at conceded strength — stage-sect-drafter <section>` — and one per
+  `tabs/<slug>` entry, routed to `stage-tabs-builder <slug>`. Merge on re-runs: never uncheck or
+  reword an existing box, and append a box only for a point, or a conceded claim's `Stated in`
+  entry, that has none. An open box whose point this draft answers without that promise is
+  listed and asked about (§7.7, a deletion); on a yes it moves under `## Withdrawn` as
+  `- <point>: <promise> — withdrawn <date>: <reason>`, with no checkbox.
 - `notes/claims.md` — conceded claims flip to `weakened` and `updated:` is bumped. `weakened`
   is the only status this skill ever sets.
 
 ### Step 6: Report and commit
 
 Digest ≤300 words: points by disposition, promises opened, claims weakened, measured length vs
-`response_limit`. Routing: promised experiments run upstream in STAR, then `stage-evid-curator`
-re-imports; promised edits → `stage-sect-drafter` / `stage-tabs-builder`; promise state at a
-glance → `stage-flow-status`; the camera-ready gate that reads the boxes → `stage-subm-packer`.
-One commit per session (conventions §1), subject `stage-resp-writer: <cycle> response <date>`.
+`response_limit`, and the anonymity check's result when it ran. Routing: promised experiments run
+upstream in STAR, then `stage-evid-curator` re-imports; promised edits → `stage-sect-drafter` /
+`stage-tabs-builder`; promise state at a glance → `stage-flow-status`; the pack gate that reads the
+boxes → `stage-subm-packer`.
+One commit for the run (conventions §1), subject `stage-resp-writer: <cycle> response <date>`.
 
 ## Output
 
 Output-table row (§8): Response — producer `stage-resp-writer`, paths
 `cycls/<cycle>/response/RESPONSE_<date>.md` plus promises in `tasks/<cycle>_promises.md`, state:
-promise checkboxes; side effect: `weakened` downgrades in `notes/claims.md`. Exact shapes:
+promise checkboxes, ticked by the skill whose revision keeps each; side effect: `weakened`
+downgrades in `notes/claims.md`. Exact shapes:
 
 ```markdown
 ---
 cycle: <cycle>
 date: YYYY-MM-DD
-sources: [reviews/received_R2.md, reviews/SIM_REVIEW_<date>.md]
+sources: [reviews/received_R1.md, reviews/received_R2.md]
 ---
 ## Point ledger
 | Point | Reviewer | Attacked claims | Evidence | Response summary | Promise? |
@@ -158,6 +193,10 @@ sources: [reviews/received_R2.md, reviews/SIM_REVIEW_<date>.md]
 ```markdown
 # Promises — <cycle>
 - [ ] R2.W2: add ablation on X — run upstream, then stage-evid-curator + stage-tabs-builder
+- [ ] R1.W3: restate C4 at conceded strength — stage-sect-drafter 4_expts
+- [ ] R1.W3: restate C4 at conceded strength — stage-tabs-builder main_results
+## Withdrawn
+- R2.W4: add runtime table — withdrawn YYYY-MM-DD: cut from the sent rebuttal
 ```
 
 In chat: the Step 6 digest. Review files are read-only inputs and the manuscript is untouched —

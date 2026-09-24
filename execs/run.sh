@@ -146,10 +146,16 @@ log "Engine: ${LATEX_ENGINE}; output: ${BUILD_DIR}"
 # -cd compiles with the entry point's directory as the working directory so
 # relative \input and stys/ paths resolve; the absolute -outdir keeps every
 # generated file out of the tree.
+# A failed build leaves <main>.failed beside its log: a BibTeX error can keep
+# the previous PDF and a clean log, and lint.sh --no-build reads this marker
+# rather than mistake that PDF for a finished build. Any successful run,
+# a -C clean included, removes it.
 if ! latexmk "${ENGINE_FLAG}" -interaction=nonstopmode -halt-on-error \
         -cd -outdir="${BUILD_DIR}" ${1+"$@"} "${MAIN_TEX}"; then
+    : > "${BUILD_DIR}/${MAIN_BASE}.failed"
     fail "latexmk failed — see ${BUILD_DIR}/${MAIN_BASE}.log."
 fi
+rm -f "${BUILD_DIR}/${MAIN_BASE}.failed"
 
 PDF_FILE="${BUILD_DIR}/${MAIN_BASE}.pdf"
 if [[ -f "${PDF_FILE}" ]]; then

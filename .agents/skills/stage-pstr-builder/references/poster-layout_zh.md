@@ -8,7 +8,7 @@
 
 ## 1. 纸张尺寸
 
-尺寸来自 `cycls/<cycle>/venue.yml` 且其 `confirmed:` 已设（规约 §9c）。这张表的用途是核对一个已确认的值是否合理、以及换算单位——绝不用来提供一个用户尚未确认的尺寸。
+尺寸是用户确认过的那一个，作为 `size:` 与 `orientation:` 连同 `size_confirmed:` 记在 `POSTER_PLAN.md` 里（`SKILL.md` 原则 6）。这张表的用途是核对一个已确认的值是否合理、以及换算单位——绝不用来提供一个用户尚未确认的尺寸。
 
 | 名称 | 竖版（宽 × 高） | 横版（宽 × 高） |
 |---|---|---|
@@ -79,7 +79,7 @@
 有效 pt = 撰写时 pt × (印刷宽度 / 撰写宽度)
 ```
 
-所以在 A0（宽 841 mm）上写的 25pt 正文，印成 36 英寸（914 mm）时有效字号是 25 × 914/841 ≈ 27pt，达标；同一份文件印在 A1（594 mm）上则是 25 × 594/841 ≈ 18pt，不达标。要算，不要看。
+"装得下"那条检查（§6）把渲染出的页面钉在已确认的纸张上，所以对文档字号而言比例是 1，文档类的基准字号就是有效字号。比例要紧的是被引入的图内部的文字：`effective_pt = label_pt × placed_width / natural_width`，其中 `natural_width` 是 `pdfinfo manus/figs/<slug>.pdf` 报出的该图 `Page size`，`placed_width` 是它在 `poster.tex` 里的 `width=`。一张 72pt 宽的图里的 10pt 标签，放成 600pt 宽时印出来约 83pt；同样的标签在一张 500pt 宽的图里、放成 600pt 宽时印出来是 12pt，不达标。要算，不要看。
 
 有两处字号脱离文档类的基准字号，必须单独核对：被引入的图 PDF **内部**的文字，它随图被放置的框缩放而不随文档字号；以及任何用显式 `\fontsize` 排的东西。`check` 闸会点名纸面上最小的文字连同其算出的字号；一张图若其内部标签在被放置的宽度下低于 20pt，那是给 `stage-figs-designer` 的发现——绝不在这里重画（`SKILL.md` 原则 4）。
 
@@ -90,6 +90,7 @@
 ```latex
 \documentclass[a0paper, portrait, 25pt]{tikzposter}
 \usepackage{graphicx}
+\tikzposterlatexaffectionproofoff  % 文档类自带的署名行字号低于 20pt 下限
 % \usepackage{qrcode}   % 仅在用户给了二维码目标时
 
 \title{...}                    % 论文标题，逐字取自 manus/main.tex
@@ -114,19 +115,20 @@
 无论用哪个文档类都成立的规则：
 
 1. **一个分区一个块，顺序照计划。** 有块无行、或有行无块，就是不带参数的审计要报出的漂移。
-2. **`% src:` 写在它所来源的那个数字的上一行**，一个数字一条——与 `stage-tabs-builder` 对表格行的做法相同，好让 `stage-clms-auditor` 能像走表格那样走这张海报。
-3. **图按相对路径从 `manus/figs/` 引入**，不作修改。只用 `width` 参数缩放；绝不 `trim`、`clip` 或改配色。
+2. **`% src:` 写在它所来源的那个数字的上一行**，一个数字一条——比 `stage-tabs-builder` 每个数据行一条更细，好让 `check` 闸的 Sourced 一项（`SKILL.md` Step 5.1）能把海报上的每个数字走到它的指纹。`stage-clms-auditor` 只读 `manus/`，不审计海报。
+3. **图从 `manus/figs/` 引入，路径写成相对 `poster.tex` 的路径**（`../../../manus/figs/<slug>.pdf`；`run.sh` 在入口文件所在目录里编译），不作修改。只用 `width` 参数缩放；绝不 `trim`、`clip` 或改配色。
 4. **这里根本不定义 `\todo` 宏。** 手稿的第三种状态在海报上不存在（`SKILL.md` 原则 3），而一个宏未定义的文档类会在编译期大声失败，而不是把一个标记印到墙上。
 5. **各栏宽度之和要小于 1。** `tikzposter` 会加栏间距；和恰好为 1 的宽度会溢出纸张，而"装得下"那条检查要等到白渲染一次之后才抓得到。
 
 ## 5. 会议给了模板包时
 
-整包拷进 `cycls/<cycle>/poster/template/`，逐字节照抄、不作编辑，并在 `venue.yml` 里记下 `poster_template:` 点名包内的文档类。此时不再使用 §4 的自带骨架：用的是模板包自己的文档类、自己的块或栏命令、自己的标题宏，而分区图是映射到模板包所提供的结构上，而不是映射到 `tikzposter` 上。
+整包拷进 `cycls/<cycle>/poster/template/`，逐字节照抄、不作编辑，并在 `POSTER_PLAN.md` 的 frontmatter 里记下 `poster_template:` 点名包内的文档类。此时不再使用 §4 的自带骨架：用的是模板包自己的文档类、自己的块或栏命令、自己的标题宏，而分区图是映射到模板包所提供的结构上，而不是映射到 `tikzposter` 上。渲染时在 `SKILL.md` Step 4 的命令前加上 `TEXINPUTS=./template//:`；只写 `\documentclass{template/<class>}` 的话，文档类一旦装载同目录下的文件就会失败。
 
 §3 的一切仍然适用——模板包定的是观感，不是可读性下限，而它自带的示例内容是示例，不是约束。模板包按原样编译不过时，修正写在生成出来的 `poster.tex` 里或写进汇报里，绝不写进模板包的文件：这是 `stage-subm-packer` 原则 7 的同一条边界，理由也相同——一个为了在本地编译通过而被改过的文档类，会以印厂才发现的方式出错。
 
 ## 6. 需要跑命令的检查
 
 - **页面尺寸与页数。** 从渲染产物上读，而不是信任文档类：`pdfinfo wkdrs/builds/poster/poster.pdf` 报出以点为单位的 `Page size`（1 in = 72 pt）与 `Pages`，后者必须恰好是 1。与已确认纸张尺寸比对到毫米。
+- **最小文字。** `pdftotext -bbox wkdrs/builds/poster/poster.pdf -` 列出纸面上的每个词，图内文字按其被放置后的比例一并列出。词框高度（`yMax − yMin`，pt）读数略小于设定字号，所以偏向判不达标。图里转成轮廓的文字它看不见：`label_pt` 从图的源文件和框高都读不出来时，把 Legible 一项报为降级（规约 §3.5），绝不报为通过。
 - **灰度。** 转一份副本出来看——海报所依赖的每一处区分（数据系列、高亮、面板分组）都必须存活。工具链转不了时，如实说明，并点名改用推敲配色的方式核对了什么；绝不汇报一项没有真正跑过的检查。
 - **二维码目标。** URL 或 DOI 是用户的，由其提供并记进计划的 frontmatter。不抓取任何东西来拼出它，也绝不凭记忆写一个 arXiv id——错的二维码会把一整个展厅送到别人的论文上。

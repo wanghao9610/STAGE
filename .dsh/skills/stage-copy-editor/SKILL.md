@@ -71,8 +71,10 @@ from the same ones instead of each session inventing a voice.
 3. **Meaning-preserving edits are applied; meaning-adjacent ones are asked.** Grammar, wordiness,
    flow, tense and voice, canon enforcement: edit directly — that is the job. A rewrite that
    could shade a technical statement, or any cut beyond tightening, is proposed per conventions
-   §7 or routed, never silently applied. Sentences that state ledger claims (`notes/claims.md`)
-   get the most careful hands: polish the wording, never the strength.
+   §7 or routed, never silently applied — the recommended answer is to leave the sentence and
+   route it, so at `low` it becomes a `tasks/polish_followups.md` item and is never applied
+   unasked. Sentences that state ledger claims (`notes/claims.md`) get the most careful hands:
+   polish the wording, never the strength.
 4. **Budgets come from the outline.** Trim toward each section's Budget column in
    `notes/outline.md`. Tightening is yours; a section that cannot reach budget without losing
    substance becomes a routed finding naming what must go — the cut belongs to `stage-sect-drafter`.
@@ -91,9 +93,10 @@ from the same ones instead of each session inventing a voice.
    profile on disk means write exactly as this skill always has; never invent one mid-polish, and
    never widen one because a sentence would read better outside it.
 
-8. **Naturalness is a paragraph-level, evidence-preserving edit.** Treat the guide's patterns as
-   diagnostic signals, not forbidden-word rules. First freeze numbers, keys, anchors, `\todo{}`
-   markers, attribution, claim strength, and required qualifiers; then diagnose clusters and the
+8. **Naturalness is a paragraph-level, evidence-preserving edit.** Treat the human-writing
+   contract's patterns (conventions §7) as diagnostic signals, not forbidden-word rules. First
+   freeze numbers, keys, anchors, `\todo{}` markers, attribution, claim strength, and required
+   qualifiers; then diagnose clusters and the
    rhetorical job they perform. Rewrite the paragraph around its main claim, preserving deliberate
    parallelism, technical language, and uncertainty that the evidence requires. A rewrite that
    cannot pass the protected-content comparison is reported and left unapplied. Never claim that
@@ -102,12 +105,18 @@ from the same ones instead of each session inventing a voice.
 9. **Fan out per section file (§6).** A whole-manuscript run polishes files that do not touch each
    other: one delegate per in-scope `manus/secs/<n>_<slug>.tex`, on the EXEC tier's model
    (conventions §11.6), where the harness can name one, each owning that file alone for
-   the length of the fan-out (§6.2) and editing it in place under Principles 1–4 — no number
+   the length of the fan-out (§6.2) and editing it in place under Principles 1–3, 7, and 8, with
+   `notes/style.md` when it exists and the human-writing contract (conventions §7) — no number
    changed, no citation key touched, no `\todo` moved, the canon in `notes/notation.md` enforced,
-   and every meaning-adjacent edit returned as a question rather than applied. One section in scope
-   is one file, so it is done here. What never splits: the budget arithmetic, which compares
-   sections against each other; Principle 6's systematic patterns, which are only visible across
-   the whole return set; and Step 6's build, the gate the main agent runs itself (§6.3).
+   and every meaning-adjacent edit returned as a question rather than applied. Each returns, for
+   its file, the Step 3 protected inventory before and after its edits, its edit counts by kind,
+   the advisory patterns it reviewed, the meaning-adjacent edits it left unapplied, and its routed
+   findings, and nothing else. One section in scope is one file, so it is done here. What never
+   splits: the budget arithmetic, which compares sections against each other; Principle 6's
+   systematic patterns, which are only visible across the whole return set; caption prose in
+   `manus/tabs/`, which no section delegate owns; the `notes/outline.md` Sections rows, which one
+   writer sets (§6.2); and Step 6's build and Step 7's conservation check and lint, the gates the
+   main agent runs itself (§6.3).
 
 ## Workflow
 
@@ -118,11 +127,13 @@ to get it: switch the session's model — then continue here.
 
 1. **Load.** Read the conventions whole; then `notes/notation.md`, `notes/outline.md`
    (section rows and budgets), and `notes/claims.md` (know which sentences carry claims), plus
-   `notes/style.md` when it exists (Principle 7). Real date from the system clock (conventions §4).
+   `notes/style.md` when it exists (Principle 7), and, when `notes/story.md` names a `cycle:`,
+   that cycle's `venue.yml` — `page_limit_main`, `references_in_limit`, `confirmed:` (Step 5).
+   Real date from the system clock (conventions §4).
 2. **Resolve scope (conventions §5).** The literal `style` → the profile branch below, and
-   nothing else this run. Otherwise a section argument → one section; none → every section at
-   `drafted` or later, in outline order. `planned`/`skeleton` sections have nothing to polish —
-   skip them and say so.
+   nothing else this run but Step 10's commit. Otherwise a section argument → one section; none →
+   every section at `drafted` or later, in outline order. `planned`/`skeleton` sections have
+   nothing to polish — skip them and say so.
 
    **The profile branch (`style`).** Follow `references/style-profile.md`, which holds the dial
    vocabulary, the three ways in — interview, samples the user points at, or a named preset — and
@@ -132,8 +143,10 @@ to get it: switch the session's model — then continue here.
    above it), and write `notes/style.md` to the conventions §8.11 schema only after the user
    confirms — asked at every involve level (conventions §7.9): the dials are the author's. A run
    that finds a profile on disk starts from it: show the current tables, change only what the
-   user asks, append the trail entry — never re-derive unasked. Then stop: a profile run edits no prose, runs no build, files no report, and its
-   closing line is `stage-copy-editor <section>` — the run that puts the dials to work.
+   user asks, append the trail entry — never re-derive unasked. Then go to Step 10 (the commit
+   offer, `notes/style.md` alone) and end there: a profile run edits no prose, runs no build,
+   files no report, and its closing line is `stage-copy-editor <section>` — the run that puts the
+   dials to work.
 3. **Read whole first and freeze protected content.** Read each in-scope
    `manus/secs/<n>_<slug>.tex` end to end before editing: note flow breaks, canon violations,
    over-budget signs, repeated openings or endings, and anything that smells like a meaning problem
@@ -150,11 +163,27 @@ to get it: switch the session's model — then continue here.
    reviewed.
 5. **Trim to budget.** Compare each section against its outline budget — page estimate from the
    latest build in `wkdrs/builds/` when one exists, else word count as a proxy. Tighten where
-   prose alone closes the gap; record the remainder as a routed finding (Principle 4).
-6. **Verify the build.** Run `execs/run.sh` (bash). On failure, bisect the session's edits,
-   revert the breaker, rebuild — only a compiling manuscript leaves this skill.
-7. **Verify conservation and review warnings.** Compare the edited scope with the Step 3 inventory;
-   any changed protected item is restored before the pass continues. Re-read paragraph openings,
+   prose alone closes the gap; record the remainder as a routed finding (Principle 4). When
+   `venue.yml` carries `confirmed:` and a filled `page_limit_main` (conventions §9c; either empty
+   → report it and close with `stage-stry-coach`) and the page count that lint's gate or a
+   `stage-subm-packer` pack reported — else the latest build's — exceeds that limit, the limit
+   comes first: the overflow is that count minus the limit, less the reference pages when
+   `references_in_limit: false` and the count included them — nothing left over → cut nothing and
+   say the gate counted references. Tighten the sections furthest over budget first; what prose
+   cannot close is routed to `stage-sect-drafter` for the cut, or to `stage-outl-planner` when
+   the budgets no longer sum within the limit. No `cycle:` → outline budgets only.
+6. **Verify the build.** Run `execs/run.sh` (bash). On failure, bisect the run's edits,
+   revert the breaker, rebuild — only a compiling manuscript leaves this skill, unless the
+   failure persists with every edit of this pass reverted: then it was already there, so restore
+   the edits, report it with `file:line` and the skill that owns that file, and say the build and
+   Step 7's lint did not verify this pass — pre-existing breakage is a finding, not this skill's
+   repair.
+7. **Verify conservation and review warnings.** Compare the edited scope with the Step 3 inventory
+   — in a fanned-out run, the before-and-after inventories the delegates returned (Principle 9);
+   any changed protected item is restored before the pass continues. Once the comparison holds
+   and Step 6's build compiled, set each Sections row this pass polished to `polished` in
+   `notes/outline.md` — a section it read through and found nothing to change included — and
+   bump `updated:`. Re-read paragraph openings,
    sentence-length variation, transitions, and paragraph endings against `notes/style.md` when it
    exists, or a restrained, direct scholarly default when it does not. Run `execs/scpts/lint.sh`;
    prose-pattern warnings are advisory and enter the report, but they authorize neither a blind
@@ -162,12 +191,13 @@ to get it: switch the session's model — then continue here.
 8. **Report.** Write `wkdrs/reports/POLISH_<date>.md` (`mkdir -p` first) per Output. Append one
    `- [ ]` item per systematic or routed finding to `tasks/polish_followups.md` under a
    `## <date>` heading — location(s), issue, route; a re-run checks off items the new pass shows
-   resolved.
+   resolved and files only what has no open box (conventions §8.12).
 9. **Digest in chat.** ≤300 words: sections polished, edit counts by kind, canon violations
    fixed, budget state per section, findings routed, report path.
-10. **Commit (conventions §1).** One commit for the session — the edited `manus/` files and
-   `tasks/polish_followups.md`, or `notes/style.md` alone after a profile run — subject naming
-   this skill. `wkdrs/` is never committed.
+10. **Commit (conventions §1).** One commit for the run — the edited `manus/` files, the
+   `notes/outline.md` Sections rows it polished, and `tasks/polish_followups.md`, or
+   `notes/style.md` alone after a profile run — subject naming this skill. `wkdrs/` is never
+   committed.
 
 ## Output
 
@@ -188,6 +218,8 @@ to get it: switch the session's model — then continue here.
   lists, and the samples, to the conventions §8.11 schema (output-table row: Style profile). A polish
   run reads it and never writes it, and a `style` run writes nothing
   else durable — measurement scratch under `wkdrs/` (gitignored, regenerable) excepted.
-- No writes to the ledger, the outline, the notation canon, `mates/`, or the bib — ownership of
-  claims, structure, and canon stays with the skills that hold it.
+- `notes/outline.md` — the Sections rows this pass polished → `polished`, and `updated:`.
+- No writes to the ledger, the outline beyond the Sections rows this pass polished, the notation
+  canon, `mates/`, or the bib — ownership of claims, structure, and canon stays with the skills
+  that hold it.
 - Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

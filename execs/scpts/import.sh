@@ -42,22 +42,26 @@ Options:
   --source PATH   Source repo (default: STAR_HOME from .env).
   --slug NAME     Destination mates/<slug>/ (default: the source directory's
                   basename, lowercased).
-  --diff          Read-only staleness report: compare upstream against
-                  mates/<slug>/ and list stale / new upstream / missing
-                  upstream files. Exits 0 when clean, 2 when anything
-                  drifted, 1 on a hard error (no source configured, bad
-                  slug) — drift and misconfiguration are different answers
-                  and a caller reading the exit code must be able to tell
-                  them apart. Writes nothing.
+  --diff          Read-only staleness report. Bare, it checks every slug
+                  mates/MANIFEST.md records as source-type: star against its
+                  recorded source, a leading $STAR_HOME read as the current
+                  STAR_HOME; before the first star entry exists it previews
+                  STAR_HOME against mates/<its basename>/. With --source or
+                  --slug it compares that one upstream against mates/<slug>/.
+                  Lists stale / new upstream / missing upstream / tampered
+                  files, names importable files the upstream has not
+                  committed, and reports a slug whose source is not
+                  reachable as unknown. Exits 0 when clean, 2 when anything
+                  drifted, 1 on a hard error or an unreachable source (no
+                  source configured, bad slug) — drift and misconfiguration
+                  are different answers and a caller reading the exit code
+                  must be able to tell them apart. Writes nothing.
   -h, --help      Show this help message.
 
 Imported (skipped with a note when absent upstream):
   metds/{adopt,codearc,overview,framework,dataset,training,evaluation}.md
   metds/ideas/*.md      metds/refs/**  (including reference.bib)
   wkdrs/results/*.md    wkdrs/digests/*.md
-
-Convenience: when manus/bibs/reference.bib is absent and the source has
-metds/refs/reference.bib, a copy is seeded there.
 
 Entries with source-type: manual (hand-dropped evidence under mates/manual/)
 are owned by /stage-evid-curator and never touched by this script.
@@ -115,23 +119,31 @@ env_value() {
 
 STAR_HOME="${STAR_HOME:-$(env_value STAR_HOME)}"
 
-SOURCE_INPUT="${OPT_SOURCE:-${STAR_HOME:-}}"
-[[ -n "${SOURCE_INPUT}" ]] || \
-    fail "No evidence source: pass --source PATH, or set STAR_HOME in ${ENV_FILE} (copy .env.example to .env first)."
-[[ -d "${SOURCE_INPUT}" ]] || fail "Source is not a directory: ${SOURCE_INPUT}"
-SOURCE_DIR="$(cd -- "${SOURCE_INPUT}" && pwd -P)"
+SOURCE_DIR=""
+SLUG=""
+DEST_DIR=""
 
-if [[ -n "${OPT_SLUG}" ]]; then
-    SLUG="$(printf '%s' "${OPT_SLUG}" | tr '[:upper:]' '[:lower:]')"
-else
-    SLUG="$(basename -- "${SOURCE_DIR}" | tr '[:upper:]' '[:lower:]')"
-fi
-[[ "${SLUG}" =~ ^[a-z0-9][a-z0-9._-]*$ ]] || \
-    fail "Slug '${SLUG}' must be lowercase [a-z0-9._-] and start with a letter or digit."
-[[ "${SLUG}" != "manual" ]] || \
-    fail "Slug 'manual' is reserved for hand-registered evidence (mates/manual/)."
+# The one upstream an import, or a --diff given --source or --slug, works on:
+# --source, else STAR_HOME; the slug from --slug, else that directory's name.
+resolve_source() {
+    local input="${OPT_SOURCE:-${STAR_HOME:-}}"
+    [[ -n "${input}" ]] || \
+        fail "No evidence source: pass --source PATH, or set STAR_HOME in ${ENV_FILE} (copy .env.example to .env first)."
+    [[ -d "${input}" ]] || fail "Source is not a directory: ${input}"
+    SOURCE_DIR="$(cd -- "${input}" && pwd -P)"
 
-DEST_DIR="${ROOT_DIR}/mates/${SLUG}"
+    if [[ -n "${OPT_SLUG}" ]]; then
+        SLUG="$(printf '%s' "${OPT_SLUG}" | tr '[:upper:]' '[:lower:]')"
+    else
+        SLUG="$(basename -- "${SOURCE_DIR}" | tr '[:upper:]' '[:lower:]')"
+    fi
+    [[ "${SLUG}" =~ ^[a-z0-9][a-z0-9._-]*$ ]] || \
+        fail "Slug '${SLUG}' must be lowercase [a-z0-9._-] and start with a letter or digit."
+    [[ "${SLUG}" != "manual" ]] || \
+        fail "Slug 'manual' is reserved for hand-registered evidence (mates/manual/)."
+
+    DEST_DIR="${ROOT_DIR}/mates/${SLUG}"
+}
 
 TEMP_DIR="$(mktemp -d)"
 trap 'rm -rf -- "${TEMP_DIR}"' EXIT
@@ -232,8 +244,8 @@ file_sha256() {
     fi
 }
 
-# One line saying what a path evidences; a curator may sharpen it later and
-# re-imports keep the sharpened wording.
+# One line saying what a path evidences; re-import rewrites it with the rest
+# of the entry.
 default_covers() {
     case "$1" in
         metds/adopt.md)           printf 'how the paired STAR project is wired up' ;;
@@ -285,22 +297,71 @@ manifest_entry_replace() {
     mv "${tmp}" "${MANIFEST}"
 }
 
-if [[ "${DIFF}" == true ]]; then
+# One field of a MANIFEST entry ("- <field>: <value>" under "## <key>"), value
+# only; nothing when the entry or the field is absent.
+manifest_field() {
+    [[ -f "${MANIFEST}" ]] || return 0
+    awk -v key="## $1" -v field="- $2:" '
+        $0 == key { f = 1; next }
+        /^## /    { f = 0 }
+        f && index($0, field) == 1 {
+            v = substr($0, length(field) + 1)
+            sub(/^[[:space:]]+/, "", v)
+            sub(/[[:space:]]+$/, "", v)
+            print v
+            exit
+        }
+    ' "${MANIFEST}"
+}
+
+# Importable files the source repository has not committed, as git's porcelain
+# lines: a source-commit cannot pin their bytes. Nothing for a clean tree or a
+# source that is not a git work tree.
+upstream_dirty() {
+    local -a paths=()
+    local rel
+    git -C "${SOURCE_DIR}" rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
+    while IFS= read -r rel; do
+        [[ -n "${rel}" ]] && paths+=("${rel}")
+    done < "${LIST_FILE}"
+    (( ${#paths[@]} > 0 )) || return 0
+    git -C "${SOURCE_DIR}" status --porcelain --untracked-files=all -- "${paths[@]}" 2>/dev/null || true
+}
+
+# The read-only comparison of one upstream against one mates/<slug>/. Returns
+# 0 in sync, 2 drifted: 2, not 1, because fail() exits 1 for a hard error (no
+# source, bad slug), and a skill reading the exit code must not mistake a
+# misconfigured STAR_HOME for stale evidence — the same triad update.sh --diff
+# uses.
+diff_one() {
+    local rel src dst want have dirty head
+    local drift=0
+    SOURCE_DIR="$1"
+    SLUG="$2"
+    DEST_DIR="${ROOT_DIR}/mates/${SLUG}"
+    : > "${LIST_FILE}"
+
     log "Staleness check: ${SOURCE_DIR} vs mates/${SLUG}/ (read-only)."
-else
-    log "Importing from ${SOURCE_DIR} into mates/${SLUG}/."
-fi
-
-collect
-
-if [[ "${DIFF}" == true ]]; then
-    drift=0
+    collect
 
     while IFS= read -r rel; do
         src="${SOURCE_DIR}/${rel}"
         dst="${DEST_DIR}/${rel}"
         if [[ ! -e "${dst}" ]]; then
             printf '  new upstream      %s\n' "${rel}"
+            drift=$(( drift + 1 ))
+            continue
+        fi
+        # The copy is checked against its own registration first: a copy
+        # edited in place is not upstream drift, and re-importing over it
+        # would hide the edit.
+        want="$(manifest_field "${SLUG}/${rel}" sha256)"
+        have=""
+        if [[ "${want}" =~ ^[0-9a-f]{64}$ ]]; then
+            have="$(file_sha256 "${dst}")"
+        fi
+        if [[ "${have}" =~ ^[0-9a-f]{64}$ && "${have}" != "${want}" ]]; then
+            printf '  tampered          %s (local copy no longer matches its MANIFEST sha256; /stage-evid-curator check)\n' "${rel}"
             drift=$(( drift + 1 ))
         elif ! cmp -s "${src}" "${dst}"; then
             printf '  stale             %s (upstream stamp: %s; imported stamp: %s)\n' \
@@ -318,22 +379,96 @@ if [[ "${DIFF}" == true ]]; then
         done < <(cd "${DEST_DIR}" && find . -type f -not -name '.*' 2>/dev/null | sed 's|^\./||' | sort)
     fi
 
+    dirty="$(upstream_dirty)"
+    if [[ -n "${dirty}" ]]; then
+        head="$(git -C "${SOURCE_DIR}" rev-parse HEAD 2>/dev/null || printf 'n/a')"
+        log "note: upstream has uncommitted changes in $(printf '%s\n' "${dirty}" | wc -l | tr -d ' ') importable file(s); an import would record source-commit ${head}-dirty. Commit them in the STAR repo and re-import to pin the bytes:"
+        printf '%s\n' "${dirty}" | sed 's/^/      /'
+    fi
+
     if (( drift > 0 )); then
         log "${drift} path(s) drifted. Re-import with: bash execs/scpts/import.sh --source ${SOURCE_DIR} --slug ${SLUG}"
-        # 2, not 1: fail() above exits 1 for a hard error (no source, bad slug),
-        # and a skill reading this exit code must not mistake a misconfigured
-        # STAR_HOME for stale evidence — the same triad update.sh --diff uses.
-        exit 2
+        return 2
     fi
     if [[ ! -d "${DEST_DIR}" && ! -s "${LIST_FILE}" ]]; then
         log "Nothing to compare: upstream has no importable artifacts and mates/${SLUG}/ does not exist."
-        exit 0
+        return 0
     fi
     log "mates/${SLUG}/ is in sync with ${SOURCE_DIR}."
-    exit 0
+    return 0
+}
+
+# One line per slug MANIFEST holds star entries for: "<slug><TAB><source dir>",
+# the directory being the entry's `- source:` minus its trailing /<rel>, from
+# the first entry of that slug.
+manifest_star_sources() {
+    [[ -f "${MANIFEST}" ]] || return 0
+    awk '
+        function flush(    slug, rel, dir) {
+            if (key != "" && type == "star") {
+                slug = key
+                sub(/\/.*/, "", slug)
+                rel = substr(key, length(slug) + 2)
+                dir = src
+                if (rel != "" && substr(dir, length(dir) - length(rel)) == "/" rel)
+                    dir = substr(dir, 1, length(dir) - length(rel) - 1)
+                if (!(slug in seen)) { seen[slug] = 1; print slug "\t" dir }
+            }
+            key = ""; type = ""; src = ""
+        }
+        /^## / { flush(); key = substr($0, 4); sub(/[[:space:]]+$/, "", key); next }
+        /^- source-type:/ { type = $0; sub(/^- source-type:[[:space:]]*/, "", type); sub(/[[:space:]]+$/, "", type) }
+        /^- source:/      { src = $0;  sub(/^- source:[[:space:]]*/, "", src);        sub(/[[:space:]]+$/, "", src) }
+        END { flush() }
+    ' "${MANIFEST}"
+}
+
+if [[ "${DIFF}" == true ]]; then
+    # Bare --diff after the first import: every imported slug, each against the
+    # source its own entries record, so a slug imported with --source or --slug
+    # is checked where it came from rather than against STAR_HOME's basename.
+    if [[ -z "${OPT_SOURCE}${OPT_SLUG}" ]] && [[ -n "$(manifest_star_sources)" ]]; then
+        any_drift=false
+        any_unknown=false
+        star_lit='$STAR_HOME'
+        while IFS=$'\t' read -r m_slug m_dir; do
+            [[ -n "${m_slug}" ]] || continue
+            if [[ "${m_dir}" == "${star_lit}" || "${m_dir}" == "${star_lit}/"* ]]; then
+                if [[ -z "${STAR_HOME:-}" ]]; then
+                    printf '  unknown           mates/%s/ (source %s not reachable: STAR_HOME is unset)\n' "${m_slug}" "${m_dir}"
+                    any_unknown=true
+                    continue
+                fi
+                m_dir="${STAR_HOME}${m_dir#"${star_lit}"}"
+            fi
+            if [[ -z "${m_dir}" || ! -d "${m_dir}" ]]; then
+                printf '  unknown           mates/%s/ (source %s not reachable)\n' "${m_slug}" "${m_dir:-(none recorded)}"
+                any_unknown=true
+                continue
+            fi
+            rc=0
+            diff_one "$(cd -- "${m_dir}" && pwd -P)" "${m_slug}" || rc=$?
+            if (( rc == 2 )); then any_drift=true; fi
+        done < <(manifest_star_sources)
+        if [[ "${any_unknown}" == true ]]; then
+            log "A slug above has no reachable source: set STAR_HOME, or pass --source PATH --slug NAME for it."
+        fi
+        if [[ "${any_drift}" == true ]]; then exit 2; fi
+        if [[ "${any_unknown}" == true ]]; then exit 1; fi
+        exit 0
+    fi
+    # Before the first import, or with --source / --slug: the one upstream.
+    resolve_source
+    rc=0
+    diff_one "${SOURCE_DIR}" "${SLUG}" || rc=$?
+    exit "${rc}"
 fi
 
 # ---- import -----------------------------------------------------------------
+resolve_source
+log "Importing from ${SOURCE_DIR} into mates/${SLUG}/."
+collect
+
 mkdir -p "${ROOT_DIR}/mates"
 if [[ ! -f "${MANIFEST}" ]]; then
     {
@@ -349,6 +484,18 @@ fi
 
 SOURCE_COMMIT="$(git -C "${SOURCE_DIR}" rev-parse HEAD 2>/dev/null || printf 'n/a')"
 TODAY="$(date +%Y-%m-%d)"
+
+# A commit pins only committed bytes. An importable file the upstream has not
+# committed is recorded against <sha>-dirty, so the entry never claims a commit
+# that does not hold what landed.
+if [[ "${SOURCE_COMMIT}" != "n/a" ]]; then
+    DIRTY="$(upstream_dirty)"
+    if [[ -n "${DIRTY}" ]]; then
+        SOURCE_COMMIT="${SOURCE_COMMIT}-dirty"
+        log "warn: upstream has uncommitted changes in $(printf '%s\n' "${DIRTY}" | wc -l | tr -d ' ') importable file(s); source-commit records ${SOURCE_COMMIT}. Commit them in the STAR repo and re-import to pin the bytes:"
+        printf '%s\n' "${DIRTY}" | sed 's/^/      /'
+    fi
+fi
 
 # MANIFEST names the source as $STAR_HOME/<rel> when that is where it came
 # from, so the ledger stays valid across machines with different paths.
@@ -370,14 +517,7 @@ while IFS= read -r rel; do
 
     stamp="$(extract_stamp "${src}")"
     checksum="$(file_sha256 "${dst}")"
-    covers="$(awk -v key="## ${key}" '
-        $0 == key { f = 1; next }
-        /^## /    { f = 0 }
-        f && sub(/^- covers:[[:space:]]*/, "") { print; exit }
-    ' "${MANIFEST}")"
-    if [[ -z "${covers}" ]]; then
-        covers="$(default_covers "${rel}")"
-    fi
+    covers="$(default_covers "${rel}")"
 
     {
         printf '## %s\n' "${key}"
@@ -399,14 +539,6 @@ if (( imported == 0 )); then
     log "Nothing to import: upstream has none of the importable artifacts."
     log "Evidence can still be hand-registered under mates/manual/ via /stage-evid-curator."
     exit 0
-fi
-
-# Convenience seed: a manuscript needs a bibliography before the first
-# /stage-refs-curator run; the mates/ copy above stays the fingerprinted one.
-if [[ ! -f "${ROOT_DIR}/manus/bibs/reference.bib" && -f "${SOURCE_DIR}/metds/refs/reference.bib" ]]; then
-    mkdir -p "${ROOT_DIR}/manus/bibs"
-    cp -p "${SOURCE_DIR}/metds/refs/reference.bib" "${ROOT_DIR}/manus/bibs/reference.bib"
-    log "Seeded manus/bibs/reference.bib from upstream metds/refs/reference.bib."
 fi
 
 log "Imported ${imported} file(s) from commit ${SOURCE_COMMIT} into mates/${SLUG}/; mates/MANIFEST.md updated."

@@ -54,7 +54,7 @@ Survives rebuttal: <yes|no> — <why>.
 
 把上面五个视角小节按评审组顺序串起来（魔鬼代言人放最后），每个压缩成没有 Summary 的形式（顶部共用一个 Summary），然后在同一个文件里直接接上下面的综合评审各节。开头写："Quick mode — single sequential pass; perspectives are not independent."
 
-## meta_review.md
+## SIM_REVIEW_<date>.md（综合评审）
 
 ```markdown
 ---
@@ -64,6 +64,7 @@ cycle: <venue>_<year>
 scale: <conference-6 | journal>
 mode: <panel | quick>
 generated: <YYYY-MM-DD>
+commit: <git log -1 sha, +dirty when manus/ had uncommitted edits>
 recommendation: "<4 — Borderline Accept (confidence 3) | Major Revision>"
 ---
 
@@ -119,9 +120,9 @@ resolved, or "none">. Perspectives missing: <dropped panelist, or "none">.
 
 ## REFEREE_<date>.md
 
-带 `extern=` 的运行写出的报告。正文就是上面的 `meta_review.md`，只有四处改动，此外没有别的：
+带 `extern=` 的运行写出的报告。正文就是上面的综合评审，只有四处改动，此外没有别的：
 
-- frontmatter 写成 `type: referee_report`、`target: <extern= 拿到的那个路径>`、`venue:`、`scale:`、`mode:`、`generated:`、`recommendation:`——不带 `cycle:`，因为根本没有。
+- frontmatter 写成 `type: referee_report`、`target: <extern= 拿到的那个路径>`、`venue:`、`scale:`、`mode:`、`generated:`、`recommendation:`——不带 `cycle:` 或 `commit:`，因为根本没有。
 - `## Major Weaknesses` 每一行去掉 "attacks <claim IDs>" 那一段。锚点与"由哪些视角提出"保留；没有记录表可点名，不等于可以省掉位置。
 - `## Action List` 整节省略。那是自评那一节，而这篇论文不归我们修。
 - 文件以一行收尾，说清它是什么：给那位人类审稿人改的草稿。venue 收到的是那个人提交的东西，绝不是这份文件。

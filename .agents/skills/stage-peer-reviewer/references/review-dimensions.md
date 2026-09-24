@@ -86,10 +86,10 @@ Severity guide: this perspective produces at most 3 majors — the ones it would
 
 1. You may name a reference in your review only if one of these holds:
    - **Whitelist**: it appears in the paper's own bibliography — cite it exactly as the paper cites it, and mark it `whitelist`.
-   - **Verified**: you believe relevant work exists but cannot name it from the bibliography, so you search for it. Write `what_it_would_settle` into your return **before** you run the query — "if a paper before 2023 does X, the novelty claim falls" — then run it, cache the record under your own prefix, and report the record with its cache path. Your own reading of the hit is advisory: the chair opens that payload and applies your criterion itself, and a record that does not meet it becomes a direction under item 3. A lead you could not run comes back unsettled, marked `lead`, and the chair runs it.
+   - **Verified**: you believe relevant work exists but cannot name it from the bibliography, so you search for it. Write `what_it_would_settle` into your return **before** you run the query — "if a paper before 2023 does X, the novelty claim falls" — then run it, cache the record under your own prefix, and report the record with its cache path. Your own reading of the hit is advisory: the chair opens that payload and applies your criterion itself, and a record that does not meet it becomes a direction under item 3. A lead you could not run comes back unsettled, marked `lead`, and the chair runs it. Before your first query, list every lead you will run, each with its `what_it_would_settle`, and run only those; a lead that occurs to you mid-search comes back unrun under `leads`, and the chair decides it.
 2. Never name a reference from memory. Your memory of a paper is a hypothesis, not a source; a plausible "(Author et al., year)" you cannot fetch is treated as nonexistent, and inventing one is the one unforgivable failure of this skill.
 3. What you cannot verify, phrase as a direction — "the authors should check whether prior work exists on X" — with no names attached.
-4. You search at the rate your brief gives you and no faster — a number of seconds between your own requests to a host, already divided by how many panelists are running, so the panel together stays inside one polite rate. Log every query you run with its hit count, the ones that find nothing included: a failed search is evidence that the related-work landscape is thin there, and it only counts as evidence if it is written down. Cache every record under the prefix your brief names, before you read it — a record whose payload is not on disk is one the chair will strike.
+4. You search at the rate your brief gives you and no faster — a number of seconds between your own requests to a host, already multiplied by the most panelists the chair runs at once, so the panel together stays inside one polite rate. Log every query you run with its hit count, the ones that find nothing included: a failed search is evidence that the related-work landscape is thin there, and it only counts as evidence if it is written down. Cache every record under the prefix your brief names as your very next action, unedited — the fetch tool's response itself, never a record typed from a hit list or from memory; a record whose payload is not on disk is one the chair will strike.
 5. Confidential-submission mode (you will be told if it applies): a lead's query carries topic terms only — never the paper's title, author guesses, or verbatim sentences from the paper.
 
 ## Collector Contract (what every panelist returns)
@@ -109,7 +109,7 @@ named_references: [{name_as_cited, origin: whitelist, title, authors, year, venu
 queries_run: [{query, host, hits}]       # every one, the zero-hit ones included
 verified_refs: [{name_as_cited, query, what_it_would_settle, title, authors, year,
   venue, url, cache_path}]                 # criterion written before the query ran
-leads: [{query, what_it_would_settle}]     # only what you could not run; the chair does
+leads: [{query, what_it_would_settle}]     # what you could not run, or thought of after your first query; the chair decides
 failures: [{step_or_host, error}]
 model_id: <your own model id, as your review file's frontmatter records it>
 ```

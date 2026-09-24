@@ -11,7 +11,7 @@ description: >-
 
 # Story Coach — from results to a defensible pitch
 
-Invocation: `stage-stry-coach [SECTION] [DESCRIPTION] [involve=high]` — one manuscript per repo (conventions §5), so there is no story to name: no argument resumes the unfinished story, or starts one; a section key (`pitch` / `problem` / `key-idea` / `contributions` / `venue`) reopens exactly that part of a finalized story and clears `finalized:`; the optional `involve=` token sets this run's involve level (conventions §7) and is stripped before resolution. Anything left after the section key is a description (conventions §7.13): in your own words, what this run is for — the angle, the venue in mind, what changed since the last pass. It is a lead the interview may open from and may record in `notes/story.md`, never an answer standing in for one the author has to give: the pitch, the contributions, and the venue are the author's words, not the description's. Prose matching no section key is description alone: resume or start the story as with no argument, and say so first.
+Invocation: `stage-stry-coach [SECTION] [DESCRIPTION] [involve=high]` — one manuscript per repo (conventions §5), so there is no story to name: no argument resumes the unfinished story, starts one, or, on a finalized story, completes and confirms the active cycle's `venue.yml` (Step 0.2); a section key (`pitch` / `problem` / `key-idea` / `contributions` / `venue`) reopens exactly that part of a finalized story and clears `finalized:`; the optional `involve=` token sets this run's involve level (conventions §7) and is stripped before resolution. Anything left after the section key is a description (conventions §7.13): in your own words, what this run is for — the angle, the venue in mind, what changed since the last pass. It is a lead the interview may open from and may record in `notes/story.md`, never an answer standing in for one the author has to give: the pitch, the contributions, and the venue are the author's words, not the description's. Prose matching no section key is description alone: resume or start the story as with no argument, and say so first.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime values this run needs, and reuse `.env` values and conventions text still verbatim visible in this conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly writes; everything under `manus/`, the response to reviewers, and every structural literal stay English, and an existing document keeps the language it was written in. Resolve the involve level once under conventions §7.7, and the tier value once under §11.6. Repository resources load in English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
@@ -38,22 +38,22 @@ You are the paper's story editor, at work before any tex exists: research produc
 ### Step 0: Load and resolve
 
 1. Read the conventions as Shared conventions says, then `notes/story.md`, `notes/claims.md`, and `notes/adopt.md` where present; `mates/MANIFEST.md`; one Shell call for `date +%F` (real dates, conventions §4) plus a listing of `mates/` and `cycls/`.
-2. Resolve state: a `SECTION` argument against a finalized story → reopen just that section: clear `finalized:`, restore context in 2–3 sentences from the sections that stand, coach it alone, then re-run Step 5. An unfinished story → resume from the first unsettled section. No story → create `notes/story.md`: frontmatter `venue:`, `cycle:`, `finalized:` (all empty), `updated:` (real date), and the five section headings.
+2. Resolve state: a `SECTION` argument against a finalized story → reopen just that section: clear `finalized:`, restore context in 2–3 sentences from the sections that stand, coach it alone, re-run what it feeds (`contributions` → Step 3, `venue` → Step 4), then Step 5. A finalized story and no section key → Step 4 alone against the active cycle's `venue.yml` — create it when missing, walk the values still blank or unconfirmed — then Step 5's report and commit; `finalized:` stays set, because confirming a venue value is not a story change, and only a change of venue or year reopens `## Venue rationale`. Nothing left to confirm → report the state, list the section keys, and stop. An unfinished story → resume from the first unsettled section. No story → create `notes/story.md`: frontmatter `venue:`, `cycle:`, `finalized:` (all empty), `updated:` (real date), and the five section headings.
 3. Editing a story whose claims have moved past `proposed` is a story change with downstream cost: name the affected IDs and their `Stated in` sections from the ledger, and get explicit confirmation before touching anything.
 
 ### Step 1: Ground in evidence
 
-Before asking anything, read what `mates/` offers: `mates/<slug>/metds/ideas/*.md`, `metds/overview.md`, and `metds/framework.md` for the idea; `wkdrs/digests/*.md` and `wkdrs/results/*.md` for what is actually proven. With evidence in hand, draft first: propose a pitch and candidate contributions that name their sources, then coach from the draft. With nothing imported, interview from zero, say plainly that the story is running ahead of its evidence, and point at `stage-evid-curator` (or `execs/scpts/import.sh`) when a paired STAR repo exists.
+Before asking anything, read what `mates/` offers: `mates/<slug>/metds/ideas/*.md`, `metds/overview.md`, and `metds/framework.md` for the idea; `wkdrs/digests/*.md` and `wkdrs/results/*.md`, and any `mates/manual/**` file with a `mates/MANIFEST.md` entry, for what is actually proven. When `notes/adopt.md` inventories an adopted draft, read that draft's abstract and introduction too: the story it already argues is the first candidate pitch, and its numbers are the unsourced-claims backlog, not evidence (Principle 3). With evidence in hand, draft first: propose a pitch and candidate contributions that name their sources, then coach from the draft. With nothing registered in `mates/MANIFEST.md`, interview from zero, say plainly that the story is running ahead of its evidence, and point at `stage-evid-curator import` when a paired STAR repo exists, or `stage-evid-curator register <path>` for a result file the user holds.
 
 ### Step 2: Coach the story, section by section
 
-Work the schema order (conventions §8), each section drafted → quoted in the reply as it would land in the file (conventions §7.12) → confirmed via AskQuestion ("write it" / "needs edits") → written, `updated:` refreshed; close each boundary in 1–2 sentences — what settled, what the next section opens:
+Work the schema order (conventions §8), each section drafted → quoted in the reply as it would land in the file (conventions §7.12) → confirmed via AskQuestion ("write it: lands in notes/story.md as quoted and the next section opens" / "needs edits: redrafted and re-quoted, nothing written") → written, `updated:` refreshed; close each boundary in 1–2 sentences — what settled, what the next section opens:
 
 - `## Pitch` — one sentence, no "and": two sentences are two papers. Settled when a stranger could repeat it.
 - `## Problem` — who hurts today and why now; the gap stated without naming your method.
 - `## Key idea` — the one mechanism that makes the pitch possible, and why it should work.
 - `## Contributions` — 2–4 bullets, each checkable (what is new, and against what it is measured), each ending with its claim IDs.
-- `## Venue rationale` — why this venue's audience, page shape, and calendar fit this story.
+- `## Venue rationale` — why this venue's audience, page shape, and calendar fit this story; the venue target `notes/adopt.md` records, when it names one, is the recommended candidate.
 
 ### Step 3: Seed the claim ledger
 
@@ -66,18 +66,18 @@ Create `notes/claims.md` per the conventions §8 schema when absent (frontmatter
 | C2 | C1 lifts ADE20K mIoU by ≥1.5 over the shared decoder | performance | — | `mates/<slug>/wkdrs/results/main.md#ade20k` | proposed |
 ```
 
-On re-runs: add rows and edit `proposed` rows freely; never renumber or delete an existing ID — a claim the story no longer makes flips to `dropped` and keeps its row.
+On re-runs: add rows and edit `proposed` rows freely; never renumber or delete an existing ID — a claim the story no longer makes flips to `dropped` and keeps its row, and one the manuscript states routes to `stage-sect-drafter` (Step 5).
 
 ### Step 4: Venue profile and cycle
 
 1. From `## Venue rationale`, settle venue and year; the cycle slug is `<venue>_<year>`, lowercased (conventions §5). A venue change in a later round opens a new `cycls/<venue>_<year>/` — old cycles are history, never edited.
-2. Walk `venue.yml` value by value from the user's answers or a CFP they supply; echo the completed file back, and only on explicit confirmation write `cycls/<cycle>/venue.yml` with `confirmed:` set to the real date of that confirmation (schema per conventions §8):
+2. Walk `venue.yml` value by value from the user's answers or a CFP they supply; echo the file back, blanks included, and only on explicit confirmation write `cycls/<cycle>/venue.yml` with `confirmed:` set to the real date of that confirmation (schema per conventions §8):
 
 ```yaml
 venue: CVPR
 year: 2027
 cycle: cvpr_2027
-template: cvpr2027
+template: cvpr                # the class inside the kit (conventions §8.3); empty or arxiv = the preprint form
 page_limit_main: 8
 references_in_limit: false
 page_limit_supp: 0
@@ -91,17 +91,17 @@ scale: conference             # rubric track: conference | journal; stage-peer-r
 confirmed: 2026-08-02
 ```
 
-3. Values the user cannot confirm stay blank, `confirmed:` stays empty, and the gaps are named in the report (Principle 5). An existing `venue.yml` (from `stage-proj-adopt`) is completed in place, never recreated; changed values re-confirm.
+3. Values the user cannot confirm yet stay blank and are named in the report (Principle 5): the confirmation covers the file as echoed, and a blank means not yet known and binds nothing — each reader gates on the value it needs. An existing `venue.yml` is completed in place, never recreated; a filled blank or a changed value re-confirms.
 4. Write `venue:` and `cycle:` into the story frontmatter — per conventions §5 this is what makes the cycle active for every downstream skill.
 
 ### Step 5: Finalize, report, commit
 
-Set `finalized:` (real date) only when all five sections are user-confirmed or explicitly skipped-and-marked; reopening anything clears it. It is the signal `stage-outl-planner` trusts — nothing else sets it. Then report in ≤300 words: the pitch verbatim, the claim IDs seeded, venue and cycle, every `venue.yml` value still unconfirmed, and the one next command — `stage-outl-planner` when finalized, `stage-evid-curator` first when claims sit at `Evidence` `—`. Offer once to commit what this run wrote — `stage-stry-coach: <milestone>` (conventions §1). Declining is fine.
+Set `finalized:` (real date) only when all five sections are user-confirmed or explicitly skipped-and-marked; reopening anything clears it. It is the signal `stage-outl-planner` trusts — nothing else sets it. Then report in ≤300 words: the pitch verbatim, the claim IDs seeded, venue and cycle, every `venue.yml` value still blank, and the one next command — `stage-sect-drafter <section>` for the first `Stated in` section of a claim this run dropped or reworded, the rest listed; otherwise `stage-outl-planner` when finalized, `stage-stry-coach` when not — except on the venue-only branch (Step 0.2), where `stage-outl-planner` is named only when `notes/outline.md` is missing or unfinalized or this run filled or changed a value its budget reads (`page_limit_main`, `references_in_limit`), and `stage-flow-status` otherwise. `performance` rows still at `Evidence` `—` are a gap line naming `stage-evid-curator import` or `stage-evid-curator register <path>`, never the next command. Offer once to commit what this run wrote — `stage-stry-coach: <milestone>` (conventions §1). Declining is fine.
 
 ## Output
 
 - `notes/story.md` — frontmatter `venue:`, `cycle:`, `finalized:`, `updated:`; sections `## Pitch` (one sentence), `## Problem`, `## Key idea`, `## Contributions` (each bullet naming its claim IDs), `## Venue rationale`. Output-table row: Story — produced here; state `finalized:`, `venue:`, `cycle:`.
-- `notes/claims.md` — created here, every seeded row at `proposed`; later updated by `stage-sect-drafter`, `stage-tabs-builder`, `stage-clms-auditor`, and `stage-resp-writer`. Output-table state: per-claim `Status`.
-- `cycls/<cycle>/venue.yml` — flat `key: value`, user-confirmed values only; `confirmed:` filled only by an explicit user confirmation. Output-table row: Venue profile — produced here (or by `stage-proj-adopt`).
+- `notes/claims.md` — created here, every seeded row at `proposed`; later updated by `stage-sect-drafter`, `stage-tabs-builder`, `stage-clms-auditor`, and `stage-resp-writer`; `stage-outl-planner` rewrites a renamed `Stated in` slug. Output-table state: per-claim `Status`.
+- `cycls/<cycle>/venue.yml` — flat `key: value`, user-confirmed values only; `confirmed:` filled only by an explicit user confirmation. Output-table row: Venue profile — produced here.
 - In chat: the ≤300-word report. Nothing under `manus/` or `mates/` is ever written by this skill.
 - Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.
