@@ -377,6 +377,8 @@ for readme in README.md README.zh-CN.md; do
         'STAGE_LANG' \
         'STAGE_HARNESSES' \
         'STAGE_PLAN_MODEL' \
+        '/stage-auto' \
+        '$stage-auto' \
         'INVOLVE=low' \
         '.stage/memory/' \
         'bash execs/update.sh --diff' \
@@ -396,10 +398,16 @@ done
 # 4f. /stage-auto is the goal-run grant (conventions §11.5): one shared
 #     procedure under .agents/commands, thin native entry points in every
 #     harness, each explicit-only. The procedure never starts a skill marked †,
-#     so it must name every one of them, and every wrapper must carry that rule.
+#     so it must name every one of them, and it and every entry point carry the
+#     one sentence that says so. STAR's launch machinery (stop=,
+#     auto=unattended, .await) stays out of all of them, and the procedure and
+#     its wrappers ship in English only: a zh-CN copy would be listed by its host
+#     as a second command.
 section "Goal run grant (/stage-auto)"
 auto_errors=0
 AUTO_PROCEDURE=".agents/commands/stage-auto.md"
+AUTO_DAGGER='A skill marked † is never started'
+AUTO_STAR='stop=|auto=unattended|\.await'
 if [[ ! -f "${AUTO_PROCEDURE}" ]]; then
     fail "${AUTO_PROCEDURE} is missing"
     auto_errors=1
@@ -414,8 +422,12 @@ else
         fail "${AUTO_PROCEDURE} lost the rule that green lint is never a goal run's check"
         auto_errors=1
     }
-    if grep -qE 'stop=|auto=unattended|tier=' "${AUTO_PROCEDURE}"; then
-        fail "${AUTO_PROCEDURE} carries STAR's grant machinery (stop=, auto=unattended, tier=)"
+    grep -qF -- "${AUTO_DAGGER}" "${AUTO_PROCEDURE}" || {
+        fail "${AUTO_PROCEDURE} does not state that a skill marked † is never started"
+        auto_errors=1
+    }
+    if grep -qE "${AUTO_STAR}|tier=" "${AUTO_PROCEDURE}"; then
+        fail "${AUTO_PROCEDURE} carries STAR's grant machinery (stop=, auto=unattended, .await, tier=)"
         auto_errors=1
     fi
     if grep -qE '^\| `stage-[a-z-]+`' "${AUTO_PROCEDURE}"; then
@@ -432,8 +444,12 @@ while IFS='|' read -r wrapper argument_marker; do
     fi
     if ! grep -qF 'Read `.agents/commands/stage-auto.md`' "${wrapper}" || \
        ! grep -qF -- "${argument_marker}" "${wrapper}" || \
-       ! grep -qF '†' "${wrapper}"; then
-        fail "${wrapper} does not delegate to ${AUTO_PROCEDURE} with its native argument marker ${argument_marker}, or drops its † rule"
+       ! grep -qF -- "${AUTO_DAGGER}" "${wrapper}"; then
+        fail "${wrapper} does not delegate to ${AUTO_PROCEDURE} with its native argument marker ${argument_marker}, or drops the sentence '${AUTO_DAGGER}'"
+        auto_errors=1
+    fi
+    if grep -qE '^\| `stage-[a-z-]+`' "${wrapper}"; then
+        fail "${wrapper} duplicates the roster owned by ${ROUTER}"
         auto_errors=1
     fi
 done <<'EOF'
@@ -452,8 +468,10 @@ if [[ ! -f "${CODEX_AUTO_SKILL}" ]] || \
    ! frontmatter_has_line "${CODEX_AUTO_SKILL}" 'name: stage-auto' || \
    ! grep -qF 'Read `.agents/commands/stage-auto.md`' "${CODEX_AUTO_SKILL}" || \
    ! grep -qF 'allow_implicit_invocation: false' "${PLUGIN_ROOT}/skills/stage-auto/agents/openai.yaml" || \
-   ! grep -qF '$stage-auto' "${PLUGIN_ROOT}/.codex-plugin/plugin.json"; then
-    fail "${PLUGIN_ROOT} does not carry the explicit-only \$stage-auto wrapper around ${AUTO_PROCEDURE}"
+   ! grep -qF '$stage-auto' "${PLUGIN_ROOT}/.codex-plugin/plugin.json" || \
+   ! grep -qF '$stage-<name> <argument>' "${CODEX_AUTO_SKILL}" || \
+   ! grep -qF -- "${AUTO_DAGGER}" "${CODEX_AUTO_SKILL}"; then
+    fail "${PLUGIN_ROOT} does not carry the explicit-only \$stage-auto wrapper around ${AUTO_PROCEDURE}, with its \$stage-<name> spelling and the sentence '${AUTO_DAGGER}'"
     auto_errors=1
 fi
 KIMI_AUTO_SKILL="${KIMI_PLUGIN_ROOT}/skills/stage-auto/SKILL.md"
@@ -461,8 +479,10 @@ if [[ ! -f "${KIMI_AUTO_SKILL}" ]] || \
    ! frontmatter_has_line "${KIMI_AUTO_SKILL}" 'name: stage-auto' || \
    ! frontmatter_has_line "${KIMI_AUTO_SKILL}" 'disableModelInvocation: true' || \
    ! grep -qF 'Read `.agents/commands/stage-auto.md`' "${KIMI_AUTO_SKILL}" || \
-   ! grep -qF '/stage-auto' "${KIMI_PLUGIN_ROOT}/.kimi-plugin/plugin.json"; then
-    fail "${KIMI_PLUGIN_ROOT} does not carry the explicit-only /stage-auto wrapper around ${AUTO_PROCEDURE}"
+   ! grep -qF '/stage-auto' "${KIMI_PLUGIN_ROOT}/.kimi-plugin/plugin.json" || \
+   ! grep -qF '/skill:stage-<name> <argument>' "${KIMI_AUTO_SKILL}" || \
+   ! grep -qF -- "${AUTO_DAGGER}" "${KIMI_AUTO_SKILL}"; then
+    fail "${KIMI_PLUGIN_ROOT} does not carry the explicit-only /stage-auto wrapper around ${AUTO_PROCEDURE}, with its /skill:stage-<name> spelling and the sentence '${AUTO_DAGGER}'"
     auto_errors=1
 fi
 if ! grep -qF 'name: "stage-auto",' "${DSH_COMMAND_IMPL}" || \
@@ -472,6 +492,27 @@ if ! grep -qF 'name: "stage-auto",' "${DSH_COMMAND_IMPL}" || \
     fail "${DSH_COMMAND_ROOT} does not also register /stage-auto, or its follow-ups do not respell /stage-<name> while keeping /stage-auto"
     auto_errors=1
 fi
+if ! grep -qF 'so ask for one' "${DSH_COMMAND_IMPL}" || \
+   ! grep -qF 'the DSH-owned copy under `.dsh/skills/`' "${DSH_COMMAND_IMPL}" || \
+   ! grep -qF -- "${AUTO_DAGGER}" "${DSH_COMMAND_IMPL}"; then
+    fail "${DSH_COMMAND_IMPL}'s /stage-auto follow-up does not ask for a missing goal, name the .dsh/skills copy it starts, or carry the sentence '${AUTO_DAGGER}'"
+    auto_errors=1
+fi
+for auto_entry in .claude/commands/stage-auto.md .cursor/commands/stage-auto.md .pi/prompts/stage-auto.md \
+                  .qwen/commands/stage-auto.md "${CODEX_AUTO_SKILL}" "${KIMI_AUTO_SKILL}" "${DSH_COMMAND_IMPL}"; do
+    if [[ -f "${auto_entry}" ]] && grep -qE "${AUTO_STAR}" "${auto_entry}"; then
+        fail "${auto_entry} carries STAR's stop=, auto=unattended, or .await launch machinery"
+        auto_errors=1
+    fi
+done
+for zh_auto in .agents/commands/stage-auto.zh-CN.md .claude/commands/stage-auto.zh-CN.md \
+               .cursor/commands/stage-auto.zh-CN.md .pi/prompts/stage-auto.zh-CN.md \
+               .qwen/commands/stage-auto.zh-CN.md; do
+    if [[ -e "${zh_auto}" || -L "${zh_auto}" ]]; then
+        fail "${zh_auto}: /stage-auto ships English only; a host would list this file as a second command"
+        auto_errors=1
+    fi
+done
 grep -qF '`/stage-auto <goal>`' "${ROUTER}" || {
     fail "${ROUTER} does not hand goal pursuit to /stage-auto"
     auto_errors=1
@@ -897,7 +938,7 @@ for spec in "items:${CONV_ITEMS[*]}" "subheads:${CONV_SUBHEADS[*]}" "letters:${C
 done
 
 # Every citation resolves: the section exists, and the sub-item it names does too.
-CITATION_SCAN=("${SKILL_ROOTS[@]}" docs/mds/stage-workflow AGENTS.md README.md README.zh-CN.md)
+CITATION_SCAN=("${SKILL_ROOTS[@]}" docs/mds/stage-workflow AGENTS.md README.md README.zh-CN.md .agents/commands .codex/plugins .kimi-code/plugins)
 cite_checked=0
 while IFS= read -r cite; do
     [[ -n "${cite}" ]] || continue

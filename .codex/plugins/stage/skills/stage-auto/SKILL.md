@@ -14,6 +14,6 @@ Adapt only its invocation spelling for Codex:
 - `$stage-<name> <argument>` is the spelling where the shared file writes `/stage-<name> <argument>`.
 
 For an unmarked skill, load and follow that `stage-*` skill from the current project's available skills.
-A skill marked `†` is never started: show the exact `$stage-<name> <argument>` invocation as the run's closing line and stop, as the shared file says.
+A skill marked † is never started: show the exact `$stage-<name> <argument>` invocation as the run's closing line and stop, as the shared file says.
 
 If `.agents/commands/stage-auto.md` is missing, report that the project does not contain the STAGE goal-run procedure instead of guessing from the plugin package.

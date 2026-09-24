@@ -21,6 +21,11 @@ const inject = ["commands"];
 // exception: it is no skill but the command this package registers below.
 const spelling = "In DSH, a skill's command is `/skill:stage-<name> <argument>` wherever the shared file writes `/stage-<name> <argument>`, except `/stage-auto <goal>`, which DSH registers as a command and stays as written.";
 
+// What the goal-run procedure leaves to "the harness's native skill
+// mechanism": which skill copy DSH starts, and the rule that keeps the loop off
+// the skills marked †, as every other harness's entry point states it.
+const autoStart = "For an unmarked skill, read the DSH-owned copy under `.dsh/skills/` in full and follow it. A skill marked † is never started: print the exact `/skill:stage-<name> <argument>` command as the run's closing line and stop, as the shared file says.";
+
 function apply(ctx) {
   ctx.commands.register({
     name: "stage",
@@ -60,8 +65,8 @@ function apply(ctx) {
         content: [{
           type: "text",
           text: invocation === ""
-            ? "Read `.agents/commands/stage-auto.md` and follow it; the invocation carries no goal, so ask for one. " + spelling
-            : `Read \`.agents/commands/stage-auto.md\` and follow it with this invocation: ${invocation}\n\n${spelling}`,
+            ? "Read `.agents/commands/stage-auto.md` and follow it; the invocation carries no goal, so ask for one. " + autoStart + " " + spelling
+            : `Read \`.agents/commands/stage-auto.md\` and follow it with this invocation: ${invocation}\n\n${autoStart} ${spelling}`,
         }],
         source: { kind: "user" },
       });
