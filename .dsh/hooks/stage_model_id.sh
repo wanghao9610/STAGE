@@ -110,6 +110,16 @@ transcript=$(payload_field transcript_path)
 # CLAUDE_PROJECT_DIR is the bridge's own variable, set from its projectDir config
 # and defaulting to the session cwd — which is the project root, because dsh
 # takes the invoking directory as the workspace.
+#
+# The path is built from the bridge's project dir although the Claude Code copy
+# hands out a project-relative one. That copy went relative only so a committed
+# permissions.allow prefix can match the command, because a delegate cannot
+# answer a permission prompt. Neither half holds here: DSH's workspace-write
+# sandbox asks only before a write outside the workspace, and this command only
+# reads; the bridge never pre-approves on `allow` in any case; and .dsh/hooks.json
+# mounts this hook on SessionStart alone, so there is no delegate line to serve.
+# With the bridge's variable set it is absolute, so it resolves from any
+# directory the shell has moved to.
 self="${CLAUDE_PROJECT_DIR:-.}/.dsh/hooks/stage_model_id.sh"
 
 if [ -n "${transcript:-}" ]; then

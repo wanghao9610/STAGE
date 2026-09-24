@@ -1173,6 +1173,16 @@ for f in .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
 done
 grep -qF '180 days' "${CONV_EN}" || \
     { fail "conventions §12 (project memory) no longer states the 180-day aging window"; hook_errors=1; }
+#     Every copy tells the session that a memory is never a source (conventions
+#     §9); drop it from one and that harness reads the index without the
+#     boundary conventions §12 puts on it.
+for f in .claude/hooks/stage_memory.sh .codex/hooks/stage_memory.sh \
+         .cursor/hooks/stage_memory.sh .kimi-code/hooks/stage_memory.sh \
+         .dsh/hooks/stage_memory.sh .pi/extensions/stage-hooks/stage_memory.sh \
+         .qwen/hooks/stage_memory.sh; do
+    grep -qF 'A memory is never a source for a number' "${f}" || \
+        { fail "${f} no longer states that a memory is never a source"; hook_errors=1; }
+done
 #     What the awk does is shown, not read: every copy is run at its own depth
 #     against one store of three memories — an aged `env`, a `deadend` of the
 #     same date, and a legacy file with no `summary:` — and has to list all three

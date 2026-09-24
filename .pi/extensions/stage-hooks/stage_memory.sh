@@ -75,7 +75,7 @@ if $list; then
     exit 0
 fi
 
-printf '%s\n' "STAGE project memory — what earlier sessions in this repository learned, recorded under .stage/memory/ rather than in your own memory store. Each line is a pointer, not the fact: type · scope · last verified · file — summary. Open the file under .stage/memory/ before acting on one. A scope naming a machine or a cycle applies only there, and where a memory disagrees with a file in the repository, the file wins. Recording a new one: docs/mds/stage-workflow/writing-workflow-conventions.md section 12."
+printf '%s\n' "STAGE project memory — what earlier sessions in this repository learned, recorded under .stage/memory/ rather than in your own memory store. Each line is a pointer, not the fact: type · scope · last verified · file — summary. Open the file under .stage/memory/ before acting on one. A scope naming a machine, a cycle, or a manuscript path applies only there, and where a memory disagrees with a file in the repository, the file wins. A memory is never a source for a number, a venue rule, or what a cited paper says — those trace to mates/, venue.yml, and notes/refs/. Recording a new one: docs/mds/stage-workflow/writing-workflow-conventions.md section 12."
 [ -n "${shared}" ] && printf 'Shared (.stage/memory/):\n%s\n' "${shared}"
 [ -n "${machine}" ] && printf 'Machine-local (.stage/memory/local/):\n%s\n' "${machine}"
 exit 0
