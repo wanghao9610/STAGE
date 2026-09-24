@@ -42,9 +42,10 @@ esac
 
 # Dot-directories at the project root — .git, .qwen, .stage, the other tool
 # trees — keep their prompt, the way auto-edit mode keeps one for protected
-# paths. Their contents are project machinery, not the code a run is editing. A
-# `..` segment can climb back out of the root, so a path carrying one keeps its
-# prompt too.
-[[ "${rel}" == .* || "${rel}" == */../* || "${rel}" == */.. ]] && exit 0
+# paths. Their contents are project machinery, not the code a run is editing.
+# mates/ keeps its prompt too: the evidence is read-only, written only through
+# execs/scpts/import.sh and stage-evid-curator. A `..` segment can climb back out
+# of the root, so a path carrying one keeps its prompt as well.
+[[ "${rel}" == .* || "${rel}" == mates/* || "${rel}" == */../* || "${rel}" == */.. ]] && exit 0
 
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":"INVOLVE=low"}}\n'

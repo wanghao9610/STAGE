@@ -942,8 +942,9 @@ for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
          .cursor/hooks/stage_commit_guard.sh .dsh/hooks/stage_commit_guard.sh \
          .kimi-code/hooks/stage_commit_guard.sh .pi/extensions/stage-hooks/stage_commit_guard.sh \
          .qwen/hooks/stage_commit_guard.sh \
-         .claude/hooks/stage_involve_gate.sh .codex/hooks/stage_involve_gate.sh \
-         .qwen/hooks/stage_involve_gate.sh .dsh/hooks/install.sh .kimi-code/hooks/install.sh; do
+         .claude/hooks/stage_involve_gate.sh .claude/hooks/stage_involve_level.sh \
+         .codex/hooks/stage_involve_gate.sh .qwen/hooks/stage_involve_gate.sh \
+         .dsh/hooks/install.sh .kimi-code/hooks/install.sh; do
     [[ -x "${f}" ]] || { fail "${f} is missing or not executable"; hook_errors=1; }
     [[ -f "${f}" ]] && ! bash -n "${f}" 2>/dev/null && { fail "${f} does not parse"; hook_errors=1; }
 done
@@ -1015,8 +1016,13 @@ for f in .claude/settings.json .codex/hooks.json .qwen/settings.json; do
     grep -qF stage_involve_gate.sh "${f}" || { fail "${f} does not register stage_involve_gate.sh"; hook_errors=1; }
 done
 for f in .claude/hooks/stage_involve_gate.sh .codex/hooks/stage_involve_gate.sh .qwen/hooks/stage_involve_gate.sh; do
-    grep -qF '"${involve}" == "low"' "${f}" || { fail "${f} no longer gates on INVOLVE=low"; hook_errors=1; }
+    grep -qF '"${involve}" == "low"' "${f}" || { fail "${f} no longer gates on involve=low"; hook_errors=1; }
+    grep -qF 'mates/*' "${f}" || { fail "${f} no longer keeps the prompt for mates/"; hook_errors=1; }
 done
+# Claude's gate takes the level from the shared resolver, so an invocation's
+# involve= token reaches it (conventions §7.7); a gate back on .env alone drops it.
+grep -qF 'involve="$(stage_involve_level "${input}" "${root}")"' .claude/hooks/stage_involve_gate.sh || \
+    { fail ".claude/hooks/stage_involve_gate.sh no longer takes its level from stage_involve_level.sh"; hook_errors=1; }
 
 for f in .claude/hooks/stage_model_id.sh .codex/hooks/stage_model_id.sh \
          .cursor/hooks/stage_model_id.sh .dsh/hooks/stage_model_id.sh \

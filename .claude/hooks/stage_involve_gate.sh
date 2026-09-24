@@ -1,25 +1,27 @@
 #!/usr/bin/env bash
 # Skip Claude's permission prompt for file edits while the project runs at
-# INVOLVE=low (.env, writing workflow conventions §7.7). Confirmation points are
+# involve=low (writing workflow conventions §7.7). Confirmation points are
 # untouched: the STOP line, deletions and overwrites, and every venue.yml value
 # entering as confirmed are questions a skill asks, not permission prompts a hook
 # can answer.
 #
+# The level comes from stage_involve_level.sh: the `involve=` token of the
+# session's most recent STAGE command, or `.env`'s INVOLVE when it carried none.
 # Silence means "no decision", so every other level, every path this declines,
-# and a project with no .env fall through to the normal permission flow. INVOLVE
-# is read on each call, so editing .env takes effect without a restart.
+# and a project that sets none fall through to the normal permission flow. The
+# level is resolved on each call, so a new invocation — or an edit to .env —
+# takes effect without a restart.
 set -uo pipefail
 
 root="${CLAUDE_PROJECT_DIR:-${PWD}}"
 
-# The payload is read before the level is tested: the runtime writes it to this
-# hook's stdin, and a hook that exits without reading leaves that write to fail.
+# The payload is read before the level is tested: it carries the transcript path
+# the level is resolved from, and a hook that exits without reading stdin leaves
+# the runtime's write to fail.
 input=$(cat)
 
-line="$(grep -sE '^INVOLVE=' "${root}/.env" | tail -1)"
-value="${line#INVOLVE=}"
-value="${value%%#*}"
-involve="$(printf '%s' "${value}" | tr -cd '[:alpha:]')"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/stage_involve_level.sh"
+involve="$(stage_involve_level "${input}" "${root}")"
 [[ "${involve}" == "low" ]] || exit 0
 
 # The edited path, from Edit/Write (file_path) or NotebookEdit (notebook_path).
@@ -43,8 +45,10 @@ esac
 # Dot-directories at the project root — .git, .claude, .stage, the other tool
 # trees — keep their prompt, the way acceptEdits mode keeps one for protected
 # paths. Their contents are project machinery, not the manuscript, the notes, or
-# the cycle files a run is writing. A `..` segment can climb back out of the
-# root, so a path carrying one keeps its prompt too.
-[[ "${rel}" == .* || "${rel}" == */../* || "${rel}" == */.. ]] && exit 0
+# the cycle files a run is writing. mates/ keeps its prompt too: the evidence is
+# read-only, written only through execs/scpts/import.sh and stage-evid-curator.
+# A `..` segment can climb back out of the root, so a path carrying one keeps its
+# prompt as well.
+[[ "${rel}" == .* || "${rel}" == mates/* || "${rel}" == */../* || "${rel}" == */.. ]] && exit 0
 
-printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":"INVOLVE=low"}}\n'
+printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":"involve=low"}}\n'

@@ -21,7 +21,7 @@
 # conventions §1 forbid.
 #
 # WHAT IT DELIBERATELY DOES NOT WIRE: the involve gate. That hook exists to
-# answer the permission prompt before a file edit while .env reads INVOLVE=low,
+# answer the permission prompt before a file edit at involve=low (§7.7),
 # and DSH raises no such prompt to answer. Its default workspace-write sandbox
 # lets an edit inside the project run without asking; the only approval a file
 # operation raises is a one-shot escalation for a write OUTSIDE the workspace,

@@ -48,7 +48,8 @@ except Exception:
 # Every path the patch names must sit in the project, outside the dot-directories
 # at its root — .git, .codex, .stage, the other tool trees — whose contents are
 # project machinery rather than the manuscript, the notes, or the cycle files a
-# run is writing.
+# run is writing, and outside mates/, the read-only evidence that only
+# execs/scpts/import.sh and stage-evid-curator write.
 path_ok() { # $1 = path as the header writes it, relative to cwd or absolute
     local rel="$1"
     case "$1" in
@@ -58,7 +59,7 @@ path_ok() { # $1 = path as the header writes it, relative to cwd or absolute
             esac ;;
     esac
     case "${rel}" in
-        .*|*/..|*/../*) return 1 ;;
+        .*|mates|mates/*|*/..|*/../*) return 1 ;;
     esac
     return 0
 }

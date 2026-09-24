@@ -15,7 +15,7 @@
 //   - the commit guard, on the bash tool, declining what conventions §1 forbids
 //
 // What it deliberately does not wire: the involve gate. That hook exists to
-// answer the permission prompt before a file edit while .env reads INVOLVE=low,
+// answer the permission prompt before a file edit at involve=low (§7.7),
 // and Pi ships no permission prompts — there is no prompt to skip, so the level
 // governs only what the skills themselves ask.
 

@@ -40,7 +40,7 @@ DOCS_TREE="docs/mds/stage-workflow"
 # one that states the runtime's model id so an artifact records who wrote it
 # (conventions §8). Two decide instead: the commit guard that declines the git
 # commands conventions §1 forbids, in every tree, and the involve gate that
-# answers a file-edit permission prompt at INVOLVE=low (§7.7), in the three trees
+# answers a file-edit permission prompt at involve=low (§7.7), in the three trees
 # whose harness lets a hook decide one. One copy of each per harness, because
 # every runtime spells the event and the output field differently. Overwritten
 # on update like the skills — the memory store itself is the paper's and is
