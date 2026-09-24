@@ -46,7 +46,7 @@ Open with one line stating the check and the resolved level.
 
 ## What a goal run never does
 
-These stay outside the grant whatever the goal says and whatever level resolves. The run stops at the first one it would need and prints it as its closing line instead of taking it:
+These stay outside the grant whatever the goal says and whatever level resolves. The run stops at the first one it would need and prints it as its closing line instead of taking it; what step 6 sets aside is the exception, and ends the run only when nothing else bears on the goal (Where it ends):
 
 - start a skill marked †: `stage-proj-adopt`, `stage-stry-coach`, `stage-outl-planner`, `stage-resp-writer`, `stage-subm-packer`, or `stage-pstr-builder`;
 - import, register, or refresh evidence: nothing in a goal run writes `mates/` (conventions §10.1);
@@ -64,7 +64,7 @@ These stay outside the grant whatever the goal says and whatever level resolves.
 Report and stop at the first of:
 
 - the goal's check passes;
-- the next action that bears on the goal is a skill marked †, a STOP-line action, or another action outside the grant;
+- the next action that bears on the goal is a skill marked †, a STOP-line action, or another action outside the grant, other than what step 6 skips;
 - a mandatory question has nobody to answer it;
 - a check needs a `venue.yml` value whose `confirmed:` is empty, and the goal states no limit of its own;
 - nothing bearing on the goal is left but what step 6 skipped. Where some of it waits on a value `mates/` does not hold, the evidence route is the author's choice: produce the result in the paired STAR repository, behind its own STOP line, then `/stage-evid-curator import`; or drop the file under `mates/manual/` and run `/stage-evid-curator register <path>`, whose provenance question is the author's. Where some of it is an open promise, the reply lists the boxes to tick, each with the commit that made its change or the paths it left uncommitted;
