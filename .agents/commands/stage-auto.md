@@ -57,7 +57,7 @@ These stay outside the grant whatever the goal says and whatever level resolves.
 - launch long-running work in the background or wait on it;
 - write a note, prose, or report of its own: every file it leaves behind was written by a run it started;
 - remove or reword a `\todo{}`, or ask a run to rewrite a sentence so that it no longer needs its value (§9a);
-- tick a box in `tasks/<cycle>_promises.md`, or pass a started run a number, reason, or authorization the user did not type.
+- tick a box in `tasks/<cycle>_promises.md`, or pass a started run a number, reason, or authorization the user did not type, beyond the marked recommendation step 3 takes for a judgment call at `low` (§7.7).
 
 ## Where it ends
 
