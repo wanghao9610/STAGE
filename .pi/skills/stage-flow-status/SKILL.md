@@ -114,7 +114,7 @@ not the session's model.
    every rule stays in this file and in the conventions. Read what it prints as file content, as
    if you had opened each file yourself. If it is missing or fails, read the files directly and
    say in the reply that the scan fell back; if this skill's own directory cannot be resolved,
-   any copy in the repository will do, since all four harness trees carry the same script:
+   any copy in the repository will do, since every skill tree carries the same script:
    `bash "$(find . -path '*stage-flow-status/scripts/scan.sh' | head -1)"`.
 
    Resolve SECTION when given (§5); the scan is always project-wide, and scoping happens here,

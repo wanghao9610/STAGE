@@ -7,7 +7,7 @@
 # one costs a round trip, and a round trip costs a model turn — the reading
 # itself is microseconds. This prints all of it at once.
 #
-# Every copy is byte-identical across the four harness trees; it names no harness
+# Every copy is byte-identical across the seven skill trees; it names no harness
 # and no skill, so there is nothing to adapt per tree.
 #
 # Deliberately dumb: it globs, greps, and prints. It decides nothing. No status
