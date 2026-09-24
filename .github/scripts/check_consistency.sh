@@ -469,9 +469,10 @@ if [[ ! -f "${CODEX_AUTO_SKILL}" ]] || \
    ! grep -qF 'Read `.agents/commands/stage-auto.md`' "${CODEX_AUTO_SKILL}" || \
    ! grep -qF 'allow_implicit_invocation: false' "${PLUGIN_ROOT}/skills/stage-auto/agents/openai.yaml" || \
    ! grep -qF '$stage-auto' "${PLUGIN_ROOT}/.codex-plugin/plugin.json" || \
-   ! grep -qF '$stage-<name> <argument>' "${CODEX_AUTO_SKILL}" || \
+   ! grep -qF -- '- `$stage-<name> <argument>` is the spelling' "${CODEX_AUTO_SKILL}" || \
+   ! grep -qF 'is never started: show the exact `$stage-<name> <argument>` invocation' "${CODEX_AUTO_SKILL}" || \
    ! grep -qF -- "${AUTO_DAGGER}" "${CODEX_AUTO_SKILL}"; then
-    fail "${PLUGIN_ROOT} does not carry the explicit-only \$stage-auto wrapper around ${AUTO_PROCEDURE}, with its \$stage-<name> spelling and the sentence '${AUTO_DAGGER}'"
+    fail "${PLUGIN_ROOT} does not carry the explicit-only \$stage-auto wrapper around ${AUTO_PROCEDURE}, with its \$stage-<name> spelling in both the adapt bullet and the † hand-back, and the sentence '${AUTO_DAGGER}'"
     auto_errors=1
 fi
 KIMI_AUTO_SKILL="${KIMI_PLUGIN_ROOT}/skills/stage-auto/SKILL.md"
@@ -480,9 +481,10 @@ if [[ ! -f "${KIMI_AUTO_SKILL}" ]] || \
    ! frontmatter_has_line "${KIMI_AUTO_SKILL}" 'disableModelInvocation: true' || \
    ! grep -qF 'Read `.agents/commands/stage-auto.md`' "${KIMI_AUTO_SKILL}" || \
    ! grep -qF '/stage-auto' "${KIMI_PLUGIN_ROOT}/.kimi-plugin/plugin.json" || \
-   ! grep -qF '/skill:stage-<name> <argument>' "${KIMI_AUTO_SKILL}" || \
+   ! grep -qF -- '- `/skill:stage-<name> <argument>` is the spelling' "${KIMI_AUTO_SKILL}" || \
+   ! grep -qF 'is never started: show the exact `/skill:stage-<name> <argument>` invocation' "${KIMI_AUTO_SKILL}" || \
    ! grep -qF -- "${AUTO_DAGGER}" "${KIMI_AUTO_SKILL}"; then
-    fail "${KIMI_PLUGIN_ROOT} does not carry the explicit-only /stage-auto wrapper around ${AUTO_PROCEDURE}, with its /skill:stage-<name> spelling and the sentence '${AUTO_DAGGER}'"
+    fail "${KIMI_PLUGIN_ROOT} does not carry the explicit-only /stage-auto wrapper around ${AUTO_PROCEDURE}, with its /skill:stage-<name> spelling in both the adapt bullet and the † hand-back, and the sentence '${AUTO_DAGGER}'"
     auto_errors=1
 fi
 if ! grep -qF 'name: "stage-auto",' "${DSH_COMMAND_IMPL}" || \
