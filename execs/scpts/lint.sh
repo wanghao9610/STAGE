@@ -44,7 +44,9 @@ Build the manuscript (execs/run.sh), then run the deterministic checks:
     - undefined citations or references in the latexmk log
     - todo markers anywhere under manus/ (§9a: an unsourced number stays a
       visible todo — lint fails until evidence lands)
-    - page count over page_limit_main in the active cycle's venue.yml
+    - page count over page_limit_main in the active cycle's venue.yml: pages
+      through the one the references start on, or every page when its
+      references_in_limit is true or the build has no reference list
     - identity leaks while ANON=true in .env
 
   warnings and notes (reported, exit 0):
@@ -61,7 +63,8 @@ its comment stripped before the test, so only markers that would reach the PDF
 count.
 
 Options:
-  --no-build    Reuse the latest wkdrs/builds/ output instead of rebuilding.
+  --no-build    Reuse the latest wkdrs/builds/ output instead of rebuilding;
+                a last build that failed is a hard error.
   -h, --help    Show this help message.
 
 The active cycle is `cycle:` in notes/story.md frontmatter; when it, its
@@ -289,6 +292,10 @@ check_prose_patterns() {
 
 # ---- build ------------------------------------------------------------------
 if [[ "${NO_BUILD}" == true ]]; then
+    # run.sh leaves this marker when latexmk fails; a PDF and log can outlive
+    # that failure, so they alone do not prove the last build finished.
+    [[ ! -f "${BUILD_DIR}/main.failed" ]] || \
+        fail "--no-build: the last build failed (execs/run.sh exited non-zero; see wkdrs/builds/main.log and main.blg). Fix the source, then run 'bash execs/run.sh'."
     [[ -f "${LOG_FILE}" && -f "${PDF_FILE}" ]] || \
         fail "--no-build: no finished build under wkdrs/builds/. Run 'bash execs/run.sh' first."
     log "Reusing the existing build in wkdrs/builds/ (--no-build)."
@@ -310,7 +317,7 @@ else
 fi
 
 # ---- 1. undefined citations / references (hard) -----------------------------
-UNDEF="$(grep -E 'LaTeX Warning: (Citation|Reference) .* undefined' "${LOG_FILE}" || true)"
+UNDEF="$(grep -E '(LaTeX|Package natbib|Package biblatex) Warning: (Citation|Reference) .* undefined' "${LOG_FILE}" | sort -u || true)"
 if [[ -z "${UNDEF}" ]]; then
     UNDEF="$(grep 'There were undefined' "${LOG_FILE}" || true)"
 fi
@@ -383,15 +390,30 @@ elif [[ ! -f "${ROOT_DIR}/cycls/${CYCLE}/venue.yml" ]]; then
     log "note: page-limit check skipped — cycls/${CYCLE}/venue.yml absent."
 else
     LIMIT="$(awk -F': *' '/^page_limit_main:/ {print $2; exit}' "${ROOT_DIR}/cycls/${CYCLE}/venue.yml" | sed 's/#.*//' | tr -d ' \t\r' || true)"
+    REFS_IN="$(awk -F': *' '/^references_in_limit:/ {print $2; exit}' "${ROOT_DIR}/cycls/${CYCLE}/venue.yml" | sed 's/#.*//' | tr -d ' \t\r' || true)"
+    # stage.cls labels the page the reference list starts on (stage@refs).
+    # Counting that page as content is the conservative reading. No label — no
+    # bibliography yet, or a stage.cls or kernel without the hook — means total pages.
+    COUNT="${PAGES}"
+    COUNTED="${PAGES} pages"
+    TOTAL_NOTE="; count is total PDF pages, references included"
+    if [[ "${REFS_IN}" != "true" && -f "${BUILD_DIR}/main.aux" ]]; then
+        REFS_PAGE="$(sed -n 's/^\\newlabel{stage@refs}{{[^}]*}{\([0-9][0-9]*\)}.*/\1/p' "${BUILD_DIR}/main.aux" | head -1 || true)"
+        if [[ -n "${REFS_PAGE}" ]]; then
+            COUNT="${REFS_PAGE}"
+            COUNTED="${REFS_PAGE} content pages (through the page the references start on; ${PAGES:-?} total)"
+            TOTAL_NOTE=""
+        fi
+    fi
     if ! [[ "${LIMIT}" =~ ^[0-9]+$ ]]; then
         log "note: page-limit check skipped — no numeric page_limit_main in cycls/${CYCLE}/venue.yml."
-    elif [[ -z "${PAGES}" ]]; then
+    elif [[ -z "${COUNT}" ]]; then
         log "note: page-limit check skipped — page count unknown."
-    elif (( PAGES > LIMIT )); then
-        log "FAIL: ${PAGES} pages exceeds page_limit_main ${LIMIT} (cycle ${CYCLE}; count is total PDF pages, references included)."
+    elif (( COUNT > LIMIT )); then
+        log "FAIL: ${COUNTED} exceeds page_limit_main ${LIMIT} (cycle ${CYCLE}${TOTAL_NOTE})."
         HARD=$(( HARD + 1 ))
     else
-        log "ok: ${PAGES} pages within page_limit_main ${LIMIT} (cycle ${CYCLE})."
+        log "ok: ${COUNTED} within page_limit_main ${LIMIT} (cycle ${CYCLE})."
     fi
 fi
 
@@ -400,11 +422,29 @@ fi
 # from the first unescaped % to end of line — before any pattern is tested, so a
 # commented-out \author or \thanks block, the standard way to anonymize, does
 # not fail the gate (the todo check above strips comments for the same reason).
+# A comment still ships with a source upload: a real name in one is the
+# author's to delete, and no check here sees it.
+# A hard hit is an \author, a title-panel macro (\affiliation, \correspondence,
+# \email, the links row and the \metadata under it), or an e-mail address (not
+# a file name such as figs/teaser@2x.png) that does not say anonymous; a
+# \thanks; an acknowledgments heading or environment (the heading, because the
+# word alone is ordinary prose); and a \documentclass{stys/stage} in main.tex
+# without the anon option, whose title panel prints what that option hides.
 # github.com links are a warning, not a failure: citing third-party code by URL
 # is routine in a paper, and only a human can tell facebookresearch from the
 # authors' own account — the warning names each link so that read happens.
 if [[ "${ANON}" == "true" ]]; then
     ANON_OUT="$(find "${MANU_DIR}" -type f -name '*.tex' -exec awk '
+        # An address anywhere on the line; a match ending in a file extension is
+        # a density-suffixed file name (teaser@2x.png) and is skipped.
+        function has_addr(s,   m) {
+            while (match(s, /[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z][A-Za-z]+/)) {
+                m = tolower(substr(s, RSTART, RLENGTH))
+                if (m !~ /\.(png|jpe?g|pdf|eps|svg|tex)$/) return 1
+                s = substr(s, RSTART + RLENGTH)
+            }
+            return 0
+        }
         {
             code = $0
             gsub(/\\%/, "\002", code)
@@ -412,12 +452,43 @@ if [[ "${ANON}" == "true" ]]; then
             low = tolower(code)
             loc = FILENAME ":" FNR ":"
             if (code ~ /\\author/ && low !~ /anonymous/) print "H " loc $0
+            else if (code ~ /\\(affiliation|correspondence|email|code|project|dataset|demo|metadata)(\[[^]]*\])?\{/ && low !~ /anonymous/) print "H " loc $0
+            else if (has_addr(code) && low !~ /anonymous/) print "H " loc $0
             else if (code ~ /\\thanks\{/) print "H " loc $0
-            else if (low ~ /acknowledg/) print "H " loc $0
+            else if (low ~ /\\((sub)*section|paragraph)\*?\{[^}]*acknowledg/ || low ~ /\\begin\{ack/ || low ~ /\\acks/) print "H " loc $0
             if (code ~ /github\.com\/[A-Za-z0-9_.-]+/) print "W " loc $0
         }' {} + 2>/dev/null | sort -u || true)"
     LEAKS="$(printf '%s\n' "${ANON_OUT}" | sed -n 's/^H //p')"
     LINKS="$(printf '%s\n' "${ANON_OUT}" | sed -n 's/^W //p')"
+    # The PDF half: read the first uncommented \documentclass, which may span
+    # lines, up to its closing brace.
+    if [[ -f "${MANU_DIR}/main.tex" ]]; then
+        DOCCLASS="$(awk '
+            {
+                code = $0
+                gsub(/\\%/, "\002", code)
+                sub(/%.*/, "", code)
+                if (!start && code ~ /\\documentclass/) { start = FNR; acc = "" }
+                if (start) {
+                    acc = acc " " code
+                    if (acc ~ /\\documentclass[[:space:]]*(\[[^]]*\])?[[:space:]]*\{[^}]*\}/) {
+                        print start "\t" acc
+                        exit
+                    }
+                }
+            }' "${MANU_DIR}/main.tex" 2>/dev/null || true)"
+        DOC_LINE="${DOCCLASS%%$'\t'*}"
+        DOC_CODE="${DOCCLASS#*$'\t'}"
+        if [[ -n "${DOCCLASS}" && "${DOC_CODE}" =~ \{[[:space:]]*stys/stage[[:space:]]*\} ]]; then
+            DOC_OPTS=""
+            if [[ "${DOC_CODE}" =~ \\documentclass[[:space:]]*\[([^]]*)\] ]]; then
+                DOC_OPTS="${BASH_REMATCH[1]}"
+            fi
+            if ! printf ',%s,' "${DOC_OPTS}" | tr -d ' \t' | grep -qF ',anon,'; then
+                append_lines LEAKS "${MANU_DIR}/main.tex:${DOC_LINE}: \\documentclass without the anon option, so the title panel prints what anon hides"
+            fi
+        fi
+    fi
     n="$(count_lines "${LEAKS}")"
     if (( n > 0 )); then
         log "FAIL: ANON=true and ${n} possible identity leak(s):"
@@ -452,6 +523,11 @@ else
             ;;
         3)
             log "note: sentence-per-line check skipped — ${FMT_OUT#*ERROR: }"
+            ;;
+        4)
+            log "warn: the sentence-per-line check could not read every file:"
+            printf '%s\n' "${FMT_OUT}" | sed -e 's/^\[STAGE fmt\] //' -e 's/^/      /'
+            WARNS=$(( WARNS + 1 ))
             ;;
         *)
             log "warn: manuscript sources are not one sentence per line:"

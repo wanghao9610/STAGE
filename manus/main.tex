@@ -11,10 +11,12 @@
 %%
 %%   stys/stage.cls   the look — page geometry, the title panel, headings,
 %%                    captions, floats, and the citation package. This is the
-%%                    layer a venue swap replaces: drop the venue's class and
-%%                    style files into manus/stys/ and change the line below to,
-%%                    say, \documentclass{stys/cvpr}. run.sh compiles with manus/
-%%                    as the working directory and puts manus/stys/ on TEXINPUTS.
+%%                    layer a venue's format replaces, in the copy
+%%                    /stage-subm-packer convert generates from the kit under
+%%                    cycls/<cycle>/template/ (conventions §10.4); the line
+%%                    below stays \documentclass{stys/stage}. run.sh compiles
+%%                    with manus/ as the working directory and puts manus/stys/
+%%                    on TEXINPUTS.
 %%
 %%   stys/stage.sty   the authoring layer — \todo plus the macros the writing
 %%                    skills emit into secs/ and tabs/. It survives every venue
@@ -27,9 +29,11 @@
 %% Class options: onecolumn | twocolumn, plus anon and anything article takes.
 %% `anon` prints the title panel as "Anonymous Authors" and drops affiliations,
 %% contribution notes, and the links row. That is the PDF half of double-blind;
-%% the source half is ANON=true in .env, which makes lint.sh fail on identity
-%% anywhere under manus/ — comments included, because comments ship with a
-%% source upload. Keep the placeholders below anonymous until the camera-ready.
+%% the source half is ANON=true in .env, which makes lint.sh fail on identity in
+%% typeset text anywhere under manus/, and on the \documentclass line below
+%% until it carries anon. Comments are not scanned: a commented-out block stays
+%% out of the PDF but ships with a source upload, so delete a real name from one
+%% yourself. Keep the placeholders below anonymous until the camera-ready.
 \documentclass[twocolumn]{stys/stage}
 \usepackage{stys/stage}
 
@@ -55,7 +59,8 @@
 
 %% The links row under the abstract. Every URL here is public the moment the PDF
 %% is — a real code or project link during a double-blind cycle is an identity
-%% leak, and lint.sh treats a code-hosting URL under manus/ as one.
+%% leak, and lint.sh fails on a links-row line that does not say anonymous and
+%% warns on each github.com URL under manus/ for you to check.
 % \paperdate{\today}
 % \code{https://anonymous.example.com/code}
 % \project{https://anonymous.example.com/project}
@@ -79,19 +84,19 @@ it is gone.
 
 %% ── Paper-wide macros ──────────────────────────────────────────────────────
 %% Project-specific commands belong here, never in stys/ — the class and the
-%% package are template layers and get replaced or updated under you. Symbols
+%% package are template layers, and the venue copy replaces the class. Symbols
 %% and abbreviations defined here are also rows in notes/notation.md.
 % \newcommand{\method}{MethodName\xspace}
 
 \begin{document}
 \maketitle
 
-%% Placeholder body — superseded by the secs/ inputs below as they come alive.
+%% Placeholder body — /stage-outl-planner deletes it once a secs/ input is live.
 \section{Introduction}
 \todo{No content yet: run /stage-stry-coach, then /stage-outl-planner.}
 
 %% Section files — /stage-outl-planner creates manus/secs/<n>_<slug>.tex
-%% skeletons and uncomments one \input line per created file, in the order
+%% skeletons and uncomments or adds one \input per created file, in the order
 %% notes/outline.md fixes. The <n>_ prefix is load-bearing (conventions §5):
 %% outline rows, the ledger's "Stated in" column, and this input order share it.
 %% Example shape:
@@ -101,17 +106,17 @@ it is gone.
 % \input{secs/4_experiments}
 % \input{secs/5_conclusion}
 
-%% Bibliography — uncomment once manus/bibs/reference.bib exists
-%% (execs/scpts/import.sh seeds it from a paired STAR repo, or
-%% /stage-refs-curator starts one from scratch). The class loads natbib, so
+%% Bibliography — these lines build with or without manus/bibs/reference.bib
+%% (latexmk skips BibTeX while it is absent); /stage-refs-curator creates it.
+%% The class loads natbib, so
 %% \citep / \citet work; stys/stage.bst sorts entries by author and numbers them
 %% [3], and prints no DOI, URL, ISBN, or ISSN — those fields stay in
 %% reference.bib as provenance and are simply not typeset, which is how a
 %% conference reference list reads. run.sh puts stys/ on BSTINPUTS, so the bare
 %% name resolves. A venue's own style replaces it in the copy
 %% /stage-subm-packer generates; this line is the preprint's.
-% \bibliographystyle{stage}
-% \bibliography{bibs/reference}
+\bibliographystyle{stage}
+\bibliography{bibs/reference}
 
 %% Appendix — \beginappendix breaks the page, prints the divider, and relabels
 %% sections A, B, C. Appendix sections keep the same secs/<n>_<slug>.tex naming

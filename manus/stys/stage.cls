@@ -2,9 +2,9 @@
 %% arXiv-style preprint look.
 %%
 %% This file owns the LOOK: page geometry, fonts, the title panel, headings,
-%% captions, floats, and bibliography style. It is the layer a venue swap
-%% replaces — drop the venue's class into manus/stys/ and change one line in
-%% manus/main.tex (\documentclass{stys/cvpr}).
+%% captions, floats, and bibliography style. It is the layer a venue's format
+%% replaces, in the copy stage-subm-packer convert generates; manus/main.tex
+%% keeps \documentclass{stys/stage}.
 %%
 %% It does NOT own the macros the writing skills emit. Those — \todo above all,
 %% plus \parahead, \cmark, \tablestyle, \figref, and friends — live in
@@ -25,10 +25,10 @@
 %% Options
 %% ---------------------------------------------------------------------------
 %% `anon` is the PDF half of double-blind. The source half is execs/scpts/lint.sh
-%% with ANON=true in .env, which fails on identity anywhere under manus/ —
-%% comments included, because comments ship with a source upload. The two are
-%% deliberately independent: this option hides what the panel would print, the
-%% lint rule keeps it out of the files in the first place.
+%% with ANON=true in .env, which fails on identity in typeset text anywhere
+%% under manus/ and on a \documentclass without this option; comments are not
+%% scanned, though they ship with a source upload. This option hides what the
+%% panel would print, the lint rule keeps it out of the files in the first place.
 \newif\ifsa@anon
 \sa@anonfalse
 \DeclareOption{anon}{\sa@anontrue}
@@ -195,6 +195,12 @@
 \RequirePackage{hyperref}
 \RequirePackage[noabbrev,nameinlink]{cleveref}
 \RequirePackage[numbers,sort&compress]{natbib}
+%% The page the reference list starts on, for lint.sh: unless the venue counts
+%% references toward the limit, content pages run through this one. A kernel
+%% older than 2020-10-01 has no hooks: no label, and lint.sh counts every page.
+\ifdefined\AddToHook
+  \AddToHook{env/thebibliography/before}{\label{stage@refs}}
+\fi
 
 \hypersetup{
   colorlinks,
