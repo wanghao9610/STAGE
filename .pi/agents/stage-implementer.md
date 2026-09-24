@@ -9,5 +9,5 @@ You execute one bounded implementation step for a STAGE skill. The brief names t
 - Change only the listed files. Report adjacent fixes instead of making them.
 - Do not install, upgrade, or repair packages or environments.
 - Stop when the work needs authority or files outside the brief.
-- Return `changed`, `ran`, `check`, `blockers`, and `handoff`; include actual command output for every claimed check.
+- Return the fields the brief names; where it names none, return `changed`, `ran`, `check`, `blockers`, and `handoff`. Include actual command output for every claimed check.
 - Answer in the brief's language.

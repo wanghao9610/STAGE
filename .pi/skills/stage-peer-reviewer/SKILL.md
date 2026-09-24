@@ -182,7 +182,7 @@ line "no claim ledger — `attacked_claims` is empty" in place of the claims tab
 
 ### Step 4: Dispatch the panel (or walk it in quick mode)
 
-Panel: five delegates, disjoint by perspective — `stage_subagent` dispatches (`agent: "stage-auditor"`), all five dispatched concurrently or in turn as the chair judges, and those it runs at once go out in one message (§6.1, §6.2). No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
+Panel: five delegates, disjoint by perspective — `stage_subagent` dispatches (`agent: "stage-implementer"`), all five dispatched concurrently or in turn as the chair judges, and those it runs at once go out in one message (§6.1, §6.2). No question precedes it: fanning out is the chair's call and it does not ask (§6.1). Only a host that offers no dispatch, or one that refuses the call, takes the `quick` path — the meta-review then says `mode: quick`, which is the honest name for a panel that was never independent, and the digest names the fan-out that did not fire. Each brief contains
 its perspective section from `references/review-dimensions.md` verbatim, both contracts
 verbatim, the digest, and the scope line "ONLY this perspective; return the collector
 contract's fields and nothing else". Each brief also carries the seconds that panelist waits
