@@ -87,10 +87,10 @@ HOOK_FILES=(
 # execs/run.sh is here because the skills call it by name and by flag — a paper
 # repo that syncs a skill using `run.sh --main` while keeping a run.sh that
 # predates the flag gets a run that fails at its build step. The three utilities
-# under execs/scpts/ are here for the same reason and it is not weaker: sixteen
-# skills call `import.sh --diff` and five call `lint.sh --no-build` by name and
-# by flag, `lint.sh` calls `fmt.sh --check` the same way, and a caller reading an
-# exit code means the one its own version documents. No script here carries
+# under execs/scpts/ are here for the same reason and it is not weaker: the
+# skills call `import.sh --diff` and `lint.sh --no-build` by name and by flag,
+# `lint.sh` calls `fmt.sh --check` the same way, and a caller reading an exit
+# code means the one its own version documents. No script here carries
 # project configuration: everything an instance sets lives in .env, which is
 # git-ignored and never synced (conventions §3.1) — so all five are safe to
 # replace wholesale.
