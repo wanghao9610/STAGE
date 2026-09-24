@@ -346,7 +346,7 @@ dsh --profile YOUR_PROFILE --dump-config
 六个 skill（下表以 † 标注）仅限显式调用（slash-only）：接入、故事、提纲、回复、投稿与海报选择。六套具名 harness 的 manifest 使用 `disable-model-invocation: true`；Codex 在 `.codex/skills/` 中使用 `allow_implicit_invocation: false`，再链接到共用根。CI 会把七套实现都与[规约 §11](docs/mds/stage-workflow/writing-workflow-conventions.md) 核对。
 
 <div align="center">
-  <img src="docs/srcs/stage-writing-workflow.png" alt="STAGE 写作工作流：十五个 skill 的调用顺序与一个横向通读的 skill、各自写出什么，以及起草循环与拒稿回流如何闭合" width="100%">
+  <img src="docs/mds/stage-workflow/stage-writing-workflow.png" alt="STAGE 写作工作流：十五个 skill 的调用顺序与一个横向通读的 skill、各自写出什么，以及起草循环与拒稿回流如何闭合" width="100%">
 </div>
 
 | Skill | 用途 | 主要产出 |
@@ -451,7 +451,7 @@ bash execs/update.sh
 - `.codex/plugins/`——Codex 专属的 `$stage` 分流与 `$stage-auto` 目标运行插件，以及 marketplace 实体；`.agents/plugins/marketplace.json` 只是一条指向该 marketplace 的文件链接，绝不链接整个目录
 - `.dsh/commands/` 与 `.kimi-code/plugins/`——DSH 和 Kimi 的 `/stage` 与 `/stage-auto` 包，各自只在选中对应宿主时更新
 - 对应的钩子、command、prompt、agent 与 extension 目录，以及保存 Codex 逐 skill UI manifest 的 `.codex/skills/`；`.stage/memory/` 下的记忆库属于论文自己，从不同步
-- `docs/mds/stage-workflow/`——工作流规约（项目记忆是其 §12，宿主钩子与模型溯源是其 §13）、skill 指南及其中文版
+- `docs/mds/stage-workflow/`——工作流规约（项目记忆是其 §12，宿主钩子与模型溯源是其 §13）、skill 指南及其中文版，以及指南内嵌的工作流图
 - `execs/run.sh`——构建入口；你对它的改动会被替换，而 skill 会按名字、按参数调用它，所以一个同步了 skill 却留着旧 `run.sh` 的仓库，会在构建那一步失败
 - `execs/scpts/import.sh`、`execs/scpts/lint.sh`、`execs/scpts/fmt.sh`——三个工具脚本，理由同上：skill 按名字和参数调用 `import.sh --diff` 与 `lint.sh --no-build`，而读退出码的调用方，认的是它自己那一版写明的那套码。比某个工具脚本更老的 ref 会打印一行跳过它
 - `execs/update.sh`——更新脚本自己，为的是不让任何仓库卡在一个老到取不回后继版本的更新机制上。它用重命名装上：执行更新的那一次仍读旧文件跑完，下一次调用才用上新的
