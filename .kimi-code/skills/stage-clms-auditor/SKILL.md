@@ -182,7 +182,7 @@ to get it: switch the session's model — then continue here.
    A re-run checks off items it can prove resolved (a mismatch now matched, a naked number now
    sourced or `\todo`-wrapped) and files only what has no open box (conventions §8.12).
 9. **Report.** Write `wkdrs/reports/CLAIMS_<date>.md` (`mkdir -p` first) per Output.
-10. **Digest in chat.** ≤300 words: counts per verdict, staleness state, ledger flips, tasks
+10. **Digest in chat.** Counts per verdict, staleness state, ledger flips, tasks
     filed, and the one next action.
 11. **Commit (conventions §1).** One commit — `notes/claims.md`, `tasks/claims_followups.md`, and
     `notes/adopt.md` when this run set its `backfilled:` — subject naming this skill. Never

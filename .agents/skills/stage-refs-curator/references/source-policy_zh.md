@@ -29,7 +29,7 @@ Google Scholar 不是这里的来源：它没有 API，用 CAPTCHA 挡自动请�
 
 每份抓回的原始内容，**先**缓存到 `wkdrs/refs_<date>/raw/<citekey>.<source>.<ext>` 再使用。缓存里存的是负载本身的字节，按上面各端点的写法经 shell 抓取（`curl`）；把页面交给模型渲染后再返回的网页工具可以帮忙找到记录，但它的输出从不作为记录缓存、从不誊进 `reference.bib`、也从不作为 `## Citable facts` 里的引文。`wkdrs/` 可再生、永不提交（规约 §1.2），所以这份缓存服务的是本次运行的自查和当天的重跑；能活下来的是 bib 里那行 `% src:` 与该条目在 `notes/refs/refs_index.md` 里的行——那两处是被跟踪的。
 
-**三篇以上的一批，先把 id 解析出来。** 对每个本来就带 arXiv id 或 DOI 的输入，走一次 Semantic Scholar 批量调用——`POST https://api.semanticscholar.org/graph/v1/paper/batch?fields=externalIds,title,year,venue,authors`，请求体里最多 500 个 id，和刷新影响力分用的是同一个端点——它返回的 `externalIds` 直接把每篇论文送到来源 1–2 的 DBLP key 或 DOI 上。字段来自哪里一点没变：条目仍然照着 DBLP 或 Crossref 的记录誊写，仍然三项全部匹配才算命中。省掉的是"每篇一次标题检索"——请求大头就在那里，退避的大头也在那里。十篇 arXiv id 的 `add`，从十次检索变成一次批量调用加十次按 key 的查询。输入是标题的那些没有 id 可批，照旧解析。
+**三篇以上的一批，先把 id 解析出来。** 对每个本来就带 arXiv id 或 DOI 的输入，走一次 Semantic Scholar 批量调用——`POST https://api.semanticscholar.org/graph/v1/paper/batch?fields=externalIds,title,year,venue,authors`，请求体里最多 500 个 id，和刷新影响力分用的是同一个端点——它返回的 `externalIds` 直接把每篇论文送到来源 1–2 的 DBLP key 或 DOI 上。字段来自哪里一点没变：条目仍然照着 DBLP 或 Crossref 的记录誊写，仍然三项全部匹配才算命中。省掉的是"每篇一次标题检索"——请求大头就在那里，退避的大头也在那里。十篇 arXiv id 的 `add`，从十次检索变成一次批量调用加十次按 key 的查询。输入是标题的那些没有 id 可批，按标题解析（见下文“标题的解析”）。
 
 ## 主题发现——按主题找候选
 

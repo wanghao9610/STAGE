@@ -63,7 +63,7 @@ Derive rows from `## Pitch` and `## Contributions` in `notes/story.md` and the s
 1. Confirm the figure's row exists; if absent, draft one under Step 2's rules, show it (conventions §7.12), and ask before writing it, at every involve level (§7.9).
 2. Fix the intended manuscript width and aspect ratio; sketch the hierarchy and identify which elements carry data or claims.
 3. Resolve each data-bearing element through `notes/claims.md`, `mates/MANIFEST.md`, and the evidence file opened this run. Write `<slug>.sources.md` before the PPTX, one element and one `% src:` anchor per line. Missing evidence → route to `stage-evid-curator`, keep Status `sketch`, and do not draw the missing element.
-4. Decide whether Image Gen materially improves a strictly illustrative layer. If yes, state that the skill is generating an asset, plan its crop and negative space, prompt for no text, labels, numbers, logos, or watermarks, call `image_gen`, inspect the output with `view_image`, and retain only an accepted output plus its exact prompt under `<slug>.assets/`. If no, compose the figure entirely with editable PowerPoint objects.
+4. Decide whether Image Gen materially improves a strictly illustrative layer. If yes, state that the skill is generating an asset, plan its crop and negative space, prompt for no text, labels, numbers, logos, or watermarks, call `image_gen`, inspect the output with `view_image`, and retain only an accepted output under `<slug>.assets/`, recording its exact prompt in `<slug>.sources.md` (Principle 5). If no, compose the figure entirely with editable PowerPoint objects.
 
 ### Step 4: Compose and inspect the editable PPTX
 

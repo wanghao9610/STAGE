@@ -167,7 +167,7 @@ into a promise or takes the number out. When `anonymized: true` or `.env` sets `
 
 ### Step 6: Report and commit
 
-Digest ≤300 words: points by disposition, promises opened, claims weakened, measured length vs
+Digest: points by disposition, promises opened, claims weakened, measured length vs
 `response_limit`, and the anonymity check's result when it ran. Routing: promised experiments run
 upstream in STAR, then `stage-evid-curator` re-imports; promised edits → `stage-sect-drafter` /
 `stage-tabs-builder`; promise state at a glance → `stage-flow-status`; the pack gate that reads the

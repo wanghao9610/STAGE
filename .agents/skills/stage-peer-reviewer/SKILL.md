@@ -230,7 +230,7 @@ written at all.
 
 ### Step 8: Report and commit
 
-Digest ≤300 words (§7.1): the recommendation and confidence with the scale named, caps
+Digest (§7.1): the recommendation and confidence with the scale named, caps
 triggered, top majors with their attacked claim IDs (each explained at first use, §7.11),
 dropped-item and disagreement counts, and the decisions record (§7.8). Routing: answer it via
 `stage-resp-writer`; repair majors via `stage-sect-drafter`, `stage-clms-auditor`,

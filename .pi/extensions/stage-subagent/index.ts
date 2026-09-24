@@ -11,7 +11,7 @@
  *
  * Uses JSON mode to capture structured output from subagents.
  *
- * Vendored from pi's own examples/extensions/subagent (pi 0.84.1, MIT), with three
+ * Vendored from pi's own examples/extensions/subagent (pi 0.84.1, MIT), with four
  * deviations from upstream:
  *
  * 1. The tool is stage_subagent, not subagent, so a user-level copy of the same example
@@ -23,6 +23,8 @@
  * 3. agentScope defaults to "project", not "user", because the roster this tool exists
  *    to reach is the one this repository ships in .pi/agents/. On the upstream default a
  *    fresh clone finds no agents at all.
+ * 4. The tool description states the parallel limits, so a run can fix its fan-out width
+ *    (conventions §6.2) before the first dispatch instead of learning them from a failed call.
  */
 
 import { spawn } from "node:child_process";
@@ -487,7 +489,7 @@ export default function (pi: ExtensionAPI) {
 		label: "STAGE subagent",
 		description: [
 			"Delegate tasks to specialized subagents with isolated context.",
-			"Modes: single (agent + task), parallel (tasks array), chain (sequential with {previous} placeholder).",
+			`Modes: single (agent + task), parallel (tasks array; at most ${MAX_PARALLEL_TASKS} tasks, ${MAX_CONCURRENCY} running at once), chain (sequential with {previous} placeholder).`,
 			`Agent scope defaults to "project" — STAGE's roster in ${CONFIG_DIR_NAME}/agents.`,
 			`Pass agentScope: "user" for ${path.join(getAgentDir(), "agents")}, or "both" for the two together.`,
 		].join(" "),

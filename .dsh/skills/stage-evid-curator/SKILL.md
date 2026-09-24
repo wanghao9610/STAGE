@@ -84,7 +84,7 @@ Everything else is `ok`. A fully clean check reports clean and stops — never i
 
 ### Step 4: Digest and route
 
-≤300 words: counts per state, what changed this run, whether the star side was live, then the routes — refreshed or newly registered evidence → `stage-tabs-builder` (tables built from evidence just went stale) and `stage-clms-auditor` (claims citing the moved entries need re-checking); an entry whose `sha256:` this run changed, by a re-import or a re-registration, → `stage-figs-designer` with no argument (its audit demotes every figure whose source recorded the old checksum); a claim that needs a citation rather than a file → `stage-refs-curator`. Name the `mates/` paths this run changed: they are the user's to commit (conventions §1), and `stage-subm-packer` will not freeze over them uncommitted. Close with the standing rule: the writing skills consume evidence only through the manifest.
+Counts per state, what changed this run, whether the star side was live, then the routes — refreshed or newly registered evidence → `stage-tabs-builder` (tables built from evidence just went stale) and `stage-clms-auditor` (claims citing the moved entries need re-checking); an entry whose `sha256:` this run changed, by a re-import or a re-registration, → `stage-figs-designer` with no argument (its audit demotes every figure whose source recorded the old checksum); a claim that needs a citation rather than a file → `stage-refs-curator`. Name the `mates/` paths this run changed: they are the user's to commit (conventions §1), and `stage-subm-packer` will not freeze over them uncommitted. Above the closing line (conventions §7.5), state the standing rule: the writing skills consume evidence only through the manifest.
 
 ## State & File Rules
 

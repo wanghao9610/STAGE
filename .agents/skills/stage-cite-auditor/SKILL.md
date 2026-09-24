@@ -126,7 +126,7 @@ to get it: switch the session's model — then continue here.
    version. A re-run checks off items it can prove resolved and files only what has no open box
    (conventions §8.12).
 8. **Report.** Write `wkdrs/reports/CITES_<date>.md` (`mkdir -p` first) per Output.
-9. **Digest in chat.** ≤300 words: counts per check, worst findings first, tasks filed, the one
+9. **Digest in chat.** Counts per check, worst findings first, tasks filed, the one
    next action.
 10. **Commit (conventions §1).** One commit — `tasks/cites_followups.md` — subject naming this
     skill; nothing filed and nothing checked off → nothing to commit, say so. `wkdrs/` is never committed (conventions

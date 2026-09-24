@@ -90,7 +90,7 @@ from the same ones instead of each session inventing a voice.
    dial licenses a number, a citation key, or a `\todo` (Principle 1), no dial overrides the
    canon (Principle 2), and **no dial changes what a sentence asserts** (Principle 3) —
    `hedging: minimal` tightens wording and never strips a qualifier the evidence requires. No
-   profile on disk means write exactly as this skill always has; never invent one mid-polish, and
+   profile on disk means the human-writing contract's restrained, direct scholarly default (conventions §7); never invent one mid-polish, and
    never widen one because a sentence would read better outside it.
 
 8. **Naturalness is a paragraph-level, evidence-preserving edit.** Treat the human-writing
@@ -192,7 +192,7 @@ to get it: switch the session's model — then continue here.
    `- [ ]` item per systematic or routed finding to `tasks/polish_followups.md` under a
    `## <date>` heading — location(s), issue, route; a re-run checks off items the new pass shows
    resolved and files only what has no open box (conventions §8.12).
-9. **Digest in chat.** ≤300 words: sections polished, edit counts by kind, canon violations
+9. **Digest in chat.** Sections polished, edit counts by kind, canon violations
    fixed, budget state per section, findings routed, report path.
 10. **Commit (conventions §1).** One commit for the run — the edited `manus/` files, the
    `notes/outline.md` Sections rows it polished, and `tasks/polish_followups.md`, or
