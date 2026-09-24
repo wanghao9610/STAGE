@@ -29,7 +29,7 @@ Green lint is never the check, even when the goal mentions lint. A visible `\tod
 
 A goal that cannot be turned into such a check is asked about, not pursued. A goal that only an action outside the grant could meet (What a goal run never does, below) — a finalized story or outline, imported evidence, a response to reviewers, a frozen submission — is not pursued either: name the command that owns it as the closing line, and stop.
 
-Open with one line stating the check and the resolved level.
+Open with one line stating the check and the resolved level, and name any path under `mates/` the snapshot found dirty, for the user to commit before the first run's commit.
 
 ## The loop
 
