@@ -187,7 +187,10 @@ its perspective section from `references/review-dimensions.md` verbatim, both co
 verbatim, the digest, and the scope line "ONLY this perspective; return the collector
 contract's fields and nothing else". Each brief also carries the seconds that panelist waits
 between its own requests to a host and its own cache prefix under the run directory
-(Principle 3) — never a request quota, which is not what politeness is made of. At involve
+(Principle 3) — never a request quota, which is not what politeness is made of — and tells the
+panelist to open its file with a frontmatter block carrying its own `model_id:` and one
+`model_trail:` entry (conventions §8), and to return that id, which goes with the tier into
+the decisions record (§11.6). At involve
 `high`, announce the partition before dispatch (§6.8). Quick: the chair reads the
 paper once and fills all five collector returns itself, in perspective order, devil's advocate
 last.
@@ -258,5 +261,6 @@ directory — `REFEREE_<date>.md` beside the perspective reviews and `citation_a
 default destination or the one `out=` named.
 
 Provenance (conventions §8): every artifact above under `notes/`, `tasks/`, `cycls/`, or
-`wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended
+`wkdrs/reports/` carries `model_id:` — the writing model's id, verbatim: this session's, or a
+panelist's own for its `review_<perspective>.md` (conventions §8, §11.6) — and one appended
 `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

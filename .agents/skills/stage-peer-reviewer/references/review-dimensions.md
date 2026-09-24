@@ -111,6 +111,7 @@ verified_refs: [{name_as_cited, query, what_it_would_settle, title, authors, yea
   venue, url, cache_path}]                 # criterion written before the query ran
 leads: [{query, what_it_would_settle}]     # only what you could not run; the chair does
 failures: [{step_or_host, error}]
+model_id: <your own model id, as your review file's frontmatter records it>
 ```
 
 Anchors are locations in the paper — `§3.2`, `Tab. 2`, `Fig. 4`, `Eq. (5)`, or a tex source line.
