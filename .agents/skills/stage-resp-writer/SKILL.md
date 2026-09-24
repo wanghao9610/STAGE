@@ -72,8 +72,9 @@ prove.
 
 7. **Fan out the parse (§6).** More than two files in `cycls/<cycle>/reviews/` → one delegate per
    review file, on the READ tier's model (conventions §11.6), where the harness can name one, each
-   returning that review's points as ledger rows — point ID, the verbatim quote,
-   severity, and the claim IDs it attacks — and nothing else. What does not split is everything
+   returning that review's points as ledger rows — point ID, the verbatim quote, the severity
+   the review states, and the claim IDs a SIM review names, each copied and none judged; a
+   free-form review's attacks are mapped here, in Step 3 — and nothing else. What does not split is everything
    after it: a disposition is decided against the whole point set, the costly ones are the user's
    call and stay at a confirmation point (§6.5), and the response is one document written to one
    limit. Every number quoted to a reviewer enters under Principle 4 whoever writes it (§6.4).
