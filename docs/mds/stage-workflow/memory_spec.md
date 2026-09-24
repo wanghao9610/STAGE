@@ -91,7 +91,7 @@ A cycle is not a retirement event. A `cycle:<cycle>` memory from a submission th
 
 | Runtime | Hook | Event | What it injects |
 |---|---|---|---|
-| Claude Code | `.claude/hooks/stage_memory.sh` | `SessionStart` | the index, as `additionalContext` |
+| Claude Code | `.claude/hooks/stage_memory.sh` | `SessionStart`, and `SubagentStart` for a delegate | the index, as `additionalContext` |
 | Codex | `.codex/hooks/stage_memory.sh` | `SessionStart` | the index, as `additionalContext` |
 | Cursor | `.cursor/hooks/stage_memory.sh` | `sessionStart` | the index, as `additional_context` |
 | Kimi | `.kimi-code/hooks/stage_memory.sh` | `UserPromptSubmit` | the index, once per session |

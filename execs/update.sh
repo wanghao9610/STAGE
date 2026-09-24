@@ -283,6 +283,18 @@ harness_rels() {
     done
 }
 
+# A kept .claude/settings.json can register every hook and still lack the allow
+# rule for the command the provenance hook hands a delegate. A delegate cannot
+# answer a permission prompt, so that command is denied and the delegate records
+# "unrecorded". A missing permission is not a missing hook, so it gets a note of
+# its own rather than a name in report_unregistered_hooks' list.
+note_resolver_rule() { # $1 = config path relative to the project root
+    [[ "$1" == ".claude/settings.json" && -e "${ROOT_DIR}/$1" ]] || return 0
+    grep -q 'stage_model_id\.sh --resolve' "${ROOT_DIR}/$1" 2>/dev/null && return 0
+    log "NOTE: $1 does not allow the model-id resolver, so a delegate's model_id reads unrecorded."
+    log "      Copy \"Bash(bash .claude/hooks/stage_model_id.sh --resolve:*)\" from upstream $1 into its permissions.allow."
+}
+
 # A kept registration config that does not name one of the hooks: the script is
 # installed, nothing errors, and either no memory reaches a session, or every
 # artifact it writes records "unrecorded", or a git command §1 forbids meets no
@@ -305,6 +317,15 @@ report_unregistered_hooks() {
             .claude/settings.json|.codex/hooks.json|.qwen/settings.json)
                 hooks+=("stage_involve_gate.sh|involve gate") ;;
         esac
+        # A delegate starts with none of the context the two session hooks
+        # inject, and SessionStart does not fire for one. Claude Code is the
+        # only harness here with an event that does — SubagentStart — so it is
+        # the only config that can be missing it, and a config written before
+        # the event existed registers the two scripts against SessionStart
+        # alone. Nothing else reports that: the delegate simply records
+        # "unrecorded" and works without the project's memory index.
+        [[ "${cfg}" == ".claude/settings.json" ]] && \
+            hooks+=("SubagentStart|SubagentStart delegate context")
         for hook in "${hooks[@]}"; do
             label="${hook#*|}"
             grep -q "${hook%%|*}" "${ROOT_DIR}/${cfg}" 2>/dev/null || missing+="${missing:+, }${label}"
@@ -321,6 +342,7 @@ report_unregistered_hooks() {
             log "NOTE: ${cfg} is registered, but Codex runs a project hook only after you approve it."
             log "      Run /hooks in the Codex CLI and approve it — re-approve whenever it changes."
         fi
+        note_resolver_rule "${cfg}"
     done
 }
 

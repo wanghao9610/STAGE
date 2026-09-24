@@ -286,7 +286,7 @@ bash execs/scpts/fmt.sh    # 一句一行；--check 只报告偏离，不写入
 
 `/stage-flow-status` 是最值得记住的一个：它读取盘上的提纲、记录表、manifest 和周期状态，给出唯一的下一步行动及其准确命令，你永远不必回忆上次写到哪里。
 
-**两个会话钩子。** 一个在每次会话开头提供[项目记忆](#项目记忆)索引；另一个报出运行时模型 id，让产物记录 `model_id` 与追加的 `model_trail`（工作流规约 §8）。Claude、Codex、Cursor、Pi 和 Qwen 从项目内注册；Kimi 与 DSH 因为把钩子注册放在项目外，需要各运行一次 `.kimi-code/hooks/install.sh` 与 `.dsh/hooks/install.sh`。Codex 项目钩子仍需通过 `/hooks` 批准。
+**两个会话钩子。** 一个在每次会话开头提供[项目记忆](#项目记忆)索引；另一个报出运行时模型 id，让产物记录 `model_id` 与追加的 `model_trail`（工作流规约 §8）。在 Claude Code 里，子代理启动时这两个钩子会再跑一次，因为会话钩子不会为子代理触发：溯源钩子把解析该子代理自己转录的命令交给它，于是子代理写出的产物记录的是真正写下它的模型，而不是会话的模型；记忆钩子也为它再给一遍索引。Claude、Codex、Cursor、Pi 和 Qwen 从项目内注册；Kimi 与 DSH 因为把钩子注册放在项目外，需要各运行一次 `.kimi-code/hooks/install.sh` 与 `.dsh/hooks/install.sh`。Codex 项目钩子仍需通过 `/hooks` 批准。
 
 **另外两个钩子做决定而非注入。** Claude、Codex 与 Qwen 带 `INVOLVE=low` 的编辑权限放行钩子。七套 harness 都带 `stage_commit_guard.sh`，用于拒绝[规约 §1](docs/mds/stage-workflow/writing-workflow-conventions.md) 禁止的 git 命令；Pi 从项目扩展注册，DSH 与 Kimi 通过各自的钩子桥接注册。
 
@@ -453,6 +453,8 @@ bash execs/update.sh
 要更新哪些 harness 树由 `STAGE_HARNESSES` 指定，取值顺序为环境变量、`.env`、默认 `all`。写 `STAGE_HARNESSES=codex` 就只维护 Codex 的 `.codex/`，也可从 `claude`、`codex`、`cursor`、`dsh`、`kimi`、`pi`、`qwen` 中任选多个并用逗号分隔；`none` 表示只更新共享骨架。未选中的树既不安装、不更新，也不删除；共享的 `.agents/skills/` 与 `.agents/commands/`、agent 指令、工作流文档和 `execs/` 脚本始终更新。
 
 harness 配置——`.cursorignore`、`.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json`、`.pi/settings.json` 与 `.qwen/settings.json`——仅在缺失时安装，除非加 `--force`，否则绝不覆盖：论文仓库可能往这些文件里加过自己的设置。若保留下来的文件与上游有差异，命令会打印提示；若保留下来的钩子注册没有某个 STAGE 钩子，也会点名说明。
+
+早于子代理钩子保留下来的 `.claude/settings.json` 缺两处，命令会逐一提示：一是 `SubagentStart` 块，提示里点名为缺失的 `SubagentStart delegate context` 钩子；二是模型 id 解析命令的放行规则，缺了它，子代理因为没法回答权限弹窗，`model_id` 只能记成 `unrecorded`。把两处都从上游文件抄进你自己的配置：那个块里的两条钩子命令，以及 `permissions.allow` 下的 `"Bash(bash .claude/hooks/stage_model_id.sh --resolve:*)"`。
 
 更新脚本若仍点名某个上游已删除的路径，会在替换自己之前以 `Upstream ref is missing <path>` 中止。用下面这行手动取回当前版本并提交，再运行一次 `bash execs/update.sh`：
 
