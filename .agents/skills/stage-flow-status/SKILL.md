@@ -1,13 +1,11 @@
 ---
 name: stage-flow-status
 description: >-
-  Show where the paper stands and what to write next: claims, evidence, cycle, build. Read-only map
-  of the whole writing flow — per-section, per-figure, and per-table status from notes/outline.md,
-  claim coverage counts by ledger status, evidence freshness against upstream stamps, reference
-  counts, cycle state (venue confirmed, reviews in, response drafted, promises open, frozen), the
-  latest build and lint signal, and exactly one next action with its exact stage-* command. Reports
-  in chat only and points every action at the sibling skill that owns it. Never writes. Use when the
-  user invokes stage-flow-status or a run names it as the next action.
+  Show where the paper stands and what to write next: outline, claims, evidence freshness, references,
+  cycle state, and the last build and lint, ending in one next action with its exact stage-* command.
+  Use when the user invokes stage-flow-status, a run names it next, or asks where the paper stands,
+  what to work on next, or whether the evidence or build is fresh. Read-only: it reports in chat,
+  routes each action to its owning skill, and never writes.
 ---
 
 # Writing Flow Status — read-only overview

@@ -2,15 +2,11 @@
 name: stage-pstr-builder
 disable-model-invocation: true
 description: >-
-  Owns the conference poster for the active cycle: a content plan at cycls/<cycle>/poster/POSTER_PLAN.md
-  (one takeaway, the claims that earn wall space, figures reused from manus/figs/), a poster.tex built from
-  it, and a render under wkdrs/builds/poster/. A poster is a selection, not a reflow of the paper: it states
-  only claims the ledger carries at verified, every number traces to fingerprinted mates/ evidence, and it
-  never draws new artwork — that routes to /stage-figs-designer. Poster size and any official poster kit are
-  user-confirmed venue.yml facts, copied byte-for-byte, never synthesized. The legibility gate measures
-  effective point size at print scale and refuses a \todo on a wall. No argument audits the poster against
-  its plan; plan selects the content; render emits poster.tex and compiles the sheet; check runs the gate.
-  Use when the user runs /stage-pstr-builder, or asks to plan, render, or check the poster for a venue.
+  Plan, render, and check the active cycle's poster: only claims the ledger holds at verified, every
+  number from fingerprinted mates/ evidence, figures reused from manus/figs/, and a legibility gate
+  that refuses a \todo on the wall. Use when the user runs /stage-pstr-builder, or asks to plan,
+  render, or check the poster for a venue. Never draws new artwork; poster size and any official kit
+  are user-confirmed venue facts, the kit copied byte-for-byte, never synthesized.
 argument-hint: "[plan | render | check] [kit=<path>] [DESCRIPTION] [involve=high]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),

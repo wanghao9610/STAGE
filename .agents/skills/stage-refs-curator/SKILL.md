@@ -1,17 +1,11 @@
 ---
 name: stage-refs-curator
 description: >-
-  Curates the reference base: manus/bibs/reference.bib, every field transcribed from a fetched record,
-  never from memory; reading notes notes/refs/ABBREV.md whose Citable facts
-  stage-cite-auditor checks against; and the index notes/refs/refs_index.md. Every entry carries a
-  % src: line; every shape is fixed by references/source-policy.md. Seeds
-  from STAR refs under mates/. No argument surveys the base; an arXiv id, DOI, URL, or title
-  reads one paper in, `add` several; `discover` searches from the paper's own story and proposes
-  candidates, taking none in unasked; `tidy` fixes hygiene offline; `position` clusters for related
-  work; `verify` re-fetches and diffs every entry; `score` refreshes impact metrics. A paper with no
-  fetchable record goes to manual check, never guessed. Use when the user runs stage-refs-curator,
-  when a run names it as the next action, or asks to add a reference or reading note, find work worth
-  citing, dedupe the bibliography, or position against related work.
+  Curate the reference base, manus/bibs/reference.bib and its reading notes in notes/refs/: read
+  papers in, discover, tidy, verify, and score. Use when the user invokes stage-refs-curator, a run
+  names it next, or asks to add a reference or reading note, find work worth citing, dedupe the
+  bibliography, or position against related work. Every bib field comes from a fetched record, never
+  memory; discover takes nothing in unasked; an unfetchable paper goes to manual check, never guessed.
 ---
 
 # Refs Curator — verified bibliography & notes the auditor can check

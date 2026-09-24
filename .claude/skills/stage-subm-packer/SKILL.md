@@ -2,17 +2,11 @@
 name: stage-subm-packer
 disable-model-invocation: true
 description: >-
-  Preflight and package a submission for the active cycle: the execs/run.sh build and
-  execs/scpts/lint.sh gate must both pass, then a checklist walk over user-confirmed venue.yml
-  facts, a figure/table/bibliography completeness sweep, a package (camera PDF, supplementary,
-  arXiv-ready source) under wkdrs/builds/, the durable record cycls/<cycle>/SUBMISSION_<date>.md,
-  and the freeze tag freeze/<cycle>_<date> — the one skill in the family allowed to create a git
-  tag. Camera-ready mode additionally refuses to pack while tasks/<cycle>_promises.md holds
-  unchecked promise boxes; convert mode reformats the paper into a user-supplied official venue
-  template as a regenerable copy under wkdrs/, never fetching or reconstructing one. It packages
-  and records; it never uploads to a portal, never pushes, never edits the manuscript. Use when
-  the user runs /stage-subm-packer, or asks to package, freeze, convert to a venue template, or
-  prepare the submission, the camera-ready, or the arXiv source.
+  Preflight and package a submission: build and lint must pass, then the user-confirmed venue
+  checklist, a completeness sweep, the package, a SUBMISSION record, and the freeze tag; camera-ready
+  refuses open promises, convert uses a user-supplied template. Use when the user runs
+  /stage-subm-packer, or asks to package, freeze, convert, or prepare a submission, camera-ready, or
+  arXiv source. Never fetches or reconstructs a template, uploads, pushes, or edits the manuscript.
 argument-hint: "[camera | convert] [kit=<path>] [DESCRIPTION] [involve=high]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),

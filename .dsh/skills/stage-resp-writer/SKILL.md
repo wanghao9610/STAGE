@@ -2,14 +2,11 @@
 name: stage-resp-writer
 disable-model-invocation: true
 description: >-
-  Turn every review in cycls/<cycle>/reviews/ — received_<id>.md files dropped by the user and
-  SIM_REVIEW_* files from /skill:stage-peer-reviewer — into a point ledger mapping each attack to
-  claims and evidence, then draft the response within the venue's response_limit. Writes
-  cycls/<cycle>/response/RESPONSE_<date>.md, mirrors every promised change as a checkbox in
-  tasks/<cycle>_promises.md, and downgrades conceded claims to weakened in notes/claims.md.
-  Never edits the manuscript or the review files themselves. Use when the user
-  runs /skill:stage-resp-writer, or asks to draft a rebuttal or response letter, answer reviewers
-  point by point, or decide what to concede.
+  Map every review under cycls/, received or simulated, into a point ledger tied to claims and
+  evidence, then draft the response within the venue's response_limit, mirror each promise as a
+  checkbox under tasks/, and mark conceded claims weakened. Use when the user runs
+  /skill:stage-resp-writer, or asks to draft a rebuttal or response letter, answer reviewers point by
+  point, or decide what to concede. Never edits the manuscript or the review files.
 ---
 
 # Response Writer — point-by-point defense, promises on the books

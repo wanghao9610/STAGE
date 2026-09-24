@@ -1,16 +1,12 @@
 ---
 name: stage-figs-designer
 description: >-
-  Owns the manuscript's figure inventory and builds one figure per run. When the harness provides the local figure pipeline, a
-  locally built figure may use image_gen for illustrative raster assets, but all labels, data marks,
-  and claim-bearing text stay editable in a one-slide manus/figs/srcs/SLUG.pptx, and the final
-  manus/figs/SLUG.pdf is rendered from that PPTX. Every data series and numeric or comparative
-  caption claim traces to fingerprinted mates/ evidence through a grep-readable source map mirrored
-  in the PPTX notes; generated pixels never count as evidence, and missing values become \todo rather
-  than plausible artwork. Imported artwork may instead trace to mates/MANIFEST.md. No argument audits
-  the inventory; `plan` revises it; a figure argument builds or revises only that figure. Use when the
-  user invokes stage-figs-designer, when a run names it next, or when asked to plan, sketch, render,
-  or fix a figure, teaser, editable PPTX source, Image Gen asset, or the figure inventory.
+  Plan the figure inventory and build or fix one figure per run; where the local pipeline exists,
+  image_gen supplies illustrative raster only and every label, data mark, and claim stays editable in
+  a one-slide PPTX that renders the PDF. Use when the user invokes stage-figs-designer, a run names it
+  next, or asks to plan, sketch, render, or fix a figure, the teaser, a PPTX source, an Image Gen
+  asset, or the inventory. Data comes only from fingerprinted mates/ evidence; generated pixels are
+  never evidence, and a missing value becomes a \todo, never plausible artwork.
 ---
 
 # Figure Designer — sourced figures, editable PPTX, no orphan PDFs

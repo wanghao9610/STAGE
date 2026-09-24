@@ -1,15 +1,11 @@
 ---
 name: stage-copy-editor
 description: >-
-  Polish pass over one section or the whole manuscript: clarity, flow, terminology and abbreviation
-  consistency against notes/notation.md, length trimmed toward the outline's page budgets. Edits prose in
-  manus/ in place but never changes technical meaning, any number, any citation or reference key, or any
-  \todo marker; content-level cuts and systematic issues are reported and routed, never silently applied.
-  Writes wkdrs/reports/POLISH_<date>.md (ephemeral) plus follow-up items in tasks/, and proves the
-  manuscript still builds. A style run instead records the author's prose preferences as measurable dials
-  in notes/style.md and edits no prose. Use when the user runs /stage-copy-editor, when a run names it as
-  the next action, or asks to polish, tighten, proofread, or de-jargon the paper's prose, or to set,
-  change, or derive its writing style.
+  Polish one section or the whole manuscript for clarity, flow, natural scholarly prose, consistent
+  notation, and page budget; a style run only records preferences in notes/style.md. Use when the user
+  runs /stage-copy-editor, a run names it next, or asks to polish, tighten, proofread, de-jargon, cut
+  formulaic or AI-like phrasing, restore the author's voice, or set the style. Never changes technical
+  meaning, a number, a \cite or \ref key, or a \todo; content cuts are routed, not applied.
 argument-hint: "[SECTION | style] [DESCRIPTION] [involve=low]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*), Agent,

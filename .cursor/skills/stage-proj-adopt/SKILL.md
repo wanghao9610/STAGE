@@ -2,18 +2,11 @@
 name: stage-proj-adopt
 disable-model-invocation: true
 description: >-
-  Adopt an already-started LaTeX manuscript into STAGE without destroying anything. A read-only
-  inventory maps the draft — main file, section inputs, figures, tables, bibliographies, styles,
-  venue signals, git shape, and files that look like evidence rather than prose — then the mapping
-  and the per-file move plan into manus/ are each confirmed before anything is touched; every
-  \input, \graphicspath, and \bibliography edit is named in the plan before it is applied, and the
-  adopted tree is verified with a build. An external draft is copied in, its source
-  tree never modified. Every number already in the prose is recorded as an unsourced claim — the
-  backlog /stage-clms-auditor works down — and candidate
-  evidence files are routed to /stage-evid-curator, never copied into mates/ here. Use when the
-  user runs /stage-proj-adopt, wants to bring an existing paper, thesis chapter, or Overleaf
-  export into STAGE, or asks how to onboard a draft that did not start from the template.
-  Bilingual (en/zh).
+  Adopt an existing LaTeX draft into STAGE without destroying anything: a read-only inventory, a
+  mapping and move plan confirmed before any file moves, a verifying build, and every number in the
+  prose logged as an unsourced claim. Use when the user runs /stage-proj-adopt, or wants to bring an
+  existing paper, thesis chapter, or Overleaf export into STAGE. The external source tree is never
+  modified; evidence files route to /stage-evid-curator, never copied into mates/ here.
 ---
 
 # Project Adopt — bring an in-progress manuscript into STAGE

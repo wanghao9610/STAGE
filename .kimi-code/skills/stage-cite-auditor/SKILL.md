@@ -1,14 +1,11 @@
 ---
 name: stage-cite-auditor
 description: >-
-  Citation audit: every \cite key must resolve in manus/bibs/reference.bib, and every assertion about a
-  cited work must be checkable against a reading note (notes/refs/ or imported refs under mates/) —
-  unverifiable or unsupported assertions are flagged, never silently fixed. Also scans for missing
-  citations and bib field hygiene. Read-only on the manuscript, the bib, and the ledger; writes
-  wkdrs/reports/CITES_<date>.md (ephemeral) plus tasks/ follow-ups, and routes every fix to
-  /skill:stage-refs-curator or /skill:stage-sect-drafter. Use when the user runs
-  /skill:stage-cite-auditor, when a run names it as the next action, or asks whether the citations and
-  related-work claims hold up.
+  Check that every \cite key resolves in manus/bibs/reference.bib and every assertion about a cited
+  work is backed by a reading note in notes/refs/ or an imported ref under mates/; also missing
+  citations and bib hygiene. Use when the user runs /skill:stage-cite-auditor, a run names it next, or
+  asks whether the citations and related-work claims hold up. Read-only on the manuscript, the bib,
+  and the ledger: problems are flagged and routed, never silently fixed.
 ---
 
 # Citation Auditor — keys resolved, assertions checked, nothing patched

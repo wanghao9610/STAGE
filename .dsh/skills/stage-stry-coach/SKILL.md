@@ -2,13 +2,11 @@
 name: stage-stry-coach
 disable-model-invocation: true
 description: >-
-  Dialogue-first coaching that shapes the paper's story: interviews the user — or drafts from
-  imported idea docs and results digests under mates/ when they exist — to settle pitch, problem,
-  key idea, contributions, and target venue. Writes notes/story.md, seeds notes/claims.md with
-  one proposed claim per contribution, and creates cycls/<cycle>/venue.yml from user-confirmed
-  values only — never an invented page limit or deadline. Use when the user runs
-  /skill:stage-stry-coach, or asks to shape the paper's story or pitch, sharpen contributions, pick a
-  target venue, or open a submission cycle.
+  Shape the paper's story through dialogue, or from idea docs and digests imported under mates/:
+  pitch, problem, key idea, contributions, and target venue. Writes notes/story.md, seeds one claim
+  per contribution, and opens the cycle's venue.yml. Use when the user runs /skill:stage-stry-coach,
+  or asks to shape the story or pitch, sharpen contributions, pick a venue, or open a submission
+  cycle. Venue values come only from the user: never an invented page limit or deadline.
 ---
 
 # Story Coach — from results to a defensible pitch

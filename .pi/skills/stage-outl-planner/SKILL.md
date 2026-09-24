@@ -2,13 +2,11 @@
 name: stage-outl-planner
 disable-model-invocation: true
 description: >-
-  Turns the finalized story into a compilable manuscript skeleton: writes notes/outline.md — a
-  section table whose page budgets sum within the venue page limit, a figure plan, a table plan,
-  and a claim-to-section assignment — creates manus/secs/<n>_<slug>.tex skeletons whose leading
-  comment block is the section brief, uncomments their \input lines in manus/main.tex so the
-  build stays green, and seeds notes/notation.md. Use when the user runs /stage-outl-planner,
-  or asks to outline the paper, budget sections against the page limit, set up section files, or
-  turn the story into a skeleton.
+  Turn the finalized story into a compilable skeleton: notes/outline.md with section page budgets
+  inside the venue limit, figure and table plans, and a claim-to-section map; section stubs under
+  manus/secs/ wired into manus/main.tex so the build stays green; and a seeded notes/notation.md. Use
+  when the user runs /stage-outl-planner, or asks to outline the paper, budget sections against the
+  page limit, set up section files, or turn the story into a skeleton.
 ---
 
 # Plan Outliner — story to compilable skeleton

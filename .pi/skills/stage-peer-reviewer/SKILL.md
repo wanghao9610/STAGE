@@ -1,16 +1,11 @@
 ---
 name: stage-peer-reviewer
 description: >-
-  Simulated program committee. Convenes a five-perspective panel — novelty & related work, technical
-  soundness, experimental rigor & reproducibility, clarity & presentation, devil's advocate — under a
-  citation-integrity contract (whitelist or verified references only, every search logged), scoring by
-  anchored rubric bands with hard caps and honest confidence (6-point conference scale or journal tiers).
-  On this repo's manuscript it builds first, a broken build being finding #1, and writes
-  cycls/<cycle>/reviews/SIM_REVIEW_<date>.md whose weaknesses name the claim IDs they attack, so /stage-
-  resp-writer reads simulated and real reviews alike; extern=<path> referees someone else's paper instead —
-  same panel and rubric, no build, no ledger, confidential search, report under wkdrs/. quick mode runs a
-  single pass. Never edits the manuscript or the ledger. Use when the user runs /stage-peer-reviewer, asks
-  for a mock review, a review panel, a pre-submission attack, or to referee an external paper.
+  Simulate a program committee: a five-perspective panel scores the paper on an anchored rubric, cites
+  only verified references, logs every search, and writes a SIM_REVIEW report whose weaknesses name
+  the claims they attack. Use when the user runs /stage-peer-reviewer, or asks for a mock review, a
+  review panel, a pre-submission attack, or to referee an external paper. Never edits the manuscript
+  or the ledger; an external paper's title and text stay out of searches unless it is public.
 ---
 
 # Peer Reviewer — a five-perspective panel with an anchored rubric

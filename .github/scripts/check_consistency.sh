@@ -553,9 +553,15 @@ fi
 #         awk's length() is bytes on BWK awk, so the count goes through perl.
 #       - The folded-block indicator is not part of the value: leaving ">-" in
 #         the measured text inflates every folded file by 3.
-#     The Kimi tree is the tight one — /skill: adds six characters per skill
-#     token, three tokens in the longest description — so a description trimmed
-#     to fit .claude can still overrun there.
+#     A description says what the skill does, when it applies, and the
+#     exclusions that prevent likely misrouting; mode syntax, procedures and
+#     output shapes belong in the body. This bound and the DSH one below are
+#     ceilings, not targets. When a description is shortened to fit, cut
+#     detail, never a guarantee about what the skill will not do: a "never", a
+#     read-only boundary, a venue fact only the user may confirm. Frontmatter is
+#     hand-maintained per tree (port.sh does not generate it), so a shared change
+#     edits all seven copies, each keeping its own invocation token (check 7)
+#     and its other fields.
 section "Description length (<= ${DESC_MAX:=1024} characters, SKILL.md spec)"
 desc_errors=0
 while IFS= read -r manifest; do
@@ -573,6 +579,34 @@ while IFS= read -r manifest; do
     fi
 done < <(find -L "${SKILL_ROOTS[@]}" -name 'SKILL.md' | sort)
 (( desc_errors == 0 )) && note "all descriptions within ${DESC_MAX} characters in all seven trees"
+
+#     DSH is stricter than the spec and silent about it. Its model-facing catalog
+#     renders `description` through catalogDescriptionMaxLength, default 500, and
+#     over that it keeps the first 497 characters and appends "..." — no warning,
+#     no log line. A STAGE description closes on its "Use when ..." routing
+#     clause and the guarantees after it, so truncation removes exactly what
+#     the model matches on and what keeps it from misusing the skill.
+#     /skill: makes the .dsh copy of each shared description (and Kimi's, which
+#     shares the token) the longest. Only .agents' figs-designer text, which
+#     alone carries the image_gen/PPTX pipeline (check 19), runs longer, and DSH
+#     reads .dsh/skills ahead of .agents/skills, so this is the bound that binds.
+section "Description length in .dsh (<= ${DSH_DESC_MAX:=500}, DSH catalog bound)"
+dsh_desc_errors=0
+while IFS= read -r manifest; do
+    len="$(awk '
+        NR == 1 && /^---[ \t]*$/ { fm = 1; next }
+        fm && /^---[ \t]*$/ { exit }
+        fm && /^description:/ { grab = 1; sub(/^description:[ \t]*/, ""); sub(/^[>|][-+]?[ \t]*$/, "") }
+        fm && grab && /^[A-Za-z_-]+:/ && !/^description:/ { exit }
+        grab { gsub(/^[ \t]+|[ \t]+$/, ""); if (length($0)) body = body (length(body) ? " " : "") $0 }
+        END { print body }
+    ' "${manifest}" | perl -CSD -Mutf8 -ne 'chomp; $n += length; END { print $n + 0 }')"
+    if (( len > DSH_DESC_MAX )); then
+        fail "${manifest}: description is ${len} characters; DSH truncates its catalog at ${DSH_DESC_MAX}, cutting its closing clause"
+        dsh_desc_errors=1
+    fi
+done < <(find -L .dsh/skills -name 'SKILL.md' | sort)
+(( dsh_desc_errors == 0 )) && note "every .dsh description survives DSH's ${DSH_DESC_MAX}-character catalog intact"
 
 # 11. Heading structure matches across the six named trees.
 #     Checks 1-3 compare file *sets*; nothing above compares what is inside

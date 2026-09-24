@@ -1,14 +1,11 @@
 ---
 name: stage-clms-auditor
 description: >-
-  The numbers audit: extracts every number from manus/tabs/ and manus/secs/, traces each through % src:
-  comments and claim-ledger evidence links to fingerprinted mates/ entries, and issues a per-number
-  verdict — matched, mismatched, or unsourced. Flips notes/claims.md statuses (drafted → verified /
-  unsourced), checks evidence staleness via import.sh --diff, writes wkdrs/reports/CLAIMS_<date>.md
-  (ephemeral) and one tasks/ item per failure. Never edits the manuscript or mates/ — every fix routes to
-  the skill that owns the file. Use when the user runs /stage-clms-auditor, when a run names it as the
-  next action, or asks whether the paper's numbers are backed by evidence, or before any submission
-  freeze.
+  Trace every number in manus/tabs/ and manus/secs/ through its % src: comment and the claim ledger to
+  a fingerprinted mates/ entry, grade it matched, mismatched, or unsourced, and flip its status in
+  notes/claims.md. Use when the user runs /stage-clms-auditor, a run names it next, before a
+  submission freeze, or when asked whether the paper's numbers are backed by evidence. Never edits the
+  manuscript or mates/; every fix routes to the skill that owns the file.
 argument-hint: "[SECTION | CLAIM_ID] [DESCRIPTION]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh:*),

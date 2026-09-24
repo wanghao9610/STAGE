@@ -1,14 +1,11 @@
 ---
 name: stage-sect-drafter
 description: >-
-  Draft or revise one manuscript section per invocation from its outline brief, the claim ledger, and
-  fingerprinted evidence under mates/. Resolves the section by number, file slug, or title against
-  notes/outline.md and writes manus/secs/<n>_<slug>.tex; every number either traces to a fingerprinted
-  mates/ entry read this run or is written as \todo{...} — no third state. Updates the claim ledger
-  (Stated in, status drafted), appends new symbols and abbreviations to notes/notation.md, and flips the
-  section's outline row. Never edits mates/ and never re-scopes the outline. Use when the user runs
-  /stage-sect-drafter, when a run names it as the next action, or asks to draft, write, expand, or revise
-  a section — abstract, intro, method, experiments, related work — or to turn an outline row into prose.
+  Draft or revise one manuscript section per run from its outline brief, the claim ledger, and
+  fingerprinted mates/ evidence, updating the ledger, notation, and outline row. Use when the user
+  runs /stage-sect-drafter, a run names it next, or asks to draft, write, expand, or revise a section,
+  or turn an outline row into prose. Every number traces to a mates/ entry read this run or is written
+  as \todo{...}, no third state; never edits mates/ or re-scopes the outline.
 argument-hint: "SECTION [DESCRIPTION] [involve=low]"
 ---
 

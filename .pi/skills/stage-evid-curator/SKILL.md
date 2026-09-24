@@ -1,17 +1,12 @@
 ---
 name: stage-evid-curator
 description: >-
-  Curator of mates/, the read-only store behind the paper's numbers — this skill and
-  execs/scpts/import.sh are its only writers. `import` pulls or refreshes results from the paired STAR
-  repo, which pins each file's upstream commit in mates/MANIFEST.md and rewrites its source-type: star
-  entries; `register <path>` adopts hand-dropped evidence under mates/manual/ as a source-type: manual
-  entry — read in full, provenance asked, checksummed, dated; `check` (the default) reconciles disk
-  against manifest and grades every file ok, unregistered, missing, tampered, or stale, each with the
-  command that fixes it. Evidence is read-only — a wrong number is fixed at its source and re-imported,
-  never in place — and a file with no manifest entry does not exist to the writing skills. Use when the
-  user runs /stage-evid-curator, when a run names it as the next action, wants STAR results imported or
-  refreshed, has a result file to put behind a claim, or asks whether the paper's evidence is current.
-  Bilingual (en/zh).
+  Curate mates/, the paper's fingerprinted evidence: import or refresh STAR results, register a
+  hand-dropped result file, or check disk against mates/MANIFEST.md. Use when the user runs
+  /stage-evid-curator, a run names it next, wants STAR results imported, has a file to put behind a
+  claim, or asks whether the evidence is current. Evidence is read-only: a wrong number is fixed at
+  its source and re-imported, never in place; an unregistered file does not exist to the writing
+  skills.
 ---
 
 # Evidence Curator — the manifest and the files behind the numbers
