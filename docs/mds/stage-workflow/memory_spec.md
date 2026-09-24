@@ -23,12 +23,12 @@ The exclusivity cuts hardest against the fabrication boundary (conventions §9):
 .stage/memory/
 ├── MEMORY.md          # the index: one line per memory
 ├── <slug>.md          # one memory per file
-└── local/             # machine-specific memories, git-ignored
+└── local/             # git-ignored: what stays on this machine
     ├── MEMORY.md
     └── <slug>.md
 ```
 
-`.stage/memory/` is versioned, so a memory outlives the machine that recorded it and travels with a clone. `local/` is ignored the way `.env` is: a path, a font, a missing LaTeX package, or an engine quirk that is true here and false on the next machine belongs there. Where such a fact is worth carrying anyway, the alternative is a shared memory whose `scope` names the machine it holds on.
+`.stage/memory/` is versioned, so a memory outlives the machine that recorded it and travels with a clone. `local/` is ignored the way `.env` is and holds what stays behind: a `machine:` scoped fact — a path, a font, a missing LaTeX package, or an engine quirk true here and false on the next machine — and any memory the user keeps off the repository, whatever its scope. Every other scope — `global`, `cycle:`, `manus:` — holds on any clone and goes to the versioned store; the split is by where a fact travels, not by where it holds.
 
 ## The memory file
 

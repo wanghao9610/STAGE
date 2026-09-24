@@ -18,8 +18,9 @@ dash is free text. Only lines starting with `- ` are read.
 
 Nothing that a repository file already owns goes here — a number belongs to
 `mates/`, a claim to `notes/claims.md`, a page limit to the cycle's `venue.yml`.
-Machine-specific memories live in `local/`, which git ignores. Full rules — what
-belongs here, the file format, how a memory is retired:
+One subdirectory git ignores, `local/`, holds what stays on this machine: the
+`machine:` scoped facts, and any memory kept off the repository. Full rules —
+what belongs here, the file format, how a memory is retired:
 `docs/mds/stage-workflow/memory_spec.md`.
 
 <!-- entries below -->

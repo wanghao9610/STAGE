@@ -1315,6 +1315,23 @@ fi
 rm -rf -- "${PROSE_TEST_DIR}"
 (( prose_lint_errors == 0 )) && note "chatbot, cluster, false-positive, comment, and caption fixtures pass"
 
+# 21. The versioned memory store ships as its template. STAGE is the template
+#     every paper starts from — a clone or the GitHub template copies
+#     .stage/memory/ as is, and update.sh --adopt seeds its MEMORY.md — so a
+#     memory about developing STAGE would arrive in every paper as a fact about
+#     that paper. Upstream's own memories live under the git-ignored
+#     .stage/memory/local/ whatever their scope (README, "Working on STAGE
+#     itself"); this holds the tracked store to the files the template ships.
+section "Upstream memory store ships as its template"
+MEMORY_TEMPLATE_FILES=$'.stage/memory/MEMORY.md\n.stage/memory/MEMORY.zh-CN.md'
+tracked_memory="$(git ls-files .stage/memory)"
+if [[ "${tracked_memory}" == "${MEMORY_TEMPLATE_FILES}" ]]; then
+    note ".stage/memory/ tracks only the files the template ships"
+else
+    fail ".stage/memory/ tracks more than the template ships; STAGE's own memories belong under the git-ignored .stage/memory/local/:"
+    diff <(printf '%s\n' "${MEMORY_TEMPLATE_FILES}") <(printf '%s\n' "${tracked_memory}") | sed 's/^/      /'
+fi
+
 printf '\n'
 if (( FAILURES > 0 )); then
     printf '%d check(s) failed.\n' "${FAILURES}"

@@ -1,8 +1,9 @@
 # local runtime config
 .env
 
-# Machine-specific project memories, ignored the way .env is: the shared store
-# .stage/memory/ travels with a clone, local/ does not.
+# Project memories that stay on this machine — machine-scoped facts, and any
+# kept off the repository — ignored the way .env is; the rest of .stage/memory/
+# travels with a clone.
 .stage/memory/local/
 
 # builds and ephemeral reports live out-of-tree

@@ -432,7 +432,7 @@ Where a skill puts what it writes. Each destination is exclusive — a file belo
 | Submission cycles | `cycls/<venue>_<year>/`: `venue.yml`, `template/` (the official venue kit, unpacked whole, byte-for-byte, never edited), `reviews/`, `response/`, `SUBMISSION_<date>.md`, `poster/` (the poster plan and its source, with an official poster kit under `poster/template/`) |
 | Revision scratch, promise lists | `tasks/` |
 | Builds, ephemeral reports, fetch caches | `wkdrs/builds/`, `wkdrs/reports/`, `wkdrs/refs_<date>/raw/` (gitignored, regenerable) |
-| What earlier sessions learned, owned by no other file | `.stage/memory/`; machine-specific facts in `.stage/memory/local/`, which git ignores ([`memory_spec.md`](memory_spec.md)) |
+| What earlier sessions learned, owned by no other file | `.stage/memory/`; the git-ignored `.stage/memory/local/` for `machine:` scoped facts and anything kept off the repository ([`memory_spec.md`](memory_spec.md)) |
 | Entrypoints | `execs/run.sh`, `execs/update.sh` — **execs/ root is closed**; utilities go in `execs/scpts/` (`import.sh`, `lint.sh`, `fmt.sh`). Every script under `execs/` is upstream-managed and `execs/update.sh` overwrites all five; per-project settings live in `.env`, never in an edited copy of one |
 | Workflow docs (upstream-managed) | `docs/mds/stage-workflow/` |
 

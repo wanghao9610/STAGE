@@ -4,10 +4,11 @@
 # sessions in this repository learned.
 #
 # The store is .stage/memory/ in the project, not the harness's own memory: one
-# file per fact, listed one line each in MEMORY.md, with machine-specific facts
-# under local/ (git-ignored, like .env). Only the index is injected — the lines
-# are pointers, and the fact itself is read from its file when it matters. What
-# belongs in the store, and the format of both, is
+# file per fact, listed one line each in MEMORY.md, with a git-ignored local/
+# beside it (like .env) holding what stays on this machine: the machine: scoped
+# facts, and any memory the user keeps off the repository. Only the index is
+# injected — the lines are pointers, and the fact itself is read from its file
+# when it matters. What belongs in the store, and the format of both, is
 # docs/mds/stage-workflow/memory_spec.md.
 #
 # Why UserPromptSubmit and not SessionStart: in Kimi, SessionStart is

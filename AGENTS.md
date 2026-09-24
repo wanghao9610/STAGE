@@ -97,7 +97,7 @@ The test: every changed line traces to the user's request, and every number in i
 - Record a fact there only when no file in the repository already owns it — a number belongs to `mates/`, a claim to `notes/claims.md`, a page limit to the cycle's `venue.yml`, what a paper says to `notes/refs/`, a promise to `tasks/`. Memory holds the residue.
 - A memory is never a source: it can never back a number in `manus/`, a venue rule, or an assertion about a cited work (§2 stands whatever a memory says).
 - Offer, never assume: at most two offers per session, and write only after the user agrees. `INVOLVE=low` records unasked and says so.
-- A fact true only of this machine goes to `.stage/memory/local/`, which git ignores. Where a memory disagrees with a file in the repository, the file wins.
+- What travels with the repository goes to the versioned `.stage/memory/`; a `machine:` scoped fact, true only here, goes to the git-ignored `.stage/memory/local/`, as does any memory the user keeps off the repository. Where a memory disagrees with a file in the repository, the file wins.
 - Types, file format, the index line the hooks parse, and how a memory is retired: `docs/mds/stage-workflow/memory_spec.md`.
 
 ## 11. Verification
