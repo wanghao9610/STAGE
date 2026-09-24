@@ -7,6 +7,11 @@
 ## review_<perspective>.md
 
 ```markdown
+---
+perspective: <one of the five>
+generated: <YYYY-MM-DD>
+---
+
 # Review — <Perspective Name>
 
 **Paper:** <title or target path> · **Venue/scale:** <venue_year, conference-6 | journal>
