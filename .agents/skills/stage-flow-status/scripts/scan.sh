@@ -186,7 +186,7 @@ say ""
 say "## MATES — mates/MANIFEST.md entries (§8.2)"
 if [ -f mates/MANIFEST.md ]; then
     say "### mates/MANIFEST.md — mtime $(mtime mates/MANIFEST.md)"
-    grep -nE '^## |^(imported|source|source-type|sha256|rows|stamp):' mates/MANIFEST.md | cap_list
+    grep -nE '^## |^- (source-type|source|source-commit|source-stamp|sha256|imported|covers):' mates/MANIFEST.md | cap_list
 else
     say "(absent)"
 fi
