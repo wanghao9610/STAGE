@@ -461,7 +461,7 @@ bash execs/update.sh
 
 要更新哪些 harness 树由 `STAGE_HARNESSES` 指定，取值顺序为环境变量、`.env`、默认 `all`。写 `STAGE_HARNESSES=codex` 就只维护 Codex 的 `.codex/`，也可从 `claude`、`codex`、`cursor`、`dsh`、`kimi`、`pi`、`qwen` 中任选多个并用逗号分隔；`none` 表示只更新共享骨架。未选中的树既不安装、不更新，也不删除；共享的 `.agents/skills/` 与 `.agents/commands/`、agent 指令、工作流文档和 `execs/` 脚本始终更新。
 
-harness 配置——`.cursorignore`、`.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json`、`.pi/settings.json` 与 `.qwen/settings.json`——仅在缺失时安装，除非加 `--force`，否则绝不覆盖。若保留下来的文件与上游有差异，命令会打印提示；若保留下来的钩子注册没有某个 STAGE 钩子，也会点名说明。
+harness 配置——`.cursorignore`、`.claude/settings.json`、`.codex/hooks.json`、`.cursor/hooks.json`、`.pi/settings.json` 与 `.qwen/settings.json`——以及 `fmt.sh` 和 `lint.sh` 读取的断行规则 `.latexindent.yaml` 与其编辑器一侧的 `.editorconfig`，仅在缺失时安装，除非加 `--force`，否则绝不覆盖。若保留下来的文件与上游有差异，命令会打印提示；若保留下来的钩子注册没有某个 STAGE 钩子，也会点名说明。
 
 早于子代理钩子保留下来的 `.claude/settings.json` 缺两处，命令会逐一提示：一是 `SubagentStart` 块，提示里点名为缺失的 `SubagentStart delegate context` 钩子；二是模型 id 解析命令的放行规则，缺了它，子代理因为没法回答权限弹窗，`model_id` 只能记成 `unrecorded`。把两处都从上游文件抄进你自己的配置：那个块里的两条钩子命令，以及 `permissions.allow` 下的 `"Bash(bash .claude/hooks/stage_model_id.sh --resolve:*)"`。
 

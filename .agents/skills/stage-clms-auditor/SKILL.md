@@ -23,8 +23,10 @@ stripped before either is read (§7.7); it moves no verdict, since a verdict is 
 call; it still governs the commit offer (§1.6) and, at `high`, the fan-out announcement (§6.8).
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
-the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever
-it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+the start of every run. It is longer than one read or one shell command returns, so read it by
+line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
+the whole file is saved aside unread. It is the baseline every STAGE
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly
@@ -156,7 +158,8 @@ to get it: switch the session's model — then continue here.
    Adoption backlog rows enter the ledger here, and through no other skill (conventions §9a:
    every known-but-unfingerprinted value carries an `unsourced` ledger row). Each backlog row of
    `notes/adopt.md` whose `file:line` lies in this run's scope and is not yet in the ledger gets
-   one this run — next free ID, the claim as the
+   one this run — a row whose recorded `file:line` a later move or renumbering left stale is found
+   by its recorded claim text, and is in scope where that text now sits — next free ID, the claim as the
    manuscript states it, its section or table in `Stated in`, Evidence from the trace when one
    resolved this run or `—`, status per this run's verdict: `verified` when every number under it
    matched fresh evidence, `unsourced` otherwise — and every `unsourced` one is a Step 8 task,
@@ -167,12 +170,15 @@ to get it: switch the session's model — then continue here.
 
    When `notes/adopt.md` exists and this run audited the whole manuscript, close the adoption loop
    in the same pass: every row of its unsourced backlog must by now be a `verified` claim, an
-   `unsourced` one whose statement carries its `\todo`, or a cited-work claim handed to
-   `stage-cite-auditor` (Principle 4). All resolved → set that file's
+   `unsourced` one whose statement carries its `\todo`, a cited-work claim handed to
+   `stage-cite-auditor` (Principle 4), or a claim the typeset text no longer states — its sentence
+   rewritten not to need the value (conventions §9a), which a search of `manus/` outside comments
+   for its recorded claim text shows;
+   the report names each such withdrawn row. All resolved → set that file's
    `backfilled:` to the real date, which is what releases `stage-subm-packer`'s adoption gate
    (conventions §8.9); any row still a naked number → leave it empty and name those rows in the
-   report. `backfilled:` is the only field of `notes/adopt.md` this skill writes, and no other skill
-   writes it at all.
+   report. `backfilled:` is the only content field of `notes/adopt.md` this skill writes, beside
+   the §8 provenance pair its frontmatter carries, and no other skill writes it at all.
 8. **File failures.** Append one `- [ ]` per mismatch, naked-unsourced number, stale-tainted
    match, tampered `MANIFEST.md` entry (Step 3), dead evidence link, or selected-without-spread
    match (Principle 8) to `tasks/claims_followups.md` under a `## <date>` heading —
@@ -203,7 +209,7 @@ to get it: switch the session's model — then continue here.
 - Status flips, Evidence completions, and `updated:` in `notes/claims.md`; one `- [ ]` per
   failure in `tasks/claims_followups.md` — the durable outcomes.
 - New ledger rows for adoption-backlog entries (Step 7), and `backfilled:` in `notes/adopt.md` on
-  a whole-manuscript run that closes the backlog — the only field of that file it writes.
+  a whole-manuscript run that closes the backlog — the only content field of that file it writes.
 - Never edits `manus/`, `mates/`, or the bib: verdicts, flips, new backlog rows, `backfilled:`,
   and tasks are all it writes.
 - Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

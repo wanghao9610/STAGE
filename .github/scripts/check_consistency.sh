@@ -1333,6 +1333,10 @@ fi
 guard_dir="$(mktemp -d "${TMPDIR:-/tmp}/stage-commit-guard-check.XXXXXX")" || guard_dir=""
 if [[ -n "${guard_dir}" ]]; then
     git -C "${guard_dir}" init -q
+    # One commit and one tag, so a push naming a tag this clone holds by its
+    # short name is tested too.
+    git -C "${guard_dir}" -c user.name=ci -c user.email=ci@ci commit -q --allow-empty -m x
+    git -C "${guard_dir}" tag v1.0
     head -c $((11 * 1024 * 1024)) /dev/zero > "${guard_dir}/big.pdf"
     GUARDS=(.claude/hooks/stage_commit_guard.sh .codex/hooks/stage_commit_guard.sh
             .cursor/hooks/stage_commit_guard.sh .dsh/hooks/stage_commit_guard.sh
@@ -1403,6 +1407,42 @@ pass|git commit -m x -- notes/claims.md
 pass|git checkout -b feat
 pass|git checkout --conflict=diff3 a.tex
 pass|git switch -c x
+deny|sudo git add -A
+deny|sudo -u me git commit --amend
+deny|xargs git add -A
+deny|git push --delete origin refs/tags/freeze/x_2026-09-24
+deny|git push origin :refs/tags/freeze/x_2026-09-24
+deny|git push -f origin refs/tags/freeze/x_2026-09-24
+deny|git push origin +refs/tags/freeze/x_2026-09-24
+deny|git push --force --tags
+deny|git push --mirror origin
+pass|git push origin main
+pass|git push origin refs/tags/freeze/x_2026-09-24
+pass|git push --tags
+pass|git push -d origin old-branch
+deny|git push --delete origin freeze/x_2026-09-24
+deny|git push origin :tags/freeze/x_2026-09-24
+deny|git push --del origin v1.0
+deny|git push -f origin v1.0
+deny|git push --mirr origin
+deny|git push --prune origin 'refs/tags/*:refs/tags/*'
+deny|git push --delete origin tag nolocal/tag
+deny|git push --delete origin \\\nfreeze/x_2026-09-24
+deny|timeout 60 git push --delete origin freeze/x_2026-09-24
+deny|git commit --amen -m x
+pass|git push origin v1.0
+pass|git push -f production main
+pass|git push --prune origin 'refs/heads/*:refs/heads/*'
+pass|git push -oci.variable=DEPLOY=false origin main v1.0
+pass|git push -u origin main
+pass|git push origin main # never --mirror
+pass|git add notes/claims.md # not -A
+pass|git push -n -d origin v1.0
+pass|git push -f tag feat
+pass|git push -f -o "merge_request.title=Fix tag v1.0" origin feat
+deny|doas -u me git push -d origin v1.0
+deny|caffeinate -t 600 git push origin :v1.0
+deny|git push -d origin v1.0 # a real delete
 deny|bash <<'EOF'\ngit add -A\nEOF
 deny|cat <<EOF | sh\ngit add -A\nEOF
 pass|bash execs/scpts/lint.sh && git commit -F- <<'EOF'\nstage-x: y\n\ngit add -A avoided\nEOF
@@ -1545,6 +1585,21 @@ allow|install -d wkdrs/x
 prompt|echo $(( 1 << EOF ))\nrm x\nEOF
 prompt|echo ${x#<<EOF }\nrm x\nEOF
 allow|echo $(( 1 << 2 )); cat <<EOF\nrm x\nEOF
+allow|cat notes/claims.md; echo ---; grep -sE '^(STAGE_LANG|INVOLVE|STAGE_(PLAN|EXEC|READ)_MODEL)=' .env || true
+allow|git commit -m "stage-x: C2 (a|b); one follow-up" -- notes/claims.md
+prompt|grep -E 'a|b' .env; rm x
+prompt|bash -c 'x; rm y'
+prompt|FOO='a|b' rm x
+prompt|cp 'a|b' notes/claims.md
+prompt|mv x 'y;z' notes/claims.md
+prompt|grep -c 'todo' notes/claims.md  # what's left\ncd wkdrs && rm -rf builds
+prompt|grep x `bash -c 'echo; rm -rf notes'`
+prompt|grep "$(echo "'")" notes/claims.md; rm -rf notes
+prompt|grep x <<E.F\ngrep it's\nE.F\necho a; rm -rf notes
+allow|git commit -m "fix: x" -m "- add y"
+allow|ls # ; rm -rf notes
+prompt|cp a mates/x 2>/dev/null
+allow|tee 'a;b' < notes/claims.md
 CASES
     (( gate_errors == 0 )) && note "bash gate allows ordinary commands at involve=low and leaves STAGE's red lines to the prompt"
     rm -rf "${gate_dir}"

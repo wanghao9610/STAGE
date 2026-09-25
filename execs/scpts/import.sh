@@ -335,7 +335,7 @@ upstream_dirty() {
 # uses.
 diff_one() {
     local rel src dst want have dirty head
-    local drift=0
+    local drift=0 refresh=0 tampered=0 when
     SOURCE_DIR="$1"
     SLUG="$2"
     DEST_DIR="${ROOT_DIR}/mates/${SLUG}"
@@ -349,7 +349,7 @@ diff_one() {
         dst="${DEST_DIR}/${rel}"
         if [[ ! -e "${dst}" ]]; then
             printf '  new upstream      %s\n' "${rel}"
-            drift=$(( drift + 1 ))
+            drift=$(( drift + 1 )); refresh=$(( refresh + 1 ))
             continue
         fi
         # The copy is checked against its own registration first: a copy
@@ -362,11 +362,11 @@ diff_one() {
         fi
         if [[ "${have}" =~ ^[0-9a-f]{64}$ && "${have}" != "${want}" ]]; then
             printf '  tampered          %s (local copy no longer matches its MANIFEST sha256; /stage-evid-curator check)\n' "${rel}"
-            drift=$(( drift + 1 ))
+            drift=$(( drift + 1 )); tampered=$(( tampered + 1 ))
         elif ! cmp -s "${src}" "${dst}"; then
             printf '  stale             %s (upstream stamp: %s; imported stamp: %s)\n' \
                 "${rel}" "$(extract_stamp "${src}")" "$(extract_stamp "${dst}")"
-            drift=$(( drift + 1 ))
+            drift=$(( drift + 1 )); refresh=$(( refresh + 1 ))
         fi
     done < "${LIST_FILE}"
 
@@ -386,8 +386,23 @@ diff_one() {
         printf '%s\n' "${dirty}" | sed 's/^/      /'
     fi
 
+    # A re-import clears stale and new files. It never removes a local copy that
+    # upstream dropped, and over a tampered copy it would overwrite the edit
+    # before anyone saw it, so both go to the curator's check — the tampered
+    # ones before any re-import.
     if (( drift > 0 )); then
-        log "${drift} path(s) drifted. Re-import with: bash execs/scpts/import.sh --source ${SOURCE_DIR} --slug ${SLUG}"
+        log "${drift} path(s) drifted."
+        if (( tampered > 0 )); then
+            log "${tampered} tampered: run /stage-evid-curator check first — a re-import overwrites a tampered copy and hides the edit."
+        fi
+        if (( drift - refresh - tampered > 0 )); then
+            log "$(( drift - refresh - tampered )) missing upstream: a re-import never removes a local copy; settle them with /stage-evid-curator check."
+        fi
+        if (( refresh > 0 )); then
+            when=""
+            (( tampered > 0 )) && when=", once that check has run"
+            log "${refresh} stale or new upstream${when}: re-import with: bash execs/scpts/import.sh --source ${SOURCE_DIR} --slug ${SLUG}"
+        fi
         return 2
     fi
     if [[ ! -d "${DEST_DIR}" && ! -s "${LIST_FILE}" ]]; then

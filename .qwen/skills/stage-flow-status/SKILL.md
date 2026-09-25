@@ -19,14 +19,18 @@ carries (§7.5) and changes nothing else here. An ambiguous section argument is 
 skill may ask (§5); it asks nothing else.
 Anything left after `SECTION` is a description (conventions §7.13): in your own words, what this
 run is for. Prose that resolves to no section is description alone, not a missing target — report
-the whole flow, and say so in the reply's first line. A description can steer what the report
+the whole flow, and say so in the reply's first line. With `STAGE_LANG` unset, the description's
+language is the user's dialogue language (§7.6): where this run sees no conversation around it, a
+question asked in Chinese gets its report in Chinese. A description can steer what the report
 reads hardest — which unknown is worth a second look, which line is worth quoting rather than
 counting — but it drops nothing the report owes, and it never moves the next action, which the
 priority order fixes down to the tie-break.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
-the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever
-it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+the start of every run. It is longer than one read or one shell command returns, so read it by
+line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
+the whole file is saved aside unread. It is the baseline every STAGE
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly
@@ -189,7 +193,8 @@ not the session's model.
    sentence (§9a). A freeze dated on or after a `RESPONSE_*` that answers a `received_*` file, with
    no `poster/POSTER_PLAN.md`, is a gap line naming stage-pstr-builder, for a paper accepted with a
    poster.
-   Give the one-line reason with the exact command; when the recommended level differs from the one
+   Give the one-line reason with the exact command — the skill names above written with the prefix
+   this harness invokes them by (conventions §11), never bare; when the recommended level differs from the one
    `INVOLVE` in `.env` resolves to, the command carries the explicit `involve=low|medium|high`
    token, copyable as printed (conventions §7.5). Always print the recommendation and end this
    status run: the report starts no successor, whichever skill it names (conventions §11.4) —

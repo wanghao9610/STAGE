@@ -154,6 +154,11 @@ HARNESS_FILES=(
     ".cursor/hooks.json"
     ".pi/settings.json"
     ".qwen/settings.json"
+    # Not a harness's, but kept the same way: the line-break rule fmt.sh and
+    # lint.sh read and the editor-side half of it. Without these an updated paper
+    # gets the scripts and never the rule, and lint skips the check for good.
+    ".latexindent.yaml"
+    ".editorconfig"
 )
 HOOK_CONFIGS=(
     ".claude/settings.json"
@@ -387,9 +392,10 @@ which leaves this running process on the old file and gives the next invocation
 the new one.
 
 Harness configuration an instance may have edited — .cursorignore, the four hook
-registrations, and .pi/settings.json
-— is installed when it is absent and otherwise kept, however far it has drifted
-from upstream; only --force overwrites it. A kept registration that does not name
+registrations, and .pi/settings.json — and the line-break rule fmt.sh and lint.sh
+read, .latexindent.yaml with its editor half .editorconfig, are installed when
+absent and otherwise kept, however far they have drifted from upstream; only
+--force overwrites them. A kept registration that does not name
 a hook is reported, since a hook nobody registers never fires.
 
 --harnesses limits the run to named harness trees, comma separated: claude,
@@ -590,11 +596,6 @@ if [[ "${ADOPT}" == true ]]; then
         ".stage/memory/.gitkeep"
         ".env.example"
         ".gitignore"
-        # The line-break rule fmt.sh applies and .vscode/settings.json points
-        # at, plus the editor-side half of the same convention; a paper that
-        # already has either keeps its own, like every file here.
-        ".latexindent.yaml"
-        ".editorconfig"
         "execs/run.sh"
         "execs/update.sh"
         "execs/scpts/import.sh"

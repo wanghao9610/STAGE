@@ -42,7 +42,8 @@ done
 
 FM_CAP=60    # frontmatter lines per file
 ROW_CAP=200  # table rows per file, listing entries per directory
-if [ "$FULL" = 1 ]; then FM_CAP=100000; ROW_CAP=100000; fi
+BOX_CAP=10   # wrapped lines kept per open box
+if [ "$FULL" = 1 ]; then FM_CAP=100000; ROW_CAP=100000; BOX_CAP=100000; fi
 
 say() { printf '%s\n' "$*"; }
 
@@ -106,15 +107,32 @@ rows() {
 
 # `- [ ]` / `- [x]` lines: the promise lists, where the open boxes are what gates
 # a camera-ready. Never capped by row count alone — an open box is the thing a
-# reader must see — so the cap counts ticked ones only.
+# reader must see — so the cap counts ticked ones only. An open box wrapped onto
+# indented lines keeps them, up to BOX_CAP: the route or owner it names usually
+# sits at its end, and a status run must not re-open the file to find it. Past
+# the cap, the middle lines are the ones counted and dropped, never the last.
 boxes() {
-    awk -v cap="$ROW_CAP" '
+    awk -v cap="$ROW_CAP" -v bcap="$BOX_CAP" '
+        function flush(    i) {
+            if (n <= bcap) { for (i = 1; i <= n; i++) print buf[i] }
+            else {
+                for (i = 1; i < bcap; i++) print buf[i]
+                printf "      … (%d more lines)\n", n - bcap
+                print buf[n]
+            }
+            n = 0
+        }
         { sub(/\r$/, "") }
         /^[ \t]*- \[[ xX]\]/ {
+            flush(); open = 0
             if ($0 ~ /- \[[xX]\]/) { if (++ticked > cap) { omitted++; next } }
+            else open = 1
             print
+            next
         }
-        END { if (omitted) printf "… (%d more ticked boxes)\n", omitted }
+        open && /^[ \t]+[^ \t]/ { buf[++n] = $0; next }
+        { flush(); open = 0 }
+        END { flush(); if (omitted) printf "… (%d more ticked boxes)\n", omitted }
     ' "$1"
 }
 

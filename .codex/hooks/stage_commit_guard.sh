@@ -17,8 +17,11 @@
 # would stage a file over 10 MB — a build PDF, a raw figure export, or an
 # evidence blob in history is a paper repository's one costly mistake, since
 # clearing it back out needs exactly those rewrites. `push` is deliberately
-# absent: no rule here makes a skill likelier to push, and a user who asks for
-# one directly should get it.
+# absent, except where it deletes or moves a tag on the remote (push --delete of
+# a tag, a :<tag> refspec, a forced push of a tag or of --tags, a pruned or
+# forced tag wildcard, --mirror) — a tag being a refs/tags/ or freeze/ name or
+# one this clone holds: no rule here makes a skill likelier to push, and a user
+# who asks for one directly should get it.
 #
 # Registered under [hooks.PreToolUse] matching Bash in .codex/hooks.json. Codex
 # offers no project-directory variable and runs hooks with the session cwd as
@@ -124,7 +127,6 @@ strip_heredocs() {
             fi
             continue
         fi
-        out="${out}${line}"$'\n'
         found=0
         rest=""
         n=${#line}
@@ -201,6 +203,8 @@ strip_heredocs() {
                     esac ;;
             esac
         done
+        # A comment is not read: the line is kept up to its `#`.
+        out="${out}${line:0:i}"$'\n'
         (( found )) || continue
         rest="${rest#-}"
         read -r delim rest <<< "${rest}" || delim=""
@@ -218,12 +222,42 @@ strip_heredocs
 # run, the bodies are read as commands too.
 feeds_shell='(^|[;&|(])[[:space:]]*([^[:space:];&|()]*/)?(ba|z)?sh([[:space:]]+-[A-Za-z]+)*[[:space:]]*(<<|[;&|)]|$)'
 [[ "${cmd//$'\n'/;}" =~ ${feeds_shell} ]] && cmd="${cmd}"$'\n'"${bodies}"
+# A backslash-newline continues the line, so `git push --delete origin \⏎ tag`
+# is one push — joined after the bodies are dropped, as stage_bash_gate.sh does.
+bsnl=$'\\\n'
+cmd="${cmd//"${bsnl}"/ }"
+
+# Whether a word a push names is a tag: spelled as one (`refs/tags/…`), or the
+# name of a tag here. A `+` (force) prefix and a refspec's source side are
+# dropped first — `:freeze/x` and `+HEAD:freeze/x` both name freeze/x.
+names_tag() { # $1 = one word of a push command line
+    local name="${1#+}"
+    name="${name##*:}"
+    [[ -n "${name}" ]] || return 1
+    case "${name}" in
+        refs/tags/*|tags/*|freeze/*) return 0 ;;
+        # A wildcard over the whole of refs/ reaches every tag.
+        refs/\**) return 0 ;;
+        refs/*) return 1 ;;
+    esac
+    [[ -n "$(git -C "${root}" tag -l -- "${name}" 2>/dev/null)" ]]
+}
+
+# Sets vq to the quote a raw word opens and does not close, so the words a
+# quoted option value spans are skipped with it.
+open_quote() { # $1 = one word as written, quotes kept
+    local pre="${1%%[\"\']*}" q
+    q="${1:${#pre}:1}"
+    [[ -n "${q}" ]] || return 0
+    [[ "${1:${#pre}+1}" == *"${q}"* ]] || vq="${q}"
+}
 
 # One shell line can carry several commands, so each is read on its own: `cd x &&
 # git add -A` is the add it looks like.
 while IFS= read -r segment; do
     read -ra tok <<< "${segment}"
     [[ ${#tok[@]} -gt 0 ]] || continue
+    raw=("${tok[@]}")
     # The shell drops every quote and backslash before it runs a word: `\git`
     # (the usual way past an alias), `g''it`, and `"git"` are all git, and
     # `add "."` is the add `add .` is. Each word sheds them, and the `$` of a
@@ -235,23 +269,37 @@ while IFS= read -r segment; do
     # Walk past what runs a command without being one — an assignment
     # (`GIT_SEQUENCE_EDITOR=: git rebase -i`, the usual non-interactive
     # spelling), a wrapper and the value its option takes, a shell keyword — as
-    # stage_bash_gate.sh does, so `env git add -A` is the add it carries.
+    # stage_bash_gate.sh does, so `env git add -A` is the add it carries, and
+    # `sudo git add -A` or `xargs git add -A` too.
     w=0
     prev=""
+    dur=""
     while [[ ${w} -lt ${#tok[@]} ]]; do
         case "${prev}:${tok[w]}" in
             env:-u|env:-C|nice:-n|exec:-a|time:-f|time:-o) w=$((w + 2)); continue ;;
+            sudo:-[ugCDphrtTUR]|sudo:--user|sudo:--group|sudo:--host|sudo:--prompt|sudo:--chdir|sudo:--role|sudo:--type)
+                w=$((w + 2)); continue ;;
+            xargs:-[IJLnPsEdaRS]|xargs:--max-args|xargs:--max-procs|xargs:--max-lines|xargs:--arg-file|xargs:--delimiter|xargs:--eof|xargs:--replace)
+                w=$((w + 2)); continue ;;
+            timeout:-[sk]|timeout:--signal|timeout:--kill-after|stdbuf:-[ioe]) w=$((w + 2)); continue ;;
+            sudo:--close-from|sudo:--command-timeout|sudo:--other-user|sudo:--chroot|doas:-[aCu]|caffeinate:-[tw])
+                w=$((w + 2)); continue ;;
         esac
+        # timeout's duration is its first operand, not the command.
+        if [[ "${prev}" == timeout && -z "${dur}" && "${tok[w]}" != -* ]]; then
+            dur=1; w=$((w + 1)); continue
+        fi
         case "${tok[w]}" in
             *=*|-*) w=$((w + 1)); continue ;;
         esac
         case "${tok[w]##*/}" in
-            env|command|exec|nohup|time|nice|sh|bash|zsh|if|then|else|elif|do|while|until|'!'|'{')
-                prev="${tok[w]##*/}"; w=$((w + 1)) ;;
+            env|command|exec|nohup|time|nice|sudo|doas|xargs|timeout|gtimeout|stdbuf|caffeinate|eval|sh|bash|zsh|if|then|else|elif|do|while|until|'!'|'{')
+                prev="${tok[w]##*/}"; [[ "${prev}" == gtimeout ]] && prev=timeout; w=$((w + 1)) ;;
             *) break ;;
         esac
     done
     tok=("${tok[@]:w}")
+    raw=("${raw[@]:w}")
     [[ ${#tok[@]} -gt 0 ]] || continue
     case "${tok[0]}" in
         git|*/git) ;;
@@ -297,7 +345,7 @@ while IFS= read -r segment; do
                         break ;;
                     .|./|:/)
                         deny "STAGE conventions §1.1: a commit naming the whole tree commits every tracked modification under it, including work this run did not do. Stage the paths this run wrote, by name, then commit without it." ;;
-                    --amend)
+                    --am*)
                         deny "STAGE conventions §1.3: no history rewrites — the user owns the branch and the remote, and a freeze tag points at a commit that must not move. Make a new commit instead." ;;
                     --all)
                         deny "STAGE conventions §1.1: commit --all stages every tracked modification, including work this run did not do. Stage the paths this run wrote, by name, then commit without it." ;;
@@ -330,6 +378,59 @@ while IFS= read -r segment; do
             for ((j = i + 1; j < ${#tok[@]}; j++)); do
                 [[ "${tok[j]}" == --hard ]] && \
                     deny "STAGE conventions §1.3: reset --hard discards uncommitted work, including anything the user had in the tree."
+            done
+            ;;
+        push)
+            # Pushing stays the user's and the prompt's, except where the push
+            # deletes or moves a tag on the remote, which §1.4 closes as firmly
+            # as a local `tag -d`: `--delete` of a tag, a `:<tag>` refspec, a
+            # forced or `+` push of a tag, a forced or pruning `--tags` or tag
+            # wildcard, and `--mirror`, which force-updates and prunes every
+            # remote tag at once. Git takes any unambiguous prefix of a long
+            # option (`--del`, `--mirr`), so those are read by prefix. The
+            # first operand is the remote, never a ref; a value option's word
+            # is skipped.
+            del=0; force=0; tags=0; prune=0; want_v=0; dry=0; mirror=0; vq=""
+            refs=()
+            for ((j = i + 1; j < ${#tok[@]}; j++)); do
+                arg="${tok[j]}"
+                # A quoted option value can span words (`-o "title=Fix tag x"`).
+                if [[ -n "${vq}" ]]; then [[ "${raw[j]}" == *"${vq}"* ]] && vq=""; continue; fi
+                if (( want_v )); then want_v=0; open_quote "${raw[j]}"; continue; fi
+                case "${arg}" in
+                    -o|--push-option|--repo|--receive-pack|--exec) want_v=1 ;;
+                    -o*|--push-option=*|--repo=*|--receive-pack=*|--exec=*) open_quote "${raw[j]}" ;;
+                    -n|--dr*) dry=1 ;;
+                    -d|--de*) del=1 ;;
+                    # --force-if-includes forces nothing alone; a lease with a
+                    # value forces only the ref it names.
+                    --force-i*) ;;
+                    --force-w*=*:*) lease="${arg#*=}"; names_tag "${lease%%:*}" && force=1 ;;
+                    -f|--forc*) force=1 ;;
+                    --ta*) tags=1 ;;
+                    --pru*) prune=1 ;;
+                    --m*) mirror=1 ;;
+                    --*) ;;
+                    -*) [[ "${arg}" == *d* ]] && del=1; [[ "${arg}" == *f* ]] && force=1; [[ "${arg}" == *n* ]] && dry=1 ;;
+                    *) refs+=("${arg}") ;;
+                esac
+            done
+            # A dry run changes nothing on the remote.
+            (( dry )) && continue
+            (( mirror )) && \
+                deny "STAGE conventions §1.4: push --mirror force-updates and prunes every tag on the remote, and a freeze tag is the immutable record of what was submitted. Push the branch by name."
+            [[ ${tags} -eq 1 && ( ${force} -eq 1 || ${prune} -eq 1 ) ]] && \
+                deny "STAGE conventions §1.4: a forced or pruning push of --tags moves or deletes tags on the remote, and a freeze tag is the immutable record of what was submitted. Push new tags without forcing."
+            for ((j = 1; j < ${#refs[@]}; j++)); do
+                arg="${refs[j]}"
+                # `tag <name>` names a tag, but refs[0] is the remote.
+                [[ ${j} -ge 2 && "${refs[j - 1]}" == tag ]] || names_tag "${arg}" || continue
+                if [[ ${del} -eq 1 || "${arg}" == :* || ( ${prune} -eq 1 && "${arg}" == *'*'* ) ]]; then
+                    deny "STAGE conventions §1.4: this push deletes a tag on the remote — ${arg} — and a freeze tag is the immutable record of what was submitted. Leave it in place."
+                fi
+                if [[ ${force} -eq 1 || "${arg}" == +* ]]; then
+                    deny "STAGE conventions §1.4: a forced push of a tag moves it on the remote — ${arg} — and a freeze tag is the immutable record of what was submitted. Leave it where it is."
+                fi
             done
             ;;
         tag)

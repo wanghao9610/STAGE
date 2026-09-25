@@ -35,8 +35,10 @@ accompany any argument: it sets this run's involve level (conventions §7.7), is
 argument nor the description, and is stripped before either is read.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
-the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever
-it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+the start of every run. It is longer than one read or one shell command returns, so read it by
+line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
+the whole file is saved aside unread. It is the baseline every STAGE
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly
@@ -166,7 +168,10 @@ to get it: switch the session's model — then continue here.
    paragraph around its main claim; do not replace words mechanically. Then edit table and figure
    captions (`manus/tabs/` caption prose only — data cells and `% src:` lines are untouchable).
    Apply Principles 1–3, 7, and 8; keep a per-section count of edits by kind and of advisory patterns
-   reviewed.
+   reviewed. A sentence this pass writes or rewrites starts on its own line (conventions §3.7); lines
+   it does not otherwise touch keep their breaks, so the diff shows the edits and nothing else.
+   Reflowing a whole file is `bash execs/scpts/fmt.sh <file>`'s whitespace-only job: report the
+   drift `lint.sh` warns about as a report line with that command, never reflow by hand.
 5. **Trim to budget.** Compare each section against its outline budget — page estimate from the
    latest build in `wkdrs/builds/` when one exists, else word count as a proxy. Tighten where
    prose alone closes the gap; record the remainder as a routed finding (Principle 4). When

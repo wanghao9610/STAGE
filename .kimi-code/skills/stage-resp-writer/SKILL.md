@@ -24,8 +24,10 @@ argument: it sets this run's involve level (conventions §7.7), is part of neith
 the description, and is stripped before either is read.
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
-the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever
-it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+the start of every run. It is longer than one read or one shell command returns, so read it by
+line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
+the whole file is saved aside unread. It is the baseline every STAGE
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly

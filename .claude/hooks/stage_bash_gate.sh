@@ -125,7 +125,6 @@ strip_heredocs() {
             fi
             continue
         fi
-        out="${out}${line}"$'\n'
         found=0
         rest=""
         n=${#line}
@@ -202,6 +201,8 @@ strip_heredocs() {
                     esac ;;
             esac
         done
+        # A comment is not read: the line is kept up to its `#`.
+        out="${out}${line:0:i}"$'\n'
         (( found )) || continue
         rest="${rest#-}"
         read -r delim rest <<< "${rest}" || delim=""
@@ -219,6 +220,79 @@ strip_heredocs
 bsnl=$'\\\n'
 cmd="${cmd//"${bsnl}"/ }"
 [[ -n "${cmd//[[:space:]]/}" ]] || exit 0
+# A quoted word is one word to the shell, yet the segment split below tears it
+# at every `;&|()` and backtick inside it. Two passes answer that, and the
+# command is allowed only when both do. The first reads the line as split, so a
+# quoted string another command runs (`bash -c 'x; rm y'`, `eval`, `ssh`) is
+# still read as the commands it carries; only a grep pattern, data the shell
+# never runs, is kept whole there, so `grep -sE '^(INVOLVE|STAGE_LANG)=' .env`
+# — the .env read every skill opens with — is the read it is. The second runs
+# this gate again on the line with every quoted word kept whole, its splitting
+# characters and blanks turned to `_`, so `cp 'a|b' notes/claims.md` is the
+# overwrite it is rather than two harmless-looking pieces.
+#
+# Both read quotes with a flat scanner, which is exact only on a plain line: one
+# line, no comment, no backslash, no `$(…)`, backtick, `$'…'`, or heredoc, and
+# short. Any other line skips both and is read as split, as it always was — a
+# quote the scanner could misplace must never hide the command after it.
+mask_quoted() { # $1 = grep (single-quoted grep patterns only) | all
+    local out="" c first="" word="" at_start=1 q="" i
+    for ((i = 0; i < ${#cmd}; i++)); do
+        c="${cmd:i:1}"
+        if [[ -n "${q}" ]]; then
+            if [[ ( "${q}" == s && "${c}" == "'" ) || ( "${q}" == d && "${c}" == '"' ) ]]; then
+                q=""; out+="${c}"; continue
+            fi
+            if [[ "$1" == all ]]; then
+                case "${c}" in ';'|'&'|'|'|'('|')'|'<'|'>'|[[:space:]]) c='_' ;; esac
+                # A quoted word never reads as a flag here; the first pass has
+                # the flags, and a message such as "- add x" is not `-a`.
+                [[ "${c}" == '-' && "${out: -1}" == [\'\"] ]] && c='_'
+            elif [[ "${q}" == s ]]; then
+                case "${first##*/}" in
+                    grep|egrep|fgrep) case "${c}" in ';'|'&'|'|'|'('|')'|'<'|'>') c=' ' ;; esac ;;
+                esac
+            fi
+            out+="${c}"; continue
+        fi
+        case "${c}" in
+            "'") q=s ;;
+            '"') q=d ;;
+            ';'|'&'|'|'|'('|')') first=""; word=""; at_start=1; out+="${c}"; continue ;;
+            [[:space:]])
+                if (( at_start )) && [[ -n "${word}" ]]; then
+                    case "${word}" in *=*) ;; *) first="${word}"; at_start=0 ;; esac
+                fi
+                word=""; out+="${c}"; continue ;;
+        esac
+        word+="${c}"
+        out+="${c}"
+    done
+    [[ -z "${q}" ]] || { printf '%s' "${cmd}"; return; }
+    printf '%s' "${out}"
+}
+plain_line() {
+    local t="${cmd}"
+    # strip_heredocs ends every line it keeps with a newline; only an inner one
+    # makes a second line.
+    while [[ "${t}" == *$'\n' ]]; do t="${t%$'\n'}"; done
+    (( ${#t} <= 4000 )) || return 1
+    case "${t}" in
+        *$'\n'*|*'#'*|*'\'*|*'`'*|*'$('*|*"\$'"*|*'<<'*) return 1 ;;
+    esac
+    return 0
+}
+if [[ "${1:-}" == --quoted-pass ]]; then
+    cmd="${STAGE_BASH_GATE_QUOTED:-}"
+    [[ -n "${cmd}" ]] || exit 0
+elif plain_line; then
+    quoted="$(mask_quoted all)"
+    if [[ "${quoted}" != "${cmd}" ]]; then
+        second="$(printf '%s' "${input}" | STAGE_BASH_GATE_QUOTED="${quoted}" bash "${BASH_SOURCE[0]}" --quoted-pass 2>/dev/null)"
+        [[ "${second}" == *'"permissionDecision":"allow"'* ]] || exit 0
+    fi
+    cmd="$(mask_quoted grep)"
+fi
 # The overwriting redirections the segment split below would tear apart: `>|`
 # (past noclobber) and zsh's `>!` are a plain `>`, and `>&` keeps a marker in
 # place of its `&`, so `>&file` is read as the write it is while `2>&1` stays a
@@ -465,6 +539,21 @@ while IFS= read -r segment; do
         [[ "${a}" =~ ${protected_re} ]] && { touches=1; break; }
     done
 
+    # The words the command acts on, its redirections left out: the loop above
+    # has read every `>` target, and a `<` one is only read. So
+    # `cp a mates/x 2>/dev/null` lands in mates/x, and `tee x < notes/claims.md`
+    # writes only x.
+    opnds=()
+    skip=0
+    for a in ${args[@]+"${args[@]}"}; do
+        (( skip )) && { skip=0; continue; }
+        case "${a}" in
+            '<'|'<<<'|'<>'|'>'|'>>'|">${dup}"|[0-9]'<'|[0-9]'<<<'|[0-9]'<>'|[0-9]'>'|[0-9]'>>'|[0-9]">${dup}") skip=1 ;;
+            '<'*|'>'*|[0-9]'<'*|[0-9]'>'*) ;;
+            *) opnds+=("${a}") ;;
+        esac
+    done
+
     case "${name}" in
         rm|rmdir|unlink|shred|srm|trash)
             exit 0 ;;
@@ -514,7 +603,7 @@ while IFS= read -r segment; do
                 [[ -n "${a}" ]] || continue
                 protected "${a}" && exit 0
                 tracked "${a}" && exit 0
-            done < <(landing contents ${args[@]+"${args[@]}"})
+            done < <(landing contents ${opnds[@]+"${opnds[@]}"})
             ;;
         curl)
             # A GET — stage-refs-curator's DOI content negotiation — only reads,
@@ -601,7 +690,7 @@ while IFS= read -r segment; do
             for a in ${args[@]+"${args[@]}"}; do
                 case "${a}" in -a|--append) append=1 ;; esac
             done
-            for a in ${args[@]+"${args[@]}"}; do
+            for a in ${opnds[@]+"${opnds[@]}"}; do
                 case "${a}" in -*) ;; *) (( append )) || ! tracked_file "${a}" || exit 0 ;; esac
             done
             ;;
@@ -623,7 +712,7 @@ while IFS= read -r segment; do
                 [[ -n "${a}" ]] || continue
                 protected "${a}" && exit 0
                 tracked "${a}" && exit 0
-            done < <(landing "${lmode}" ${args[@]+"${args[@]}"})
+            done < <(landing "${lmode}" ${opnds[@]+"${opnds[@]}"})
             # A copy reads its sources: out of mates/ or a kit is not a write there.
             # install -d copies nothing: it creates every operand as a directory,
             # so it goes on to the rule for any command naming a protected path,

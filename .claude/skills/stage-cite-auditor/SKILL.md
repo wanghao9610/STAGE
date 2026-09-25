@@ -27,8 +27,10 @@ whole. An `involve=<level>` token is stripped before the section or the descript
 commit offer (§1.6) and, at `high`, the fan-out announcement (§6.8).
 
 **Shared conventions.** Read `docs/mds/stage-workflow/writing-workflow-conventions.md` whole at
-the start of every run; it is the baseline every STAGE skill shares, and this file wins wherever
-it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+the start of every run. It is longer than one read or one shell command returns, so read it by
+line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
+the whole file is saved aside unread. It is the baseline every STAGE
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly
@@ -57,7 +59,9 @@ re-reading routes to `stage-refs-curator`.
    makes every assertion unverifiable — that is the finding, not an error. A note carrying `depth:`
    was converted from an upstream STAR note rather than read here: the verdict is still whatever its
    facts decide, but the Note cell names that depth, and `abstract-and-intro` means the assertion
-   rests on a read that stopped at the abstract — filed for a proper read whatever the verdict.
+   rests on a read that stopped at the abstract — filed for a proper read whatever the verdict. A
+   note without `depth:` whose own text says its read stopped short of the §8.7 floor (the method or
+   the main results not read — a note written before that floor existed) is treated the same way.
 2. **Flag, never fix.** Verdicts land in the report and `tasks/`; the manuscript, the bib, the
    notes, and the ledger leave this skill byte-identical. Even a one-character key typo is filed,
    not corrected — silent fixes are how wrong citations survive to camera-ready.
@@ -115,12 +119,14 @@ to get it: switch the session's model — then continue here.
 6. **Check hygiene.** Principle 5's classes over the whole bib, entries quoted.
 7. **File failures.** Append one `- [ ]` per undefined key, unsupported assertion, cited key
    with no note (its unverifiable sentences listed under it), missing citation, and hygiene
-   defect, and each seeded note with `depth: abstract-and-intro` that backed a verdict this run,
+   defect, and each seeded note with `depth: abstract-and-intro`, or a native note whose text records
+   a read short of the §8.7 floor (Principle 1), that backed a verdict this run,
    supported ones included (one box per note, its sentences listed), to
    `tasks/cites_followups.md` under a `## <date>` heading — location (with the claim ID when a
    ledger claim states the sentence), quote, verdict, route: no note →
    `stage-refs-curator <DOI | arXiv id>` of the entry reads the paper into one; a seeded note
-   marked `abstract-and-intro` → the same command, read properly this time; undefined key or
+   marked `abstract-and-intro`, or a native note read short of the floor → the same command, read
+   properly this time; undefined key or
    missing citation → `stage-sect-drafter <section>`, or `stage-tabs-builder <table>` when it
    sits in `manus/tabs/`, sets the `\cite` when the work already has an entry, else
    `stage-refs-curator <DOI | arXiv id | "title">` first, then that run; wrong sentence →
@@ -143,7 +149,8 @@ to get it: switch the session's model — then continue here.
   checked / undefined; assertions supported / unsupported / unverifiable; missing-citation and
   hygiene counts), `## Keys` (undefined with locations; uncited entries), `## Assertions` —
   `| Where | Assertion | Key | Note | Verdict |` (the Where cell adds the claim ID when a ledger
-  claim states the sentence; the Note cell names the file and, for a seeded note, its `depth:`),
+  claim states the sentence; the Note cell names the file and, for a seeded note, its `depth:`, or for a native note read short
+  of the §8.7 floor, `read short of floor`),
   failures first, `## Missing citations`,
   `## Bib hygiene` (entries quoted), `## Tasks filed`.
 - `tasks/cites_followups.md` — one checkbox per item Step 7 files, under a dated heading: the durable
