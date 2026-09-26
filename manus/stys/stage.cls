@@ -193,7 +193,7 @@
 %% ---------------------------------------------------------------------------
 \RequirePackage{url}
 \RequirePackage{hyperref}
-\RequirePackage[noabbrev,nameinlink]{cleveref}
+\RequirePackage[capitalise,noabbrev,nameinlink]{cleveref}
 \RequirePackage[numbers,sort&compress]{natbib}
 %% The page the reference list starts on, for lint.sh: unless the venue counts
 %% references toward the limit, content pages run through this one. A kernel

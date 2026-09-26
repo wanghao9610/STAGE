@@ -117,5 +117,26 @@
 %% algorithmicx's two-argument form for line references); this is the fallback
 %% for a venue class that ships no algorithm support.
 \providecommand{\algref}[1]{Algorithm~\ref{#1}\xspace}
+%% \autoref names capitalized to match: hyperref's defaults print "section",
+%% "appendix". babel resets them on every language switch, so they are set
+%% again after each one as well as at \begin{document}.
+\makeatletter
+\newcommand{\stage@autorefnames}{%
+  \def\sectionautorefname{Section}%
+  \def\subsectionautorefname{Section}%
+  \def\subsubsectionautorefname{Section}%
+  \def\paragraphautorefname{Paragraph}%
+  \def\subparagraphautorefname{Paragraph}%
+  \def\appendixautorefname{Appendix}%
+  \def\figureautorefname{Figure}%
+  \def\tableautorefname{Table}%
+  \def\equationautorefname{Equation}%
+  \def\algorithmautorefname{Algorithm}%
+}
+\AtBeginDocument{%
+  \stage@autorefnames
+  \@ifundefined{extrasenglish}{}{\addto\extrasenglish{\stage@autorefnames}}%
+}
+\makeatother
 
 \endinput
