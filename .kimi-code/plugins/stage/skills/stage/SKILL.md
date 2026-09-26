@@ -7,7 +7,7 @@ disableModelInvocation: true
 # Route a STAGE request
 
 Read `.agents/commands/stage.md` from the current project root and follow it as the authoritative routing roster.
-Write the user-facing wording in the language the workflow conventions §7.6 resolve: an explicit request in the conversation first, then `STAGE_LANG=en|zh` in `.env`, then the conversation's language. `.agents/commands/stage.md` is the only roster; its skill names and routing decisions do not change with the language.
+Write the user-facing wording in the language the workflow conventions §7.6 resolve: an explicit request in the conversation first, then `STAGE_LANG=en|zh` in `.env`, then the conversation's language, read from the user's latest message in their own words and never from a bare command line. `.agents/commands/stage.md` is the only roster; its skill names and routing decisions do not change with the language.
 
 Adapt only its invocation spelling for Kimi Code:
 

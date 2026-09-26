@@ -39,7 +39,7 @@ the whole file is saved aside unread. It is the baseline every STAGE
 skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
-valid `STAGE_LANG`, then the user's dialogue language — for replies and the Markdown this run newly
+valid `STAGE_LANG`, then the user's dialogue language, read from their latest message in their own words and never from a bare command line or the English this run loads — for replies and the Markdown this run newly
 writes; everything under `manus/`, the response to reviewers, and every structural literal stay
 English, and an existing document keeps the language it was written in. Resolve the involve level
 once under conventions §7.7, and the tier value once under §11.6. Repository resources load in
