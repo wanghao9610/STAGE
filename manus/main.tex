@@ -70,7 +70,7 @@
 
 %% ── Abstract ───────────────────────────────────────────────────────────────
 %% This class takes the abstract as a preamble command, not a body environment,
-%% so section 0 is \input here rather than between \begin{document} and
+%% so secs/00_abstract is \input here rather than between \begin{document} and
 %% \end{document}. The later \abstract{} wins: /stage-outl-planner uncomments
 %% the input line below and moves this placeholder text into the skeleton.
 \abstract{
@@ -91,14 +91,34 @@ it is gone.
 \begin{document}
 \maketitle
 
+%% Teaser slot — key 00 (conventions §10.6): the one figure this file places
+%% itself, so it is figs/00_teaser.pdf, its source figs/srcs/00_teaser.pptx (or
+%% .tex, .py, .drawio), and its notes/outline.md Figures row, F1, has Section
+%% main.tex (conventions §8.5). /stage-figs-designer teaser renders it, and
+%% /stage-outl-planner uncomments this block once that row is planned and the
+%% PDF exists: commented, it asks nothing of the build or lint. The caption
+%% stays a visible todo until the author writes it — /stage-sect-drafter writes
+%% only in secs/. [htb] keeps the teaser on page 1, under the title panel, in
+%% either column layout: [t] alone moves it to page 2 in onecolumn, and so does
+%% figure* in twocolumn, where a spanning float starts on the next page.
+% \begin{figure}[htb]
+%   \centering
+%   \includegraphics[width=\linewidth]{figs/00_teaser}
+%   \caption{\todo{Teaser caption: the problem, the key idea, and the headline result, each number with its source anchor.}}
+%   \label{fig:teaser}
+% \end{figure}
+
 %% Placeholder body — /stage-outl-planner deletes it once a secs/ input is live.
 \section{Introduction}
 \todo{No content yet: run /stage-stry-coach, then /stage-outl-planner.}
 
 %% Section files — /stage-outl-planner creates manus/secs/<nn>_<slug>.tex
 %% skeletons and uncomments or adds one \input per created file, in the order
-%% notes/outline.md fixes. The <nn>_ prefix is load-bearing (conventions §5):
-%% outline rows, the ledger's "Stated in" column, and this input order share it.
+%% notes/outline.md fixes. The <nn>_ key is load-bearing (conventions §5.5):
+%% outline rows, the ledger's "Stated in" column, and this input order share it,
+%% and every figure and table a section includes takes its key (secs/03_method
+%% places figs/03_<slug>.pdf); 00 is kept for an asset this file includes
+%% directly, as the teaser slot above does (conventions §10.6).
 %% Example shape:
 % \input{secs/01_intro}
 % \input{secs/02_related}
@@ -124,6 +144,6 @@ it is gone.
 %% whether the appendix precedes or follows the references: move this block
 %% above the bibliography when the venue's template does.
 % \beginappendix
-% \input{secs/10_appx_details}
+% \input{secs/10_appx-details}
 
 \end{document}

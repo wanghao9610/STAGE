@@ -71,8 +71,8 @@ STAGE/
 ├── manus/                  # 稿件
 │   ├── main.tex            # 入口文件；开箱即可独立编译
 │   ├── secs/               # 章节源文件：<nn>_<slug>.tex（00_abstract.tex、01_intro.tex …，附录 10_ 起）
-│   ├── figs/               # 渲染好的图：<nn>_<slug>.pdf；figs/srcs/ 以同名存放源文件
-│   ├── tabs/               # 表格：<nn>_<slug>.tex，由证据生成
+│   ├── figs/               # 渲染好的图：<nn>_<slug>.pdf，<nn> 取引用它的那一节的编号；figs/srcs/ 以同名存放源文件
+│   ├── tabs/               # 表格：<nn>_<slug>.tex，编号取引用它的那一节，由证据生成
 │   ├── bibs/               # reference.bib
 │   └── stys/               # stage.cls（版式）+ stage.bst（参考文献表）+ stage.sty（\todo 与写作宏）
 ├── mates/                  # 导入的证据——只读
@@ -357,7 +357,7 @@ dsh --profile YOUR_PROFILE --dump-config
 | `stage-outl-planner` † | 故事 → 骨架：页数预算合计不超 venue 上限的章节表、图和表的计划、论断→章节分配、骨架 `.tex` 文件、记号表种子 | `notes/outline.md`、`manus/secs/*.tex` 骨架、`notes/notation.md` |
 | `stage-sect-drafter` | 每次调用起草或修改一个章节，依据章节简报、映射的证据、论断和记号规范；没有指纹的数字一律写成 `\todo{}` | `manus/secs/<nn>_<slug>.tex` |
 | `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<nn>_<slug>.tex` |
-| `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<nn>_<slug>.pdf` + 源文件 |
+| `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser，即 `main.tex` 标题下那个位置里的 `00_teaser`）有专属检查单 | `manus/figs/<nn>_<slug>.pdf` + 源文件 |
 | `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子，没有时用 `discover` 按主题检索并提议候选 | `manus/bibs/reference.bib`、`notes/refs/<ABBREV>.md`、`notes/refs/refs_index.md` |
 | `stage-copy-editor` | 打磨一节或整篇手稿：清晰度、流畅度、自然的学术表达、记号一致性与篇幅收紧——段落级改写不改变技术含义、数字、引用、归属或论断强度；`style` 模式改为记录作者的散文档位 | `manus/` 中编辑后的散文、`wkdrs/reports/POLISH_<date>.md`、`tasks/` 条目、`notes/style.md` |
 | `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转记录表状态，检查证据过期 | `notes/claims.md` 的状态翻转、`wkdrs/reports/CLAIMS_<date>.md`、`tasks/` 条目 |
@@ -417,7 +417,7 @@ dsh --profile YOUR_PROFILE --dump-config
 ```markdown
 | ID | Claim | Type | Stated in | Evidence | Status |
 |----|-------|------|-----------|----------|--------|
-| C3 | +2.1 mask AP over X on LVIS | performance | `04_expts`, `tabs/00_main` | `mates/proj/wkdrs/results/results.md#lvis` | verified |
+| C3 | +2.1 mask AP over X on LVIS | performance | `04_experiments`, `tabs/04_main-results` | `mates/proj/wkdrs/results/results.md#lvis` | verified |
 ```
 
 生命周期：`proposed`（故事提出）→ `drafted`（写进正文）→ `verified`（审计对上了证据）/ `unsourced`（写了但没有指纹——必须带 `\todo`）/ `weakened`（回复中让步）/ `dropped`（放弃）。故事播种论断，起草陈述论断，审计验证论断，回复捍卫论断：同一批行，一路走到投稿。
@@ -492,11 +492,13 @@ bash execs/update.sh --skill stage-flow-status
 
 上游同路径文件会直接覆盖本地版本，上游新增文件也会被加入；更新范围内，仅存在于当前项目的自定义文件会保留。为避免误删自定义内容，上游已删除的文件不会在本地自动删除。STAGE 已不再提供下列文件，而更新会保留你仓库里已有的副本，所以凡来自 STAGE 的请逐一删除：`AGENTS.zh-CN.md` 与 `CLAUDE.zh-CN.md`；每个 skill 与分流插件旁的 `SKILL_zh.md`；`.agents/commands/` 下的 `stage.zh-CN.md` 路由器，以及它在 `.claude/commands/`、`.cursor/commands/`、`.pi/prompts/` 与 `.qwen/commands/` 下的四个原生包装，每个都会在所属 harness 的命令菜单里多出一条重复的 `/stage.zh-CN`；以及 `docs/mds/stage-workflow/` 下除 skill 指南之外的所有 `*.zh-CN.md` 中文版，连同 `human-writing-guide.md`、`memory_spec.md` 与 `model_id_spec.md`——它们的规则如今由规约 §7、§12 与 §13 承载。记忆钩子改为从每条记忆的 frontmatter 生成索引之前就建好的论文仓库，会留着它的 `.stage/memory/MEMORY.md` 与 `MEMORY.zh-CN.md`：已没有钩子读取它们，可以删除。更新不会修改其他目录、当前分支、Git remote 或暂存区——稿件、`mates/`、`notes/` 与 `cycls/` 从不在范围内。建议更新前提交当前工作，更新后使用 `git status` 和 `git diff` 检查并提交结果。
 
+在章节改用两位编号、图和表改用引用它的那一节的编号之前建好的论文仓库，会保留原有的文件名：更新从不碰 `manus/`。`lint.sh` 现在会对每个不合规约 §10.6 的文件名给出警告，但不会判为失败：一位数的章节编号 `<n>_`、没有编号的图或表、slug 里的 `_`、slug 里补零宽度不一的数字，以及编号与引用它的那一节不一致的图或表。要消除这些警告，先给每一节换上两位编号——第一位是部分，第二位是该部分内的顺序（`3_method.tex` → `03_method.tex`，连同 `main.tex` 里它的 `\input` 行）；再把每张图、每个图源文件和每张表改用引用它的那一节的编号，把每个 slug 改成以连字符连词的小写形式、其中的数字补零到同一宽度，并在同一次提交里改写 `\input` 与 `\includegraphics` 行，以及 `notes/outline.md`、`notes/claims.md` 和 `tasks/` 未勾选条目里的路径；`/stage-outl-planner`（reconcile）可以替你规划每一步 `git mv`。模板的 `main.tex` 现在还在 `\maketitle` 之后带一个注释掉的首图（teaser）位置，编号为 `00`（规约 §8.5）；更新不会把它加进你的 `main.tex`。由引言放置的首图保留引言的编号，不会引发警告；要把它移进这个位置、改名为 `figs/00_teaser.pdf`，属于一次重新编号，由 `/stage-outl-planner`（reconcile）规划，`main.tex` 里没有这个位置时一并加上。`.env` 里的 `ANON` 如果不恰好是 `true` 或 `false`，`lint.sh` 现在会判为失败（规约 §3.4）：以前像 `ANON=true  # blind` 或带行尾空格的值会被悄悄当成 `false`，身份泄露扫描因此被跳过；请把注释移到单独一行。
+
 如果你改的是 STAGE 本身而不是某篇论文：只编辑 `.agents/skills/` 下工具中立的作者源，再用 `bash .github/scripts/port.sh --write` 重新生成六套 harness 技能树。仅属于某个 harness 的行为写进该树的 rules 或带锚点的 overrides。随后用 `bash .github/scripts/port.sh` 证明所有生成目录和共享链接仍然匹配，最后运行 `bash .github/scripts/check_consistency.sh` 核对七个根目录的语义约束。后两项检查都在 CI 中运行。STAGE 自己的记忆无论作用域，一律放 git 忽略的 `.stage/memory/local/`：克隆或 GitHub 模板会原样复制受版本管理的 `.stage/memory/`，关于开发 STAGE 的记忆就会作为论文自己的事实出现在每个论文仓库里。`check_consistency.sh` 发现那里有模板所带 `.gitkeep` 之外的被跟踪文件就会失败。
 
 ## 项目约定
 
-1. 稿件放在 `manus/`：入口是 `main.tex`，章节是 `secs/<nn>_<slug>.tex`，图放 `figs/`（可编辑源在 `figs/srcs/`），表放 `tabs/`——三者都命名为 `<nn>_<slug>`，第一位 `0` 表示正文、`1` 表示附录，第二位是该部分内的顺序——参考文献是 `bibs/reference.bib`，模板层在 `stys/`。
+1. 稿件放在 `manus/`：入口是 `main.tex`；章节是 `secs/<nn>_<slug>.tex`，第一位 `0` 表示正文、`1` 表示附录，第二位是该部分内的顺序；图放 `figs/`（可编辑源在 `figs/srcs/`），表放 `tabs/`，都命名为 `<nn>_<slug>`，`<nn>` 取引用它的那一个文件的编号（由 `main.tex` 直接引用的取 `00`），自己不另编号；slug 一律小写、以连字符连词（写 `main-results`，不写 `main_results`），其中的数字按同一系列里最大的那个补零到同一宽度（`ablation-02` … `ablation-10`），这样一个目录在 git 和终端里的排列顺序与在 VS Code、Overleaf、Finder 里的一致；参考文献是 `bibs/reference.bib`，模板层在 `stys/`。
 2. 证据放在 `mates/`，且只读——`execs/scpts/import.sh` 与 `/stage-evid-curator` 是仅有的两个写入者。数字错了，去它的源头改再重新导入，绝不就地编辑证据文件。
 3. 写作元数据放在 `notes/`：固定文件 `story.md`、`claims.md`、`outline.md`、`notation.md`、`style.md`、`adopt.md`，阅读笔记放 `notes/refs/`。
 4. 投稿周期放在 `cycls/<venue>_<year>/`，venue 官方模板包整包解压进该周期的 `template/`；修订便签、承诺清单与 venue 跟进项放 `tasks/`。

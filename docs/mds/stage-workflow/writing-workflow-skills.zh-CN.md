@@ -88,7 +88,7 @@ Slash-only。以对话为先的故事塑形：有 STAR 配对提供导入的 ide
 
 ### stage-outl-planner
 
-Slash-only。把定稿的故事变成论文的骨架：`notes/outline.md`，其中章节表的页数预算加起来不超 venue 上限，另有图计划、表计划、以及主张→章节的分配；骨架文件 `manus/secs/<nn>_<slug>.tex`，每个开头以注释块写着它的章节简介，对应的 `\input` 行在 `main.tex` 里取消注释；以及一份播好种子的 `notes/notation.md`。跑完这一次，论文就以真实结构编译得出来，而之后每个 skill 都知道什么该放哪、每节必须扛哪些主张。
+Slash-only。把定稿的故事变成论文的骨架：`notes/outline.md`，其中章节表的页数预算加起来不超 venue 上限，另有图计划、表计划、以及主张→章节的分配；骨架文件 `manus/secs/<nn>_<slug>.tex`，每个开头以注释块写着它的章节简介，对应的 `\input` 行在 `main.tex` 里取消注释，`figs/00_teaser.pdf` 生成之后标题下的首图位置也一并取消注释；以及一份播好种子的 `notes/notation.md`。跑完这一次，论文就以真实结构编译得出来，而之后每个 skill 都知道什么该放哪、每节必须扛哪些主张。
 
 ### stage-sect-drafter
 
@@ -100,7 +100,7 @@ Slash-only。把定稿的故事变成论文的骨架：`notes/outline.md`，其�
 
 ### stage-figs-designer
 
-它拥有图的清单（提纲的 Figures 表）以及每张图的全程：它的用途、它在 `manus/figs/srcs/` 下可编辑的源文件（tikz、python、drawio；在带有中立副本本地图管线的宿主上，是一页 PPTX 及其渲染记录；或者一条 MANIFEST 条目，用于导入的美术素材）、以及它在 `manus/figs/` 下渲染出的 PDF。每张图要么有源文件、要么有 manifest 条目；一个没有出处的 PDF 不会存在。teaser 图有专门的检查清单——它必须独自把故事讲清楚，配一句自足的 caption——因为它是每个评审人都会看的那一张。不带参数的审计属于 READ 档，规划与构建图属于 EXEC 档（规约 §11.6）。
+它拥有图的清单（提纲的 Figures 表）以及每张图的全程：它的用途、它在 `manus/figs/srcs/` 下可编辑的源文件（tikz、python、drawio；在带有中立副本本地图管线的宿主上，是一页 PPTX 及其渲染记录；或者一条 MANIFEST 条目，用于导入的美术素材）、以及它在 `manus/figs/` 下渲染出的 PDF。每张图要么有源文件、要么有 manifest 条目；一个没有出处的 PDF 不会存在。teaser 图，即 `main.tex` 标题下那个位置里的 `figs/00_teaser.pdf`，有专门的检查清单——它必须独自把故事讲清楚，配一句自足的 caption，由作者写在那个位置里——因为它是每个评审人都会看的那一张。不带参数的审计属于 READ 档，规划与构建图属于 EXEC 档（规约 §11.6）。
 
 ### stage-refs-curator
 

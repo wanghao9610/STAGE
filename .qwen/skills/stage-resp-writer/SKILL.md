@@ -196,8 +196,8 @@ sources: [reviews/received_R1.md, reviews/received_R2.md]
 ```markdown
 # Promises — <cycle>
 - [ ] R2.W2: add ablation on X — run upstream, then stage-evid-curator + stage-tabs-builder
-- [ ] R1.W3: restate C4 at conceded strength — stage-sect-drafter 04_expts
-- [ ] R1.W3: restate C4 at conceded strength — stage-tabs-builder main_results
+- [ ] R1.W3: restate C4 at conceded strength — stage-sect-drafter 04_experiments
+- [ ] R1.W3: restate C4 at conceded strength — stage-tabs-builder main-results
 ## Withdrawn
 - R2.W4: add runtime table — withdrawn YYYY-MM-DD: cut from the sent rebuttal
 ```

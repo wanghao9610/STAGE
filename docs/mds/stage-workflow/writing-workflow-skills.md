@@ -86,7 +86,7 @@ Slash-only. Dialogue-first story shaping: it reads imported idea docs and digest
 
 ### stage-outl-planner
 
-Slash-only. Turns the finalized story into the paper's skeleton: `notes/outline.md` with a section table whose page budgets sum within the venue limit, a figure plan, a table plan, and a claim→section assignment; skeleton files `manus/secs/<nn>_<slug>.tex`, each opening with its section brief as a comment block, with their `\input` lines uncommented in `main.tex`; and a seeded `notes/notation.md`. After this run the paper builds with its real structure, and every later skill knows what belongs where and which claims each section must carry.
+Slash-only. Turns the finalized story into the paper's skeleton: `notes/outline.md` with a section table whose page budgets sum within the venue limit, a figure plan, a table plan, and a claim→section assignment; skeleton files `manus/secs/<nn>_<slug>.tex`, each opening with its section brief as a comment block, with their `\input` lines uncommented in `main.tex`, as is the teaser slot under the title once `figs/00_teaser.pdf` exists; and a seeded `notes/notation.md`. After this run the paper builds with its real structure, and every later skill knows what belongs where and which claims each section must carry.
 
 ### stage-sect-drafter
 
@@ -98,7 +98,7 @@ Generates `manus/tabs/*.tex` **from `mates/` evidence only**: booktabs style, on
 
 ### stage-figs-designer
 
-Owns the figure inventory (the outline's Figures table) and each figure end to end: its purpose, its editable source under `manus/figs/srcs/` (tikz, python, drawio; a one-slide PPTX with its render record where the harness carries the neutral copy's local figure pipeline; or a MANIFEST entry for imported artwork), and its rendered PDF under `manus/figs/`. Every figure has a source file or a manifest entry; a PDF with no origin does not happen. The teaser figure gets a dedicated checklist — it must tell the story alone, with a self-contained caption — because it is the one figure every reviewer reads. The no-argument audit is on the READ tier, planning and building a figure on EXEC (conventions §11.6).
+Owns the figure inventory (the outline's Figures table) and each figure end to end: its purpose, its editable source under `manus/figs/srcs/` (tikz, python, drawio; a one-slide PPTX with its render record where the harness carries the neutral copy's local figure pipeline; or a MANIFEST entry for imported artwork), and its rendered PDF under `manus/figs/`. Every figure has a source file or a manifest entry; a PDF with no origin does not happen. The teaser figure, `figs/00_teaser.pdf` in `main.tex`'s slot under the title, gets a dedicated checklist — it must tell the story alone, with a self-contained caption, which the author writes in that slot — because it is the one figure every reviewer reads. The no-argument audit is on the READ tier, planning and building a figure on EXEC (conventions §11.6).
 
 ### stage-refs-curator
 

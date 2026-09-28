@@ -137,7 +137,7 @@
   <rect x="1210" y="112" width="70" height="18" rx="9" fill="#ffffff" stroke="#c7d2fe"/>
   <text class="tag" x="1245" y="124.5">one per run</text>
   <text class="np" x="978" y="156">One section drafted; unsourced numbers → \todo</text>
-  <text class="no" x="978" y="178">manus/secs/&lt;n&gt;_&lt;slug&gt;.tex</text>
+  <text class="no" x="978" y="178">manus/secs/&lt;nn&gt;_&lt;slug&gt;.tex</text>
 
   <!-- 6 tabs-builder (PLAN) -->
   <rect x="960" y="224" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
@@ -145,7 +145,7 @@
   <text class="bn" x="988" y="254.5">6</text>
   <text class="nt" x="1010" y="255">/stage-tabs-builder</text>
   <text class="np" x="978" y="280">Tables built from evidence, never typed</text>
-  <text class="no" x="978" y="302">manus/tabs/&lt;slug&gt;.tex · % src: per data row</text>
+  <text class="no" x="978" y="302">manus/tabs/&lt;nn&gt;_&lt;slug&gt;.tex · % src: per data row</text>
 
   <!-- 7 figs-designer (PLAN) -->
   <rect x="960" y="348" width="340" height="92" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
@@ -153,7 +153,7 @@
   <text class="bn" x="988" y="378.5">7</text>
   <text class="nt" x="1010" y="379">/stage-figs-designer</text>
   <text class="np" x="978" y="404">Every figure: a purpose, a source, a rendered PDF</text>
-  <text class="no" x="978" y="426">manus/figs/&lt;slug&gt;.pdf · figs/srcs/&lt;slug&gt;.*</text>
+  <text class="no" x="978" y="426">manus/figs/&lt;nn&gt;_&lt;slug&gt;.pdf · srcs/&lt;nn&gt;_&lt;slug&gt;.*</text>
 
   <!-- 8 copy-editor (PLAN) — also where the author's voice is recorded: a style
        run writes notes/style.md, which the drafter reads. -->

@@ -1798,9 +1798,13 @@ done
 # 20. The advisory prose scan keeps the STORY-aligned thresholds: chatbot
 #     residue can stand alone, ordinary phrases require a multi-pattern cluster,
 #     comments and table data are outside the scan, and captions remain prose.
+#     The fixture sits under a directory named tabs/: a file is a table by its
+#     place under manus/, never by a pattern over the whole path, so its
+#     sections are still read as prose.
 section "Advisory prose lint"
 prose_lint_errors=0
-PROSE_TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stage-prose-lint.XXXXXX")"
+PROSE_TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/stage-prose-lint.XXXXXX")"
+PROSE_TEST_DIR="${PROSE_TEST_ROOT}/tabs/paper"
 mkdir -p "${PROSE_TEST_DIR}/execs/scpts" "${PROSE_TEST_DIR}/manus/secs" \
          "${PROSE_TEST_DIR}/manus/tabs" "${PROSE_TEST_DIR}/wkdrs/builds"
 cp execs/scpts/lint.sh "${PROSE_TEST_DIR}/execs/scpts/lint.sh"
@@ -1812,41 +1816,41 @@ EOF
 : > "${PROSE_TEST_DIR}/wkdrs/builds/main.log"
 : > "${PROSE_TEST_DIR}/wkdrs/builds/main.pdf"
 
-cat > "${PROSE_TEST_DIR}/manus/secs/1_positive.tex" <<'EOF'
+cat > "${PROSE_TEST_DIR}/manus/secs/01_positive.tex" <<'EOF'
 This section delves into the evolving landscape and sets the stage for the method.
 
 值得注意的是，本节将深入探讨不断演变的格局，从而彰显该方法的重要性。
 EOF
-cat > "${PROSE_TEST_DIR}/manus/secs/2_chatbot.tex" <<'EOF'
+cat > "${PROSE_TEST_DIR}/manus/secs/02_chatbot.tex" <<'EOF'
 I hope this helps.
 EOF
-cat > "${PROSE_TEST_DIR}/manus/secs/3_single_signal.tex" <<'EOF'
+cat > "${PROSE_TEST_DIR}/manus/secs/03_single-signal.tex" <<'EOF'
 It is important to note that the optimizer uses momentum.
 EOF
-cat > "${PROSE_TEST_DIR}/manus/secs/4_safe.tex" <<'EOF'
+cat > "${PROSE_TEST_DIR}/manus/secs/04_safe.tex" <<'EOF'
 However, the samples were normalized before training, and the same term is used throughout.
 % I hope this helps. This section delves into an evolving landscape.
 EOF
-cat > "${PROSE_TEST_DIR}/manus/tabs/results.tex" <<'EOF'
+cat > "${PROSE_TEST_DIR}/manus/tabs/04_results.tex" <<'EOF'
 I hope this helps. This section delves into the evolving landscape.
 \caption{This table stands as a testament to the result. It is important to note that all rows use the same split.}
 EOF
 
 if PROSE_TEST_OUT="$(cd "${PROSE_TEST_DIR}" && bash execs/scpts/lint.sh 2>&1)"; then
     for marker in \
-        'manus/secs/1_positive.tex:1: prose review (inflated-significance,stock-signposting)' \
-        'manus/secs/1_positive.tex:3: prose review (' \
-        'manus/secs/2_chatbot.tex:1: prose review (chatbot-residue)' \
-        'manus/tabs/results.tex:2: prose review (inflated-significance,stock-signposting)'; do
+        'manus/secs/01_positive.tex:1: prose review (inflated-significance,stock-signposting)' \
+        'manus/secs/01_positive.tex:3: prose review (' \
+        'manus/secs/02_chatbot.tex:1: prose review (chatbot-residue)' \
+        'manus/tabs/04_results.tex:2: prose review (inflated-significance,stock-signposting)'; do
         grep -qF -- "${marker}" <<< "${PROSE_TEST_OUT}" || {
             fail "prose lint missed expected marker: ${marker}"
             prose_lint_errors=1
         }
     done
     for ignored in \
-        'manus/secs/3_single_signal.tex:1: prose review' \
-        'manus/secs/4_safe.tex:1: prose review' \
-        'manus/tabs/results.tex:1: prose review'; do
+        'manus/secs/03_single-signal.tex:1: prose review' \
+        'manus/secs/04_safe.tex:1: prose review' \
+        'manus/tabs/04_results.tex:1: prose review'; do
         if grep -qF -- "${ignored}" <<< "${PROSE_TEST_OUT}"; then
             fail "prose lint warned on protected or below-threshold text: ${ignored}"
             prose_lint_errors=1
@@ -1856,18 +1860,24 @@ if PROSE_TEST_OUT="$(cd "${PROSE_TEST_DIR}" && bash execs/scpts/lint.sh 2>&1)"; 
         fail "prose lint no longer states its advisory, non-authorship boundary"
         prose_lint_errors=1
     }
+    grep -qF 'ok: manuscript file names follow <nn>_<slug>' <<< "${PROSE_TEST_OUT}" || {
+        fail "the prose fixture's file names no longer pass the file-name lint (conventions §10.6)"
+        prose_lint_errors=1
+    }
 else
     fail "prose lint fixture exited non-zero"
     printf '%s\n' "${PROSE_TEST_OUT}" | sed 's/^/      /'
     prose_lint_errors=1
 fi
-rm -rf -- "${PROSE_TEST_DIR}"
-(( prose_lint_errors == 0 )) && note "chatbot, cluster, false-positive, comment, and caption fixtures pass"
+rm -rf -- "${PROSE_TEST_ROOT}"
+(( prose_lint_errors == 0 )) && note "chatbot, cluster, false-positive, comment, and caption fixtures pass, under a tabs/ directory too"
 
 # 20a. The ANON=true identity scan (conventions §3.4) fails on identity in
 #      typeset text and on a \documentclass without anon, warns on a github.com
 #      link, and passes a density-suffixed file name, an anonymous placeholder,
-#      a commented-out block, and plain prose about acknowledging.
+#      a commented-out block, and plain prose about acknowledging. An ANON that
+#      is neither true nor false — an inline comment in .env, which is part of
+#      the value — fails lint on its verdict rather than skipping the scan.
 section "Identity-leak lint (ANON=true)"
 anon_lint_errors=0
 ANON_TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stage-anon-lint.XXXXXX")"
@@ -1879,7 +1889,7 @@ printf '#!/usr/bin/env bash\nexit 0\n' > "${ANON_TEST_DIR}/execs/run.sh"
 cat > "${ANON_TEST_DIR}/manus/main.tex" <<'EOF'
 \documentclass[twocolumn]{stys/stage}
 EOF
-cat > "${ANON_TEST_DIR}/manus/secs/1_anon.tex" <<'EOF'
+cat > "${ANON_TEST_DIR}/manus/secs/01_anon.tex" <<'EOF'
 \includegraphics{figs/teaser@2x.png}
 \includegraphics[width=\linewidth]{figs/model@3x.PDF}
 Contact jane.doe@cs.example.edu for the data.
@@ -1900,24 +1910,520 @@ if ANON_TEST_OUT="$(cd "${ANON_TEST_DIR}" && ANON=true bash execs/scpts/lint.sh 
 fi
 for marker in \
     'FAIL: ANON=true and 6 possible identity leak(s):' \
-    'manus/secs/1_anon.tex:3:' 'manus/secs/1_anon.tex:4:' 'manus/secs/1_anon.tex:5:' \
-    'manus/secs/1_anon.tex:10:' 'manus/secs/1_anon.tex:12:' \
+    'manus/secs/01_anon.tex:3:' 'manus/secs/01_anon.tex:4:' 'manus/secs/01_anon.tex:5:' \
+    'manus/secs/01_anon.tex:10:' 'manus/secs/01_anon.tex:12:' \
     'manus/main.tex:1: \documentclass without the anon option' \
-    'warn: ANON=true and 1 github.com link(s)' 'manus/secs/1_anon.tex:11:'; do
+    'warn: ANON=true and 1 github.com link(s)' 'manus/secs/01_anon.tex:11:'; do
     grep -qF -- "${marker}" <<< "${ANON_TEST_OUT}" || {
         fail "identity-leak lint missed expected output: ${marker}"
         anon_lint_errors=1
     }
 done
 for ignored in 1 2 6 7 8 9; do
-    if grep -qF -- "manus/secs/1_anon.tex:${ignored}:" <<< "${ANON_TEST_OUT}"; then
-        fail "identity-leak lint flagged a line it must pass: manus/secs/1_anon.tex:${ignored}"
+    if grep -qF -- "manus/secs/01_anon.tex:${ignored}:" <<< "${ANON_TEST_OUT}"; then
+        fail "identity-leak lint flagged a line it must pass: manus/secs/01_anon.tex:${ignored}"
         anon_lint_errors=1
     fi
 done
 (( anon_lint_errors == 0 )) || printf '%s\n' "${ANON_TEST_OUT}" | sed 's/^/      /'
+printf '%s\n' 'ANON=true  # double-blind cycle' > "${ANON_TEST_DIR}/.env"
+ANON_VALUE_OUT="$(cd "${ANON_TEST_DIR}" && env -u ANON bash execs/scpts/lint.sh 2>&1)" && anon_value_rc=0 || anon_value_rc=$?
+if [[ "${anon_value_rc}" != 1 ]] ||
+   ! grep -qF "FAIL: ANON is 'true  # double-blind cycle', neither true nor false" <<< "${ANON_VALUE_OUT}" ||
+   ! grep -qF '[STAGE lint] 1 hard failure(s),' <<< "${ANON_VALUE_OUT}" ||
+   grep -qF 'note: ANON=false' <<< "${ANON_VALUE_OUT}"; then
+    fail "lint read ANON=true with an inline comment as something other than a value to reject (exit ${anon_value_rc}); it must fail on it, on its verdict:"
+    printf '%s\n' "${ANON_VALUE_OUT}" | sed 's/^/      /'
+    anon_lint_errors=1
+fi
 rm -rf -- "${ANON_TEST_DIR}"
-(( anon_lint_errors == 0 )) && note "typeset identity fails, a github.com link warns, and file names, placeholders, and comments pass"
+(( anon_lint_errors == 0 )) && note "typeset identity fails, a github.com link warns, file names, placeholders, and comments pass, and an ANON with an inline comment fails"
+
+# 20b. File names follow conventions §10.6, and lint reports a departure as a
+#      warning, never a failure: a name off <nn>_<slug>, a directory whose byte
+#      order and natural order differ (mixed key widths) or whose names differ
+#      only in a number's leading zeros, an asset key no section carries (a
+#      symlink counts), and an include whose key is not its includer's (a bare
+#      name under \graphicspath{{./figs/}}, bracketed and repeated options, and
+#      options or a target continued on the next line after [, ]%, or {%, and
+#      a target split inside its braces by a comment — figs/% then an indented
+#      01_teaser, which TeX reads as figs/01_teaser) each warn once, and never
+#      as a path:line: location. The include warning names the file on disk
+#      with its extension (as written when several files match), once however
+#      many includes name it. An includer lends its key when that key is two
+#      digits, even with a slug off the grammar (02_related_work.tex, which has
+#      its own grammar warning); one without a two-digit key (3_method.tex)
+#      lends none. A failed build still reports every name. A \graphicspath is
+#      read the same way: its path list continued on the next line, after a
+#      comment or not, still puts a bare name under figs/, while a {figs/}
+#      outside its own brace groups does not. A compliant tree — compound
+#      source suffixes, source directories, a bare and a multi-line
+#      \includegraphics under \graphicspath, commented (also after \\) and
+#      keyless includes, hidden .DS_Store and .ipynb_checkpoints entries, and
+#      git-ignored backups, one with a non-ASCII name and one that opens with a
+#      double quote — draws none, and so does main.tex's teaser slot as the
+#      template ships it (conventions §8.5), uncommented beside
+#      figs/00_teaser.pdf and its source.
+section "File-name lint (conventions §10.6)"
+naming_lint_errors=0
+NAMING_TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stage-naming-lint.XXXXXX")"
+for tree in good bad; do
+    mkdir -p "${NAMING_TEST_DIR}/${tree}/execs/scpts" "${NAMING_TEST_DIR}/${tree}/manus/secs" \
+             "${NAMING_TEST_DIR}/${tree}/manus/figs/srcs" "${NAMING_TEST_DIR}/${tree}/manus/tabs" \
+             "${NAMING_TEST_DIR}/${tree}/manus/stys" "${NAMING_TEST_DIR}/${tree}/wkdrs/builds"
+    cp execs/scpts/lint.sh "${NAMING_TEST_DIR}/${tree}/execs/scpts/lint.sh"
+    printf '#!/usr/bin/env bash\nexit 0\n' > "${NAMING_TEST_DIR}/${tree}/execs/run.sh"
+    : > "${NAMING_TEST_DIR}/${tree}/wkdrs/builds/main.log"
+    : > "${NAMING_TEST_DIR}/${tree}/wkdrs/builds/main.pdf"
+    : > "${NAMING_TEST_DIR}/${tree}/manus/secs/.gitkeep"
+done
+
+NG="${NAMING_TEST_DIR}/good/manus"
+printf '%s\n' '\graphicspath{{figs/}}' > "${NG}/stys/stage.sty"
+cat > "${NG}/main.tex" <<'EOF'
+\documentclass{stys/stage}
+\input{secs/00_abstract}
+\begin{document}
+\includegraphics{figs/00_overview}
+\input{secs/01_intro}
+\input{secs/03_method}
+\input{secs/04_experiments}
+\input{secs/10_appx-details}
+\end{document}
+EOF
+printf 'Abstract.\n' > "${NG}/secs/00_abstract.tex"
+printf '%s\n' '\includegraphics[width=\linewidth]{figs/01_teaser.pdf}' \
+    '\includegraphics[%' '  width=\linewidth]%' '  {01_teaser}' > "${NG}/secs/01_intro.tex"
+cat > "${NG}/secs/03_method.tex" <<'EOF'
+\includegraphics{03_framework} and \includegraphics[trim={1 2 3 4}]{figs/03_ablation-2}
+% \includegraphics{figs/04_moved-away}
+A line break.\\% \includegraphics{figs/04_moved-away}
+\includegraphics{figs/logo}
+EOF
+printf '%s\n' '\input{tabs/04_main-results}' > "${NG}/secs/04_experiments.tex"
+printf '%s\n' '\input{tabs/10_extra-ablation}' > "${NG}/secs/10_appx-details.tex"
+mkdir -p "${NG}/figs/srcs/03_framework.assets" "${NG}/figs/srcs/01_teaser" "${NG}/figs/srcs/.ipynb_checkpoints"
+for f in secs/.DS_Store figs/.DS_Store figs/00_overview.pdf figs/01_teaser.pdf figs/03_framework.pdf figs/03_ablation-2.pdf \
+         figs/srcs/03_framework.pptx figs/srcs/03_framework.sources.md figs/srcs/03_framework.render.yml \
+         figs/srcs/03_ablation-2.py tabs/04_main-results.tex tabs/10_extra-ablation.tex; do
+    : > "${NG}/${f}"
+done
+
+# Inside a git work tree, a name git ignores is not the manuscript's either.
+if git -C "${NAMING_TEST_DIR}/good" init -q >/dev/null 2>&1; then
+    printf '%s\n' '*.bak[0-9]*' > "${NAMING_TEST_DIR}/good/.gitignore"
+    : > "${NG}/secs/01_intro.bak0"
+    : > "${NG}/secs/01_intro-副本.bak1"
+    : > "${NG}/secs/\"01_intro.bak2"
+fi
+
+NB="${NAMING_TEST_DIR}/bad/manus"
+cat > "${NB}/main.tex" <<'EOF'
+\documentclass{stys/stage}
+\begin{document}
+\includegraphics{figs/01_teaser}
+\includegraphics{figs/01_teaser.pdf}
+\end{document}
+EOF
+for f in secs/01_intro.tex secs/02_related_work.tex secs/3_method.tex \
+         figs/01_teaser.pdf figs/03_x.pdf figs/03_y.pdf figs/03_y.png figs/04_Plot.PDF figs/04_seed1.pdf \
+         figs/04_seed01.pdf tabs/04_main-results.tex tabs/07_orphan.tex; do
+    : > "${NB}/${f}"
+done
+ln -s 01_teaser.pdf "${NB}/figs/09_linked.pdf"
+printf '%s\n' '\graphicspath{{./figs/}}' > "${NB}/stys/stage.sty"
+cat > "${NB}/secs/03_method.tex" <<'EOF'
+\includegraphics[
+  width=\linewidth,
+]{figs/01_teaser}
+\includegraphics[width=\linewidth]%
+  {figs/04_seed1}
+\includegraphics[width=\linewidth]{%
+  09_linked}
+\input{%
+  tabs/07_orphan}
+\includegraphics[1,2][3,4]{figs/04_seed01}
+EOF
+printf '%s\n' '\includegraphics[alt={A [b] c}]{03_x}' '\includegraphics{figs/03_y}' > "${NB}/secs/04_experiments.tex"
+printf '%s\n' '\includegraphics{figs/03_x}' > "${NB}/secs/3_method.tex"
+printf '%s\n' '\includegraphics{figs/03_x}' > "${NB}/secs/02_related_work.tex"
+printf '%s\n' '\input{tabs/04_main-results}' '\includegraphics{figs/%' > "${NB}/secs/10_appx-details.tex"
+printf '\t%s\n' '01_teaser}' >> "${NB}/secs/10_appx-details.tex"
+
+if NAMING_GOOD_OUT="$(cd "${NAMING_TEST_DIR}/good" && bash execs/scpts/lint.sh 2>&1)"; then
+    grep -qF 'ok: manuscript file names follow <nn>_<slug>' <<< "${NAMING_GOOD_OUT}" || {
+        fail "file-name lint did not pass a compliant tree"
+        naming_lint_errors=1
+    }
+    if grep -qF '(conventions §10.6)' <<< "${NAMING_GOOD_OUT}"; then
+        fail "file-name lint warned on a compliant tree:"
+        grep -F '(conventions §10.6)' <<< "${NAMING_GOOD_OUT}" | sed 's/^/      /'
+        naming_lint_errors=1
+    fi
+else
+    fail "file-name lint fixture (compliant tree) exited non-zero"
+    printf '%s\n' "${NAMING_GOOD_OUT}" | sed 's/^/      /'
+    naming_lint_errors=1
+fi
+
+if NAMING_BAD_OUT="$(cd "${NAMING_TEST_DIR}/bad" && bash execs/scpts/lint.sh 2>&1)"; then
+    for marker in \
+        'warn: manus/secs/02_related_work.tex is off the <nn>_<slug> grammar' \
+        'warn: manus/secs/3_method.tex is off the <nn>_<slug> grammar' \
+        'warn: manus/figs/04_Plot.PDF is off the <nn>_<slug> grammar' \
+        'warn: manus/secs lists in a different order in git and ls than in VS Code, Overleaf, and Finder: 04_experiments.tex comes before 3_method.tex' \
+        'use one key width and pad digit runs inside slugs' \
+        'warn: manus/tabs/07_orphan.tex has key 07, but no manus/secs/07_*.tex exists' \
+        'warn: manus/figs/09_linked.pdf has key 09, but no manus/secs/09_*.tex exists' \
+        'warn: manus/figs lists in a different order in git and ls than in Finder: 04_seed01.pdf and 04_seed1.pdf differ only in a number' \
+        'warn: manus/figs/03_x.pdf is included from manus/secs/04_experiments.tex with key 03' \
+        'expected 04_x.pdf;' \
+        'warn: manus/figs/03_x.pdf is included from manus/secs/02_related_work.tex with key 03' \
+        'expected 02_x.pdf;' \
+        'warn: manus/figs/03_y is included from manus/secs/04_experiments.tex with key 03' \
+        'expected 04_y;' \
+        'warn: manus/tabs/04_main-results.tex is included from manus/secs/10_appx-details.tex with key 04' \
+        'expected 10_main-results.tex;' \
+        'warn: manus/figs/01_teaser.pdf is included from manus/main.tex with key 01' \
+        'expected 00_teaser.pdf;' \
+        'warn: manus/figs/01_teaser.pdf is included from manus/secs/03_method.tex with key 01' \
+        'expected 03_teaser.pdf;' \
+        'warn: manus/figs/04_seed1.pdf is included from manus/secs/03_method.tex with key 04' \
+        'expected 03_seed1.pdf;' \
+        'warn: manus/figs/09_linked.pdf is included from manus/secs/03_method.tex with key 09' \
+        'expected 03_linked.pdf;' \
+        'warn: manus/tabs/07_orphan.tex is included from manus/secs/03_method.tex with key 07' \
+        'expected 03_orphan.tex;' \
+        'warn: manus/figs/04_seed01.pdf is included from manus/secs/03_method.tex with key 04' \
+        'expected 03_seed01.pdf;' \
+        'warn: manus/figs/01_teaser.pdf is included from manus/secs/10_appx-details.tex with key 01' \
+        'expected 10_teaser.pdf;'; do
+        grep -qF -- "${marker}" <<< "${NAMING_BAD_OUT}" || {
+            fail "file-name lint missed expected warning: ${marker}"
+            naming_lint_errors=1
+        }
+    done
+    naming_warns="$(grep -cF '(conventions §10.6).' <<< "${NAMING_BAD_OUT}" || true)"
+    if [[ "${naming_warns}" != 18 ]]; then
+        fail "file-name lint printed ${naming_warns} warning(s) for the violating tree, expected 18 (one per name, directory, asset, and included file)"
+        naming_lint_errors=1
+    fi
+    naming_main_warns="$(grep -cF 'included from manus/main.tex' <<< "${NAMING_BAD_OUT}" || true)"
+    if [[ "${naming_main_warns}" != 1 ]]; then
+        fail "file-name lint warned ${naming_main_warns} time(s) about figs/01_teaser.pdf from main.tex, which names it twice (with and without .pdf); one file draws one warning"
+        naming_lint_errors=1
+    fi
+    if grep -qF 'included from manus/secs/3_method.tex' <<< "${NAMING_BAD_OUT}"; then
+        fail "file-name lint took a key from secs/3_method.tex, whose key is not two digits; such an includer lends none"
+        naming_lint_errors=1
+    fi
+    if grep -qF 'ok: manuscript file names follow' <<< "${NAMING_BAD_OUT}"; then
+        fail "file-name lint printed its ok line over a violating tree"
+        naming_lint_errors=1
+    fi
+    if grep -qE 'manus/[^ ]+:[0-9]+:' <<< "${NAMING_BAD_OUT}"; then
+        fail "file-name lint printed a path:line: location; its warnings name files, never lines"
+        naming_lint_errors=1
+    fi
+else
+    fail "file-name lint fixture (violating tree) exited non-zero; naming findings are warnings, never failures"
+    naming_lint_errors=1
+fi
+printf '#!/usr/bin/env bash\nexit 1\n' > "${NAMING_TEST_DIR}/bad/execs/run.sh"
+NAMING_FAILED_BUILD_OUT="$(cd "${NAMING_TEST_DIR}/bad" && bash execs/scpts/lint.sh 2>&1 || true)"
+grep -qF 'warn: manus/tabs/07_orphan.tex has key 07' <<< "${NAMING_FAILED_BUILD_OUT}" || {
+    fail "file-name lint stayed silent when the build failed; it reads the tree, not the build, and runs before it"
+    naming_lint_errors=1
+}
+(( naming_lint_errors == 0 )) || printf '%s\n' "${NAMING_BAD_OUT:-}" | sed 's/^/      /'
+
+# \graphicspath read the way TeX reads it, one tree per spelling: whether a
+# bare \includegraphics{02_bare} in main.tex (key 00) draws the include warning
+# says whether lint took figs/ to be on the path. Fields: expected result, the
+# first line of stage.sty, its second line.
+gp_case=0
+while IFS='|' read -r gp_expect gp_first gp_second; do
+    gp_case=$(( gp_case + 1 ))
+    GP="${NAMING_TEST_DIR}/gp${gp_case}"
+    mkdir -p "${GP}/execs/scpts" "${GP}/manus/stys" "${GP}/wkdrs/builds"
+    cp execs/scpts/lint.sh "${GP}/execs/scpts/lint.sh"
+    printf '#!/usr/bin/env bash\nexit 0\n' > "${GP}/execs/run.sh"
+    : > "${GP}/wkdrs/builds/main.log"
+    : > "${GP}/wkdrs/builds/main.pdf"
+    printf '%s\n' "${gp_first}" "${gp_second}" > "${GP}/manus/stys/stage.sty"
+    printf '%s\n' '\documentclass{stys/stage}' '\begin{document}' '\includegraphics{02_bare}' \
+        '\end{document}' > "${GP}/manus/main.tex"
+    GP_OUT="$(cd "${GP}" && bash execs/scpts/lint.sh 2>&1 || true)"
+    gp_got=none
+    if grep -qF 'warn: manus/figs/02_bare is included from manus/main.tex with key 02' <<< "${GP_OUT}"; then
+        gp_got=warn
+    fi
+    if [[ "${gp_got}" != "${gp_expect}" ]]; then
+        fail "file-name lint misread the \\graphicspath in stage.sty lines '${gp_first}' and '${gp_second}': expected ${gp_expect} for a bare 02_bare in main.tex, got ${gp_got}"
+        naming_lint_errors=1
+    fi
+done <<'EOF'
+warn|\graphicspath{{./figs/}}|
+warn|\graphicspath{%|  {figs/}}
+warn|\graphicspath|  {{./figs}}
+warn|\graphicspath{{srcs/}%|	{figs/}}
+none|\graphicspath{{srcs/}}|\newcommand{\figdir}{figs/}
+EOF
+# The teaser slot as manus/main.tex ships it: commented out there, so the
+# template's lint verdict does not move, and keyed 00, main.tex's own key, so
+# uncommenting it beside figs/00_teaser.pdf draws no file-name warning.
+TS="${NAMING_TEST_DIR}/teaser"
+mkdir -p "${TS}/execs/scpts" "${TS}/manus/secs" "${TS}/manus/figs/srcs" "${TS}/manus/stys" "${TS}/wkdrs/builds"
+cp execs/scpts/lint.sh "${TS}/execs/scpts/lint.sh"
+printf '#!/usr/bin/env bash\nexit 0\n' > "${TS}/execs/run.sh"
+: > "${TS}/wkdrs/builds/main.log"
+: > "${TS}/wkdrs/builds/main.pdf"
+TEASER_SLOT="$(awk '/^% \\begin\{figure\}/ { on = 1 } on { sub(/^% ?/, ""); print } on && /\\end\{figure\}/ { exit }' manus/main.tex)"
+if grep -qF '\includegraphics[width=\linewidth]{figs/00_teaser}' <<< "${TEASER_SLOT}" &&
+   grep -qF '\label{fig:teaser}' <<< "${TEASER_SLOT}"; then
+    { printf '%s\n' '\documentclass{stys/stage}' '\begin{document}' '\maketitle'
+      printf '%s\n' "${TEASER_SLOT}" '\end{document}'; } > "${TS}/manus/main.tex"
+    : > "${TS}/manus/figs/00_teaser.pdf"
+    : > "${TS}/manus/figs/srcs/00_teaser.pptx"
+    TS_OUT="$(cd "${TS}" && bash execs/scpts/lint.sh 2>&1 || true)"
+    if grep -qF '(conventions §10.6)' <<< "${TS_OUT}" ||
+       ! grep -qF 'ok: manuscript file names follow <nn>_<slug>' <<< "${TS_OUT}"; then
+        fail "file-name lint did not pass main.tex's teaser slot, uncommented beside figs/00_teaser.pdf:"
+        printf '%s\n' "${TS_OUT}" | sed 's/^/      /'
+        naming_lint_errors=1
+    fi
+else
+    fail "manus/main.tex ships no commented teaser slot: a '% \\begin{figure}' block holding \\includegraphics[width=\\linewidth]{figs/00_teaser} and \\label{fig:teaser} (conventions §8.5)"
+    naming_lint_errors=1
+fi
+rm -rf -- "${NAMING_TEST_DIR}"
+(( naming_lint_errors == 0 )) && note "off-grammar names, mixed key widths, leading-zero ties, ownerless keys, and wrong includers (multi-line and comment-split ones too, named with their extension) warn; a multi-line \\graphicspath is read; an off-grammar includer with a two-digit key lends it; a compliant tree and main.tex's teaser slot, uncommented, pass"
+
+# 20c. A TeX comment opens at a % that an even run of backslashes precedes: \%
+#      is a percent sign, \\% a line break and then a comment. Every lint check
+#      that strips comments keeps to that — the todo count, the identity scan
+#      and its \documentclass read, and the prose review all stop at \\% and
+#      read on past \%. Each also reads lines as TeX joins them: a todo marker
+#      whose brace follows a space or opens the next line after a comment or a
+#      plain line end is typeset and counts, on the line its \todo starts,
+#      while \\todo is a line break and then text; and a \documentclass whose
+#      class name or option list a comment splits is still read whole. The
+#      fixture's own path holds a %, which must not read as a comment either.
+section "Lint comment stripping (\\\\% opens a comment, \\% does not)"
+parity_lint_errors=0
+PARITY_TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stage-parity%lint.XXXXXX")"
+mkdir -p "${PARITY_TEST_DIR}/execs/scpts" "${PARITY_TEST_DIR}/manus/secs" "${PARITY_TEST_DIR}/wkdrs/builds"
+cp execs/scpts/lint.sh "${PARITY_TEST_DIR}/execs/scpts/lint.sh"
+printf '#!/usr/bin/env bash\nexit 0\n' > "${PARITY_TEST_DIR}/execs/run.sh"
+: > "${PARITY_TEST_DIR}/wkdrs/builds/main.log"
+: > "${PARITY_TEST_DIR}/wkdrs/builds/main.pdf"
+cat > "${PARITY_TEST_DIR}/manus/main.tex" <<'EOF'
+\RequirePackage{fix-cm}\\% \documentclass{stys/stage}
+\documentclass[anon]{stys/stage}
+EOF
+cat > "${PARITY_TEST_DIR}/manus/secs/01_comments.tex" <<'EOF'
+A line break.\\% \todo{hidden} \author{Jane Doe} I hope this helps.
+A share of 50\% \todo{typeset} is still typeset.
+A spaced \todo {typeset too}.
+A split \todo%
+  {typeset after a comment}.
+A broken \todo
+  {typeset after a line end}.
+A line break and then text: \\todo{not a marker}.
+EOF
+PARITY_OUT="$(cd "${PARITY_TEST_DIR}" && ANON=true bash execs/scpts/lint.sh 2>&1)" && parity_rc=0 || parity_rc=$?
+if [[ "${parity_rc}" != 1 ]]; then
+    fail "comment-stripping lint fixture exited ${parity_rc}; its typeset todo markers must fail it with 1"
+    parity_lint_errors=1
+fi
+for marker in \
+    'FAIL: 4 todo marker(s)' 'manus/secs/01_comments.tex:2:' 'manus/secs/01_comments.tex:3:' \
+    'manus/secs/01_comments.tex:4:' 'manus/secs/01_comments.tex:6:' \
+    'ok: ANON=true and no identity leaks found.' \
+    'ok: prose review found no high-confidence' \
+    '1 hard failure(s)'; do
+    grep -qF -- "${marker}" <<< "${PARITY_OUT}" || {
+        fail "comment-stripping lint missed expected output: ${marker}"
+        parity_lint_errors=1
+    }
+done
+for ignored in 'manus/secs/01_comments.tex:1:' 'manus/secs/01_comments.tex:5:' \
+               'manus/secs/01_comments.tex:7:' 'manus/secs/01_comments.tex:8:' 'manus/main.tex:1:'; do
+    if grep -qF -- "${ignored}" <<< "${PARITY_OUT}"; then
+        fail "comment-stripping lint read past a \\\\% comment, or took a line break for a marker: ${ignored}"
+        parity_lint_errors=1
+    fi
+done
+(( parity_lint_errors == 0 )) || printf '%s\n' "${PARITY_OUT}" | sed 's/^/      /'
+
+# \documentclass read as TeX joins its lines, one main.tex per spelling:
+# whether ANON=true reports the missing anon option says whether lint read the
+# class and its options whole. Fields: expected result, main.tex line 1, line 2.
+dc_case=0
+while IFS='|' read -r dc_expect dc_first dc_second; do
+    dc_case=$(( dc_case + 1 ))
+    printf '%s\n' "${dc_first}" "${dc_second}" > "${PARITY_TEST_DIR}/manus/main.tex"
+    : > "${PARITY_TEST_DIR}/manus/secs/01_comments.tex"
+    DC_OUT="$(cd "${PARITY_TEST_DIR}" && ANON=true bash execs/scpts/lint.sh 2>&1 || true)"
+    dc_got=ok
+    if grep -qF 'manus/main.tex:1: \documentclass without the anon option' <<< "${DC_OUT}"; then
+        dc_got=leak
+    fi
+    if [[ "${dc_got}" != "${dc_expect}" ]]; then
+        fail "identity lint misread the \\documentclass in main.tex lines '${dc_first}' and '${dc_second}': expected ${dc_expect}, got ${dc_got}"
+        parity_lint_errors=1
+    fi
+done <<'EOF'
+leak|\documentclass[twocolumn]{stys/%|  stage}
+leak|\documentclass[twocolumn]%|  {stys/stage}
+ok|\documentclass[twocolumn,%|  anon]{stys/stage}
+ok|\documentclass[anon]{stys/%|  stage}
+EOF
+rm -rf -- "${PARITY_TEST_DIR}"
+(( parity_lint_errors == 0 )) && note "a todo, an \\author, a \\documentclass, and chatbot residue after \\\\% are comments; a todo after \\% or split across lines is typeset; a split \\documentclass is read whole; a % in the path is not a comment"
+
+# 20d. A byte that is not UTF-8 (Latin-1 é, 0xE9, here) neither stops lint nor
+#      hides a line from it. The checks that match only ASCII read bytes, so a
+#      todo and an \author on such a line, a \documentclass after one on its
+#      line, an undefined citation and the page count in a log holding one,
+#      the reference page in an aux holding one, and an ANON value in .env
+#      holding one are all still read. The prose review, which matches Chinese
+#      on purpose, leaves a file that is not well-formed UTF-8 out with a
+#      warning naming it — a Latin-1 byte, and a sequence past U+10FFFF
+#      (F4 90 80 80) that macOS iconv lets through — and still scans every
+#      other file, a later Chinese one too. Lint ends on its verdict line,
+#      never on an awk, sed, or tr error. It runs under a UTF-8 locale (the
+#      first of en_US.UTF-8 and C.UTF-8 that locale -a lists), where BSD awk,
+#      sed, tr, and bash's =~ stop at or skip such a byte, so on macOS this
+#      pins each byte guard; GNU and mawk userlands read on, so there it checks
+#      the output alone. Lint's output holds those bytes too, so this test
+#      greps it as bytes (LC_ALL=C).
+section "Lint over bytes that are not UTF-8"
+bytes_lint_errors=0
+BYTES_LOCALE="$(locale -a 2>/dev/null | LC_ALL=C grep -xE 'en_US\.(UTF-8|utf8)|C\.(UTF-8|utf8)' | LC_ALL=C sort -r | head -1 || true)"
+BYTES_TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stage-bytes-lint.XXXXXX")"
+mkdir -p "${BYTES_TEST_DIR}/execs/scpts" "${BYTES_TEST_DIR}/manus/secs" "${BYTES_TEST_DIR}/wkdrs/builds" \
+         "${BYTES_TEST_DIR}/notes" "${BYTES_TEST_DIR}/cycls/c1"
+cp execs/scpts/lint.sh "${BYTES_TEST_DIR}/execs/scpts/lint.sh"
+printf '#!/usr/bin/env bash\nexit 0\n' > "${BYTES_TEST_DIR}/execs/run.sh"
+: > "${BYTES_TEST_DIR}/wkdrs/builds/main.pdf"
+printf 'Caf\351 box\nLaTeX Warning: Citation `jos\351'"'"' on page 1 undefined on input line 2.\nOutput written on main.pdf (7 pages, 1234 bytes).\n' \
+    > "${BYTES_TEST_DIR}/wkdrs/builds/main.log"
+printf '\\@writefile{toc}{\\contentsline {section}{Caf\351}{1}}\n\\newlabel{stage@refs}{{}{4}}\n' \
+    > "${BYTES_TEST_DIR}/wkdrs/builds/main.aux"
+printf '%s\n' '---' 'cycle: c1' '---' > "${BYTES_TEST_DIR}/notes/story.md"
+printf '%s\n' 'page_limit_main: 5' > "${BYTES_TEST_DIR}/cycls/c1/venue.yml"
+printf '\\newcommand{\\cafe}{Caf\351}\\documentclass[twocolumn]{stys/stage}\\title{Caf\351}\n' \
+    > "${BYTES_TEST_DIR}/manus/main.tex"
+printf 'Caf\351 au lait \\todo{latin}.\n\\author{Jos\351 Doe}\n\nI hope this helps.\n' \
+    > "${BYTES_TEST_DIR}/manus/secs/01_latin.tex"
+printf '%s\n' 'I hope this helps.' > "${BYTES_TEST_DIR}/manus/secs/02_valid.tex"
+printf 'Text \364\220\200\200 here.\n' > "${BYTES_TEST_DIR}/manus/secs/03_high.tex"
+printf '%s\n' '希望这对您有帮助。' > "${BYTES_TEST_DIR}/manus/secs/04_zh.tex"
+BYTES_OUT="$(cd "${BYTES_TEST_DIR}" && env ${BYTES_LOCALE:+LC_ALL=${BYTES_LOCALE}} ANON=true bash execs/scpts/lint.sh 2>&1)" && bytes_rc=0 || bytes_rc=$?
+if [[ "${bytes_rc}" != 1 ]]; then
+    fail "lint over bytes that are not UTF-8 exited ${bytes_rc}; its hard failures must end it with 1, on its verdict"
+    bytes_lint_errors=1
+fi
+for marker in \
+    'warn: manus/secs/01_latin.tex is not valid UTF-8, so its prose was not checked' \
+    'warn: manus/secs/03_high.tex is not valid UTF-8, so its prose was not checked' \
+    'manus/secs/02_valid.tex:1: prose review (chatbot-residue)' \
+    'manus/secs/04_zh.tex:1: prose review (chatbot-residue)' \
+    'FAIL: 1 todo marker(s)' 'manus/secs/01_latin.tex:1:' \
+    'FAIL: ANON=true and 2 possible identity leak(s):' 'manus/secs/01_latin.tex:2:' \
+    'manus/main.tex:1: \documentclass without the anon option' \
+    'FAIL: 1 undefined citation/reference warning(s):' \
+    'build: wkdrs/builds/main.pdf (7 pages)' \
+    'ok: 4 content pages (through the page the references start on; 7 total) within page_limit_main 5 (cycle c1).' \
+    '[STAGE lint] 3 hard failure(s),'; do
+    LC_ALL=C grep -qF -- "${marker}" <<< "${BYTES_OUT}" || {
+        fail "lint over bytes that are not UTF-8 missed expected output: ${marker}"
+        bytes_lint_errors=1
+    }
+done
+if LC_ALL=C grep -qE 'towc|illegal byte sequence|multibyte|prose review stopped' <<< "${BYTES_OUT}"; then
+    fail "lint printed an awk or sed encoding error, or stopped a prose scan, over bytes that are not UTF-8"
+    bytes_lint_errors=1
+fi
+(( bytes_lint_errors == 0 )) || printf '%s\n' "${BYTES_OUT}" | LC_ALL=C sed 's/^/      /'
+# ANON read from .env, where a Latin-1 comment trails the value: tr reads it
+# byte-wise, and the value, being neither true nor false, fails on the verdict.
+printf 'ANON=false # d\351sactiv\351\n' > "${BYTES_TEST_DIR}/.env"
+BYTES_ENV_OUT="$(cd "${BYTES_TEST_DIR}" && env -u ANON ${BYTES_LOCALE:+LC_ALL=${BYTES_LOCALE}} bash execs/scpts/lint.sh 2>&1)" && bytes_env_rc=0 || bytes_env_rc=$?
+if [[ "${bytes_env_rc}" != 1 ]] ||
+   ! LC_ALL=C grep -qF "FAIL: ANON is 'false # d" <<< "${BYTES_ENV_OUT}" ||
+   ! LC_ALL=C grep -qF '[STAGE lint] 3 hard failure(s),' <<< "${BYTES_ENV_OUT}" ||
+   LC_ALL=C grep -qiE 'illegal byte sequence' <<< "${BYTES_ENV_OUT}"; then
+    fail "lint over an ANON value in .env holding a byte that is not UTF-8 exited ${bytes_env_rc}; it must fail on that value, on its verdict:"
+    printf '%s\n' "${BYTES_ENV_OUT}" | LC_ALL=C sed 's/^/      /'
+    bytes_lint_errors=1
+fi
+rm -rf -- "${BYTES_TEST_DIR}"
+(( bytes_lint_errors == 0 )) && note "a Latin-1 byte hides no todo, leak, citation, page count, or ANON value, a file that is not well-formed UTF-8 skips only its own prose review with a warning, and lint reaches its verdict${BYTES_LOCALE:+ (under ${BYTES_LOCALE})}"
+
+# 20e. A source lint cannot read, or that would block a reader, neither hides
+#      itself nor stops lint. A section file that cannot be read is named once,
+#      the file-name check prints no ok line over includes it could not read,
+#      and every later file is still scanned (a Chinese one's residue too). A
+#      named pipe under manus/ (secs/02_pipe.tex) blocks no check: lint still
+#      reaches its verdict, under a 30-second alarm here. Root reads any file,
+#      so there the unreadable case is skipped.
+section "Lint over sources it cannot read"
+unread_lint_errors=0
+UNREAD_TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stage-unread-lint.XXXXXX")"
+mkdir -p "${UNREAD_TEST_DIR}/execs/scpts" "${UNREAD_TEST_DIR}/manus/secs" "${UNREAD_TEST_DIR}/wkdrs/builds"
+cp execs/scpts/lint.sh "${UNREAD_TEST_DIR}/execs/scpts/lint.sh"
+printf '#!/usr/bin/env bash\nexit 0\n' > "${UNREAD_TEST_DIR}/execs/run.sh"
+: > "${UNREAD_TEST_DIR}/wkdrs/builds/main.log"
+: > "${UNREAD_TEST_DIR}/wkdrs/builds/main.pdf"
+printf '%s\n' 'Locked \todo{hidden}.' '\includegraphics{figs/03_x}' > "${UNREAD_TEST_DIR}/manus/secs/01_locked.tex"
+printf '%s\n' '希望这对您有帮助。' > "${UNREAD_TEST_DIR}/manus/secs/03_zh.tex"
+chmod 000 "${UNREAD_TEST_DIR}/manus/secs/01_locked.tex"
+if [[ -r "${UNREAD_TEST_DIR}/manus/secs/01_locked.tex" ]]; then
+    note "running as root, which reads any file: the unreadable-source case is skipped"
+else
+    UNREAD_OUT="$(cd "${UNREAD_TEST_DIR}" && ANON=true bash execs/scpts/lint.sh 2>&1)" && unread_rc=0 || unread_rc=$?
+    for marker in \
+        'warn: manus/secs/01_locked.tex cannot be read, so no check read it' \
+        'manus/secs/03_zh.tex:1: prose review (chatbot-residue)' \
+        '[STAGE lint] clean: 0 hard failures,'; do
+        grep -qF -- "${marker}" <<< "${UNREAD_OUT}" || {
+            fail "lint over an unreadable section missed expected output: ${marker}"
+            unread_lint_errors=1
+        }
+    done
+    for ignored in 'ok: manuscript file names follow' "can't open" 'prose review stopped'; do
+        if grep -qF -- "${ignored}" <<< "${UNREAD_OUT}"; then
+            fail "lint over an unreadable section printed '${ignored}'; the file is named once and read by no check"
+            unread_lint_errors=1
+        fi
+    done
+    (( unread_lint_errors == 0 )) || printf '%s\n' "${UNREAD_OUT}" | sed 's/^/      /'
+fi
+chmod 644 "${UNREAD_TEST_DIR}/manus/secs/01_locked.tex"
+rm -f -- "${UNREAD_TEST_DIR}/manus/secs/01_locked.tex"
+# Lint's output goes to a file, not a command substitution: a reader blocked on
+# the pipe would outlive the alarm and hold a substitution open for good. Once
+# lint is done, opening the pipe for writing without blocking hands any such
+# reader end of file, so a regression fails this test instead of hanging it.
+PIPE_FIFO="${UNREAD_TEST_DIR}/manus/secs/02_pipe.tex"
+if command -v mkfifo >/dev/null 2>&1 && mkfifo "${PIPE_FIFO}" 2>/dev/null; then
+    (cd "${UNREAD_TEST_DIR}" && perl -e 'alarm 30; exec @ARGV' bash execs/scpts/lint.sh) \
+        < /dev/null > "${UNREAD_TEST_DIR}/pipe.out" 2>&1 && pipe_rc=0 || pipe_rc=$?
+    perl -MFcntl -e 'sysopen(my $f, $ARGV[0], O_WRONLY | O_NONBLOCK)' "${PIPE_FIFO}" 2>/dev/null || true
+    rm -f -- "${PIPE_FIFO}"
+    PIPE_OUT="$(cat "${UNREAD_TEST_DIR}/pipe.out")"
+    if [[ "${pipe_rc}" == 142 ]] || ! grep -qF '[STAGE lint] clean: 0 hard failures,' <<< "${PIPE_OUT}"; then
+        fail "lint over a named pipe under manus/secs exited ${pipe_rc} without its verdict (142: stopped by the alarm, blocked on the pipe)"
+        printf '%s\n' "${PIPE_OUT}" | sed 's/^/      /'
+        unread_lint_errors=1
+    fi
+else
+    note "mkfifo unavailable: the named-pipe case is skipped"
+fi
+rm -rf -- "${UNREAD_TEST_DIR}"
+(( unread_lint_errors == 0 )) && note "an unreadable source is named once and hides no later file, and a named pipe blocks no check"
 
 # 21. The versioned memory store ships as its template. STAGE is the template
 #     every paper starts from — a clone or the GitHub template copies

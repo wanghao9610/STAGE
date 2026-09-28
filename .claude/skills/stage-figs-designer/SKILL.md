@@ -50,12 +50,12 @@ First match wins: `plan` → Step 2; `teaser` → the teaser figure, Steps 3–5
 
 1. Every PDF under `manus/figs/` resolves to an origin per Principle 2 — orphans are the headline finding.
 2. Every Figures row checks against disk: File exists or Status is `planned`; Source resolves; a `mates/` Source still has its MANIFEST entry (§8 — staleness is stamp comparison, never mtime; upstream drift surfaces via `import.sh --diff`); every `sha256:` a `src:` comment recorded still equals its entry's current MANIFEST `sha256:` — a mismatch sets that row's Status to `draft` in `notes/outline.md` unless it already stands lower, with its `updated:` and provenance fields (§8) and the run's one commit (§1), and names `stage-figs-designer <ID>` as its rebuild, and a comment recording none is reported as unchecked.
-3. Drafted sections are scanned for `\includegraphics` of figures no row plans — an unplanned figure gets a proposed row, not silent adoption.
+3. Drafted sections are scanned for `\includegraphics` of figures no row plans — an unplanned figure gets a proposed row, not silent adoption. A figure whose key is not its row's Section key (`00` where the Section is `main.tex`, conventions §8.5), or not the key of the file that includes it (conventions §10.6), is drift for `stage-outl-planner` to re-key, never renamed here.
 4. Report drift, any row item 2 demoted, and one next action with its exact command; beyond item 2's Status write and its commit (§1.6), go no further unless asked.
 
 ### Step 2: Plan the inventory (`plan`)
 
-Derive rows from `## Pitch` and `## Contributions` in `notes/story.md` and the outline's section briefs: the teaser, a method figure when the mechanism needs one, results or ablation figures only where a plot shows what `manus/tabs/` cannot. Fill every column — File `manus/figs/<nn>_<slug>.pdf` (prefix per conventions §10.6), Purpose in one clause, Section, intended Source form, Status `planned`. Check the set against the outline's page budgets; flag any purpose a planned table already serves. Show the row diff and ask (§7) before overwriting rows this run did not create, then update `notes/outline.md` and its `updated:`.
+Derive rows from `## Pitch` and `## Contributions` in `notes/story.md` and the outline's section briefs: the teaser, a method figure when the mechanism needs one, results or ablation figures only where a plot shows what `manus/tabs/` cannot. Fill every column — File `manus/figs/<nn>_<slug>.pdf` (`<nn>` the key of its Section's file, the slug kebab-case and used by no other figure; conventions §10.6), Purpose in one clause, Section, intended Source form, Status `planned`. Check the set against the outline's page budgets; flag any purpose a planned table already serves. Show the row diff and ask (§7) before overwriting rows this run did not create, then update `notes/outline.md` and its `updated:`.
 
 ### Step 3: Build the source
 
@@ -66,7 +66,7 @@ Derive rows from `## Pitch` and `## Contributions` in `notes/story.md` and the o
 
 ### Step 4: Render
 
-Tikz sources compile standalone with the `.env` engine into `wkdrs/builds/figs/`, and the PDF is copied to `manus/figs/<nn>_<slug>.pdf`; python sources run from the repo root and write `manus/figs/<nn>_<slug>.pdf` themselves; drawio exports run outside this environment — hand the user the exact export step and hold Status at `draft` until the PDF lands. A render the toolchain cannot run is not a failure: commit the source, state exactly what remains, keep Status honest. Report the `\includegraphics{figs/<nn>_<slug>}` line for `stage-sect-drafter` — placement is the drafter's, not yours.
+Tikz sources compile standalone with the `.env` engine into `wkdrs/builds/figs/`, and the PDF is copied to `manus/figs/<nn>_<slug>.pdf`; python sources run from the repo root and write `manus/figs/<nn>_<slug>.pdf` themselves; drawio exports run outside this environment — hand the user the exact export step and hold Status at `draft` until the PDF lands. A render the toolchain cannot run is not a failure: commit the source, state exactly what remains, keep Status honest. Report the `\includegraphics{figs/<nn>_<slug>}` line for `stage-sect-drafter <nn>`, the section whose key the figure carries — placement is the drafter's, not yours; a `00` figure, whose Section is `main.tex`, is placed there instead (conventions §8.5): the teaser by `main.tex`'s teaser slot — while that slot is still commented, report `stage-outl-planner` (`reconcile`), which uncomments it now that the PDF exists — and any other `00` figure by the author; either way its caption, with any `\todo{}` caption text, is the author's to write.
 
 ### Step 5: Teaser checklist (`teaser` runs)
 
@@ -84,7 +84,7 @@ Fails become the figure's todo list; the teaser's row stays short of `final` whi
 ### Step 6: Update the output table and report
 
 1. Flip the figure's Status honestly (`planned → sketch → draft → final`), fill its Source column, touch the outline's `updated:` — the Figures row is this skill's output-table state (§8). Then, in `tasks/<cycle>_promises.md`, for each open box naming this figure, ask once "does this revision keep <point id>?" with no recommended answer — a mandatory confirmation point, asked at every involve level (conventions §7.7, §7.9); on a yes, tick that box `- [ ]` → `- [x]` and append this run's `model_trail:` entry, in this run's commit.
-2. Digest in chat: rows changed, files written, `src:` anchors used, checklist or audit verdicts, and routing — unregistered artwork or missing evidence → `stage-evid-curator`; placement → `stage-sect-drafter`; caption claims → `stage-clms-auditor`.
+2. Digest in chat: rows changed, files written, `src:` anchors used, checklist or audit verdicts, and routing — unregistered artwork or missing evidence → `stage-evid-curator`; placement → `stage-sect-drafter`, or for the teaser `stage-outl-planner` (conventions §8.5); caption claims → `stage-clms-auditor`.
 3. Commit once for the run, subject naming this skill (§1).
 
 ## Output

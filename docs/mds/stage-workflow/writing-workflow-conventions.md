@@ -41,7 +41,7 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 | Skill | Commits | Stages |
 | --- | --- | --- |
 | `stage-stry-coach` | offered once when the run ends | `notes/story.md`, the seeded `notes/claims.md`, the cycle's `venue.yml` when this run wrote it |
-| `stage-outl-planner` | offered once when the run ends | `notes/outline.md`, `notes/notation.md`, new `manus/secs/` skeletons, the `\input`, `\title`, and placeholder edits in `manus/main.tex`, and after a renumbering the `git mv` renames with the `Stated in` slugs they changed in `notes/claims.md` |
+| `stage-outl-planner` | offered once when the run ends | `notes/outline.md`, `notes/notation.md`, new `manus/secs/` skeletons, the `\input`, `\title`, teaser-slot, and placeholder edits in `manus/main.tex`, and after a renumbering or re-key the `git mv` renames — each section with the figures, figure sources, and tables it owns (§10.6) — with the include lines, the `notes/claims.md` `Stated in` tokens, and the open `tasks/` boxes they changed |
 | `stage-sect-drafter` | offered once per drafted section | that section's `.tex`, plus its ledger, notation, and outline updates, and the `tasks/<cycle>_promises.md` boxes it ticked |
 | `stage-tabs-builder` | offered once when the run ends | the tables written, plus their outline and ledger updates, and the `tasks/<cycle>_promises.md` boxes it ticked |
 | `stage-figs-designer` | offered once when the run ends | `manus/figs/` renders, `manus/figs/srcs/` sources, outline updates, and the `tasks/<cycle>_promises.md` boxes it ticked |
@@ -119,7 +119,7 @@ Five of them are read by the scripts under `execs/`. The other five no script re
 1. **`.env` at the repository root is where these values live.** For the five the scripts read, the precedence is **environment, then `.env`, then the documented default**; the other five are read from `.env` alone (§7.6, §7.7, §11.6), so a shell variable of the same name changes nothing. Each of those scripts reads the keys it needs out of the file rather than sourcing it, so `STAR_HOME=… bash execs/scpts/import.sh` and `LATEX_ENGINE=xelatex bash execs/run.sh` mean what they say instead of being silently overridden by the file — the same order in `run.sh`, `update.sh`, `import.sh`, and `lint.sh`. A one-off override is a command-line variable or `--harnesses`; a lasting one is an edit to `.env`. Never guess a local path, never hardcode one, never read them from memory of another project. `.env` itself is git-ignored and machine-specific.
 2. **Every variable has a working default**, so a missing `.env` never blocks a build: `LATEX_ENGINE` falls back to pdflatex, `ANON` to false, `STAGE_LANG` to the conversation's own language, and an empty tier key to the model the run already has (§11.6). Empty `STAR_HOME` is a supported state — writing without a paired repository — in which `import.sh` requires `--source` and evidence arrives as manual drops. A skill that needs `STAR_HOME` and finds none asks (§7); it never invents a path.
 3. **Every build goes through `execs/run.sh`**, which runs latexmk **out-of-tree**: `latexmk <flag> -interaction=nonstopmode -halt-on-error -cd -outdir=<repo root>/wkdrs/builds manus/main.tex`, where `LATEX_ENGINE` picks the flag (`-pdf`, `-xelatex`, or `-lualatex`) and `-cd` makes the entry point's relative `\input` and `stys/` paths resolve. Never run latexmk bare into the source tree: `manus/` stays free of `.aux`/`.log` litter, and every build product is disposable together with `wkdrs/`. On success `run.sh` prints the PDF path and page count; `lint.sh` builds on it for the deterministic checks. On failure `run.sh` leaves `wkdrs/builds/main.failed`, which `lint.sh --no-build` reports as a hard failure.
-4. **`ANON=true` means the repository is in submission-anonymity mode.** `lint.sh` also hunts identity leaks in typeset text, comments stripped — `\author` contents, the title panel's `\affiliation`, `\correspondence`/`\email` and link-row macros, an e-mail address, an acknowledgments heading, `\thanks`, and a `\documentclass` without `anon` — and a leak is a hard failure; a `github.com/<user>` link is a warning, because only a human can tell whose account it names. The venue profile's `anonymized:` records what the venue demands; `ANON` is the operational switch and the user flips it. A skill that finds the two disagreeing says so and asks (§7) rather than silently editing either; at camera-ready time `ANON=false` beside `anonymized: true` is the expected state, not a disagreement.
+4. **`ANON=true` means the repository is in submission-anonymity mode.** `lint.sh` also hunts identity leaks in typeset text, comments stripped — `\author` contents, the title panel's `\affiliation`, `\correspondence`/`\email` and link-row macros, an e-mail address, an acknowledgments heading, `\thanks`, and a `\documentclass` without `anon` — and a leak is a hard failure; a `github.com/<user>` link is a warning, because only a human can tell whose account it names. The venue profile's `anonymized:` records what the venue demands; `ANON` is the operational switch and the user flips it. It reads `true` or `false`: any other value — a typo, or a comment on the same `.env` line, which is part of the value — fails `lint.sh` hard instead of skipping the scan. A skill that finds the two disagreeing says so and asks (§7) rather than silently editing either; at camera-ready time `ANON=false` beside `anonymized: true` is the expected state, not a disagreement.
 5. **No skill installs anything.** A tool that is absent — latexmk, pdfinfo, texcount, a bib parser — is a **degraded check**: run what can run, name the gap in the report, and give the user the install command (§2 bars running it).
 6. **The shell is stateless.** `run.sh` locates the repository root from its own path and works from anywhere; skills resolve paths absolutely and never depend on a prior `cd`.
 7. **The manuscript reads one sentence per line.** LaTeX collapses a newline to a space, so where a sentence breaks costs the PDF nothing and buys a per-sentence diff, a per-sentence blame, and — the reason this workflow cares — a fixed two-line shape for a `% src:` comment and the sentence it heads (§9a). A skill writing under `manus/` starts each sentence on its own line and never wraps at a column. `bash execs/scpts/fmt.sh` makes an existing file match and `--check` reports drift; `lint.sh` carries that as a **warning, never a hard failure** — where a line breaks cannot move a page, a reference, or a todo count, so it must not block a submission. The rule itself lives in `.latexindent.yaml` at the repository root, which the script and the editor both read, and two trees are exempt because their bytes are somebody else's: `manus/stys/` and any kit under `cycls/*/template/` (§10.4). **A rewrite that would change the typeset text is refused and the file left alone.** The tool's sentence detector is not perfect — a lowercase abbreviation before a capital (`std.`, `et al.`) can be read as a sentence end — so every rewrite is compared against the original with each whitespace run collapsed to one space, which is exactly what TeX does; a file that fails that comparison is reported, never written. The fix is in the prose (`et al.~`, `Fig.~\ref{...}`; an escaped space `et al.\ ` is split all the same), never a loosened rule. What the prose says, as opposed to where its lines break, is §7's human-writing contract.
@@ -134,11 +134,11 @@ Five of them are read by the scripts under `execs/`. The other five no script re
 ## 5. Manuscript, section, and cycle resolution
 
 1. **One manuscript per repository.** `manus/main.tex` is the entry point; there is never a "which paper" question. A second paper is a second instance of the template, not a second tree here.
-2. **A section argument resolves against `notes/outline.md`'s Sections table**: by number (`3` or `03` matches the `#` column and the `<nn>_` filename prefix; an appendix section is `10`, `11`, …), by file slug (`method`, `03_method`, or a `manus/secs/…` path), or by title match (case-insensitive substring of the Title column). Before the outline exists, only an explicit filename resolves.
+2. **A section argument resolves against `notes/outline.md`'s Sections table**: by number (`3` or `03` matches the `#` column and the `<nn>_` filename key; an appendix section is `10`, `11`, …), by file slug (`method`, `03_method`, or a `manus/secs/…` path), or by title match (case-insensitive substring of the Title column). Before the outline exists, only an explicit filename resolves.
 3. **Absent or ambiguous → list the nearest candidates** (number + file + status, one line each) and ask one direct question (§7.2). Never guess which section was meant. `involve=low` does not downgrade this: ambiguity about what the user meant is asked at every level (§7.7).
 4. **The active cycle is `cycle:` in `notes/story.md` frontmatter**, naming `cycls/<cycle>/`. An explicit cycle argument overrides it for that run. Neither present → ask, or route to `/stage-stry-coach`, which creates cycles; no skill invents a cycle directory as a side effect.
-5. **Never renumber sections, figures, or tables in passing.** The `<nn>_` prefix (§10.6) is load-bearing: outline rows, the ledger's `Stated in` column, and the `\input` order in `main.tex` are built on a section's; outline rows, the ledger's `tabs/<nn>_<slug>` entries, and the host section's `\input{tabs/…}` or `\includegraphics{figs/…}` line on a figure's or table's. Renumbering is a deliberate `stage-outl-planner` operation that updates files, outline, `main.tex`, those host-section lines, and ledger together — never a drafting side effect.
-6. **Files and outline must agree.** A `manus/secs/` file with no outline row, or a row whose file is missing, is drift to report (`stage-flow-status` names it), not something to repair silently mid-task.
+5. **Never renumber or re-key in passing.** A section's `<nn>_` key (§10.6) is load-bearing: outline rows, the ledger's `Stated in` column, and the `\input` order in `main.tex` are built on it, and so is the key of every figure, figure source, and table the section includes — those carry no number of their own, and the outline's `File` cells, the ledger's `tabs/<nn>_<slug>` entries, and the including file's `\input{tabs/…}` or `\includegraphics{figs/…}` line name them by it. Renumbering, splitting, or merging a section, and moving a figure or table to another section, is a deliberate `stage-outl-planner` operation that `git mv`s the section with every asset it owns and updates `main.tex`, those include lines, the outline, the ledger, and the open `tasks/` boxes together — never a drafting side effect. An asset is never renumbered within its section.
+6. **Files and outline must agree.** A `manus/secs/` file with no outline row, a row whose file is missing, or a figure or table whose key is not its row's `Section` key (§10.6) is drift to report (`stage-flow-status` names it), not something to repair silently mid-task.
 
 ## 6. Delegation
 
@@ -206,7 +206,7 @@ Every skill's durable output, in one table. `stage-flow-status` reads this as th
 | Evidence | `execs/scpts/import.sh` + `stage-evid-curator` | `mates/<slug>/**`, `mates/manual/**`, ledger `mates/MANIFEST.md` | per entry: `source-type:`, `source-stamp:`, `imported:` |
 | Story | `stage-stry-coach` | `notes/story.md` | `finalized:`, `venue:`, `cycle:` |
 | Venue profile | `stage-stry-coach` | `cycls/<cycle>/venue.yml` | `confirmed:` |
-| Claim ledger | `stage-stry-coach` creates; `stage-sect-drafter`, `stage-tabs-builder`, `stage-clms-auditor`, `stage-resp-writer` update; `stage-outl-planner` rewrites a renamed `Stated in` slug | `notes/claims.md` | per-claim `Status` column |
+| Claim ledger | `stage-stry-coach` creates; `stage-sect-drafter`, `stage-tabs-builder`, `stage-clms-auditor`, `stage-resp-writer` update; `stage-outl-planner` rewrites a renamed `Stated in` section or table token | `notes/claims.md` | per-claim `Status` column |
 | Outline | `stage-outl-planner` creates; drafter / figs / tabs skills and `stage-copy-editor` update their rows | `notes/outline.md` + `manus/secs/*.tex` skeletons | `finalized:`; per-row `Status` |
 | Notation | `stage-outl-planner` creates; `stage-sect-drafter` appends; `stage-copy-editor` enforces | `notes/notation.md` | `updated:` |
 | Style profile | `stage-copy-editor` creates and revises; `stage-sect-drafter` reads | `notes/style.md` | `updated:`, `source:` |
@@ -256,7 +256,7 @@ model_trail:                    # append-only: one entry per run that writes it,
 
 | ID | Claim | Type | Stated in | Evidence | Status |
 |----|-------|------|-----------|----------|--------|
-| C1 | <one sentence> | contribution \| performance \| factual | `01_intro`, `abstract`, `tabs/00_main_results` | `mates/<slug>/...#<anchor>`; `—` if none | proposed \| drafted \| verified \| unsourced \| weakened \| dropped |
+| C1 | <one sentence> | contribution \| performance \| factual | `01_intro`, `00_abstract`, `tabs/04_main-results` | `mates/<slug>/...#<anchor>`; `—` if none | proposed \| drafted \| verified \| unsourced \| weakened \| dropped |
 ```
 
 Lifecycle: `proposed` (story) → `drafted` (stated in text) → `verified` (clms-auditor matched evidence) / `unsourced` (stated, no fingerprint — must carry `\todo`) / `weakened` (conceded in response) / `dropped`. Repairs are owned like the states are: `stage-clms-auditor` flips `unsourced → verified` when a later audit finds the `\todo` gone and every number tracing to fresh, matching evidence; `stage-sect-drafter` and `stage-tabs-builder` flip `unsourced → drafted` when a revision replaces the `\todo` with a value that traces, and `weakened → drafted` when a revision restates a conceded claim per its kept promise in `tasks/<cycle>_promises.md` — after which verification is the ordinary path. `dropped` is terminal; a claim worth reviving re-enters through `stage-stry-coach` as a new row.
@@ -313,6 +313,15 @@ Frontmatter: `finalized:`, `updated:`. Three tables:
 `## Figures`: `| ID | File | Purpose | Section | Source | Status |`
 (status: planned | sketch | draft | final);
 `## Tables`: `| ID | File | Purpose | Section | Evidence | Status |` (same status scale as figures).
+A Figures or Tables row's `File` carries the key of its `Section` (§10.6); its `ID` is the float's
+stable identity and survives a re-key. A `00` asset, one `main.tex` places directly, has `main.tex`
+as its `Section`, and `stage-sect-drafter` never places it: that skill writes under `manus/` only in
+`secs/`, and `secs/00_abstract.tex` sits inside `\abstract{…}`, where no float goes. The teaser is
+the one such asset `main.tex` ships a place for — the commented teaser slot right after
+`\maketitle`, holding `figs/00_teaser.pdf` under `\label{fig:teaser}` and a `\todo` caption — and
+`stage-outl-planner`, which owns the wiring of `main.tex`, uncomments it (or adds it where `main.tex`
+has none) once the teaser's row (`F1`, Section `main.tex`) is planned and its PDF exists. The
+author writes that caption and places any other `00` asset.
 
 ### 8.6 `notes/notation.md`
 
@@ -391,12 +400,12 @@ A paper is a chain of checkable statements, and a writing agent's cheapest failu
 - **The todo discipline, concretely:**
 
   ```tex
-  % In manus/tabs/00_main_results.tex — every data row names its source;
+  % In manus/tabs/04_main-results.tex — every data row names its source;
   % a missing cell is a \todo, and the comment says what unblocks it:
   OVSeg  & 24.8 & 53.3 \\  % src: mates/xseg/wkdrs/results/results.md#tab-main
   Ours   & \todo{A-847 — import STAR results first} & 54.6 \\  % src: mates/xseg/wkdrs/results/results.md#tab-main
 
-  % In manus/secs/04_expts.tex — prose numbers trace through the ledger,
+  % In manus/secs/04_experiments.tex — prose numbers trace through the ledger,
   % so a not-yet-imported delta is a \todo, never a recalled value:
   improves mIoU by \todo{delta vs. OVSeg — awaiting results import} on ADE20K.
   ```
@@ -442,9 +451,9 @@ Where a skill puts what it writes. Each destination is exclusive — a file belo
 | What | Where |
 |---|---|
 | Manuscript entry | `manus/main.tex` |
-| Section sources | `manus/secs/<nn>_<slug>.tex` (e.g. `00_abstract.tex`, `01_intro.tex`, `10_appx_details.tex`) |
-| Figures | `manus/figs/<nn>_<slug>.pdf` rendered; `manus/figs/srcs/<nn>_<slug>.*` sources — every figure has a source file or a MANIFEST entry |
-| Tables | `manus/tabs/<nn>_<slug>.tex` |
+| Section sources | `manus/secs/<nn>_<slug>.tex` (e.g. `00_abstract.tex`, `01_intro.tex`, `10_appx-details.tex`) |
+| Figures | `manus/figs/<nn>_<slug>.pdf` rendered; `manus/figs/srcs/<nn>_<slug>.*` sources — `<nn>` the key of the file that includes the figure (§10.6); every figure has a source file or a MANIFEST entry |
+| Tables | `manus/tabs/<nn>_<slug>.tex`, `<nn>` the key of the file that includes the table (§10.6) |
 | Bibliography | `manus/bibs/reference.bib` |
 | Venue styles | `manus/stys/`: `stage.cls`, `stage.sty`, and `stage.bst`, and nothing else — `manus/` is scanned by `lint.sh` and holds only files this workflow owns |
 | Imported evidence (read-only) | `mates/<source-slug>/**` mirroring upstream paths; hand-registered drops in `mates/manual/**`; ledger `mates/MANIFEST.md` |
@@ -490,17 +499,36 @@ Rules the table alone does not carry:
    request router lives once at `.agents/commands/stage.md`, and the
    `/stage-auto` goal-run procedure (§11.5) beside it at `.agents/commands/stage-auto.md`; Claude, Cursor, Pi, and Qwen keep only thin
    native entry points that pass their argument syntax to those shared files and select their own skill tree.
-6. **Sections, figures, and tables carry a two-digit order prefix, `<nn>_<slug>`.** The first digit
-   is the part — `0` the main body, `1` the appendix — and the second the order within that part:
-   `secs/00_abstract.tex`, `secs/01_intro.tex`, `secs/10_appx_details.tex`; `figs/00_teaser.pdf`,
-   `figs/01_framework.pdf`; `tabs/00_main_results.tex`, `tabs/10_extra_ablation.tex`. A figure or
-   table takes the part of the section that places it and the order of its first appearance within
-   that part, so each directory lists in paper order; a file added after its neighbours takes the
-   next free prefix in its part, and restoring paper order is a renumber (§5.5), never a side effect
-   of the addition. A figure's rendered PDF and its sources under
-   `figs/srcs/` share one basename (`figs/00_teaser.pdf`, `figs/srcs/00_teaser.pptx`). The prefix is
-   the file's, never the label's: `\label` keys drop it (`sec:intro`, `fig:teaser`,
-   `tab:main_results`), so a renumber (§5.5) never touches a `\ref`.
+6. **Every file under `secs/`, `figs/`, `figs/srcs/`, and `tabs/` is named `<nn>_<slug>.<ext>`.**
+   The two-digit key `<nn>` and the slug are joined by the name's one `_`. The slug is lowercase
+   kebab-case, `[a-z][a-z0-9]*(-[a-z0-9]+)*`: it starts with a letter and joins words with `-`,
+   never `_`. Every extension is lowercase; `figs/srcs/` also takes compound suffixes
+   (`.sources.md`, `.render.yml`) and a `<nn>_<slug>` or `<nn>_<slug>.assets` directory for a
+   multi-file source. A number inside a slug is zero-padded to the width of the largest in its
+   series (`03_ablation-02` … `03_ablation-10`), and two names never differ only in a number's
+   leading zeros (`03_seed1` beside `03_seed01`). A language twin would end its slug in `-zh`, but
+   none exists here: everything under `manus/` is English (§7.6). With this grammar a directory lists
+   in the same order in git and the terminal as in VS Code, Overleaf, and Finder, which sort
+   numerically; mixed key widths, an unpadded number inside a slug, an `_` inside a slug, and a
+   digit-led slug each break that. **A section's key is its place in the paper**: the first digit
+   the part — `0` the main body, `1` the appendix — and the second the order within that part, so
+   a part holds at most ten sections: `secs/00_abstract.tex`,
+   `secs/01_intro.tex`, `secs/03_method.tex`, `secs/04_experiments.tex`,
+   `secs/10_appx-details.tex`. **A figure, its sources, and a table carry no number of their
+   own**: each takes the key of the one manuscript file that includes it — its owner — and `00` is
+   reserved for an asset `main.tex` includes directly, whose outline `Section` reads `main.tex`
+   (§8.5). So `main.tex` places `figs/00_teaser.pdf` in its teaser slot, and its source
+   `figs/srcs/00_teaser.pptx` shares that basename;
+   `secs/03_method.tex` places `figs/03_framework.pdf`; `secs/04_experiments.tex` places
+   `tabs/04_main-results.tex`; and `secs/10_appx-details.tex` places `tabs/10_extra-ablation.tex`.
+   LaTeX numbers the floats and the outline's `F<n>`/`T<n>` ID is each one's stable identity, so an
+   asset is never renumbered within its section: its key changes only with its owner's, or when it
+   moves to another section, and both are `stage-outl-planner` operations (§5.5). The key is the
+   file's, never the label's: `\label` keys are the slug alone (`sec:intro`, `fig:teaser`,
+   `tab:main-results`), which is why a slug is unique within its directory, and why a renumber
+   never touches a `\ref` while a slug rename does. `lint.sh` warns on a name off this grammar, a
+   directory whose two orders differ or whose names differ only in leading zeros, an asset key no
+   section carries, and an include whose key is not its includer's.
 
 ## 11. The skill roster
 

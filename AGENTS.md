@@ -27,7 +27,7 @@ Project constraints for completing the user's task with proportionate care. This
 **Touch only what you must. Say it once, plainly.**
 
 - Don't "improve" adjacent prose, captions, or formatting; don't rewrite what isn't broken. Match the manuscript's voice, even if you'd write it differently.
-- Never renumber sections, figures, or tables in passing: the two-digit `<nn>_` prefix binds outline rows, the ledger's `Stated in` column, and the `\input` order in `main.tex` together (conventions §5.5, §10.6).
+- Never renumber or re-key in passing: a section's two-digit `<nn>_` key binds outline rows, the ledger's `Stated in` column, the `\input` order in `main.tex`, and the key of every figure and table the section includes together (conventions §5.5, §10.6).
 - Minimum prose that makes the point: no filler, no padding toward a page budget, no second sentence restating the first.
 - The output table moves with the text it tracks — the claim row, the outline row, the notation entry — in the same change, not as cleanup after it.
 
@@ -76,7 +76,7 @@ The test: every changed line traces to the user's request, and every number in i
 
 **Keep files in their designated directories.** Full table and rules: conventions §10.
 
-- Manuscript under `manus/`: entry `main.tex`; sections `secs/<nn>_<slug>.tex`; figures `figs/<nn>_<slug>.pdf` with sources in `figs/srcs/` under the same basename; tables `tabs/<nn>_<slug>.tex` — the first digit `0` main body, `1` appendix, the second the order within that part (conventions §10.6); bibliography `bibs/reference.bib`; template layers `stys/`.
+- Manuscript under `manus/`: entry `main.tex`; sections `secs/<nn>_<slug>.tex` — the first digit `0` main body, `1` appendix, the second the order within that part; figures `figs/<nn>_<slug>.pdf` with sources in `figs/srcs/` under the same basename and tables `tabs/<nn>_<slug>.tex`, each taking the `<nn>` of the one file that includes it (`00` from `main.tex`), never a number of its own; every slug lowercase kebab-case (conventions §10.6); bibliography `bibs/reference.bib`; template layers `stys/`.
 - The manuscript always compiles as the preprint, and a venue's format is a generated copy: the official kit unpacks whole into `cycls/<cycle>/template/`, never under `manus/`, which `lint.sh` scans (conventions §10.4).
 - Evidence under `mates/` — read-only. `execs/scpts/import.sh` and `stage-evid-curator` are its only writers, and they only add or replace whole files with fingerprints.
 - Writing metadata under `notes/`: `story.md`, `claims.md`, `outline.md`, `notation.md`, `style.md`, `adopt.md`, and reading notes in `notes/refs/`.
