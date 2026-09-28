@@ -896,7 +896,7 @@ CONV_HEADINGS=(
     '13. Harness hooks and model provenance'
 )
 # section|numbered top-level items
-CONV_ITEMS=("1|6" "3|7" "4|4" "5|6" "6|10" "7|13" "10|5" "11|6")
+CONV_ITEMS=("1|6" "3|7" "4|4" "5|6" "6|10" "7|13" "10|6" "11|6")
 CONV_SUBHEADS=("8|12")    # ### 8.n subheadings
 CONV_LETTERS=("9|5")      # **(a) ... **(e) rules
 
@@ -1749,9 +1749,9 @@ CODEX_FIG_EN=".agents/skills/stage-figs-designer/SKILL.md"
 CODEX_FIG_UI=".codex/skills/stage-figs-designer/agents/openai.yaml"
 CODEX_FIG_MARKERS=(
     'image_gen'
-    'manus/figs/srcs/<slug>.pptx'
-    'manus/figs/srcs/<slug>.sources.md'
-    'manus/figs/srcs/<slug>.render.yml'
+    'manus/figs/srcs/<nn>_<slug>.pptx'
+    'manus/figs/srcs/<nn>_<slug>.sources.md'
+    'manus/figs/srcs/<nn>_<slug>.render.yml'
     'role: illustrative-only'
     '@oai/artifact-tool'
     'soffice'
@@ -1786,7 +1786,7 @@ grep -qF 'allow_implicit_invocation: true' "${CODEX_FIG_UI}" 2>/dev/null || {
 }
 for root in .claude/skills .cursor/skills .dsh/skills .kimi-code/skills .pi/skills .qwen/skills; do
     path="${root}/stage-figs-designer/SKILL.md"
-    for marker in 'image_gen' 'manus/figs/srcs/<slug>.pptx'; do
+    for marker in 'image_gen' 'manus/figs/srcs/<nn>_<slug>.pptx'; do
         if grep -qF -- "${marker}" "${path}" 2>/dev/null; then
             fail "${path}: contains neutral-root-only figure marker '${marker}'"
             codex_fig_errors=1

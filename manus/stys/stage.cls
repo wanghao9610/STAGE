@@ -617,9 +617,8 @@
   \fi
 }
 
-%% Appendix divider. Appendix sections keep STAGE's secs/<n>_<slug>.tex naming
-%% and numbering, continuing after the last main-body section; \appendix then
-%% relabels them A, B, C.
+%% Appendix divider. Appendix sections keep STAGE's secs/<nn>_<slug>.tex naming
+%% with the appendix digit (10_, 11_, …); \appendix then relabels them A, B, C.
 \newcommand{\beginappendix}{%
   \appendix
   \section*{Appendix}

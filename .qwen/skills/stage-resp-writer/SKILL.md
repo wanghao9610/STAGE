@@ -156,7 +156,7 @@ into a promise or takes the number out. When `anonymized: true` or `.env` sets `
 - `tasks/<cycle>_promises.md` — one `- [ ]` per promise, led by its point ID, and, for each
   conceded claim the manuscript still states, one per section its `Stated in` names —
   `- [ ] <point>: restate C<n> at conceded strength — stage-sect-drafter <section>` — and one per
-  `tabs/<slug>` entry, routed to `stage-tabs-builder <slug>`. Merge on re-runs: never uncheck or
+  `tabs/<nn>_<slug>` entry, routed to `stage-tabs-builder <nn>_<slug>`. Merge on re-runs: never uncheck or
   reword an existing box, and append a box only for a point, or a conceded claim's `Stated in`
   entry, that has none. An open box whose point this draft answers without that promise is
   listed and asked about (§7.7, a deletion); on a yes it moves under `## Withdrawn` as
@@ -196,7 +196,7 @@ sources: [reviews/received_R1.md, reviews/received_R2.md]
 ```markdown
 # Promises — <cycle>
 - [ ] R2.W2: add ablation on X — run upstream, then stage-evid-curator + stage-tabs-builder
-- [ ] R1.W3: restate C4 at conceded strength — stage-sect-drafter 4_expts
+- [ ] R1.W3: restate C4 at conceded strength — stage-sect-drafter 04_expts
 - [ ] R1.W3: restate C4 at conceded strength — stage-tabs-builder main_results
 ## Withdrawn
 - R2.W4: add runtime table — withdrawn YYYY-MM-DD: cut from the sent rebuttal

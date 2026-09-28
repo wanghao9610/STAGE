@@ -209,8 +209,8 @@ to get it: switch the session's model — then continue here.
    when a later revision changes its number — for each `manus/secs/` or `manus/tabs/` file a
    `verified` row's `Stated in` names
    (a section value resolved against the outline's Sections table as conventions §5.2 resolves a
-   section argument — `1_intro`, `intro`, and `abstract` alike — and `tabs/<slug>` →
-   `manus/tabs/<slug>.tex`), `git log -1 --format=%cs -- <file>` is earlier than the date of the
+   section argument — `01_intro`, `intro`, and `abstract` alike — and `tabs/<nn>_<slug>` →
+   `manus/tabs/<nn>_<slug>.tex`), `git log -1 --format=%cs -- <file>` is earlier than the date of the
    newest `wkdrs/reports/CLAIMS_<date>.md` whose `scope:` took that file in (resolved as
    `stage-clms-auditor` step 2 resolves a scope; a whole-manuscript report covers every file; a
    file committed the same day as that report cannot be ordered against it and is listed too),

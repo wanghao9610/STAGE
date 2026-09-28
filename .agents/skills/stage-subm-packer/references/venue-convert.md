@@ -150,7 +150,7 @@ Load order in the generated `main.tex`: the venue class, then `stys/stage`, then
 Built from the venue's own macros (step 2) filled with values read out of
 `manus/main.tex`. Follow `\input` chains reachable from that preamble: values are
 not always written literally in `main.tex` — `stage-outl-planner` moves the
-abstract into `manus/secs/0_abstract.tex` and leaves an `\input` behind.
+abstract into `manus/secs/00_abstract.tex` and leaves an `\input` behind.
 
 Carried over:
 
@@ -161,7 +161,7 @@ Carried over:
   preamble — `\method` and its kind. These are the paper's, not the framework's,
   so they are not in `stage.sty` or `compat.sty`, and the body depends on them.
 - **The `\input{secs/...}` order**, exactly as `manus/main.tex` fixes it — the
-  `<n>_` prefix is load-bearing (conventions §5.5).
+  `<nn>_` prefix is load-bearing (conventions §5.5).
 - **`\bibliographystyle{...}`** set to the kit's style; `\bibliography{bibs/reference}`.
 - **The appendix**, if `manus/main.tex` has one, as the venue's own appendix
   mechanism. Venues differ on whether the appendix precedes or follows the
@@ -191,12 +191,12 @@ The one relocation that is easy to miss and always breaks the build when missed.
 
 `stage.cls` takes the abstract as a **preamble command**, `\abstract{...}`, so
 `manus/main.tex` calls it before `\begin{document}` and `stage-outl-planner`'s
-`\input{secs/0_abstract}` sits in the preamble too. Nearly every venue class wants
+`\input{secs/00_abstract}` sits in the preamble too. Nearly every venue class wants
 a **body environment**, `\begin{abstract}...\end{abstract}` after `\maketitle`.
 
 So: extract the abstract text — from `\abstract{...}` in `manus/main.tex`, or from
 whatever file the preamble `\input`s — and re-emit it through the venue's own
-mechanism in the body. Do **not** `\input{secs/0_abstract}` into the generated
+mechanism in the body. Do **not** `\input{secs/00_abstract}` into the generated
 preamble: the venue class either does not define `\abstract` at all (compile error)
 or defines an incompatible one (silently wrong output). The rest of `secs/` is
 `\input` normally inside the body, unchanged.

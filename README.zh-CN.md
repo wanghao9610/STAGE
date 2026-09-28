@@ -70,9 +70,9 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 STAGE/
 ├── manus/                  # 稿件
 │   ├── main.tex            # 入口文件；开箱即可独立编译
-│   ├── secs/               # 章节源文件：<n>_<slug>.tex（0_abstract.tex、1_intro.tex …）
-│   ├── figs/               # 渲染好的图（PDF）；figs/srcs/ 存放每张图的源文件
-│   ├── tabs/               # 表格，由证据生成
+│   ├── secs/               # 章节源文件：<nn>_<slug>.tex（00_abstract.tex、01_intro.tex …，附录 10_ 起）
+│   ├── figs/               # 渲染好的图：<nn>_<slug>.pdf；figs/srcs/ 以同名存放源文件
+│   ├── tabs/               # 表格：<nn>_<slug>.tex，由证据生成
 │   ├── bibs/               # reference.bib
 │   └── stys/               # stage.cls（版式）+ stage.bst（参考文献表）+ stage.sty（\todo 与写作宏）
 ├── mates/                  # 导入的证据——只读
@@ -175,7 +175,7 @@ STAGE/
 | `\title{...}` | 过长的标题会自动降一号字，而不是把整个面板往下挤 |
 | `\author[1,\ast]{Name}` | 可重复，按顺序；可选参数对应上标 |
 | `\affiliation[1]{...}`、`\contribution[\ast]{...}` | 可重复 |
-| `\abstract{...}` | 是**命令而非环境**——所以 `secs/0_abstract.tex` 在导言区 `\input`，不在正文里 |
+| `\abstract{...}` | 是**命令而非环境**——所以 `secs/00_abstract.tex` 在导言区 `\input`，不在正文里 |
 | `\keywords{...}` | 排在摘要下方 |
 | `\code{}` `\project{}` `\dataset{}` `\demo{}` `\correspondence{}` `\paperdate{}` | 链接行；`\metadata[label]{value}` 可自定义任意一条 |
 
@@ -243,7 +243,7 @@ STAGE_READ_MODEL=
 
 `STAR_HOME` 决定你走哪条快速开始路径。本地 `.env` 已被 Git 忽略。
 
-`INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code、Codex 与 Qwen Code 里，文件编辑前的权限提示也会被跳过；在 Claude Code 里，shell 命令前的权限提示同样跳过，除非该命令删除、覆盖已跟踪文件、安装、推送，或写入 `mates/`、venue 模板包或 `.env`。`medium`（默认）按文档所写发问，`high` 逐条确认。任何档位都不会收回你已经给出的批准，也不会替你给出你没给的批准：你已经批准过的事——之前的一次回答，或调用时一句明确的请求，比如 `and commit it`——在其范围内不会再问第二次。硬门槛任何档位都要问，之前的批准也替代不了它：红线、删除与覆盖、每一个以"已确认"身份进入 `venue.yml` 的取值、登记证据时它的来源，以及六个 slash-only skill 各自的决定点。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 3_method involve=low`——在 Claude Code 里这个 token 连权限提示一并作数：钩子从会话里最近一条 STAGE 命令读它，一直有效到下一条命令为止；别的宿主的权限提示只认 `.env`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md)。
+`INVOLVE`（可选，`low` | `medium` | `high`）决定 skill 在拿定主意之前问多少。在 `low` 档，裁量题一律取推荐项并记录在案，本次运行写出的东西不问就提交、并在回复里点名每一次提交；在 Claude Code、Codex 与 Qwen Code 里，文件编辑前的权限提示也会被跳过；在 Claude Code 里，shell 命令前的权限提示同样跳过，除非该命令删除、覆盖已跟踪文件、安装、推送，或写入 `mates/`、venue 模板包或 `.env`。`medium`（默认）按文档所写发问，`high` 逐条确认。任何档位都不会收回你已经给出的批准，也不会替你给出你没给的批准：你已经批准过的事——之前的一次回答，或调用时一句明确的请求，比如 `and commit it`——在其范围内不会再问第二次。硬门槛任何档位都要问，之前的批准也替代不了它：红线、删除与覆盖、每一个以"已确认"身份进入 `venue.yml` 的取值、登记证据时它的来源，以及六个 slash-only skill 各自的决定点。只想改一次运行的档位，就在调用 skill 时带上同样的写法：`/stage-sect-drafter 03_method involve=low`——在 Claude Code 里这个 token 连权限提示一并作数：钩子从会话里最近一条 STAGE 命令读它，一直有效到下一条命令为止；别的宿主的权限提示只认 `.env`。完整规则见[规约 §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
 `STAGE_LANG`（可选，`en` | `zh`）决定聊天回复以及工作流所写 Markdown 的语言——`notes/`、`tasks/`、`wkdrs/` 报告。留空则一切跟随对话本身的语言。无论它取什么值，有两样东西始终是英文，因为读它们的是仓库之外的人：`manus/` 下的手稿，以及给评审的回复。任何语言的文档里，结构性字面量同样保持英文——frontmatter 键、记录表状态、ID、路径、bibkey、venue 名与指标名——这正是中文笔记仍然可被机器读取的原因。完整规则见[规约 §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md)。
 
@@ -304,13 +304,13 @@ STAGE 包含十六个相互配合的 skill，把导入的证据和一个故事�
 
 | 工具 | 调用方式 | 示例 |
 | --- | --- | --- |
-| Claude Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
-| Codex | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
-| Cursor | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
-| DSH | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
-| Kimi Code | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
-| Pi | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
-| Qwen Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Claude Code | `/stage-<name>` | `/stage-sect-drafter 01_intro` |
+| Codex | `$stage-<name>` | `$stage-sect-drafter 01_intro` |
+| Cursor | `/stage-<name>` | `/stage-sect-drafter 01_intro` |
+| DSH | `/skill:stage-<name>` | `/skill:stage-sect-drafter 01_intro` |
+| Kimi Code | `/skill:stage-<name>` | `/skill:stage-sect-drafter 01_intro` |
+| Pi | `/stage-<name>` | `/stage-sect-drafter 01_intro` |
+| Qwen Code | `/stage-<name>` | `/stage-sect-drafter 01_intro` |
 
 Claude Code、Cursor、Pi 与 Qwen Code 直接从项目文件提供 `/stage [你想做什么]`。命令把请求交给 `.agents/commands/stage.md`；空请求选择 `stage-flow-status`，匹配到六个只能显式调用的 skill 之一时，则返回准确的 `/stage-<name> <argument>` 命令并等待。
 
@@ -355,9 +355,9 @@ dsh --profile YOUR_PROFILE --dump-config
 | `stage-evid-curator` | 证据接收：运行 `import.sh`、登记 `mates/manual/` 下的手工文件、暴露过期——绝不就地修改证据 | `mates/<slug>/**`、`mates/manual/**`、`mates/MANIFEST.md` 条目 |
 | `stage-stry-coach` † | 对话优先的故事打磨：pitch、问题、核心想法、带论断编号的贡献列表、venue 理由；播种论断记录表和经用户确认的 venue 档案 | `notes/story.md`、播种的 `notes/claims.md`、`cycls/<cycle>/venue.yml` |
 | `stage-outl-planner` † | 故事 → 骨架：页数预算合计不超 venue 上限的章节表、图和表的计划、论断→章节分配、骨架 `.tex` 文件、记号表种子 | `notes/outline.md`、`manus/secs/*.tex` 骨架、`notes/notation.md` |
-| `stage-sect-drafter` | 每次调用起草或修改一个章节，依据章节简报、映射的证据、论断和记号规范；没有指纹的数字一律写成 `\todo{}` | `manus/secs/<n>_<slug>.tex` |
-| `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<slug>.tex` |
-| `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<slug>.pdf` + 源文件 |
+| `stage-sect-drafter` | 每次调用起草或修改一个章节，依据章节简报、映射的证据、论断和记号规范；没有指纹的数字一律写成 `\todo{}` | `manus/secs/<nn>_<slug>.tex` |
+| `stage-tabs-builder` | 只从 `mates/` 证据生成表格——booktabs 风格，每个数据行一条 `% src:` 指纹注释，缺数据的格写 `\todo`。手敲数字正是这个 skill 要杀死的失败模式 | `manus/tabs/<nn>_<slug>.tex` |
+| `stage-figs-designer` | 负责图清单和每张图的端到端：用途、`figs/srcs/` 下的可编辑源文件、渲染的 PDF；首图（teaser）有专属检查单 | `manus/figs/<nn>_<slug>.pdf` + 源文件 |
 | `stage-refs-curator` | 文献库卫生、新读论文的笔记录入、相关工作定位；存在导入的 STAR 参考文献时以其为种子，没有时用 `discover` 按主题检索并提议候选 | `manus/bibs/reference.bib`、`notes/refs/<ABBREV>.md`、`notes/refs/refs_index.md` |
 | `stage-copy-editor` | 打磨一节或整篇手稿：清晰度、流畅度、自然的学术表达、记号一致性与篇幅收紧——段落级改写不改变技术含义、数字、引用、归属或论断强度；`style` 模式改为记录作者的散文档位 | `manus/` 中编辑后的散文、`wkdrs/reports/POLISH_<date>.md`、`tasks/` 条目、`notes/style.md` |
 | `stage-clms-auditor` | 机械化的心脏：提取稿件里的每一个数字，逐一追溯到带指纹的证据条目，逐数判定 matched / mismatched / unsourced，翻转记录表状态，检查证据过期 | `notes/claims.md` 的状态翻转、`wkdrs/reports/CLAIMS_<date>.md`、`tasks/` 条目 |
@@ -417,7 +417,7 @@ dsh --profile YOUR_PROFILE --dump-config
 ```markdown
 | ID | Claim | Type | Stated in | Evidence | Status |
 |----|-------|------|-----------|----------|--------|
-| C3 | +2.1 mask AP over X on LVIS | performance | `4_expts`, `tabs/main` | `mates/proj/wkdrs/results/results.md#lvis` | verified |
+| C3 | +2.1 mask AP over X on LVIS | performance | `04_expts`, `tabs/00_main` | `mates/proj/wkdrs/results/results.md#lvis` | verified |
 ```
 
 生命周期：`proposed`（故事提出）→ `drafted`（写进正文）→ `verified`（审计对上了证据）/ `unsourced`（写了但没有指纹——必须带 `\todo`）/ `weakened`（回复中让步）/ `dropped`（放弃）。故事播种论断，起草陈述论断，审计验证论断，回复捍卫论断：同一批行，一路走到投稿。
@@ -496,7 +496,7 @@ bash execs/update.sh --skill stage-flow-status
 
 ## 项目约定
 
-1. 稿件放在 `manus/`：入口是 `main.tex`，章节是 `secs/<n>_<slug>.tex`，图放 `figs/`（可编辑源在 `figs/srcs/`），表放 `tabs/`，参考文献是 `bibs/reference.bib`，模板层在 `stys/`。
+1. 稿件放在 `manus/`：入口是 `main.tex`，章节是 `secs/<nn>_<slug>.tex`，图放 `figs/`（可编辑源在 `figs/srcs/`），表放 `tabs/`——三者都命名为 `<nn>_<slug>`，第一位 `0` 表示正文、`1` 表示附录，第二位是该部分内的顺序——参考文献是 `bibs/reference.bib`，模板层在 `stys/`。
 2. 证据放在 `mates/`，且只读——`execs/scpts/import.sh` 与 `/stage-evid-curator` 是仅有的两个写入者。数字错了，去它的源头改再重新导入，绝不就地编辑证据文件。
 3. 写作元数据放在 `notes/`：固定文件 `story.md`、`claims.md`、`outline.md`、`notation.md`、`style.md`、`adopt.md`，阅读笔记放 `notes/refs/`。
 4. 投稿周期放在 `cycls/<venue>_<year>/`，venue 官方模板包整包解压进该周期的 `template/`；修订便签、承诺清单与 venue 跟进项放 `tasks/`。

@@ -52,7 +52,7 @@ stage__payload_field() { # $1 = payload JSON, $2 = top-level field name
 #     in an assistant entry, its token read from the call's `args`.
 #
 # The second form exists because a skill often reaches the model wrapped in
-# another command — `/goal /stage-sect-drafter 3_method involve=low` records
+# another command — `/goal /stage-sect-drafter 03_method involve=low` records
 # <command-name>/goal and nothing else — and because the /stage router passes
 # the request, token included, to the skill it picks. Both are the user's token
 # travelling on; a /goal wrapper never shows up as a STAGE <command-name>.

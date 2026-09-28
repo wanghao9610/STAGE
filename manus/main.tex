@@ -80,7 +80,7 @@ under \texttt{mates/} or stays a visible todo marker; the placeholder below
 demonstrates the second state, and the skeleton is expected to fail lint until
 it is gone.
 }
-% \input{secs/0_abstract}
+% \input{secs/00_abstract}
 
 %% ── Paper-wide macros ──────────────────────────────────────────────────────
 %% Project-specific commands belong here, never in stys/ — the class and the
@@ -95,16 +95,16 @@ it is gone.
 \section{Introduction}
 \todo{No content yet: run /stage-stry-coach, then /stage-outl-planner.}
 
-%% Section files — /stage-outl-planner creates manus/secs/<n>_<slug>.tex
+%% Section files — /stage-outl-planner creates manus/secs/<nn>_<slug>.tex
 %% skeletons and uncomments or adds one \input per created file, in the order
-%% notes/outline.md fixes. The <n>_ prefix is load-bearing (conventions §5):
+%% notes/outline.md fixes. The <nn>_ prefix is load-bearing (conventions §5):
 %% outline rows, the ledger's "Stated in" column, and this input order share it.
 %% Example shape:
-% \input{secs/1_intro}
-% \input{secs/2_related}
-% \input{secs/3_method}
-% \input{secs/4_experiments}
-% \input{secs/5_conclusion}
+% \input{secs/01_intro}
+% \input{secs/02_related}
+% \input{secs/03_method}
+% \input{secs/04_experiments}
+% \input{secs/05_conclusion}
 
 %% Bibliography — these lines build with or without manus/bibs/reference.bib
 %% (latexmk skips BibTeX while it is absent); /stage-refs-curator creates it.
@@ -119,11 +119,11 @@ it is gone.
 \bibliography{bibs/reference}
 
 %% Appendix — \beginappendix breaks the page, prints the divider, and relabels
-%% sections A, B, C. Appendix sections keep the same secs/<n>_<slug>.tex naming
-%% and numbering, continuing after the last main-body section. Venues differ on
+%% sections A, B, C. Appendix sections take the appendix digit in the same
+%% secs/<nn>_<slug>.tex naming: 10_, 11_, … (conventions §10.6). Venues differ on
 %% whether the appendix precedes or follows the references: move this block
 %% above the bibliography when the venue's template does.
 % \beginappendix
-% \input{secs/6_appx_details}
+% \input{secs/10_appx_details}
 
 \end{document}

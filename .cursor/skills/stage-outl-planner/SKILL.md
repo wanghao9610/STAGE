@@ -37,29 +37,29 @@ You give the finalized story its load-bearing frame: which sections exist, what 
 
 ### Step 0: Load and gate
 
-1. Read the conventions as Shared conventions says, then `notes/story.md`; `notes/claims.md`; `mates/MANIFEST.md`; `notes/outline.md` and `notes/notation.md` where present; `manus/main.tex`; one Shell call for `date +%F` (conventions §4) plus a listing of `manus/secs/` and `cycls/`. Then read the active cycle's `cycls/<cycle>/venue.yml`.
+1. Read the conventions as Shared conventions says, then `notes/story.md`; `notes/claims.md`; `mates/MANIFEST.md`; `notes/outline.md` and `notes/notation.md` where present; `manus/main.tex`; one Shell call for `date +%F` (conventions §4) plus a listing of `manus/secs/`, `manus/figs/`, `manus/tabs/`, and `cycls/`. Then read the active cycle's `cycls/<cycle>/venue.yml`.
 2. Gate on the story: missing, or `finalized:` empty → the outline would be guesswork; recommend `stage-stry-coach` and stop unless the user explicitly proceeds — then the report names what the outline was built on.
 3. Gate on the limit per Principle 2.
-4. **Drafted prose is never overwritten, outline or no outline.** Before anything is created, list what `manus/secs/` already holds and read every file that is more than a skeleton — an adopted repository arrives with real sections and no `notes/outline.md`, so a guard attached only to the re-run branch below would not fire exactly where it is needed most. Any such file keeps its content: it enters the Sections table at the status its text has earned, under the `<n>_` prefix Step 1 proposes for it — the rename is Step 4's, made only after Step 1 confirms that prefix, so nothing moves here — and a skeleton is created only where no file exists. Overwriting one is a per-file question, never a default.
+4. **Drafted prose is never overwritten, outline or no outline.** Before anything is created, list what `manus/secs/` already holds and read every file that is more than a skeleton — an adopted repository arrives with real sections and no `notes/outline.md`, so a guard attached only to the re-run branch below would not fire exactly where it is needed most. Any such file keeps its content: it enters the Sections table at the status its text has earned, under the `<nn>_` prefix Step 1 proposes for it — the rename is Step 4's, made only after Step 1 confirms that prefix, so nothing moves here — and a skeleton is created only where no file exists. Overwriting one is a per-file question, never a default.
 5. An existing `notes/outline.md` → ask which re-run this is, via AskQuestion: **reconcile** (repair rows against the files that actually exist — recommended once drafting has started), **extend** (add sections, figures, or tables; keep the rest), or **re-outline** (from scratch — confirm file by file before touching any `manus/secs/` file whose outline Status has moved past `skeleton` or whose content has outgrown its brief; drafted prose is never overwritten).
 6. **What a re-run keeps.** `reconcile` and `extend`: every existing row keeps its Status and Claims, only new or repaired rows enter as Steps 1–2 write them, `notes/notation.md` is appended to and never rewritten, and Steps 1–2 show and re-confirm only the rows that changed — that answer is the plan confirmation Step 6 needs. `re-outline`: a row whose Status has moved past `planned` or `skeleton` keeps it unless the user confirms its reset in item 5's file-by-file question. With nothing drafted yet, `extend` is the recommended answer.
 
 ### Step 1: Propose the section plan
 
-Draft the Sections table from the story and the venue's shape: `#` from `0` (`0_abstract`, `1_intro`, …), `File` `<n>_<slug>.tex` (a file Step 0 found shows `<old>.tex → <n>_<slug>.tex` where its prefix changes, so adopting the prefixes adopts the rename), `Title`, `Budget (pages)` in quarter-page steps, `Claims` (the IDs this section states or supports), `Status` `planned`. Give every claim a home: contribution claims land in abstract and intro plus the method or experiment section that delivers them; performance claims land where their table or figure will sit. For example:
+Draft the Sections table from the story and the venue's shape: `#` the two-digit prefix of conventions §10.6 — `00`, `01`, … for the main body (`00_abstract`, `01_intro`, …), `10`, `11`, … for the appendix — `File` `<nn>_<slug>.tex` (a file Step 0 found shows `<old>.tex → <nn>_<slug>.tex` where its prefix changes, so adopting the prefixes adopts the rename), `Title`, `Budget (pages)` in quarter-page steps, `Claims` (the IDs this section states or supports), `Status` `planned`. Give every claim a home: contribution claims land in abstract and intro plus the method or experiment section that delivers them; performance claims land where their table or figure will sit. For example:
 
 ```markdown
 | # | File | Title | Budget (pages) | Claims | Status |
 |---|------|-------|----------------|--------|--------|
-| 1 | 1_intro.tex | Introduction | 1.25 | C1, C2, C3 | planned |
-| 3 | 3_method.tex | Method | 2.25 | C1, C2 | planned |
+| 01 | 01_intro.tex | Introduction | 1.25 | C1, C2, C3 | planned |
+| 03 | 03_method.tex | Method | 2.25 | C1, C2 | planned |
 ```
 
-Show the full table with the budget arithmetic (Principle 2) — e.g. `sum 7.75 / limit 8 (references outside) / slack 0.25` — and the claim-coverage line; rebalance until the sum fits; confirm via AskQuestion — each option a consequence (conventions §7.3), e.g. "adopt: these rows and their <n>_ prefixes go on to the figure/table plan; renumbering once drafting starts takes a re-outline run" / "edit rows: redrafted and re-shown with the arithmetic" / "merge or split sections: budgets recomputed and re-shown".
+Show the full table with the budget arithmetic (Principle 2) — e.g. `sum 7.75 / limit 8 (references outside) / slack 0.25` — and the claim-coverage line; rebalance until the sum fits; confirm via AskQuestion — each option a consequence (conventions §7.3), e.g. "adopt: these rows and their <nn>_ prefixes go on to the figure/table plan; renumbering once drafting starts takes a re-outline run" / "edit rows: redrafted and re-shown with the arithmetic" / "merge or split sections: budgets recomputed and re-shown".
 
 ### Step 2: Propose the figure and table plan
 
-Figures, teaser first: `F1` is the figure that tells the story alone — its row exists before any results figure. Rows per conventions §8 — `ID`, `File` (`manus/figs/<slug>.pdf`), `Purpose` (what it must show, not how), `Section`, `Source` (the planned source under `manus/figs/srcs/`, or the `mates/` path for imported artwork), `Status` `planned`. Tables — `ID`, `File` (`manus/tabs/<slug>.tex`), `Purpose`, `Section`, `Evidence` (the `mates/` path the data will come from, named only from a `mates/MANIFEST.md` entry whose `covers:` fits; `—` when no entry covers it yet, each `—` named for `stage-evid-curator`), `Status` `planned`. Show both tables in the reply, then confirm via AskQuestion (conventions §7.12: rows the user cannot see are rows nobody reviewed).
+Figures, teaser first: `F1` is the figure that tells the story alone — its row exists before any results figure. Rows per conventions §8 — `ID`, `File` (`manus/figs/<nn>_<slug>.pdf`, the prefix per conventions §10.6: the part of its Section, then its order of first appearance there), `Purpose` (what it must show, not how), `Section`, `Source` (the planned source under `manus/figs/srcs/`, or the `mates/` path for imported artwork), `Status` `planned`. Tables — `ID`, `File` (`manus/tabs/<nn>_<slug>.tex`, prefixed the same way), `Purpose`, `Section`, `Evidence` (the `mates/` path the data will come from, named only from a `mates/MANIFEST.md` entry whose `covers:` fits; `—` when no entry covers it yet, each `—` named for `stage-evid-curator`), `Status` `planned`. A figure or table file already on disk enters under the prefix proposed for it, shown as `<old> → <nn>_<slug>` like a section's. Show both tables in the reply, then confirm via AskQuestion (conventions §7.12: rows the user cannot see are rows nobody reviewed).
 
 ### Step 3: Write `notes/outline.md`
 
@@ -69,10 +69,10 @@ Per the conventions §8 schema: frontmatter `finalized:` (empty until Step 6) an
 
 Per Sections row, in order:
 
-1. A row whose file Step 0 found keeps that file, its content, and its earned Status: where Step 1 confirmed a new prefix, `git mv` it to `<n>_<slug>.tex` and rewrite the old `<n>_<slug>` in every ledger `Stated in` cell and every open `- [ ]` box under `tasks/` that names it — that token only, the rest of the box untouched — listing each old → new in the report and the commit message. Otherwise create `manus/secs/<n>_<slug>.tex` and set its Sections row from `planned` to `skeleton`. The leading comment block is the section brief — purpose, claims (state vs support), evidence paths (`mates/MANIFEST.md` entries only), budget, figures and tables landing here; the body is one `\section{<Title>}` line (`0_abstract` wraps its text and `\todo` in `\abstract{...}` instead of a `\section`) and one `\todo{...}` — nothing else (Principle 5):
+1. A row whose file Step 0 found keeps that file, its content, and its earned Status: where Step 1 confirmed a new prefix, `git mv` it to `<nn>_<slug>.tex` and rewrite the old `<nn>_<slug>` in every ledger `Stated in` cell and every open `- [ ]` box under `tasks/` that names it — that token only, the rest of the box untouched — listing each old → new in the report and the commit message. Otherwise create `manus/secs/<nn>_<slug>.tex` and set its Sections row from `planned` to `skeleton`. The leading comment block is the section brief — purpose, claims (state vs support), evidence paths (`mates/MANIFEST.md` entries only), budget, figures and tables landing here; the body is one `\section{<Title>}` line (`00_abstract` wraps its text and `\todo` in `\abstract{...}` instead of a `\section`) and one `\todo{...}` — nothing else (Principle 5):
 
 ```tex
-% ---- Section brief: 3_method (stage-outl-planner, 2026-08-02) ----
+% ---- Section brief: 03_method (stage-outl-planner, 2026-08-02) ----
 % Purpose: present the decoupled two-stage decoder; argue why decoupling wins.
 % Claims: states C2; supports C1.
 % Evidence: mates/<slug>/metds/framework.md#decoder; mates/<slug>/wkdrs/digests/abl_decoder.md
@@ -80,11 +80,12 @@ Per Sections row, in order:
 % Figures/Tables here: F2 (architecture), T2 (ablation).
 % -------------------------------------------------------------------
 \section{Method}
-\todo{draft per the brief — stage-sect-drafter 3}
+\todo{draft per the brief — stage-sect-drafter 03}
 ```
 
-2. Uncomment, or repoint after item 1's rename, the matching `\input{secs/<n>_<slug>}` line in `manus/main.tex`, or add one in outline order where the shipped example lines use another slug — only for files that now exist. The stock abstract moves into `0_abstract` inside `\abstract{...}`, because `main.tex` inputs that file in the preamble. Once the first body `\input` is live, delete the shipped placeholder body under `%% Placeholder body` (`\section{Introduction}` and its scaffold `\todo`): it is scaffolding, not user text. While the shipped `\title{Untitled STAGE Manuscript}` stands, replace it with the working title the user gives, asked once as an open question (conventions §7.3).
-3. After the last row: run `execs/run.sh` and fix what it reports — a missing brace, a wrong slug, a bad input path — until the build is green (Principle 6).
+2. Uncomment, or repoint after item 1's rename, the matching `\input{secs/<nn>_<slug>}` line in `manus/main.tex`, or add one in outline order where the shipped example lines use another slug — only for files that now exist. The stock abstract moves into `00_abstract` inside `\abstract{...}`, because `main.tex` inputs that file in the preamble. Once the first body `\input` is live, delete the shipped placeholder body under `%% Placeholder body` (`\section{Introduction}` and its scaffold `\todo`): it is scaffolding, not user text. While the shipped `\title{Untitled STAGE Manuscript}` stands, replace it with the working title the user gives, asked once as an open question (conventions §7.3).
+3. Per Figures and Tables row whose existing file Step 2 confirmed under a new prefix: `git mv` it — a figure's PDF together with every `manus/figs/srcs/` file sharing its basename — and rewrite the old path token in the host section's `\input{tabs/…}` or `\includegraphics{figs/…}` line, in every ledger `Stated in` cell, and in every open `- [ ]` box under `tasks/` that names it — that token only — listing each old → new in the report and the commit message.
+4. After the last row: run `execs/run.sh` and fix what it reports — a missing brace, a wrong slug, a bad input path — until the build is green (Principle 6).
 
 ### Step 5: Seed `notes/notation.md`
 
@@ -97,7 +98,7 @@ Set outline `finalized:` (real date) only when all of: both plans user-confirmed
 ## Output
 
 - `notes/outline.md` — created here; `stage-sect-drafter`, `stage-figs-designer`, `stage-tabs-builder`, and `stage-copy-editor` update their own rows afterward. Output-table state: `finalized:` plus per-row `Status` — sections `planned | skeleton | drafted | polished`; figures and tables `planned | sketch | draft | final`.
-- `manus/secs/<n>_<slug>.tex` — one skeleton per Sections row with no file yet: brief comment block, `\section` line, one `\todo`; a file Step 0 found keeps its content, renamed by `git mv` where its confirmed prefix changed; each `\input` line uncommented or added in `manus/main.tex`, the shipped placeholder body removed, and the shipped `\title` replaced by the user's working title; the result compiles via `execs/run.sh`.
+- `manus/secs/<nn>_<slug>.tex` — one skeleton per Sections row with no file yet: brief comment block, `\section` line, one `\todo`; a file Step 0 found keeps its content, renamed by `git mv` where its confirmed prefix changed, as is a figure or table file (Step 4.3); each `\input` line uncommented or added in `manus/main.tex`, the shipped placeholder body removed, and the shipped `\title` replaced by the user's working title; the result compiles via `execs/run.sh`.
 - `notes/notation.md` — created here; `stage-sect-drafter` appends, `stage-copy-editor` enforces. Output-table state: `updated:`.
-- In chat: the report. Never written here: section prose, `notes/claims.md` beyond a renamed `Stated in` slug, `tasks/` beyond a renamed slug in an open box, `mates/`, `venue.yml`.
+- In chat: the report. Never written here: section prose or any `manus/secs/` line beyond a renamed figure or table path, `notes/claims.md` beyond a renamed `Stated in` slug, `tasks/` beyond a renamed slug in an open box, `mates/`, `venue.yml`.
 - Provenance (conventions §8): every artifact this run writes under `notes/`, `tasks/`, `cycls/`, or `wkdrs/reports/` carries `model_id:` — this session's model id, verbatim — and one appended `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

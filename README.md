@@ -70,9 +70,9 @@ See [Writing workflow](#writing-workflow) for what each skill does and how to in
 STAGE/
 ├── manus/                  # The manuscript
 │   ├── main.tex            # Entry point; compiles standalone out of the box
-│   ├── secs/               # Section sources: <n>_<slug>.tex (0_abstract.tex, 1_intro.tex, …)
-│   ├── figs/               # Rendered figures (PDF); figs/srcs/ holds every figure's source
-│   ├── tabs/               # Tables, generated from evidence
+│   ├── secs/               # Section sources: <nn>_<slug>.tex (00_abstract.tex, 01_intro.tex, …, 10_ appendix)
+│   ├── figs/               # Rendered figures: <nn>_<slug>.pdf; figs/srcs/ holds each source under the same name
+│   ├── tabs/               # Tables: <nn>_<slug>.tex, generated from evidence
 │   ├── bibs/               # reference.bib
 │   └── stys/               # stage.cls (the look) + stage.bst (the reference list) + stage.sty (\todo and authoring macros)
 ├── mates/                  # Imported evidence — read-only
@@ -175,7 +175,7 @@ Keep that split when you extend the class or the package: anything a section or 
 | `\title{...}` | an over-long title drops one font size automatically rather than pushing the panel down the page |
 | `\author[1,\ast]{Name}` | repeatable, in order; the optional argument keys the superscripts |
 | `\affiliation[1]{...}`, `\contribution[\ast]{...}` | repeatable |
-| `\abstract{...}` | a **command, not an environment** — so `secs/0_abstract.tex` is `\input` in the preamble, not in the body |
+| `\abstract{...}` | a **command, not an environment** — so `secs/00_abstract.tex` is `\input` in the preamble, not in the body |
 | `\keywords{...}` | printed under the abstract |
 | `\code{}` `\project{}` `\dataset{}` `\demo{}` `\correspondence{}` `\paperdate{}` | the links row; `\metadata[label]{value}` adds an arbitrary one |
 
@@ -243,7 +243,7 @@ STAGE_READ_MODEL=
 
 `STAR_HOME` decides which quick-start path you are on. The local `.env` is ignored by Git.
 
-`INVOLVE` (optional, `low` | `medium` | `high`) sets how much the skills ask before they decide. At `low` a skill takes the recommended option on judgment calls and logs that it did, commits what its run wrote without asking and names each commit in its reply, and — in Claude Code, Codex, and Qwen Code — the permission prompt before each file edit is skipped, in Claude Code also the one before a shell command that does not delete, overwrite a tracked file, install, push, or write to `mates/`, a venue kit, or `.env`; `medium` (the default) asks as documented; `high` confirms item by item. No level revokes an approval you already gave or grants one you did not: what you already approved — an earlier answer, or a clear request such as `and commit it` in the invocation — is not asked again within its scope. Hard gates are asked at every level, and no earlier approval stands in for one: the STOP line, deletions and overwrites, every `venue.yml` value entering as confirmed, the provenance of evidence being registered, and the decision points of the six slash-only skills. To change the level for one run, add the same token when you call a skill: `/stage-sect-drafter 3_method involve=low` — in Claude Code that token reaches the permission prompts too, since the hooks read it off the session's most recent STAGE command and it holds until the next one; elsewhere the prompts follow `.env` alone. Full rule: [conventions §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md).
+`INVOLVE` (optional, `low` | `medium` | `high`) sets how much the skills ask before they decide. At `low` a skill takes the recommended option on judgment calls and logs that it did, commits what its run wrote without asking and names each commit in its reply, and — in Claude Code, Codex, and Qwen Code — the permission prompt before each file edit is skipped, in Claude Code also the one before a shell command that does not delete, overwrite a tracked file, install, push, or write to `mates/`, a venue kit, or `.env`; `medium` (the default) asks as documented; `high` confirms item by item. No level revokes an approval you already gave or grants one you did not: what you already approved — an earlier answer, or a clear request such as `and commit it` in the invocation — is not asked again within its scope. Hard gates are asked at every level, and no earlier approval stands in for one: the STOP line, deletions and overwrites, every `venue.yml` value entering as confirmed, the provenance of evidence being registered, and the decision points of the six slash-only skills. To change the level for one run, add the same token when you call a skill: `/stage-sect-drafter 03_method involve=low` — in Claude Code that token reaches the permission prompts too, since the hooks read it off the session's most recent STAGE command and it holds until the next one; elsewhere the prompts follow `.env` alone. Full rule: [conventions §7.7](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
 `STAGE_LANG` (optional, `en` | `zh`) sets the language of chat replies and of the Markdown the workflow writes — `notes/`, `tasks/`, `wkdrs/` reports. Left empty, everything follows the conversation's own language. Two things stay English whatever it says, because people outside the repository read them: the manuscript under `manus/`, and the response to reviewers. So do structural literals in any document — frontmatter keys, ledger statuses, IDs, paths, bibkeys, venue and metric names — which is what keeps a Chinese note machine-readable. Full rule: [conventions §7.6](docs/mds/stage-workflow/writing-workflow-conventions.md).
 
@@ -304,13 +304,13 @@ STAGE includes sixteen complementary skills that turn imported evidence and a st
 
 | Tool | Invocation | Example |
 | --- | --- | --- |
-| Claude Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
-| Codex | `$stage-<name>` | `$stage-sect-drafter 1_intro` |
-| Cursor | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
-| DSH | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
-| Kimi Code | `/skill:stage-<name>` | `/skill:stage-sect-drafter 1_intro` |
-| Pi | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
-| Qwen Code | `/stage-<name>` | `/stage-sect-drafter 1_intro` |
+| Claude Code | `/stage-<name>` | `/stage-sect-drafter 01_intro` |
+| Codex | `$stage-<name>` | `$stage-sect-drafter 01_intro` |
+| Cursor | `/stage-<name>` | `/stage-sect-drafter 01_intro` |
+| DSH | `/skill:stage-<name>` | `/skill:stage-sect-drafter 01_intro` |
+| Kimi Code | `/skill:stage-<name>` | `/skill:stage-sect-drafter 01_intro` |
+| Pi | `/stage-<name>` | `/stage-sect-drafter 01_intro` |
+| Qwen Code | `/stage-<name>` | `/stage-sect-drafter 01_intro` |
 
 Claude Code, Cursor, Pi, and Qwen Code expose `/stage [what you want to do]` directly from project files. The command sends the request through `.agents/commands/stage.md`; an empty request selects `stage-flow-status`, and a match to one of the six slash-only skills returns the exact `/stage-<name> <argument>` command and waits.
 
@@ -355,9 +355,9 @@ Six skills (marked † below) are slash-only: adoption, story, outline, response
 | `stage-evid-curator` | Evidence intake: run `import.sh`, register hand-dropped files under `mates/manual/`, surface staleness — never edit evidence in place | `mates/<slug>/**`, `mates/manual/**`, entries in `mates/MANIFEST.md` |
 | `stage-stry-coach` † | Dialogue-first story shaping: pitch, problem, key idea, contributions with claim IDs, venue rationale; seeds the claim ledger and the user-confirmed venue profile | `notes/story.md`, seeded `notes/claims.md`, `cycls/<cycle>/venue.yml` |
 | `stage-outl-planner` † | Story → skeleton: section table with page budgets that sum within the venue limit, figure and table plans, claim→section assignment, skeleton `.tex` files, notation seed | `notes/outline.md`, `manus/secs/*.tex` skeletons, `notes/notation.md` |
-| `stage-sect-drafter` | Draft or revise one section per invocation from its brief, mapped evidence, claims, and the notation canon; numbers without a fingerprint become `\todo{}` | `manus/secs/<n>_<slug>.tex` |
-| `stage-tabs-builder` | Generate tables from `mates/` evidence only — booktabs style, one `% src:` fingerprint comment per data row, `\todo` cells for missing data. Hand-typed numbers are the failure mode this skill exists to kill | `manus/tabs/<slug>.tex` |
-| `stage-figs-designer` | Own the figure inventory and each figure end to end: purpose, editable source under `figs/srcs/`, rendered PDF; the teaser figure gets its own checklist | `manus/figs/<slug>.pdf` + sources |
+| `stage-sect-drafter` | Draft or revise one section per invocation from its brief, mapped evidence, claims, and the notation canon; numbers without a fingerprint become `\todo{}` | `manus/secs/<nn>_<slug>.tex` |
+| `stage-tabs-builder` | Generate tables from `mates/` evidence only — booktabs style, one `% src:` fingerprint comment per data row, `\todo` cells for missing data. Hand-typed numbers are the failure mode this skill exists to kill | `manus/tabs/<nn>_<slug>.tex` |
+| `stage-figs-designer` | Own the figure inventory and each figure end to end: purpose, editable source under `figs/srcs/`, rendered PDF; the teaser figure gets its own checklist | `manus/figs/<nn>_<slug>.pdf` + sources |
 | `stage-refs-curator` | Bibliography hygiene, reading-note intake for newly read papers, and related-work positioning; seeds from imported STAR refs when present, and `discover` searches by topic and proposes candidates when there are none | `manus/bibs/reference.bib`, `notes/refs/<ABBREV>.md`, `notes/refs/refs_index.md` |
 | `stage-copy-editor` | Polish a section or the whole manuscript: clarity, flow, natural scholarly prose, notation consistency, length trim — paragraph-level rewrites preserve technical meaning, numbers, citations, attribution, and claim strength; `style` mode instead records the author's prose dials | edited prose in `manus/`, `wkdrs/reports/POLISH_<date>.md`, `tasks/` items, `notes/style.md` |
 | `stage-clms-auditor` | The mechanical heart: extract every number from the manuscript, trace each to a fingerprinted evidence entry, verdict matched / mismatched / unsourced, flip ledger statuses, check evidence staleness | `notes/claims.md` status flips, `wkdrs/reports/CLAIMS_<date>.md`, `tasks/` items |
@@ -417,7 +417,7 @@ The `source-stamp` is the upstream half of the fingerprint: the upstream file's 
 ```markdown
 | ID | Claim | Type | Stated in | Evidence | Status |
 |----|-------|------|-----------|----------|--------|
-| C3 | +2.1 mask AP over X on LVIS | performance | `4_expts`, `tabs/main` | `mates/proj/wkdrs/results/results.md#lvis` | verified |
+| C3 | +2.1 mask AP over X on LVIS | performance | `04_expts`, `tabs/00_main` | `mates/proj/wkdrs/results/results.md#lvis` | verified |
 ```
 
 Lifecycle: `proposed` (story) → `drafted` (stated in text) → `verified` (auditor matched evidence) / `unsourced` (stated with no fingerprint — must carry `\todo`) / `weakened` (conceded in a response) / `dropped`. The story seeds claims, the drafter states them, the auditor verifies them, the response defends them: the same rows, all the way to submission.
@@ -496,7 +496,7 @@ Working on STAGE itself rather than on a paper? Edit only the neutral authored s
 
 ## Project conventions
 
-1. The manuscript lives under `manus/`: `main.tex` is the entry point, sections are `secs/<n>_<slug>.tex`, figures go in `figs/` with editable sources in `figs/srcs/`, tables in `tabs/`, the bibliography is `bibs/reference.bib`, and the template layers are in `stys/`.
+1. The manuscript lives under `manus/`: `main.tex` is the entry point, sections are `secs/<nn>_<slug>.tex`, figures go in `figs/` with editable sources in `figs/srcs/`, tables in `tabs/` — all three named `<nn>_<slug>`, the first digit `0` for the main body and `1` for the appendix, the second the order within that part — the bibliography is `bibs/reference.bib`, and the template layers are in `stys/`.
 2. Evidence lives under `mates/` and is read-only — `execs/scpts/import.sh` and `/stage-evid-curator` are its only writers. A wrong number is fixed at its source and re-imported, never edited in place.
 3. Writing metadata lives under `notes/`: the fixed files `story.md`, `claims.md`, `outline.md`, `notation.md`, `style.md`, `adopt.md`, and reading notes in `notes/refs/`.
 4. Submission cycles live under `cycls/<venue>_<year>/`, with the venue's official kit unpacked whole into that cycle's `template/`; revision scratch, promise lists, and venue follow-ups go in `tasks/`.

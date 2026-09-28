@@ -111,7 +111,7 @@ from the same ones instead of each session inventing a voice.
    this pass proves authorship or defeats an AI detector.
 
 9. **Fan out per section file (§6).** A whole-manuscript run polishes files that do not touch each
-   other: one delegate per in-scope `manus/secs/<n>_<slug>.tex`, on the EXEC tier's model
+   other: one delegate per in-scope `manus/secs/<nn>_<slug>.tex`, on the EXEC tier's model
    (conventions §11.6), where the harness can name one, each owning that file alone for
    the length of the fan-out (§6.2) and editing it in place under Principles 1–3, 7, and 8, with
    `notes/style.md` when it exists and the human-writing contract (conventions §7) — no number
@@ -156,7 +156,7 @@ to get it: switch the session's model — then continue here.
    files no report, and its closing line is `stage-copy-editor <section>` — the run that puts the
    dials to work.
 3. **Read whole first and freeze protected content.** Read each in-scope
-   `manus/secs/<n>_<slug>.tex` end to end before editing: note flow breaks, canon violations,
+   `manus/secs/<nn>_<slug>.tex` end to end before editing: note flow breaks, canon violations,
    over-budget signs, repeated openings or endings, and anything that smells like a meaning problem
    (route it; do not fix it). Record the exact numbers, math, citation/reference/label keys, `% src:`
    anchors, `\todo{}` markers, claim strength, attribution, and evidence-required qualifiers that the

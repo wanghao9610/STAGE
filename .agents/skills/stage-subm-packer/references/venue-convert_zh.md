@@ -79,13 +79,13 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 ## 5. 生成 `main.tex`
 
-由 venue 自己的宏（第 2 步）填上从 `manus/main.tex` 读出的值构成。要跟着那份导言区里可达的 `\input` 链走：值并不总是字面写在 `main.tex` 里——`stage-outl-planner` 会把 abstract 移进 `manus/secs/0_abstract.tex`，只在原处留一个 `\input`。
+由 venue 自己的宏（第 2 步）填上从 `manus/main.tex` 读出的值构成。要跟着那份导言区里可达的 `\input` 链走：值并不总是字面写在 `main.tex` 里——`stage-outl-planner` 会把 abstract 移进 `manus/secs/00_abstract.tex`，只在原处留一个 `\input`。
 
 要搬过去的：
 
 - **标题、作者、单位、贡献说明、关键词、元数据链接**，用 venue 的宏重新发射。每个 `stage.cls` 命令装的是什么，见下表。
 - **论文自己的 `\newcommand` / `\renewcommand`**，来自 `manus/main.tex` 的导言区——`\method` 那一类。它们属于这篇论文而不属于框架，所以既不在 `stage.sty` 也不在 `compat.sty` 里，而正文依赖它们。
-- **`\input{secs/...}` 的顺序**，与 `manus/main.tex` 定下的完全一致——`<n>_` 前缀是承重的（规约 §5.5）。
+- **`\input{secs/...}` 的顺序**，与 `manus/main.tex` 定下的完全一致——`<nn>_` 前缀是承重的（规约 §5.5）。
 - **`\bibliographystyle{...}`** 设为模板包的样式；`\bibliography{bibs/reference}`。
 - **附录**，若 `manus/main.tex` 有，则用 venue 自己的附录机制。venue 在"附录在参考文献之前还是之后"上做法不一；照模板包的示例走，并在报告里说明用了哪种顺序。
 
@@ -109,9 +109,9 @@ venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bi
 
 这是最容易漏、而且一漏就必然编译不过的那一处搬迁。
 
-`stage.cls` 把 abstract 当作**导言区命令** `\abstract{...}`，所以 `manus/main.tex` 在 `\begin{document}` 之前调用它，`stage-outl-planner` 的 `\input{secs/0_abstract}` 也待在导言区。而几乎每个 venue class 要的都是**正文里的环境** `\begin{abstract}...\end{abstract}`，位置在 `\maketitle` 之后。
+`stage.cls` 把 abstract 当作**导言区命令** `\abstract{...}`，所以 `manus/main.tex` 在 `\begin{document}` 之前调用它，`stage-outl-planner` 的 `\input{secs/00_abstract}` 也待在导言区。而几乎每个 venue class 要的都是**正文里的环境** `\begin{abstract}...\end{abstract}`，位置在 `\maketitle` 之后。
 
-所以：把 abstract 的正文抽出来——从 `manus/main.tex` 的 `\abstract{...}`，或者从导言区 `\input` 的那个文件里——再用 venue 自己的机制在正文里重新发射。**不要**把 `\input{secs/0_abstract}` 放进生成的导言区：venue class 要么根本没定义 `\abstract`（编译报错），要么定义了一个不兼容的（静默地排错）。`secs/` 的其余部分照常在正文里 `\input`，一字不改。
+所以：把 abstract 的正文抽出来——从 `manus/main.tex` 的 `\abstract{...}`，或者从导言区 `\input` 的那个文件里——再用 venue 自己的机制在正文里重新发射。**不要**把 `\input{secs/00_abstract}` 放进生成的导言区：venue class 要么根本没定义 `\abstract`（编译报错），要么定义了一个不兼容的（静默地排错）。`secs/` 的其余部分照常在正文里 `\input`，一字不改。
 
 ### 匿名
 
