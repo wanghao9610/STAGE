@@ -1,6 +1,6 @@
 ---
 description: Pursue a stated paper goal, starting each next unmarked STAGE skill and stopping at any † skill
-argument-hint: "GOAL [involve=LEVEL]"
+argument-hint: "GOAL [involve=low]"
 disable-model-invocation: true
 ---
 

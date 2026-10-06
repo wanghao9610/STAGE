@@ -1,6 +1,6 @@
 ---
 description: Preflight and package a submission
-argument-hint: "[TARGET] [DESCRIPTION] [involve=low|medium|high]"
+argument-hint: "[camera | convert] [kit=<path>] [DESCRIPTION] [involve=high]"
 ---
 Read `.pi/skills/stage-subm-packer/SKILL.md` in full and follow it as this run's instructions. This command is the skill's Pi entry point; apply its target resolution, language, evidence, confirmation, and verification rules unchanged.
 

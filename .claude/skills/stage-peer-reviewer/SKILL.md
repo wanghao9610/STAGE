@@ -7,7 +7,7 @@ description: >-
   review, a review panel, a pre-submission attack, or to referee an external paper. Never edits the
   manuscript or the ledger; an external paper's title and text stay out of searches unless it is
   public.
-argument-hint: "[panel | quick] [extern=<path>] [out=<path>] [DESCRIPTION]"
+argument-hint: "[panel | quick] [extern=<path>] [out=<path>] [DESCRIPTION] [involve=<level>]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/run.sh:*), Bash(execs/run.sh:*),
   Bash(date +%Y-%m-%d), Bash(date +%F), Agent, WebSearch, WebFetch, Bash(git status:*),

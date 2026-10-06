@@ -1,6 +1,6 @@
 ---
 description: Trace every manuscript number to evidence
-argument-hint: "[TARGET] [DESCRIPTION] [involve=low|medium|high]"
+argument-hint: "[SECTION | CLAIM_ID] [DESCRIPTION] [involve=<level>]"
 ---
 Read `.pi/skills/stage-clms-auditor/SKILL.md` in full and follow it as this run's instructions. This command is the skill's Pi entry point; apply its target resolution, language, evidence, confirmation, and verification rules unchanged.
 

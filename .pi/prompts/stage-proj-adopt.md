@@ -1,6 +1,6 @@
 ---
 description: Adopt an existing paper repository into STAGE
-argument-hint: "[TARGET] [DESCRIPTION] [involve=low|medium|high]"
+argument-hint: "[SRC_PATH] [DESCRIPTION] [involve=low]"
 ---
 Read `.pi/skills/stage-proj-adopt/SKILL.md` in full and follow it as this run's instructions. This command is the skill's Pi entry point; apply its target resolution, language, evidence, confirmation, and verification rules unchanged.
 

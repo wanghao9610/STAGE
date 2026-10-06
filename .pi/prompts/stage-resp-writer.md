@@ -1,6 +1,6 @@
 ---
 description: Turn reviews into a response and promise list
-argument-hint: "[TARGET] [DESCRIPTION] [involve=low|medium|high]"
+argument-hint: "[CYCLE] [DESCRIPTION] [involve=high]"
 ---
 Read `.pi/skills/stage-resp-writer/SKILL.md` in full and follow it as this run's instructions. This command is the skill's Pi entry point; apply its target resolution, language, evidence, confirmation, and verification rules unchanged.
 

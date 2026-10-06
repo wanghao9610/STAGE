@@ -6,7 +6,7 @@ description: >-
   notes/claims.md. Use when the user runs /stage-clms-auditor, /stage-auto starts it, before a
   submission freeze, or when asked whether the paper's numbers are backed by evidence. Never edits the
   manuscript or mates/; every fix routes to the skill that owns the file.
-argument-hint: "[SECTION | CLAIM_ID] [DESCRIPTION]"
+argument-hint: "[SECTION | CLAIM_ID] [DESCRIPTION] [involve=<level>]"
 allowed-tools: >-
   Read, Grep, Glob, Write, Edit, Bash(bash execs/scpts/import.sh --diff:*),
   Bash(execs/scpts/import.sh --diff:*), Bash(shasum -a 256:*), Bash(sha256sum:*),

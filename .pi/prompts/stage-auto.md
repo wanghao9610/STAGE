@@ -1,6 +1,6 @@
 ---
 description: Pursue a stated paper goal, starting each next unmarked STAGE skill and stopping at any † skill
-argument-hint: "GOAL [involve=LEVEL]"
+argument-hint: "GOAL [involve=low]"
 ---
 
 Read `.agents/commands/stage-auto.md` and follow it with this invocation: [$@]

@@ -6,7 +6,7 @@ description: >-
   Use when the user runs /stage-flow-status, /stage-auto starts it, or asks where the paper stands,
   what to work on next, or whether the evidence or build is fresh. Read-only: it reports in chat,
   routes each action to its owning skill without starting it, and never writes.
-argument-hint: "[SECTION] [DESCRIPTION]"
+argument-hint: "[SECTION] [DESCRIPTION] [involve=<level>]"
 ---
 
 # Writing Flow Status — read-only overview

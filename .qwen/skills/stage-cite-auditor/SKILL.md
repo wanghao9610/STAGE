@@ -6,7 +6,7 @@ description: >-
   citations and bib hygiene. Use when the user runs /stage-cite-auditor, /stage-auto starts it, or
   asks whether the citations and related-work claims hold up. Read-only on the manuscript, the bib,
   and the ledger: problems are flagged and routed, never silently fixed.
-argument-hint: "[SECTION] [DESCRIPTION]"
+argument-hint: "[SECTION] [DESCRIPTION] [involve=<level>]"
 ---
 
 # Citation Auditor — keys resolved, assertions checked, nothing patched
