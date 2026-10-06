@@ -47,13 +47,13 @@ draft a rebuttal to somebody else's.
 the start of every run. It is longer than one read or one shell command returns, so read it by
 line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
 the whole file is saved aside unread. It is the baseline every STAGE
-skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language, read from their latest message in their own words and never from a bare command line or the English this run loads — for replies and the Markdown this run newly
 writes; everything under `manus/`, the response to reviewers, and every structural literal stay
 English, and an existing document keeps the language it was written in. Resolve the involve level
-once under conventions §7.7, and the tier value once under §11.6. Repository resources load in
+once under conventions §7.7. Repository resources load in
 English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
 **Human-writing contract.** The clarity perspective applies the evidence-bound natural-writing
@@ -83,8 +83,7 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
 1. **Five perspectives, one chair.** The panel is the five briefs of
    `references/review-dimensions.md` — novelty & related work, technical soundness, experimental
    rigor & reproducibility, clarity & presentation, devil's advocate — each dispatched as a
-   delegate that fetches nothing but its own leads (§6.9), runs on the PLAN tier's model
-   (conventions §11.6, where the harness can name one), and writes one review file, its own
+   delegate that fetches nothing but its own leads (§6.9) and writes one review file, its own
    `review_<perspective>.md` in the run directory, plus the payload caches under its own prefix (§6.2, §6.4), carrying its brief and the two
    contracts verbatim plus the built paper. It writes nothing under `manus/`, `notes/`, or
    `cycls/`: the meta-review is the chair's synthesis, not five reviews concatenated. Exactly five; their independence comes from five separate briefs and contexts, not from running at the same moment, so how many run at once is the chair's call (§6.2). `quick` is the
@@ -151,11 +150,6 @@ same rubric, owing their honesty to authors who never asked for your kindness ei
 
 ## Workflow
 
-**Where this run executes.** This run's tier is PLAN (conventions §11.6); it stays in the session
-that started it, on the session's model. When the `STAGE_PLAN_MODEL` value names a model that is not
-an alias of the session's, say so in one line at the start — the tier, that model, and the one way
-to get it: switch the session's model — then continue here.
-
 ### Step 1: Load and resolve
 
 Read the conventions whole, then `notes/story.md` (active cycle), `cycls/<cycle>/venue.yml`
@@ -193,8 +187,7 @@ contract's fields and nothing else". Each brief also carries the seconds that pa
 between its own requests to a host and its own cache prefix under the run directory
 (Principle 3) — never a request quota, which is not what politeness is made of — and tells the
 panelist to open its file with a frontmatter block carrying its own `model_id:` and one
-`model_trail:` entry (conventions §8), and to return that id, which goes with the tier into
-the decisions record (§11.6). At involve
+`model_trail:` entry (conventions §8), and to return that id. At involve
 `high`, announce the partition before dispatch (§6.8). Quick: the chair reads the
 paper once and fills all five collector returns itself, in perspective order, devil's advocate
 last.
@@ -265,5 +258,5 @@ default destination or the one `out=` named.
 
 Provenance (conventions §8): every artifact above under `notes/`, `tasks/`, `cycls/`, or
 `wkdrs/reports/` carries `model_id:` — the writing model's id, verbatim: this session's, or a
-panelist's own for its `review_<perspective>.md` (conventions §8, §11.6) — and one appended
+panelist's own for its `review_<perspective>.md` (conventions §8) — and one appended
 `model_trail:` entry for this run. Nothing under `manus/` or `mates/` carries either, and neither does `cycls/<cycle>/venue.yml`.

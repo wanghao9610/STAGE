@@ -33,13 +33,13 @@ call; it still governs the commit offer (§1.6) and, at `high`, the fan-out anno
 the start of every run. It is longer than one read or one shell command returns, so read it by
 line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
 the whole file is saved aside unread. It is the baseline every STAGE
-skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language, read from their latest message in their own words and never from a bare command line or the English this run loads — for replies and the Markdown this run newly
 writes; everything under `manus/`, the response to reviewers, and every structural literal stay
 English, and an existing document keeps the language it was written in. Resolve the involve level
-once under conventions §7.7, and the tier value once under §11.6. Repository resources load in
+once under conventions §7.7. Repository resources load in
 English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
 ## Role
@@ -98,8 +98,7 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    `stage-tabs-builder`, per the promise it keeps in `tasks/<cycle>_promises.md` — returns it to
    `drafted`, after which verification is the ordinary path.
 7. **Fan out the trace (§6).** More than one `.tex` file in scope → one delegate per in-scope
-   `manus/secs/` and `manus/tabs/` file, on the EXEC tier's model (conventions §11.6), where the
-   harness can name one, each reading its one `.tex` file plus `notes/claims.md` and
+   `manus/secs/` and `manus/tabs/` file, each reading its one `.tex` file plus `notes/claims.md` and
    `mates/MANIFEST.md` (read-only), following Principle 3's order for its own numbers, opening the
    cited `mates/` file at its anchor, and returning one row per number — Where (`file:line`),
    Value, Bin (traced / declared-`\todo` / cited-work, Step 5), Claim (the ledger ID the sentence
@@ -124,11 +123,6 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    this audit answers the first and owes the reader a word when the second is unanswered.
 
 ## Workflow
-
-**Where this run executes.** This run's tier is EXEC (conventions §11.6); it stays in the session
-that started it, on the session's model. When the `STAGE_EXEC_MODEL` value names a model that is not
-an alias of the session's, say so in one line at the start — the tier, that model, and the one way
-to get it: switch the session's model — then continue here.
 
 1. **Load.** Read the conventions whole; then `notes/claims.md`, `mates/MANIFEST.md`, and
    `notes/outline.md`. Real date from the system clock (conventions §4). No `notes/claims.md` →

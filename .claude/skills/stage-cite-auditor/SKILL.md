@@ -30,13 +30,13 @@ commit offer (§1.6) and, at `high`, the fan-out announcement (§6.8).
 the start of every run. It is longer than one read or one shell command returns, so read it by
 line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
 the whole file is saved aside unread. It is the baseline every STAGE
-skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language, read from their latest message in their own words and never from a bare command line or the English this run loads — for replies and the Markdown this run newly
 writes; everything under `manus/`, the response to reviewers, and every structural literal stay
 English, and an existing document keeps the language it was written in. Resolve the involve level
-once under conventions §7.7, and the tier value once under §11.6. Repository resources load in
+once under conventions §7.7. Repository resources load in
 English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
 ## Role
@@ -79,8 +79,7 @@ re-reading routes to `stage-refs-curator`.
    keys), missing required fields, inconsistent venue naming, arXiv entries where the note
    records a published version. The fix is `stage-refs-curator`'s.
 6. **Fan out the assertion audit (§6).** More than 20 in-scope citing sentences on keys that have a note → split them one
-   delegate per such key, on the EXEC tier's model (conventions §11.6), where the harness can name
-   one, so every sentence about a given paper reaches the same reader with the
+   delegate per such key, so every sentence about a given paper reaches the same reader with the
    same note in front of it, each returning one verdict per sentence — supported, unsupported, or
    unverifiable, with the note line it turned on — and nothing else. A key with no note never goes
    out: Principle 1 already decides its sentences `unverifiable` and a delegate would have nothing
@@ -90,11 +89,6 @@ re-reading routes to `stage-refs-curator`.
    Nothing a delegate returns is fixed anywhere — Principle 2 binds it too (§6.4).
 
 ## Workflow
-
-**Where this run executes.** This run's tier is EXEC (conventions §11.6); it stays in the session
-that started it, on the session's model. When the `STAGE_EXEC_MODEL` value names a model that is not
-an alias of the session's, say so in one line at the start — the tier, that model, and the one way
-to get it: switch the session's model — then continue here.
 
 1. **Load.** Read the conventions whole; then `notes/refs/refs_index.md` (missing → note it;
    Principle 1 applies), the bib's keys and fields, and `notes/claims.md` — factual claims may

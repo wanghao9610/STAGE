@@ -32,13 +32,13 @@ argument nor the description, and is stripped before either is read.
 the start of every run. It is longer than one read or one shell command returns, so read it by
 line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
 the whole file is saved aside unread. It is the baseline every STAGE
-skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language, read from their latest message in their own words and never from a bare command line or the English this run loads — for replies and the Markdown this run newly
 writes; everything under `manus/`, the response to reviewers, and every structural literal stay
 English, and an existing document keeps the language it was written in. Resolve the involve level
-once under conventions §7.7, and the tier value once under §11.6. Repository resources load in
+once under conventions §7.7. Repository resources load in
 English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
 **Human-writing contract.** Apply the human-writing contract (conventions §7), the evidence-bound
@@ -105,8 +105,7 @@ from the same ones instead of each session inventing a voice.
    this pass proves authorship or defeats an AI detector.
 
 9. **Fan out per section file (§6).** A whole-manuscript run polishes files that do not touch each
-   other: one delegate per in-scope `manus/secs/<nn>_<slug>.tex`, on the EXEC tier's model
-   (conventions §11.6), where the harness can name one, each owning that file alone for
+   other: one delegate per in-scope `manus/secs/<nn>_<slug>.tex`, each owning that file alone for
    the length of the fan-out (§6.2) and editing it in place under Principles 1–3, 7, and 8, with
    `notes/style.md` when it exists and the human-writing contract (conventions §7) — no number
    changed, no citation key touched, no `\todo` moved, the canon in `notes/notation.md` enforced,
@@ -121,11 +120,6 @@ from the same ones instead of each session inventing a voice.
    main agent runs itself (§6.3).
 
 ## Workflow
-
-**Where this run executes.** This run's tier is EXEC (conventions §11.6); it stays in the session
-that started it, on the session's model. When the `STAGE_EXEC_MODEL` value names a model that is not
-an alias of the session's, say so in one line at the start — the tier, that model, and the one way
-to get it: switch the session's model — then continue here.
 
 1. **Load.** Read the conventions whole; then `notes/notation.md`, `notes/outline.md`
    (section rows and budgets), and `notes/claims.md` (know which sentences carry claims), plus

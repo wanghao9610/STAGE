@@ -36,13 +36,13 @@ mapping. Read it before converting; it is not needed on a run that does not conv
 the start of every run. It is longer than one read or one shell command returns, so read it by
 line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
 the whole file is saved aside unread. It is the baseline every STAGE
-skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language, read from their latest message in their own words and never from a bare command line or the English this run loads — for replies and the Markdown this run newly
 writes; everything under `manus/`, the response to reviewers, and every structural literal stay
 English, and an existing document keeps the language it was written in. Resolve the involve level
-once under conventions §7.7, and the tier value once under §11.6. Repository resources load in
+once under conventions §7.7. Repository resources load in
 English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
 ## Role
@@ -124,20 +124,13 @@ third-party file nobody here is allowed to edit.
    audit follow-up lists are one script call and one read the main agent does itself, and the
    promises file is step 3's gate, not a sweep; Step 6's checklist walk is one delegate per
    checklist item once the list carries more
-   than 6. The completeness sweep's delegates run on the READ tier's model (conventions §11.6),
-   where the harness can name one; the checklist walk's delegates run on this run's own tier,
-   EXEC, because the record carries their pass / fail verdicts as given. The hard gates never
+   than 6. The hard gates never
    split and never delegate: `execs/run.sh`, `execs/scpts/lint.sh`,
    and the tree check are single script calls whose exit codes the main agent reads itself (§6.3).
    Neither does anything from Step 8 on — the package, the record, the commit, and the freeze tag
    stay with the main agent (§6.4–§6.5).
 
 ## Workflow
-
-**Where this run executes.** This run's tier is EXEC (conventions §11.6); it stays in the session
-that started it, on the session's model. When the `STAGE_EXEC_MODEL` value names a model that is not
-an alias of the session's, say so in one line at the start — the tier, that model, and the one way
-to get it: switch the session's model — then continue here.
 
 1. **Load and resolve.** Read the conventions in full. Resolve the mode from the argument and the
    active cycle per §5; read `cycls/<cycle>/venue.yml` and stop unless `confirmed:` is set and

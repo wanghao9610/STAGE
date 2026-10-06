@@ -29,13 +29,13 @@ priority order fixes down to the tie-break.
 the start of every run. It is longer than one read or one shell command returns, so read it by
 line range, a few hundred lines at a time, until its last line, the end of §13, is in view — a `cat` of
 the whole file is saved aside unread. It is the baseline every STAGE
-skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, `STAGE_*_MODEL`, and runtime
+skill shares, and this file wins wherever it is stricter. Read `.env` once for the `STAGE_LANG`, `INVOLVE`, and runtime
 values this run needs, and reuse `.env` values and conventions text still verbatim visible in this
 conversation. Resolve the language once under conventions §7.6 — an explicit request first, then a
 valid `STAGE_LANG`, then the user's dialogue language, read from their latest message in their own words and never from a bare command line or the English this run loads — for replies and the Markdown this run newly
 writes; everything under `manus/`, the response to reviewers, and every structural literal stay
 English, and an existing document keeps the language it was written in. Resolve the involve level
-once under conventions §7.7, and the tier value once under §11.6. Repository resources load in
+once under conventions §7.7. Repository resources load in
 English: a `references/*_zh.md` edition is for human readers and is never loaded at runtime.
 
 ## Role
@@ -81,20 +81,10 @@ writes, and never present a guess as a state.
    already in front of you — the collector does in a single call what several delegates would otherwise be
    split across. Delegation is still available and still read-only (§6.4), and it pays in one
    case: a SECTION-scoped run that must open more than 6 section sources for per-row detail the digest
-   does not carry, read by delegates on the READ tier's model (conventions §11.6), where the harness
-   can name one. Two things never fan out either way — the script signals, run once each
+   does not carry, read by delegates. Two things never fan out either way — the script signals, run once each
    in step 1 (§6.3), and Principle 5's single next action, a judgment across every board at once.
 
 ## Workflow
-
-**Where this run executes.** This run's tier is READ (conventions §11.6), and it stays in the
-session that started it. When the `STAGE_READ_MODEL` value names a model that is not an alias of the
-one this run is on, say so in one line at the start — the tier, that model, and the one way to get
-it: switch the session's model — then continue here. A harness that forks this skill on its
-manifest's own model has already chosen the model this run is on: there the line compares the READ
-value with that model, and the one way to get the READ model is that manifest's model field, pinned
-by hand in the STAGE upstream — a paper repository's `execs/update.sh` replaces a local edit to it —
-not the session's model.
 
 1. **One load, then reason.** The conventions and `.env` are read as Shared conventions says. The
    two calls below — the scan and the two script signals — go out together in a single message,
