@@ -48,6 +48,22 @@
     // workspaceFolders[0], which is the wrong folder in a multi-root workspace
     // and an empty string with no folder open (outDir would become /wkdrs).
     "latex-workshop.latex.outDir": "../wkdrs/builds",
+    // Build through execs/run.sh so the editor and the command line share one
+    // engine, .env's LATEX_ENGINE, and one TEXINPUTS. The extension reads no
+    // .env, and a % !TeX program line outranks % !LW recipe and spawns a bare
+    // engine without the tools' env, so a venue class in stys/ that loads a
+    // sibling by bare name then fails. The cwd of an external build is
+    // workspaceFolders[0], so the script and the root file are passed as
+    // absolute paths, which assumes the root file sits in manus/. The recipes
+    // below stay as the fallback when this command is removed.
+    "latex-workshop.latex.external.build.command": "bash",
+    "latex-workshop.latex.external.build.args": [
+        "%DIR%/../execs/run.sh",
+        "--main",
+        "%DOC_EXT%",
+        "-synctex=1",
+        "-file-line-error"
+    ],
     "latex-workshop.mathpreviewpanel.cursor.enabled": true,
     // A failed build must be visible: manus/stys/arxiv.cls requires pdftex, so a
     // wrong engine dies with no PDF, and a suppressed popup leaves only a log
