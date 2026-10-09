@@ -79,7 +79,7 @@
 有效 pt = 撰写时 pt × (印刷宽度 / 撰写宽度)
 ```
 
-"装得下"那条检查（§6）把渲染出的页面钉在已确认的纸张上，所以对文档字号而言比例是 1，文档类的基准字号就是有效字号。比例要紧的是被引入的图内部的文字：`effective_pt = label_pt × placed_width / natural_width`，其中 `natural_width` 是 `pdfinfo manus/figs/<nn>_<slug>.pdf` 报出的该图 `Page size`，`placed_width` 是它在 `poster.tex` 里的 `width=`。一张 72pt 宽的图里的 10pt 标签，放成 600pt 宽时印出来约 83pt；同样的标签在一张 500pt 宽的图里、放成 600pt 宽时印出来是 12pt，不达标。要算，不要看。
+"装得下"那条检查（§6）把渲染出的页面钉在已确认的纸张上，所以对文档字号而言比例是 1，文档类的基准字号就是有效字号。比例要紧的是被引入的图内部的文字：`effective_pt = label_pt × placed_width / natural_width`，其中 `natural_width` 是 `pdfinfo manus/figs/srcs/<nn>_<slug>.pdf` 报出的该图 `Page size`，`placed_width` 是它在 `poster.tex` 里的 `width=`。一张 72pt 宽的图里的 10pt 标签，放成 600pt 宽时印出来约 83pt；同样的标签在一张 500pt 宽的图里、放成 600pt 宽时印出来是 12pt，不达标。要算，不要看。
 
 有两处字号脱离文档类的基准字号，必须单独核对：被引入的图 PDF **内部**的文字，它随图被放置的框缩放而不随文档字号；以及任何用显式 `\fontsize` 排的东西。`check` 闸会点名纸面上最小的文字连同其算出的字号；一张图若其内部标签在被放置的宽度下低于 20pt，那是给 `stage-figs-designer` 的发现——绝不在这里重画（`SKILL.md` 原则 4）。
 
@@ -116,7 +116,7 @@
 
 1. **一个分区一个块，顺序照计划。** 有块无行、或有行无块，就是不带参数的审计要报出的漂移。
 2. **`% src:` 写在它所来源的那个数字的上一行**，一个数字一条——比 `stage-tabs-builder` 每个数据行一条更细，好让 `check` 闸的 Sourced 一项（`SKILL.md` Step 5.1）能把海报上的每个数字走到它的指纹。`stage-clms-auditor` 只读 `manus/`，不审计海报。
-3. **图从 `manus/figs/` 引入，路径写成相对 `poster.tex` 的路径**（`../../../manus/figs/<nn>_<slug>.pdf`；`run.sh` 在入口文件所在目录里编译），不作修改。只用 `width` 参数缩放；绝不 `trim`、`clip` 或改配色。
+3. **图从 `manus/figs/srcs/` 引入，路径写成相对 `poster.tex` 的路径**（`../../../manus/figs/srcs/<nn>_<slug>.pdf`；`run.sh` 在入口文件所在目录里编译），不作修改。只用 `width` 参数缩放；绝不 `trim`、`clip` 或改配色。
 4. **这里根本不定义 `\todo` 宏。** 手稿的第三种状态在海报上不存在（`SKILL.md` 原则 3），而一个宏未定义的文档类会在编译期大声失败，而不是把一个标记印到墙上。
 5. **各栏宽度之和要小于 1。** `tikzposter` 会加栏间距；和恰好为 1 的宽度会溢出纸张，而"装得下"那条检查要等到白渲染一次之后才抓得到。
 

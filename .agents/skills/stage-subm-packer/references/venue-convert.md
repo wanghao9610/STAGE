@@ -103,12 +103,14 @@ Copy in, byte-for-byte and unedited:
   without options (so a second load under a class that already has them is a
   no-op), and carries `\todo`, `\parahead`, `\cmark`, `\tablestyle`, the `x`/`y`/`z`/
   `P`/`Y` column types, the `Light*` row colors, `\figref`/`\tabref`/`\eqnref`, the
-  `accentcolor` fallback, and `\graphicspath{{figs/}}`. This is the layer that was
+  `accentcolor` fallback, and `\graphicspath{{figs/srcs/}}`. This is the layer that was
   designed to survive the swap; do not re-implement any of it in `compat.sty`.
 - `manus/secs/`, `manus/tabs/` → unedited
-- `manus/figs/*.pdf` → the copy's `figs/`. **Not `figs/srcs/`**: rendered figures
-  are what the paper needs, and a plotting script or `.drawio` file can carry a
-  path, a username, or a machine name into an anonymous submission.
+- `manus/figs/*.tex` → the copy's `figs/`, unedited, and from `manus/figs/srcs/`
+  only each graphic those figure files `\includegraphics` → the copy's `figs/srcs/`.
+  **Nothing else under `figs/srcs/`**: rendered graphics are what the paper needs,
+  and a `.pptx`, plotting script, `.drawio` file, `.sources.md`, or `.render.yml`
+  can carry a path, a username, or a machine name into an anonymous submission.
 - `manus/bibs/reference.bib` → the copy's `bibs/`
 
 A venue needing a different citation style is a `\bibliographystyle{...}` change in

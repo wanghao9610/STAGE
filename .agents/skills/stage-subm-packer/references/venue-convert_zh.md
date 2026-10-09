@@ -51,9 +51,9 @@
 逐字节、不加编辑地拷进去：
 
 - `cycls/<cycle>/template/` 里每一个 `.cls`、`.sty`、`.bst` → 副本的 `stys/`（模板包的示例 `.tex`、README 与样例图留在原地——副本只装编译这篇论文所需的东西，别的都不装）
-- `manus/stys/stage.sty` → 副本的 `stys/`——**写作层原样发出。** 它是一个自足的 package，不带选项地加载内容级宏包（所以在已经拉过这些包的 class 下二次加载是静默的空操作），并且携带 `\todo`、`\parahead`、`\cmark`、`\tablestyle`、`x`/`y`/`z`/`P`/`Y` 列类型、`Light*` 行底色、`\figref`/`\tabref`/`\eqnref`、`accentcolor` 备用定义以及 `\graphicspath{{figs/}}`。这一层本来就是为跨模板存活而设计的；不要在 `compat.sty` 里重新实现它的任何一部分。
+- `manus/stys/stage.sty` → 副本的 `stys/`——**写作层原样发出。** 它是一个自足的 package，不带选项地加载内容级宏包（所以在已经拉过这些包的 class 下二次加载是静默的空操作），并且携带 `\todo`、`\parahead`、`\cmark`、`\tablestyle`、`x`/`y`/`z`/`P`/`Y` 列类型、`Light*` 行底色、`\figref`/`\tabref`/`\eqnref`、`accentcolor` 备用定义以及 `\graphicspath{{figs/srcs/}}`。这一层本来就是为跨模板存活而设计的；不要在 `compat.sty` 里重新实现它的任何一部分。
 - `manus/secs/`、`manus/tabs/` → 不加编辑
-- `manus/figs/*.pdf` → 副本的 `figs/`。**不含 `figs/srcs/`**：论文需要的是渲染出的图，而一个绘图脚本或 `.drawio` 文件可能把路径、用户名或机器名带进一次匿名投稿。
+- `manus/figs/*.tex` → 副本的 `figs/`，不加编辑；`manus/figs/srcs/` 中只取这些图文件 `\includegraphics` 到的成图 → 副本的 `figs/srcs/`。**`figs/srcs/` 里的其他东西一概不带**：论文需要的是渲染出的图，而 `.pptx`、绘图脚本、`.drawio` 文件、`.sources.md` 或 `.render.yml` 可能把路径、用户名或机器名带进一次匿名投稿。
 - `manus/bibs/reference.bib` → 副本的 `bibs/`
 
 venue 需要另一种引用样式，那是生成的 `main.tex` 里的一处 `\bibliographystyle{...}` 改动，绝不是对 `reference.bib` 的编辑。

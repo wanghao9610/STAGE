@@ -99,7 +99,7 @@ effective_pt = authored_pt × (print_width / authored_width)
 Fits (§6) pins the rendered page to the confirmed sheet, so for the document font the ratio is 1
 and the class's base size is the effective size. The ratio matters for text inside an included
 figure: `effective_pt = label_pt × placed_width / natural_width`, with `natural_width` the figure's
-`Page size` from `pdfinfo manus/figs/<nn>_<slug>.pdf` and `placed_width` its `width=` in `poster.tex`. A
+`Page size` from `pdfinfo manus/figs/srcs/<nn>_<slug>.pdf` and `placed_width` its `width=` in `poster.tex`. A
 10pt label in a figure 72pt wide placed 600pt wide prints at about 83pt; the same label in a figure
 500pt wide placed 600pt wide prints at 12pt and fails. Compute it; do not look at it.
 
@@ -148,8 +148,8 @@ Rules that hold whichever class is in play:
    `stage-tabs-builder`'s one comment per data row, so the check gate's Sourced lane (SKILL.md
    Step 5.1) can walk every number on the poster to its fingerprint. `stage-clms-auditor` reads
    only `manus/` and does not audit the poster.
-3. **Figures are included from `manus/figs/` by their path relative to `poster.tex`**
-   (`../../../manus/figs/<nn>_<slug>.pdf`; `run.sh` compiles from the entry point's directory),
+3. **Figures are included from `manus/figs/srcs/` by their path relative to `poster.tex`**
+   (`../../../manus/figs/srcs/<nn>_<slug>.pdf`; `run.sh` compiles from the entry point's directory),
    unmodified. Scale with the `width` argument only; never `trim`, `clip`, or a recolor.
 4. **No `\todo` macro is defined here at all.** The manuscript's third state does not exist on a
    poster (SKILL.md Principle 3), and a class where the macro is undefined fails loudly at compile

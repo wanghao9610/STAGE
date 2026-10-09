@@ -24,7 +24,7 @@ story
   ┌─ the drafting loop — re-entered per section, table, figure ──────────────────┐
   │  → stage-sect-drafter: draft one section; unfingerprinted numbers → \todo    │
   │  → stage-tabs-builder: tables from mates/ evidence only, % src: per row      │
-  │  → stage-figs-designer: figure source → rendered PDF                         │
+  │  → stage-figs-designer: figure source → rendered PDF → figure file           │
   │  → stage-copy-editor: natural prose — preserve meaning, evidence, numbers    │
   └──────────────────────────────────────────────────────────────────────────────┘
 
@@ -84,7 +84,7 @@ Slash-only. Dialogue-first story shaping: it reads imported idea docs and digest
 
 ### stage-outl-planner
 
-Slash-only. Turns the finalized story into the paper's skeleton: `notes/outline.md` with a section table whose page budgets sum within the venue limit, a figure plan, a table plan, and a claim→section assignment; skeleton files `manus/secs/<nn>_<slug>.tex`, each opening with its section brief as a comment block, with their `\input` lines uncommented in `main.tex`, as is the teaser slot under the title once `figs/00_teaser.pdf` exists; and a seeded `notes/notation.md`. After this run the paper builds with its real structure, and every later skill knows what belongs where and which claims each section must carry.
+Slash-only. Turns the finalized story into the paper's skeleton: `notes/outline.md` with a section table whose page budgets sum within the venue limit, a figure plan, a table plan, and a claim→section assignment; skeleton files `manus/secs/<nn>_<slug>.tex`, each opening with its section brief as a comment block, with their `\input` lines uncommented in `main.tex`, as is the teaser slot under the title once `figs/00_teaser.tex` exists; and a seeded `notes/notation.md`. After this run the paper builds with its real structure, and every later skill knows what belongs where and which claims each section must carry.
 
 ### stage-sect-drafter
 
@@ -96,7 +96,7 @@ Generates `manus/tabs/*.tex` **from `mates/` evidence only**: booktabs style, on
 
 ### stage-figs-designer
 
-Owns the figure inventory (the outline's Figures table) and each figure end to end: its purpose, its editable source under `manus/figs/srcs/` (tikz, python, drawio; a one-slide PPTX with its render record where the harness carries the neutral copy's local figure pipeline; or a MANIFEST entry for imported artwork), and its rendered PDF under `manus/figs/`. Every figure has a source file or a manifest entry; a PDF with no origin does not happen. The teaser figure, `figs/00_teaser.pdf` in `main.tex`'s slot under the title, gets a dedicated checklist — it must tell the story alone, with a self-contained caption, which the author writes in that slot — because it is the one figure every reviewer reads.
+Owns the figure inventory (the outline's Figures table) and each figure end to end: its purpose, its editable source under `manus/figs/srcs/` (tikz, python, drawio; a one-slide PPTX with its render record where the harness carries the neutral copy's local figure pipeline; or a MANIFEST entry for imported artwork), its rendered PDF beside that source, and its figure file `manus/figs/<nn>_<slug>.tex` — the float, the label, and a caption whose every number carries its `% src:` line, the claims it states recorded in `notes/claims.md` — which the section places with one `\input`. Every rendered PDF has a source file or a manifest entry; a PDF with no origin does not happen. The teaser figure, `figs/00_teaser.tex` in `main.tex`'s slot under the title, gets a dedicated checklist — it must tell the story alone, with a self-contained caption, which the author writes in that figure file — because it is the one figure every reviewer reads.
 
 ### stage-refs-curator
 
@@ -138,7 +138,7 @@ It is also where the paper takes the venue's own shape. `convert` mode reads the
 
 ### stage-pstr-builder
 
-Slash-only. The poster is not the paper reflowed onto a bigger sheet — it is a selection, and making that selection is the whole skill. `plan` derives one takeaway sentence from `notes/story.md`'s pitch, walks `notes/claims.md` for the rows that reached `verified`, proposes the few that carry the contribution, and records the rest as visible exclusions so a later run does not re-litigate a settled cut; the user confirms it before anything is written. `render` turns that plan into `cycls/<cycle>/poster/poster.tex` — one block per planned zone, claim wording taken from the ledger row rather than argued afresh, figures included from `manus/figs/` unmodified — and compiles it into `wkdrs/builds/poster/`. New artwork is never drawn here: a figure that fails at poster size is a finding for `stage-figs-designer`.
+Slash-only. The poster is not the paper reflowed onto a bigger sheet — it is a selection, and making that selection is the whole skill. `plan` derives one takeaway sentence from `notes/story.md`'s pitch, walks `notes/claims.md` for the rows that reached `verified`, proposes the few that carry the contribution, and records the rest as visible exclusions so a later run does not re-litigate a settled cut; the user confirms it before anything is written. `render` turns that plan into `cycls/<cycle>/poster/poster.tex` — one block per planned zone, claim wording taken from the ledger row rather than argued afresh, figures included from `manus/figs/srcs/` unmodified — and compiles it into `wkdrs/builds/poster/`. New artwork is never drawn here: a figure that fails at poster size is a finding for `stage-figs-designer`.
 
 Two boundaries make it a STAGE skill rather than a poster tool. Numbers carry `% src:` comments to fingerprinted `mates/` evidence exactly as table rows do, and the manuscript's third state does not exist — `check` fails hard on a `\todo`, because a marker is a draft nobody has printed and this sheet gets printed. And legibility is arithmetic rather than impression: the sheet size is a user-confirmed fact recorded in the poster plan, so effective point size is computed at print scale against the floors in the skill's `references/poster-layout.md`, with the smallest text on the sheet named with its measured size. The poster is also the one artifact that does not inherit `ANON` — it carries author names because you stand beside it, which is why it lives under `cycls/` and never under `manus/`, a tree `lint.sh` scans for identity leaks. Where the venue supplies an official poster kit it is copied byte-for-byte and never edited; where it supplies only a size, the house `tikzposter` template is used at that size, and a kit is never fetched or reconstructed from memory (conventions §9).
 

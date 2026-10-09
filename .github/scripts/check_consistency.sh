@@ -1861,30 +1861,34 @@ rm -rf -- "${ANON_TEST_DIR}"
 (( anon_lint_errors == 0 )) && note "typeset identity fails, a github.com link warns, file names, placeholders, and comments pass, and an ANON with an inline comment fails"
 
 # 20b. File names follow conventions §10.6, and lint reports a departure as a
-#      warning, never a failure: a name off <nn>_<slug>, a directory whose byte
-#      order and natural order differ (mixed key widths) or whose names differ
-#      only in a number's leading zeros, an asset key no section carries (a
-#      symlink counts), and an include whose key is not its includer's (a bare
-#      name under \graphicspath{{./figs/}}, bracketed and repeated options, and
-#      options or a target continued on the next line after [, ]%, or {%, and
-#      a target split inside its braces by a comment — figs/% then an indented
-#      01_teaser, which TeX reads as figs/01_teaser) each warn once, and never
-#      as a path:line: location. The include warning names the file on disk
-#      with its extension (as written when several files match), once however
+#      warning, never a failure: a name off <nn>_<slug> (a rendered PDF left
+#      under figs/, which holds only figure files, included), a directory whose
+#      byte order and natural order differ (mixed key widths) or whose names
+#      differ only in a number's leading zeros, an asset key no section carries
+#      (a symlink counts), an include whose key is not its includer's (a bare
+#      name under \graphicspath{{./figs/srcs/}}, bracketed and repeated options,
+#      and options or a target continued on the next line after [, ]%, or {%,
+#      and a target split inside its braces by a comment — figs/% then an
+#      indented 01_teaser, which TeX reads as figs/01_teaser), and a figure
+#      file whose graphic under figs/srcs/ — a file, or a multi-file source by
+#      its directory — has another name each warn once, and never as a
+#      path:line: location. The include warning names the file on disk with
+#      its extension (as written when several graphics match), once however
 #      many includes name it. An includer lends its key when that key is two
 #      digits, even with a slug off the grammar (02_related_work.tex, which has
 #      its own grammar warning); one without a two-digit key (3_method.tex)
 #      lends none. A failed build still reports every name. A \graphicspath is
 #      read the same way: its path list continued on the next line, after a
-#      comment or not, still puts a bare name under figs/, while a {figs/}
-#      outside its own brace groups does not. A compliant tree — compound
-#      source suffixes, source directories, a bare and a multi-line
-#      \includegraphics under \graphicspath, commented (also after \\) and
-#      keyless includes, hidden .DS_Store and .ipynb_checkpoints entries, and
-#      git-ignored backups, one with a non-ASCII name and one that opens with a
-#      double quote — draws none, and so does main.tex's teaser slot as the
-#      template ships it (conventions §8.5), uncommented beside
-#      figs/00_teaser.pdf and its source.
+#      comment or not, still puts a bare name under figs/srcs/, while a
+#      {figs/srcs/} outside its own brace groups, or a {figs/} group, does not.
+#      A compliant tree — figure files that \input from sections and main.tex,
+#      graphics and compound source suffixes and source directories under
+#      figs/srcs/, a bare and a multi-line \includegraphics under \graphicspath,
+#      commented (also after \\) and keyless includes, hidden .DS_Store and
+#      .ipynb_checkpoints entries, and git-ignored backups, one with a non-ASCII
+#      name and one that opens with a double quote — draws none, and so does
+#      main.tex's teaser slot as the template ships it (conventions §8.5),
+#      uncommented beside figs/00_teaser.tex and its graphic and source.
 section "File-name lint (conventions §10.6)"
 naming_lint_errors=0
 NAMING_TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stage-naming-lint.XXXXXX")"
@@ -1900,12 +1904,12 @@ for tree in good bad; do
 done
 
 NG="${NAMING_TEST_DIR}/good/manus"
-printf '%s\n' '\graphicspath{{figs/}}' > "${NG}/stys/stage.sty"
+printf '%s\n' '\graphicspath{{figs/srcs/}}' > "${NG}/stys/stage.sty"
 cat > "${NG}/main.tex" <<'EOF'
 \documentclass{stys/stage}
 \input{secs/00_abstract}
 \begin{document}
-\includegraphics{figs/00_overview}
+\input{figs/00_overview}
 \input{secs/01_intro}
 \input{secs/03_method}
 \input{secs/04_experiments}
@@ -1913,22 +1917,28 @@ cat > "${NG}/main.tex" <<'EOF'
 \end{document}
 EOF
 printf 'Abstract.\n' > "${NG}/secs/00_abstract.tex"
-printf '%s\n' '\includegraphics[width=\linewidth]{figs/01_teaser.pdf}' \
-    '\includegraphics[%' '  width=\linewidth]%' '  {01_teaser}' > "${NG}/secs/01_intro.tex"
+printf '%s\n' '\input{figs/01_teaser}' > "${NG}/secs/01_intro.tex"
 cat > "${NG}/secs/03_method.tex" <<'EOF'
-\includegraphics{03_framework} and \includegraphics[trim={1 2 3 4}]{figs/03_ablation-2}
-% \includegraphics{figs/04_moved-away}
-A line break.\\% \includegraphics{figs/04_moved-away}
-\includegraphics{figs/logo}
+\input{figs/03_framework} and \input{figs/03_ablation-2.tex}
+% \input{figs/04_moved-away}
+A line break.\\% \input{figs/04_moved-away}
+\includegraphics{figs/srcs/logo}
 EOF
 printf '%s\n' '\input{tabs/04_main-results}' > "${NG}/secs/04_experiments.tex"
 printf '%s\n' '\input{tabs/10_extra-ablation}' > "${NG}/secs/10_appx-details.tex"
 mkdir -p "${NG}/figs/srcs/03_framework.assets" "${NG}/figs/srcs/01_teaser" "${NG}/figs/srcs/.ipynb_checkpoints"
-for f in secs/.DS_Store figs/.DS_Store figs/00_overview.pdf figs/01_teaser.pdf figs/03_framework.pdf figs/03_ablation-2.pdf \
-         figs/srcs/03_framework.pptx figs/srcs/03_framework.sources.md figs/srcs/03_framework.render.yml \
-         figs/srcs/03_ablation-2.py tabs/04_main-results.tex tabs/10_extra-ablation.tex; do
+for f in secs/.DS_Store figs/.DS_Store figs/srcs/00_overview.pdf figs/srcs/01_teaser.pdf figs/srcs/01_teaser/panel-a.pdf \
+         figs/srcs/03_framework.pdf figs/srcs/03_framework.pptx figs/srcs/03_framework.sources.md \
+         figs/srcs/03_framework.render.yml figs/srcs/03_ablation-2.pdf figs/srcs/03_ablation-2.py \
+         tabs/04_main-results.tex tabs/10_extra-ablation.tex; do
     : > "${NG}/${f}"
 done
+printf '%s\n' '\includegraphics{figs/srcs/00_overview}' > "${NG}/figs/00_overview.tex"
+printf '%s\n' '\includegraphics[width=\linewidth]{figs/srcs/01_teaser.pdf}' \
+    '\includegraphics[%' '  width=\linewidth]%' '  {01_teaser}' \
+    '\includegraphics{figs/srcs/01_teaser/panel-a.pdf}' > "${NG}/figs/01_teaser.tex"
+printf '%s\n' '\includegraphics{03_framework}' > "${NG}/figs/03_framework.tex"
+printf '%s\n' '\includegraphics[trim={1 2 3 4}]{figs/srcs/03_ablation-2}' > "${NG}/figs/03_ablation-2.tex"
 
 # Inside a git work tree, a name git ignores is not the manuscript's either.
 if git -C "${NAMING_TEST_DIR}/good" init -q >/dev/null 2>&1; then
@@ -1942,34 +1952,41 @@ NB="${NAMING_TEST_DIR}/bad/manus"
 cat > "${NB}/main.tex" <<'EOF'
 \documentclass{stys/stage}
 \begin{document}
-\includegraphics{figs/01_teaser}
-\includegraphics{figs/01_teaser.pdf}
+\input{figs/01_teaser}
+\input{figs/01_teaser.tex}
 \end{document}
 EOF
+mkdir -p "${NB}/figs/srcs/04_plot"
 for f in secs/01_intro.tex secs/02_related_work.tex secs/3_method.tex \
-         figs/01_teaser.pdf figs/03_x.pdf figs/03_y.pdf figs/03_y.png figs/04_Plot.PDF figs/04_seed1.pdf \
-         figs/04_seed01.pdf tabs/04_main-results.tex tabs/07_orphan.tex; do
+         figs/01_teaser.tex figs/03_chart.pdf figs/04_Plot.TEX figs/04_seed1.tex figs/04_seed01.tex \
+         figs/srcs/01_teaser.pdf figs/srcs/03_x.pdf figs/srcs/03_y.pdf figs/srcs/03_y.png \
+         figs/srcs/04_bars.pdf figs/srcs/04_seed1.pdf tabs/04_main-results.tex tabs/07_orphan.tex; do
     : > "${NB}/${f}"
 done
-ln -s 01_teaser.pdf "${NB}/figs/09_linked.pdf"
-printf '%s\n' '\graphicspath{{./figs/}}' > "${NB}/stys/stage.sty"
+ln -s 01_teaser.tex "${NB}/figs/09_linked.tex"
+ln -s 01_teaser.pdf "${NB}/figs/srcs/09_shot.pdf"
+printf '%s\n' '\graphicspath{{./figs/srcs/}}' > "${NB}/stys/stage.sty"
 cat > "${NB}/secs/03_method.tex" <<'EOF'
 \includegraphics[
   width=\linewidth,
-]{figs/01_teaser}
+]{figs/srcs/01_teaser}
 \includegraphics[width=\linewidth]%
-  {figs/04_seed1}
+  {figs/srcs/04_seed1}
 \includegraphics[width=\linewidth]{%
-  09_linked}
+  09_shot}
+\input{%
+  figs/09_linked}
 \input{%
   tabs/07_orphan}
-\includegraphics[1,2][3,4]{figs/04_seed01}
+\includegraphics[1,2][3,4]{figs/srcs/04_bars}
 EOF
-printf '%s\n' '\includegraphics[alt={A [b] c}]{03_x}' '\includegraphics{figs/03_y}' > "${NB}/secs/04_experiments.tex"
-printf '%s\n' '\includegraphics{figs/03_x}' > "${NB}/secs/3_method.tex"
-printf '%s\n' '\includegraphics{figs/03_x}' > "${NB}/secs/02_related_work.tex"
-printf '%s\n' '\input{tabs/04_main-results}' '\includegraphics{figs/%' > "${NB}/secs/10_appx-details.tex"
+printf '%s\n' '\includegraphics[alt={A [b] c}]{03_x}' '\includegraphics{figs/srcs/03_y}' > "${NB}/secs/04_experiments.tex"
+printf '%s\n' '\input{figs/03_x}' > "${NB}/secs/3_method.tex"
+printf '%s\n' '\input{figs/03_x}' > "${NB}/secs/02_related_work.tex"
+printf '%s\n' '\input{tabs/04_main-results}' '\input{figs/%' > "${NB}/secs/10_appx-details.tex"
 printf '\t%s\n' '01_teaser}' >> "${NB}/secs/10_appx-details.tex"
+printf '%s\n' '\includegraphics{figs/srcs/03_y}' > "${NB}/figs/03_x.tex"
+printf '%s\n' '\includegraphics{figs/srcs/04_plot/a.pdf}' '\includegraphics{04_seed1}' > "${NB}/figs/04_seed1.tex"
 
 if NAMING_GOOD_OUT="$(cd "${NAMING_TEST_DIR}/good" && bash execs/scpts/lint.sh 2>&1)"; then
     grep -qF 'ok: manuscript file names follow <nn>_<slug>' <<< "${NAMING_GOOD_OUT}" || {
@@ -1991,51 +2008,61 @@ if NAMING_BAD_OUT="$(cd "${NAMING_TEST_DIR}/bad" && bash execs/scpts/lint.sh 2>&
     for marker in \
         'warn: manus/secs/02_related_work.tex is off the <nn>_<slug> grammar' \
         'warn: manus/secs/3_method.tex is off the <nn>_<slug> grammar' \
-        'warn: manus/figs/04_Plot.PDF is off the <nn>_<slug> grammar' \
+        'warn: manus/figs/04_Plot.TEX is off the <nn>_<slug> grammar' \
+        'warn: manus/figs/03_chart.pdf is off the <nn>_<slug> grammar' \
         'warn: manus/secs lists in a different order in git and ls than in VS Code, Overleaf, and Finder: 04_experiments.tex comes before 3_method.tex' \
         'use one key width and pad digit runs inside slugs' \
         'warn: manus/tabs/07_orphan.tex has key 07, but no manus/secs/07_*.tex exists' \
-        'warn: manus/figs/09_linked.pdf has key 09, but no manus/secs/09_*.tex exists' \
-        'warn: manus/figs lists in a different order in git and ls than in Finder: 04_seed01.pdf and 04_seed1.pdf differ only in a number' \
-        'warn: manus/figs/03_x.pdf is included from manus/secs/04_experiments.tex with key 03' \
+        'warn: manus/figs/09_linked.tex has key 09, but no manus/secs/09_*.tex exists' \
+        'warn: manus/figs/srcs/09_shot.pdf has key 09, but no manus/secs/09_*.tex exists' \
+        'warn: manus/figs lists in a different order in git and ls than in Finder: 04_seed01.tex and 04_seed1.tex differ only in a number' \
+        'warn: manus/figs/srcs/03_x.pdf is included from manus/secs/04_experiments.tex with key 03' \
         'expected 04_x.pdf;' \
-        'warn: manus/figs/03_x.pdf is included from manus/secs/02_related_work.tex with key 03' \
-        'expected 02_x.pdf;' \
-        'warn: manus/figs/03_y is included from manus/secs/04_experiments.tex with key 03' \
+        'warn: manus/figs/03_x.tex is included from manus/secs/02_related_work.tex with key 03' \
+        'expected 02_x.tex;' \
+        'warn: manus/figs/srcs/03_y is included from manus/secs/04_experiments.tex with key 03' \
         'expected 04_y;' \
         'warn: manus/tabs/04_main-results.tex is included from manus/secs/10_appx-details.tex with key 04' \
         'expected 10_main-results.tex;' \
-        'warn: manus/figs/01_teaser.pdf is included from manus/main.tex with key 01' \
-        'expected 00_teaser.pdf;' \
-        'warn: manus/figs/01_teaser.pdf is included from manus/secs/03_method.tex with key 01' \
+        'warn: manus/figs/01_teaser.tex is included from manus/main.tex with key 01' \
+        'expected 00_teaser.tex;' \
+        'warn: manus/figs/srcs/01_teaser.pdf is included from manus/secs/03_method.tex with key 01' \
         'expected 03_teaser.pdf;' \
-        'warn: manus/figs/04_seed1.pdf is included from manus/secs/03_method.tex with key 04' \
+        'warn: manus/figs/srcs/04_seed1.pdf is included from manus/secs/03_method.tex with key 04' \
         'expected 03_seed1.pdf;' \
-        'warn: manus/figs/09_linked.pdf is included from manus/secs/03_method.tex with key 09' \
-        'expected 03_linked.pdf;' \
+        'warn: manus/figs/srcs/09_shot.pdf is included from manus/secs/03_method.tex with key 09' \
+        'expected 03_shot.pdf;' \
+        'warn: manus/figs/09_linked.tex is included from manus/secs/03_method.tex with key 09' \
+        'expected 03_linked.tex;' \
         'warn: manus/tabs/07_orphan.tex is included from manus/secs/03_method.tex with key 07' \
         'expected 03_orphan.tex;' \
-        'warn: manus/figs/04_seed01.pdf is included from manus/secs/03_method.tex with key 04' \
-        'expected 03_seed01.pdf;' \
-        'warn: manus/figs/01_teaser.pdf is included from manus/secs/10_appx-details.tex with key 01' \
-        'expected 10_teaser.pdf;'; do
+        'warn: manus/figs/srcs/04_bars.pdf is included from manus/secs/03_method.tex with key 04' \
+        'expected 03_bars.pdf;' \
+        'warn: manus/figs/01_teaser.tex is included from manus/secs/10_appx-details.tex with key 01' \
+        'expected 10_teaser.tex;' \
+        'warn: manus/figs/srcs/03_y is included from manus/figs/03_x.tex, whose graphic and sources share its name — expected 03_x;' \
+        'warn: manus/figs/srcs/04_plot is included from manus/figs/04_seed1.tex, whose graphic and sources share its name — expected 04_seed1;'; do
         grep -qF -- "${marker}" <<< "${NAMING_BAD_OUT}" || {
             fail "file-name lint missed expected warning: ${marker}"
             naming_lint_errors=1
         }
     done
     naming_warns="$(grep -cF '(conventions §10.6).' <<< "${NAMING_BAD_OUT}" || true)"
-    if [[ "${naming_warns}" != 18 ]]; then
-        fail "file-name lint printed ${naming_warns} warning(s) for the violating tree, expected 18 (one per name, directory, asset, and included file)"
+    if [[ "${naming_warns}" != 23 ]]; then
+        fail "file-name lint printed ${naming_warns} warning(s) for the violating tree, expected 23 (one per name, directory, asset, and included file)"
         naming_lint_errors=1
     fi
     naming_main_warns="$(grep -cF 'included from manus/main.tex' <<< "${NAMING_BAD_OUT}" || true)"
     if [[ "${naming_main_warns}" != 1 ]]; then
-        fail "file-name lint warned ${naming_main_warns} time(s) about figs/01_teaser.pdf from main.tex, which names it twice (with and without .pdf); one file draws one warning"
+        fail "file-name lint warned ${naming_main_warns} time(s) about figs/01_teaser.tex from main.tex, which names it twice (with and without .tex); one file draws one warning"
         naming_lint_errors=1
     fi
     if grep -qF 'included from manus/secs/3_method.tex' <<< "${NAMING_BAD_OUT}"; then
         fail "file-name lint took a key from secs/3_method.tex, whose key is not two digits; such an includer lends none"
+        naming_lint_errors=1
+    fi
+    if grep -qF 'manus/figs/srcs/04_seed1.pdf is included from manus/figs/04_seed1.tex' <<< "${NAMING_BAD_OUT}"; then
+        fail "file-name lint warned on a figure file's own graphic, a bare name under \\graphicspath that shares its name"
         naming_lint_errors=1
     fi
     if grep -qF 'ok: manuscript file names follow' <<< "${NAMING_BAD_OUT}"; then
@@ -2060,8 +2087,8 @@ grep -qF 'warn: manus/tabs/07_orphan.tex has key 07' <<< "${NAMING_FAILED_BUILD_
 
 # \graphicspath read the way TeX reads it, one tree per spelling: whether a
 # bare \includegraphics{02_bare} in main.tex (key 00) draws the include warning
-# says whether lint took figs/ to be on the path. Fields: expected result, the
-# first line of stage.sty, its second line.
+# says whether lint took figs/srcs/ to be on the path. Fields: expected result,
+# the first line of stage.sty, its second line.
 gp_case=0
 while IFS='|' read -r gp_expect gp_first gp_second; do
     gp_case=$(( gp_case + 1 ))
@@ -2076,7 +2103,7 @@ while IFS='|' read -r gp_expect gp_first gp_second; do
         '\end{document}' > "${GP}/manus/main.tex"
     GP_OUT="$(cd "${GP}" && bash execs/scpts/lint.sh 2>&1 || true)"
     gp_got=none
-    if grep -qF 'warn: manus/figs/02_bare is included from manus/main.tex with key 02' <<< "${GP_OUT}"; then
+    if grep -qF 'warn: manus/figs/srcs/02_bare is included from manus/main.tex with key 02' <<< "${GP_OUT}"; then
         gp_got=warn
     fi
     if [[ "${gp_got}" != "${gp_expect}" ]]; then
@@ -2084,41 +2111,45 @@ while IFS='|' read -r gp_expect gp_first gp_second; do
         naming_lint_errors=1
     fi
 done <<'EOF'
-warn|\graphicspath{{./figs/}}|
-warn|\graphicspath{%|  {figs/}}
-warn|\graphicspath|  {{./figs}}
-warn|\graphicspath{{srcs/}%|	{figs/}}
-none|\graphicspath{{srcs/}}|\newcommand{\figdir}{figs/}
+warn|\graphicspath{{./figs/srcs/}}|
+warn|\graphicspath{%|  {figs/srcs/}}
+warn|\graphicspath|  {{./figs/srcs}}
+warn|\graphicspath{{srcs/}%|	{figs/srcs/}}
+none|\graphicspath{{srcs/}}|\newcommand{\figdir}{figs/srcs/}
+none|\graphicspath{{./figs/}}|
 EOF
 # The teaser slot as manus/main.tex ships it: commented out there, so the
 # template's lint verdict does not move, and keyed 00, main.tex's own key, so
-# uncommenting it beside figs/00_teaser.pdf draws no file-name warning.
+# uncommenting it beside figs/00_teaser.tex, whose graphic and source share its
+# name, draws no file-name warning.
 TS="${NAMING_TEST_DIR}/teaser"
 mkdir -p "${TS}/execs/scpts" "${TS}/manus/secs" "${TS}/manus/figs/srcs" "${TS}/manus/stys" "${TS}/wkdrs/builds"
 cp execs/scpts/lint.sh "${TS}/execs/scpts/lint.sh"
+cp manus/stys/stage.sty "${TS}/manus/stys/stage.sty"
 printf '#!/usr/bin/env bash\nexit 0\n' > "${TS}/execs/run.sh"
 : > "${TS}/wkdrs/builds/main.log"
 : > "${TS}/wkdrs/builds/main.pdf"
-TEASER_SLOT="$(awk '/^% \\begin\{figure\}/ { on = 1 } on { sub(/^% ?/, ""); print } on && /\\end\{figure\}/ { exit }' manus/main.tex)"
-if grep -qF '\includegraphics[width=\linewidth]{figs/00_teaser}' <<< "${TEASER_SLOT}" &&
-   grep -qF '\label{fig:teaser}' <<< "${TEASER_SLOT}"; then
+TEASER_SLOT="$(grep -E '^% \\input\{figs/00_teaser\}$' manus/main.tex | sed 's/^% //' || true)"
+if [[ "${TEASER_SLOT}" == '\input{figs/00_teaser}' ]]; then
     { printf '%s\n' '\documentclass{stys/stage}' '\begin{document}' '\maketitle'
       printf '%s\n' "${TEASER_SLOT}" '\end{document}'; } > "${TS}/manus/main.tex"
-    : > "${TS}/manus/figs/00_teaser.pdf"
+    printf '%s\n' '\begin{figure}[htb]' '\includegraphics[width=\linewidth]{00_teaser}' \
+        '\caption{\todo{Teaser caption.}}' '\label{fig:teaser}' '\end{figure}' > "${TS}/manus/figs/00_teaser.tex"
+    : > "${TS}/manus/figs/srcs/00_teaser.pdf"
     : > "${TS}/manus/figs/srcs/00_teaser.pptx"
     TS_OUT="$(cd "${TS}" && bash execs/scpts/lint.sh 2>&1 || true)"
     if grep -qF '(conventions §10.6)' <<< "${TS_OUT}" ||
        ! grep -qF 'ok: manuscript file names follow <nn>_<slug>' <<< "${TS_OUT}"; then
-        fail "file-name lint did not pass main.tex's teaser slot, uncommented beside figs/00_teaser.pdf:"
+        fail "file-name lint did not pass main.tex's teaser slot, uncommented beside figs/00_teaser.tex:"
         printf '%s\n' "${TS_OUT}" | sed 's/^/      /'
         naming_lint_errors=1
     fi
 else
-    fail "manus/main.tex ships no commented teaser slot: a '% \\begin{figure}' block holding \\includegraphics[width=\\linewidth]{figs/00_teaser} and \\label{fig:teaser} (conventions §8.5)"
+    fail "manus/main.tex ships no commented teaser slot: a line '% \\input{figs/00_teaser}' (conventions §8.5)"
     naming_lint_errors=1
 fi
 rm -rf -- "${NAMING_TEST_DIR}"
-(( naming_lint_errors == 0 )) && note "off-grammar names, mixed key widths, leading-zero ties, ownerless keys, and wrong includers (multi-line and comment-split ones too, named with their extension) warn; a multi-line \\graphicspath is read; an off-grammar includer with a two-digit key lends it; a compliant tree and main.tex's teaser slot, uncommented, pass"
+(( naming_lint_errors == 0 )) && note "off-grammar names (a PDF under figs/ among them), mixed key widths, leading-zero ties, ownerless keys, wrong includers (multi-line and comment-split ones too, named with their extension), and a figure file whose graphic has another name warn; a multi-line \\graphicspath is read; an off-grammar includer with a two-digit key lends it; a compliant tree and main.tex's teaser slot, uncommented, pass"
 
 # 20c. A TeX comment opens at a % that an even run of backslashes precedes: \%
 #      is a percent sign, \\% a line break and then a comment. Every lint check

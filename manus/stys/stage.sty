@@ -47,10 +47,12 @@
 \RequirePackage{xcolor}
 \RequirePackage{hyperref}
 
-%% Rendered figures live in manus/figs/; their editable sources in
-%% manus/figs/srcs/, which is deliberately not on this path — \includegraphics
-%% reaches only what /stage-figs-designer has rendered.
-\graphicspath{{figs/}}
+%% A figure is a LaTeX file in manus/figs/, which a section inputs; its
+%% rendered graphic and its editable sources share its name in
+%% manus/figs/srcs/, the one directory on this path. \includegraphics looks
+%% only for graphic extensions, so a .pptx or .py beside the PDF never answers
+%% a bare name.
+\graphicspath{{figs/srcs/}}
 
 %% The class defines accentcolor as its theme color; a venue class does not, so
 %% fall back to black rather than failing to compile.

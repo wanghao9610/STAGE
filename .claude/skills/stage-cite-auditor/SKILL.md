@@ -94,9 +94,9 @@ re-reading routes to `stage-refs-curator`.
    Principle 1 applies), the bib's keys and fields, and `notes/claims.md` — factual claims may
    name cited works; cross-reference their IDs, never flip them (this skill is not a ledger
    writer). Real date from the system clock (conventions §4).
-2. **Resolve scope (conventions §5).** Section argument → that `secs/` file plus every table it
-   `\input`s or `\ref`s, captions and rows (as `stage-clms-auditor` scopes a section); none → all
-   of `manus/secs/` and `manus/tabs/`.
+2. **Resolve scope (conventions §5).** Section argument → that `secs/` file plus every table and
+   figure file it `\input`s or `\ref`s, captions and rows (as `stage-clms-auditor` scopes a
+   section); none → all of `manus/secs/`, `manus/tabs/`, and `manus/figs/*.tex`.
 3. **Resolve keys.** Extract every citation command from all of `manus/` (every natbib form the
    class loads — any `\[Cc]ite[a-zA-Z]*` command, `\citealt`, `\citeauthor`, and `\citeyear` among
    them, starred and optioned — plus `\nocite`, each line read after its comment is stripped from
@@ -122,10 +122,10 @@ re-reading routes to `stage-refs-curator`.
    marked `abstract-and-intro`, or a native note read short of the floor → the same command, read
    properly this time; undefined key or
    missing citation → `stage-sect-drafter <section>`, or `stage-tabs-builder <table>` when it
-   sits in `manus/tabs/`, sets the `\cite` when the work already has an entry, else
+   sits in `manus/tabs/` and `stage-figs-designer <figure>` when it sits in a figure caption, sets the `\cite` when the work already has an entry, else
    `stage-refs-curator <DOI | arXiv id | "title">` first, then that run; wrong sentence →
    `stage-sect-drafter <section>`, or `stage-tabs-builder <table>` when it sits in `manus/tabs/`
-   (a caption, a cited row); bib repair → `stage-refs-curator tidy`, or
+   (a caption, a cited row), or `stage-figs-designer <figure>` when it sits in a figure caption; bib repair → `stage-refs-curator tidy`, or
    `stage-refs-curator <DOI | arXiv id>` for an arXiv entry whose note records a published
    version. A re-run checks off items it can prove resolved and files only what has no open box
    (conventions §8.12).

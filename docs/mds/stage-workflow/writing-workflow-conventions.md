@@ -41,10 +41,10 @@ Terms this file and every `SKILL.md` use without re-explaining. Each is defined 
 | Skill | Commits | Stages |
 | --- | --- |
 | `stage-stry-coach` | offered once when the run ends | `notes/story.md`, the seeded `notes/claims.md`, the cycle's `venue.yml` when this run wrote it |
-| `stage-outl-planner` | offered once when the run ends | `notes/outline.md`, `notes/notation.md`, new `manus/secs/` skeletons, the `\input`, `\title`, teaser-slot, and placeholder edits in `manus/main.tex`, and after a renumbering or re-key the `git mv` renames — each section with the figures, figure sources, and tables it owns (§10.6) — with the include lines, the `notes/claims.md` `Stated in` tokens, and the open `tasks/` boxes they changed |
+| `stage-outl-planner` | offered once when the run ends | `notes/outline.md`, `notes/notation.md`, new `manus/secs/` skeletons, the `\input`, `\title`, teaser-slot, and placeholder edits in `manus/main.tex`, and after a renumbering or re-key the `git mv` renames — each section with the figure files, figure graphics and sources, and tables it owns (§10.6) — with the include lines, the `notes/claims.md` `Stated in` tokens, and the open `tasks/` boxes they changed |
 | `stage-sect-drafter` | offered once per drafted section | that section's `.tex`, plus its ledger, notation, and outline updates, and the `tasks/<cycle>_promises.md` boxes it ticked |
 | `stage-tabs-builder` | offered once when the run ends | the tables written, plus their outline and ledger updates, and the `tasks/<cycle>_promises.md` boxes it ticked |
-| `stage-figs-designer` | offered once when the run ends | `manus/figs/` renders, `manus/figs/srcs/` sources, outline updates, and the `tasks/<cycle>_promises.md` boxes it ticked |
+| `stage-figs-designer` | offered once when the run ends | `manus/figs/` figure files, `manus/figs/srcs/` renders and sources, outline and ledger updates, and the `tasks/<cycle>_promises.md` boxes it ticked |
 | `stage-refs-curator` | offered once when the run ends | `manus/bibs/reference.bib`, `notes/refs/` notes and index |
 | `stage-copy-editor` | offered once after the pass | only the `.tex` files the pass edited, the `notes/outline.md` Sections rows it polished, and `tasks/polish_followups.md`, or `notes/style.md` alone after a `style` run — the polish report stays in `wkdrs/` |
 | `stage-clms-auditor` | offered once after the audit | `notes/claims.md` status flips, the new `tasks/` items, and `notes/adopt.md` when the run set its `backfilled:` — the audit report stays in `wkdrs/` |
@@ -133,7 +133,7 @@ Five of them are read by the scripts under `execs/`. The other two no script rea
 2. **A section argument resolves against `notes/outline.md`'s Sections table**: by number (`3` or `03` matches the `#` column and the `<nn>_` filename key; an appendix section is `10`, `11`, …), by file slug (`method`, `03_method`, or a `manus/secs/…` path), or by title match (case-insensitive substring of the Title column). Before the outline exists, only an explicit filename resolves.
 3. **Absent or ambiguous → list the nearest candidates** (number + file + status, one line each) and ask one direct question (§7.2). Never guess which section was meant. `involve=low` does not downgrade this: ambiguity about what the user meant is asked at every level (§7.7).
 4. **The active cycle is `cycle:` in `notes/story.md` frontmatter**, naming `cycls/<cycle>/`. An explicit cycle argument overrides it for that run. Neither present → ask, or route to `/stage-stry-coach`, which creates cycles; no skill invents a cycle directory as a side effect.
-5. **Never renumber or re-key in passing.** A section's `<nn>_` key (§10.6) is load-bearing: outline rows, the ledger's `Stated in` column, and the `\input` order in `main.tex` are built on it, and so is the key of every figure, figure source, and table the section includes — those carry no number of their own, and the outline's `File` cells, the ledger's `tabs/<nn>_<slug>` entries, and the including file's `\input{tabs/…}` or `\includegraphics{figs/…}` line name them by it. Renumbering, splitting, or merging a section, and moving a figure or table to another section, is a deliberate `stage-outl-planner` operation that `git mv`s the section with every asset it owns and updates `main.tex`, those include lines, the outline, the ledger, and the open `tasks/` boxes together — never a drafting side effect. An asset is never renumbered within its section.
+5. **Never renumber or re-key in passing.** A section's `<nn>_` key (§10.6) is load-bearing: outline rows, the ledger's `Stated in` column, and the `\input` order in `main.tex` are built on it, and so is the key of every figure file, figure graphic and source, and table the section includes — those carry no number of their own, and the outline's `File` cells, the ledger's `tabs/<nn>_<slug>` and `figs/<nn>_<slug>` entries, the including file's `\input{tabs/…}` or `\input{figs/…}` line, and the figure file's `\includegraphics{figs/srcs/…}` line name them by it. Renumbering, splitting, or merging a section, and moving a figure or table to another section, is a deliberate `stage-outl-planner` operation that `git mv`s the section with every asset it owns and updates `main.tex`, those include lines, the outline, the ledger, and the open `tasks/` boxes together — never a drafting side effect. An asset is never renumbered within its section.
 6. **Files and outline must agree.** A `manus/secs/` file with no outline row, a row whose file is missing, or a figure or table whose key is not its row's `Section` key (§10.6) is drift to report (`stage-flow-status` names it), not something to repair silently mid-task.
 
 ## 6. Delegation
@@ -201,13 +201,13 @@ Every skill's durable output, in one table. `stage-flow-status` reads this as th
 | Evidence | `execs/scpts/import.sh` + `stage-evid-curator` | `mates/<slug>/**`, `mates/manual/**`, ledger `mates/MANIFEST.md` | per entry: `source-type:`, `source-stamp:`, `imported:` |
 | Story | `stage-stry-coach` | `notes/story.md` | `finalized:`, `venue:`, `cycle:` |
 | Venue profile | `stage-stry-coach` | `cycls/<cycle>/venue.yml` | `confirmed:` |
-| Claim ledger | `stage-stry-coach` creates; `stage-sect-drafter`, `stage-tabs-builder`, `stage-clms-auditor`, `stage-resp-writer` update; `stage-outl-planner` rewrites a renamed `Stated in` section or table token | `notes/claims.md` | per-claim `Status` column |
+| Claim ledger | `stage-stry-coach` creates; `stage-sect-drafter`, `stage-tabs-builder`, `stage-figs-designer`, `stage-clms-auditor`, `stage-resp-writer` update; `stage-outl-planner` rewrites a renamed `Stated in` section, table, or figure token | `notes/claims.md` | per-claim `Status` column |
 | Outline | `stage-outl-planner` creates; drafter / figs / tabs skills and `stage-copy-editor` update their rows | `notes/outline.md` + `manus/secs/*.tex` skeletons | `finalized:`; per-row `Status` |
 | Notation | `stage-outl-planner` creates; `stage-sect-drafter` appends; `stage-copy-editor` enforces | `notes/notation.md` | `updated:` |
 | Style profile | `stage-copy-editor` creates and revises; `stage-sect-drafter` reads | `notes/style.md` | `updated:`, `source:` |
 | Section drafts | `stage-sect-drafter` | `manus/secs/<nn>_<slug>.tex` | Sections row status in outline |
 | Tables | `stage-tabs-builder` | `manus/tabs/<nn>_<slug>.tex` | per-data-row `% src:` comment; Tables row in outline |
-| Figures | `stage-figs-designer` | `manus/figs/<nn>_<slug>.pdf`, `manus/figs/srcs/<nn>_<slug>.*` | Figures row in outline |
+| Figures | `stage-figs-designer` | `manus/figs/<nn>_<slug>.tex`, `manus/figs/srcs/<nn>_<slug>.*` | per-caption-sentence `% src:` comment; Figures row in outline |
 | References | `stage-refs-curator` | `manus/bibs/reference.bib`, `notes/refs/refs_index.md`, `notes/refs/<ABBREV>.md` | index presence |
 | Audit reports | `stage-clms-auditor`, `stage-cite-auditor`, `stage-copy-editor` | `wkdrs/reports/CLAIMS_<date>.md`, `CITES_<date>.md`, `POLISH_<date>.md` (ephemeral); follow-ups in `tasks/claims_followups.md`, `tasks/cites_followups.md`, `tasks/polish_followups.md` (tracked) | date in filename; open follow-up checkboxes |
 | Simulated review | `stage-peer-reviewer` | `cycls/<cycle>/reviews/SIM_REVIEW_<date>.md` — the panel meta-review; per-perspective working files in `wkdrs/reports/peer_<cycle>_<date>/`. An `extern=` run registers nothing: its `REFEREE_<date>.md` reviews somebody else's paper and is not one of this paper's stages | date in filename |
@@ -251,10 +251,10 @@ model_trail:                    # append-only: one entry per run that writes it,
 
 | ID | Claim | Type | Stated in | Evidence | Status |
 |----|-------|------|-----------|----------|--------|
-| C1 | <one sentence> | contribution \| performance \| factual | `01_intro`, `00_abstract`, `tabs/04_main-results` | `mates/<slug>/...#<anchor>`; `—` if none | proposed \| drafted \| verified \| unsourced \| weakened \| dropped |
+| C1 | <one sentence> | contribution \| performance \| factual | `01_intro`, `00_abstract`, `tabs/04_main-results`, `figs/03_framework` | `mates/<slug>/...#<anchor>`; `—` if none | proposed \| drafted \| verified \| unsourced \| weakened \| dropped |
 ```
 
-Lifecycle: `proposed` (story) → `drafted` (stated in text) → `verified` (clms-auditor matched evidence) / `unsourced` (stated, no fingerprint — must carry `\todo`) / `weakened` (conceded in response) / `dropped`. Repairs are owned like the states are: `stage-clms-auditor` flips `unsourced → verified` when a later audit finds the `\todo` gone and every number tracing to fresh, matching evidence; `stage-sect-drafter` and `stage-tabs-builder` flip `unsourced → drafted` when a revision replaces the `\todo` with a value that traces, and `weakened → drafted` when a revision restates a conceded claim per its kept promise in `tasks/<cycle>_promises.md` — after which verification is the ordinary path. `dropped` is terminal; a claim worth reviving re-enters through `stage-stry-coach` as a new row.
+Lifecycle: `proposed` (story) → `drafted` (stated in text) → `verified` (clms-auditor matched evidence) / `unsourced` (stated, no fingerprint — must carry `\todo`) / `weakened` (conceded in response) / `dropped`. Repairs are owned like the states are: `stage-clms-auditor` flips `unsourced → verified` when a later audit finds the `\todo` gone and every number tracing to fresh, matching evidence; `stage-sect-drafter`, `stage-tabs-builder`, and `stage-figs-designer` flip `unsourced → drafted` when a revision replaces the `\todo` with a value that traces, and `weakened → drafted` when a revision restates a conceded claim per its kept promise in `tasks/<cycle>_promises.md` — after which verification is the ordinary path. `dropped` is terminal; a claim worth reviving re-enters through `stage-stry-coach` as a new row.
 
 ### 8.2 `mates/MANIFEST.md` — one `##` entry per file under `mates/`
 
@@ -313,10 +313,11 @@ stable identity and survives a re-key. A `00` asset, one `main.tex` places direc
 as its `Section`, and `stage-sect-drafter` never places it: that skill writes under `manus/` only in
 `secs/`, and `secs/00_abstract.tex` sits inside `\abstract{…}`, where no float goes. The teaser is
 the one such asset `main.tex` ships a place for — the commented teaser slot right after
-`\maketitle`, holding `figs/00_teaser.pdf` under `\label{fig:teaser}` and a `\todo` caption — and
-`stage-outl-planner`, which owns the wiring of `main.tex`, uncomments it (or adds it where `main.tex`
-has none) once the teaser's row (`F1`, Section `main.tex`) is planned and its PDF exists. The
-author writes that caption and places any other `00` asset.
+`\maketitle`, `% \input{figs/00_teaser}` — and `stage-outl-planner`, which owns the wiring of
+`main.tex`, uncomments it (or adds it where `main.tex` has none) once the teaser's row (`F1`,
+Section `main.tex`) is planned and its figure file exists. `stage-figs-designer` writes that file,
+`figs/00_teaser.tex`, with the float, `\label{fig:teaser}`, and a `\todo` caption; the author
+writes that caption there and places any other `00` asset.
 
 ### 8.6 `notes/notation.md`
 
@@ -350,7 +351,7 @@ The same producer's other durable artifact is `tasks/<cycle>_venue.md`, the venu
 
 ### 8.11 `notes/style.md`
 
-The author's prose preferences, written down once so every run that touches a sentence reads the same ones instead of inventing a voice per session. `stage-copy-editor` is its only writer (its `style` mode); `stage-sect-drafter` reads it while drafting and the polish pass reads it while editing. Caption prose written by `stage-tabs-builder`, and the figure caption `stage-figs-designer` proposes for `stage-sect-drafter` to place, acquires the voice at the next polish pass, not at authoring time — neither skill reads the profile, deliberately, so a table or figure run stays lean. Frontmatter: `updated:`, and `source:` — `interview` | `sample` | `preset:<name>` — recording how the dials were arrived at. Four sections:
+The author's prose preferences, written down once so every run that touches a sentence reads the same ones instead of inventing a voice per session. `stage-copy-editor` is its only writer (its `style` mode); `stage-sect-drafter` reads it while drafting and the polish pass reads it while editing. Caption prose written by `stage-tabs-builder` and `stage-figs-designer` acquires the voice at the next polish pass, not at authoring time — neither skill reads the profile, deliberately, so a table or figure run stays lean. Frontmatter: `updated:`, and `source:` — `interview` | `sample` | `preset:<name>` — recording how the dials were arrived at. Four sections:
 
 ```markdown
 ## Dials
@@ -390,7 +391,7 @@ A paper is a chain of checkable statements, and a writing agent's cheapest failu
 **(a) Every number in `manus/` either traces to a fingerprinted `mates/` entry or is written as `\todo{...}`. There is no third state.**
 
 - **What counts as a number:** any digit-bearing value whose truth lives outside the manuscript — metrics, deltas, dataset sizes, parameter counts, runtimes, epochs, costs, "3× faster". Not the document's own machinery: section and equation numbers, figure references, citation years, subscript indices. The test is a reviewer asking "source?" — if the honest answer is a measurement or an external fact, the rule applies.
-- **Trace means the full chain.** In a table: the cell → its row's `% src: mates/<...>#<anchor>` comment → a fingerprinted MANIFEST entry → the value present in that evidence file. In prose: the sentence → the ledger row stating it (`Stated in` names this section) → the row's `Evidence` link → the fingerprint. `stage-clms-auditor` walks both chains for every number not handed off below and verdicts each **matched / mismatched / unsourced**.
+- **Trace means the full chain.** In a table: the cell → its row's `% src: mates/<...>#<anchor>` comment (in a figure file, the caption sentence → its own `% src:` comment, and the plotted series → the figure's `src:` map under `figs/srcs/`) → a fingerprinted MANIFEST entry → the value present in that evidence file. In prose: the sentence → the ledger row stating it (`Stated in` names this section) → the row's `Evidence` link → the fingerprint. `stage-clms-auditor` walks both chains for every number not handed off below and verdicts each **matched / mismatched / unsourced**.
 - **A `% src:` comment covers exactly one sentence.** In `manus/tabs/` the unit is already unambiguous — one comment per data row, never shared, never blanket. In prose the unit is the **sentence the comment heads**: it starts at the first word after the comment and ends at that sentence's terminator, however many source lines the sentence wraps across. Two numbers in one sentence share its comment; a number in the next sentence needs its own. This is not pedantry — scope by line and scope by sentence give different verdicts on the same manuscript, and an audit is mechanical only where the unit is fixed.
 - **The todo discipline, concretely:**
 
@@ -447,7 +448,7 @@ Where a skill puts what it writes. Each destination is exclusive — a file belo
 |---|---|
 | Manuscript entry | `manus/main.tex` |
 | Section sources | `manus/secs/<nn>_<slug>.tex` (e.g. `00_abstract.tex`, `01_intro.tex`, `10_appx-details.tex`) |
-| Figures | `manus/figs/<nn>_<slug>.pdf` rendered; `manus/figs/srcs/<nn>_<slug>.*` sources — `<nn>` the key of the file that includes the figure (§10.6); every figure has a source file or a MANIFEST entry |
+| Figures | `manus/figs/<nn>_<slug>.tex` figure files — the float, caption, label, and `\includegraphics{figs/srcs/<nn>_<slug>}` or inline TikZ; `manus/figs/srcs/<nn>_<slug>.*` the rendered graphic and editable sources — `<nn>` the key of the file that includes the figure (§10.6); every rendered graphic has a source file or a MANIFEST entry |
 | Tables | `manus/tabs/<nn>_<slug>.tex`, `<nn>` the key of the file that includes the table (§10.6) |
 | Bibliography | `manus/bibs/reference.bib` |
 | Venue styles | `manus/stys/`: `stage.cls`, `stage.sty`, and `stage.bst`, and nothing else — `manus/` is scanned by `lint.sh` and holds only files this workflow owns |
@@ -497,7 +498,9 @@ Rules the table alone does not carry:
 6. **Every file under `secs/`, `figs/`, `figs/srcs/`, and `tabs/` is named `<nn>_<slug>.<ext>`.**
    The two-digit key `<nn>` and the slug are joined by the name's one `_`. The slug is lowercase
    kebab-case, `[a-z][a-z0-9]*(-[a-z0-9]+)*`: it starts with a letter and joins words with `-`,
-   never `_`. Every extension is lowercase; `figs/srcs/` also takes compound suffixes
+   never `_`. Every extension is lowercase; `figs/` holds only figure files, `<nn>_<slug>.tex`, and
+   every graphic and source they use sits in `figs/srcs/` under the figure file's own name;
+   `figs/srcs/` also takes compound suffixes
    (`.sources.md`, `.render.yml`) and a `<nn>_<slug>` or `<nn>_<slug>.assets` directory for a
    multi-file source. A number inside a slug is zero-padded to the width of the largest in its
    series (`03_ablation-02` … `03_ablation-10`), and two names never differ only in a number's
@@ -509,12 +512,12 @@ Rules the table alone does not carry:
    the part — `0` the main body, `1` the appendix — and the second the order within that part, so
    a part holds at most ten sections: `secs/00_abstract.tex`,
    `secs/01_intro.tex`, `secs/03_method.tex`, `secs/04_experiments.tex`,
-   `secs/10_appx-details.tex`. **A figure, its sources, and a table carry no number of their
-   own**: each takes the key of the one manuscript file that includes it — its owner — and `00` is
+   `secs/10_appx-details.tex`. **A figure file, its graphic and sources, and a table carry no
+   number of their own**: each takes the key of the one manuscript file that includes it — its owner — and `00` is
    reserved for an asset `main.tex` includes directly, whose outline `Section` reads `main.tex`
-   (§8.5). So `main.tex` places `figs/00_teaser.pdf` in its teaser slot, and its source
-   `figs/srcs/00_teaser.pptx` shares that basename;
-   `secs/03_method.tex` places `figs/03_framework.pdf`; `secs/04_experiments.tex` places
+   (§8.5). So `main.tex` inputs `figs/00_teaser.tex` in its teaser slot, and its graphic
+   `figs/srcs/00_teaser.pdf` and source `figs/srcs/00_teaser.pptx` share that basename;
+   `secs/03_method.tex` inputs `figs/03_framework.tex`; `secs/04_experiments.tex` places
    `tabs/04_main-results.tex`; and `secs/10_appx-details.tex` places `tabs/10_extra-ablation.tex`.
    LaTeX numbers the floats and the outline's `F<n>`/`T<n>` ID is each one's stable identity, so an
    asset is never renumbered within its section: its key changes only with its owner's, or when it
@@ -523,7 +526,8 @@ Rules the table alone does not carry:
    `tab:main-results`), which is why a slug is unique within its directory, and why a renumber
    never touches a `\ref` while a slug rename does. `lint.sh` warns on a name off this grammar, a
    directory whose two orders differ or whose names differ only in leading zeros, an asset key no
-   section carries, and an include whose key is not its includer's.
+   section carries, an include whose key is not its includer's, and a figure file whose graphic
+   under `figs/srcs/` has another name.
 
 ## 11. The skill roster
 
@@ -537,7 +541,7 @@ Sixteen skills: `/stage-<name>` in Claude Code, Cursor, Pi, and Qwen Code; `$sta
 | `stage-outl-planner` † | outline, budgets, section skeletons, notation |
 | `stage-sect-drafter` | draft one section per invocation |
 | `stage-tabs-builder` | generate tables from evidence only |
-| `stage-figs-designer` | figure inventory, sources, rendered PDFs |
+| `stage-figs-designer` | figure inventory, figure files and captions, sources, rendered PDFs |
 | `stage-refs-curator` | bibliography, reading notes, discovery, positioning |
 | `stage-copy-editor` | polish prose; never meaning, never numbers |
 | `stage-clms-auditor` | trace every number to a fingerprint |

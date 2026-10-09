@@ -26,7 +26,7 @@ STAGE 提供十六个彼此衔接的写作工作流 skill，把导入的证据�
   ┌─ 起草循环 —— 按节、按表、按图重入 ─────────────────────────────────────┐
   │  → stage-sect-drafter: 起草一节；没有指纹的数字 → \todo               │
   │  → stage-tabs-builder: 表格只来自 mates/ 证据，每行一条 % src:        │
-  │  → stage-figs-designer: 图的源文件 → 渲染出的 PDF                     │
+  │  → stage-figs-designer: 图的源文件 → 渲染出的 PDF → 图文件            │
   │  → stage-copy-editor: 自然表达 —— 守住含义、证据与数字                   │
   └────────────────────────────────────────────────────────────────────────┘
 
@@ -86,7 +86,7 @@ Slash-only。以对话为先的故事塑形：有 STAR 配对提供导入的 ide
 
 ### stage-outl-planner
 
-Slash-only。把定稿的故事变成论文的骨架：`notes/outline.md`，其中章节表的页数预算加起来不超 venue 上限，另有图计划、表计划、以及主张→章节的分配；骨架文件 `manus/secs/<nn>_<slug>.tex`，每个开头以注释块写着它的章节简介，对应的 `\input` 行在 `main.tex` 里取消注释，`figs/00_teaser.pdf` 生成之后标题下的首图位置也一并取消注释；以及一份播好种子的 `notes/notation.md`。跑完这一次，论文就以真实结构编译得出来，而之后每个 skill 都知道什么该放哪、每节必须扛哪些主张。
+Slash-only。把定稿的故事变成论文的骨架：`notes/outline.md`，其中章节表的页数预算加起来不超 venue 上限，另有图计划、表计划、以及主张→章节的分配；骨架文件 `manus/secs/<nn>_<slug>.tex`，每个开头以注释块写着它的章节简介，对应的 `\input` 行在 `main.tex` 里取消注释，`figs/00_teaser.tex` 生成之后标题下的首图位置也一并取消注释；以及一份播好种子的 `notes/notation.md`。跑完这一次，论文就以真实结构编译得出来，而之后每个 skill 都知道什么该放哪、每节必须扛哪些主张。
 
 ### stage-sect-drafter
 
@@ -98,7 +98,7 @@ Slash-only。把定稿的故事变成论文的骨架：`notes/outline.md`，其�
 
 ### stage-figs-designer
 
-它拥有图的清单（提纲的 Figures 表）以及每张图的全程：它的用途、它在 `manus/figs/srcs/` 下可编辑的源文件（tikz、python、drawio；在带有中立副本本地图管线的宿主上，是一页 PPTX 及其渲染记录；或者一条 MANIFEST 条目，用于导入的美术素材）、以及它在 `manus/figs/` 下渲染出的 PDF。每张图要么有源文件、要么有 manifest 条目；一个没有出处的 PDF 不会存在。teaser 图，即 `main.tex` 标题下那个位置里的 `figs/00_teaser.pdf`，有专门的检查清单——它必须独自把故事讲清楚，配一句自足的 caption，由作者写在那个位置里——因为它是每个评审人都会看的那一张。
+它拥有图的清单（提纲的 Figures 表）以及每张图的全程：它的用途、它在 `manus/figs/srcs/` 下可编辑的源文件（tikz、python、drawio；在带有中立副本本地图管线的宿主上，是一页 PPTX 及其渲染记录；或者一条 MANIFEST 条目，用于导入的美术素材）、与源文件放在一起的渲染出的 PDF，以及它的图文件 `manus/figs/<nn>_<slug>.tex`——其中有 float、label，以及每个数字都带 `% src:` 行的图题，图题陈述的论断记入 `notes/claims.md`——由所在章节用一行 `\input` 引入。每个渲染出的 PDF 要么有源文件、要么有 manifest 条目；一个没有出处的 PDF 不会存在。teaser 图，即 `main.tex` 标题下那个位置里的 `figs/00_teaser.tex`，有专门的检查清单——它必须独自把故事讲清楚，配一句自足的 caption，由作者写在那个图文件里——因为它是每个评审人都会看的那一张。
 
 ### stage-refs-curator
 
@@ -140,7 +140,7 @@ Slash-only。预检与打包：`run.sh` 构建与 `lint.sh` 必须通过、venue
 
 ### stage-pstr-builder
 
-Slash-only。海报不是把论文重新灌进一张更大的纸——它是取舍，而做这个取舍就是这个 skill 的全部。`plan` 从 `notes/story.md` 的 pitch 提炼出一句核心结论，走一遍 `notes/claims.md` 取到达 `verified` 的行，提议出承载贡献的那几条，并把其余的记为可见的排除项，好让后来的运行不再翻已定的案；写任何东西之前由用户确认。`render` 把这份计划变成 `cycls/<cycle>/poster/poster.tex`——一个计划分区一个块，主张的措辞取自记录表那一行而不是重新论证一遍，图从 `manus/figs/` 原样引入——并编译进 `wkdrs/builds/poster/`。这里从不新画美术素材：一张在海报尺寸下失效的图，是给 `stage-figs-designer` 的发现。
+Slash-only。海报不是把论文重新灌进一张更大的纸——它是取舍，而做这个取舍就是这个 skill 的全部。`plan` 从 `notes/story.md` 的 pitch 提炼出一句核心结论，走一遍 `notes/claims.md` 取到达 `verified` 的行，提议出承载贡献的那几条，并把其余的记为可见的排除项，好让后来的运行不再翻已定的案；写任何东西之前由用户确认。`render` 把这份计划变成 `cycls/<cycle>/poster/poster.tex`——一个计划分区一个块，主张的措辞取自记录表那一行而不是重新论证一遍，图从 `manus/figs/srcs/` 原样引入——并编译进 `wkdrs/builds/poster/`。这里从不新画美术素材：一张在海报尺寸下失效的图，是给 `stage-figs-designer` 的发现。
 
 两条边界让它是一个 STAGE skill，而不是一个通用海报工具。数字带 `% src:` 注释指向带指纹的 `mates/` 证据，与表格行的做法完全一致；而手稿的第三种状态在这里不存在——`check` 遇到 `\todo` 就硬失败，因为标记是给没人印出来的草稿用的，而这张纸是要印的。可读性也是算术而不是观感：纸张尺寸是用户确认过、记在海报计划里的事实，所以有效字号按印刷尺寸折算，对着这个 skill 自带的 `references/poster-layout.md` 里的下限核对，并点名纸面上最小的那处文字连同其量出的字号。海报还是唯一不继承 `ANON` 的产物——它带作者名，因为你就站在它旁边；这也正是它放在 `cycls/` 而绝不放在 `manus/` 的原因，后者是 `lint.sh` 搜捕身份泄漏的那棵树。会议给了官方海报模板包就逐字节照抄且从不编辑；只给了尺寸，就用自带的 `tikzposter` 模板按该尺寸出图，而模板包绝不抓取、也绝不凭记忆重建（规约 §9）。
 

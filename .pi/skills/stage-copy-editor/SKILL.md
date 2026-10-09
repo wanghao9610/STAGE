@@ -114,7 +114,7 @@ from the same ones instead of each session inventing a voice.
    findings, and nothing else. One section in scope is one file, so it is done here. What never
    splits: the budget arithmetic, which compares sections against each other; Principle 6's
    systematic patterns, which are only visible across the whole return set; caption prose in
-   `manus/tabs/`, which no section delegate owns; the `notes/outline.md` Sections rows, which one
+   `manus/tabs/` and `manus/figs/*.tex`, which no section delegate owns; the `notes/outline.md` Sections rows, which one
    writer sets (§6.2); and Step 6's build and Step 7's conservation check and lint, the gates the
    main agent runs itself (§6.3).
 
@@ -153,7 +153,7 @@ from the same ones instead of each session inventing a voice.
    over-signposting, forced symmetry or triads, terminology drift, uniform rhythm, generic outlooks,
    manufactured depth, and chatbot residue. Identify what the cluster is doing before rewriting the
    paragraph around its main claim; do not replace words mechanically. Then edit table and figure
-   captions (`manus/tabs/` caption prose only — data cells and `% src:` lines are untouchable).
+   captions (`manus/tabs/` and `manus/figs/*.tex` caption prose only — data cells, `\includegraphics` lines, and `% src:` lines are untouchable).
    Apply Principles 1–3, 7, and 8; keep a per-section count of edits by kind and of advisory patterns
    reviewed. A sentence this pass writes or rewrites starts on its own line (conventions §3.7); lines
    it does not otherwise touch keep their breaks, so the diff shows the edits and nothing else.
@@ -199,7 +199,7 @@ from the same ones instead of each session inventing a voice.
 
 ## Output
 
-- Polished prose in `manus/secs/*.tex` and caption text in `manus/tabs/*.tex` — byte-identical
+- Polished prose in `manus/secs/*.tex` and caption text in `manus/tabs/*.tex` and `manus/figs/*.tex` — byte-identical
   in every number, key, label, `% src:` comment, and `\todo`.
 - `wkdrs/reports/POLISH_<date>.md` — output-table row: Audit reports, producer `stage-copy-editor`,
   ephemeral, date in filename. Frontmatter `date:`, `scope:`; sections `## Edits` (per-section

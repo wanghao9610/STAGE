@@ -154,7 +154,8 @@ into a promise or takes the number out. When `anonymized: true` or `.env` sets `
 - `tasks/<cycle>_promises.md` — one `- [ ]` per promise, led by its point ID, and, for each
   conceded claim the manuscript still states, one per section its `Stated in` names —
   `- [ ] <point>: restate C<n> at conceded strength — stage-sect-drafter <section>` — and one per
-  `tabs/<nn>_<slug>` entry, routed to `stage-tabs-builder <nn>_<slug>`. Merge on re-runs: never uncheck or
+  `tabs/<nn>_<slug>` entry, routed to `stage-tabs-builder <nn>_<slug>`, and one per `figs/<nn>_<slug>`
+  entry, routed to `stage-figs-designer <nn>_<slug>`. Merge on re-runs: never uncheck or
   reword an existing box, and append a box only for a point, or a conceded claim's `Stated in`
   entry, that has none. An open box whose point this draft answers without that promise is
   listed and asked about (§7.7, a deletion); on a yes it moves under `## Withdrawn` as

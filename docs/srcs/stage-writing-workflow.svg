@@ -153,7 +153,7 @@
   <text class="bn" x="988" y="378.5">7</text>
   <text class="nt" x="1010" y="379">/stage-figs-designer</text>
   <text class="np" x="978" y="404">Every figure: a purpose, a source, a rendered PDF</text>
-  <text class="no" x="978" y="426">manus/figs/&lt;nn&gt;_&lt;slug&gt;.pdf · srcs/&lt;nn&gt;_&lt;slug&gt;.*</text>
+  <text class="no" x="978" y="426">manus/figs/&lt;nn&gt;_&lt;slug&gt;.tex · srcs/&lt;nn&gt;_&lt;slug&gt;.*</text>
 
   <!-- 8 copy-editor (PLAN) — also where the author's voice is recorded: a style
        run writes notes/style.md, which the drafter reads. -->

@@ -100,8 +100,10 @@ third-party file nobody here is allowed to edit.
    styles, bibliography — and nothing else: no `mates/`, no `notes/`, no `tasks/`, no `.env`;
    under an anonymized cycle, nothing lint's anon families flag. `wkdrs/` is never committed
    (§1); the durable record is the SUBMISSION file and the tag. Editable figure sources stay
-   home too: `manus/figs/srcs/` never ships, because a plotting script or `.drawio` file carries
-   paths, usernames, and machine names that the rendered PDF does not.
+   home too: from `manus/figs/srcs/` ships only each graphic a shipped figure file's
+   `\includegraphics` names — never a `.pptx`, plotting script, `.drawio` file, `.sources.md`,
+   `.render.yml`, or `.assets/` directory, which carry paths, usernames, and machine names that
+   the rendered graphic does not.
 7. **The venue template is supplied, never synthesized.** A venue's class, style, and `.bst`
    files come from an official kit the user hands over, are copied byte-for-byte, and are never
    edited — not to fix a compile error, not to shave a margin. Never fetch a kit, never rebuild
@@ -118,8 +120,8 @@ third-party file nobody here is allowed to edit.
 
 9. **Fan out the sweeps, never the gates (§6).** Step 5's completeness sweep splits by its own
    checks once the ledger holds more than 6 stated claims (below that the main agent reads them
-   itself) — one delegate for the outline's three tables, one for the figure PDFs against
-   `figs/srcs/` and `mates/MANIFEST.md`, one for the claim ledger with its per-file audit dates —
+   itself) — one delegate for the outline's three tables, one for the rendered figure graphics
+   against their sources in `figs/srcs/` and `mates/MANIFEST.md`, one for the claim ledger with its per-file audit dates —
    each returning its own shortfalls as findings and nothing else; `import.sh --diff` and the
    audit follow-up lists are one script call and one read the main agent does itself, and the
    promises file is step 3's gate, not a sweep; Step 6's checklist walk is one delegate per
@@ -191,8 +193,8 @@ third-party file nobody here is allowed to edit.
    box names — a box whose number already traces or carries its `\todo` closes on a
    `stage-clms-auditor` re-run.
 5. **Completeness sweep.** Check (split per Principle 9): outline Sections rows at `polished`,
-   Figures and Tables rows at `final`; every `manus/figs/*.pdf` has a source under `figs/srcs/`
-   or a `mates/MANIFEST.md` entry; no claim stated in the manuscript sits at **`weakened` or
+   Figures and Tables rows at `final`; every rendered graphic a figure file `manus/figs/*.tex`
+   includes from `figs/srcs/` has a source there or a `mates/MANIFEST.md` entry; no claim stated in the manuscript sits at **`weakened` or
    `dropped`** in `notes/claims.md` — `weakened` means a response conceded it in writing, so a
    manuscript still asserting it ships a claim its own authors have withdrawn, which reads worse
    to a reviewer than the original overclaim, and a `dropped` row is read in the files its
@@ -201,11 +203,11 @@ third-party file nobody here is allowed to edit.
    latest claims audit did not verify it (`contribution` rows are outside this check: each
    measurable promise in one is a `performance` row of its own); no `verified` row is stated in
    a file revised after the audit that last covered it, because a `verified` row keeps its status
-   when a later revision changes its number — for each `manus/secs/` or `manus/tabs/` file a
+   when a later revision changes its number — for each `manus/secs/`, `manus/tabs/`, or `manus/figs/` file a
    `verified` row's `Stated in` names
    (a section value resolved against the outline's Sections table as conventions §5.2 resolves a
-   section argument — `01_intro`, `intro`, and `abstract` alike — and `tabs/<nn>_<slug>` →
-   `manus/tabs/<nn>_<slug>.tex`), `git log -1 --format=%cs -- <file>` is earlier than the date of the
+   section argument — `01_intro`, `intro`, and `abstract` alike — `tabs/<nn>_<slug>` →
+   `manus/tabs/<nn>_<slug>.tex`, and `figs/<nn>_<slug>` → `manus/figs/<nn>_<slug>.tex`), `git log -1 --format=%cs -- <file>` is earlier than the date of the
    newest `wkdrs/reports/CLAIMS_<date>.md` whose `scope:` took that file in (resolved as
    `stage-clms-auditor` step 2 resolves a scope; a whole-manuscript report covers every file; a
    file committed the same day as that report cannot be ordered against it and is listed too),
@@ -257,7 +259,8 @@ third-party file nobody here is allowed to edit.
    tag sitting on a tree that is no longer clean.
 8. **Package.** Assemble `wkdrs/builds/<cycle>_<date>/`: the source directory — step 7's
    converted copy when the cycle has a template, otherwise the arXiv-ready form: `main.tex`,
-   `secs/`, `tabs/`, `figs/*.pdf`, the needed `stys/`, and `bibs/reference.bib` plus the build's
+   `secs/`, `tabs/`, `figs/*.tex` with the `figs/srcs/` graphics they include (Principle 6), the
+   needed `stys/`, and `bibs/reference.bib` plus the build's
    `.bbl` — then rebuild it with
    `bash execs/run.sh --main <source>/main.tex --outdir wkdrs/builds/<cycle>_<date>_check/`: a
    bundle that does not compile is not a package. That build's PDF goes into the package beside

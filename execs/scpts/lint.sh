@@ -199,7 +199,8 @@ is_utf8() {
 
 # The prose review's awk program: one paragraph at a time, flagged when it
 # holds chatbot residue or two or more formulaic patterns. table_file (-v) is
-# 1 for a file under manus/tabs/, where only captions are prose.
+# 1 for a table under manus/tabs/ or a figure file under manus/figs/, where
+# only captions are prose.
 PROSE_AWK='
     function add_pattern(name) {
         if (patterns != "") patterns = patterns ","
@@ -328,7 +329,8 @@ PROSE_AWK='
 # and every other file is still read. Whether a file is a table is decided
 # from its place under manus/, never from a pattern over the whole path, so a
 # repository that sits under a directory called tabs/ reads its sections as
-# prose. An unreadable file was named once already, with the source list.
+# prose. A figure file reads as a table does; a source under figs/srcs/ (a
+# standalone TikZ file) is not prose. An unreadable file was named once already, with the source list.
 check_prose_patterns() {
     local file out rc table location patterns snippet
     local prose_output="" prose_count=0 candidates=0 scanned=0 stopped=0
@@ -338,6 +340,8 @@ check_prose_patterns() {
             case "${file}" in
                 "${MANU_DIR}/secs/"*) table=0 ;;
                 "${MANU_DIR}/tabs/"*) table=1 ;;
+                "${MANU_DIR}/figs/srcs/"*) continue ;;
+                "${MANU_DIR}/figs/"*) table=1 ;;
                 *) continue ;;
             esac
             candidates=$(( candidates + 1 ))
@@ -448,20 +452,22 @@ list_names() {
 }
 
 # Conventions §10.6 over manus/secs, figs, figs/srcs, and tabs, in four passes:
-# the <nn>_<slug> grammar, byte order against natural order, an owner for every
-# asset key, and an includer key for every keyed include. Warnings only; reads
+# the <nn>_<slug> grammar (figs/ holds only figure files, <nn>_<slug>.tex), byte
+# order against natural order, an owner for every asset key, and an includer
+# key for every keyed include — for a figure file's graphic under figs/srcs/,
+# the figure file's own key and slug. Warnings only; reads
 # the file tree and the includes, never the build, so it runs before it.
 check_file_names() {
     local slug='[a-z][a-z0-9]*(-[a-z0-9]+)*'
     local spec rel kind pattern names bad name byte nat pair key keys asset
-    local includer ikey hits target tkey graphicspath=0 unread=0
+    local includer ikey stem hits target tkey graphicspath=0 unread=0
     local seen candidate found matches
     local -a preamble_files=()
     local secs_pattern="^[0-9]{2}_${slug}\\.tex\$"
     local before="${WARNS}"
     local -a specs=(
         "secs|f|${secs_pattern}"
-        "figs|f|^[0-9]{2}_${slug}(\\.[a-z0-9]+)+\$"
+        "figs|f|^[0-9]{2}_${slug}\\.tex\$"
         "figs/srcs|fd|^[0-9]{2}_${slug}(\\.[a-z0-9]+)*\$"
         "tabs|f|^[0-9]{2}_${slug}\\.tex\$"
     )
@@ -521,15 +527,17 @@ check_file_names() {
         done <<< "$(list_names "${MANU_DIR}/${rel}" "${spec#*|}")"
     done
 
-    # 4. every keyed include under figs/ or tabs/ carries its includer's key. A
-    # bare \includegraphics name is under figs/ only where \graphicspath sets it.
+    # 4. every keyed include under figs/ or tabs/ carries its includer's key,
+    # and a graphic a figure file includes from figs/srcs/ carries the figure
+    # file's key and slug; a multi-file source counts by its directory. A bare
+    # \includegraphics name is under figs/srcs/ only where \graphicspath sets it.
     # Each file is read as TeX reads it (tex_line above): its comments cut, a
     # line whose comment was cut running straight into the next, and any other
     # line ending in one space. So a \graphicspath whose path list, or an
     # include whose options or target, continue on the next line is still read,
     # and '\includegraphics{figs/%' then '  01_x}' names figs/01_x. \\ is
     # masked after the join, so '\\input' is a line break and then text. A
-    # \graphicspath counts only when {figs/} is one of its own brace groups.
+    # \graphicspath counts only when {figs/srcs/} is one of its own brace groups.
     # An includer whose slug is off the grammar has had its own warning and
     # still lends its key; one whose key is not two digits lends none. A file
     # that cannot be read was named with the source list and is skipped here —
@@ -549,26 +557,31 @@ check_file_names() {
             { text = text tex_line($0) }
             END {
                 gsub(/\\\\/, "\001", text)
-                if (text ~ /\\graphicspath[[:space:]]*\{([[:space:]]*\{([^{}]|\{[^{}]*\})*\})*[[:space:]]*\{(\.\/)?figs\/?\}/) print 1
+                if (text ~ /\\graphicspath[[:space:]]*\{([[:space:]]*\{([^{}]|\{[^{}]*\})*\})*[[:space:]]*\{(\.\/)?figs\/srcs\/?\}/) print 1
                 else print 0
             }' "${preamble_files[@]}" 2>/dev/null || true)"
     fi
     [[ "${graphicspath}" == 1 ]] || graphicspath=0
-    for includer in "${MANU_DIR}/main.tex" "${MANU_DIR}"/secs/*.tex; do
+    for includer in "${MANU_DIR}/main.tex" "${MANU_DIR}"/secs/*.tex "${MANU_DIR}"/figs/*.tex; do
         [[ -f "${includer}" ]] || continue
         if [[ ! -r "${includer}" ]]; then
             unread=1
             continue
         fi
         name="${includer##*/}"
+        stem=''
         if [[ "${includer}" == "${MANU_DIR}/main.tex" ]]; then
             ikey="00"
+        elif [[ "${includer}" == "${MANU_DIR}/figs/"* ]]; then
+            [[ "${name}" =~ ^([0-9]{2})_ ]] || continue
+            ikey="${BASH_REMATCH[1]}"
+            stem="${name%.tex}"
         elif [[ "${name}" =~ ^([0-9]{2})_ ]]; then
             ikey="${BASH_REMATCH[1]}"
         else
             continue
         fi
-        hits="$(LC_ALL=C awk -v key="${ikey}" -v gp="${graphicspath}" "${TEX_AWK}"'
+        hits="$(LC_ALL=C awk -v key="${ikey}" -v stem="${stem}" -v gp="${graphicspath}" "${TEX_AWK}"'
             { text = text tex_line($0) }
             END {
                 gsub(/\\\\/, "\001", text)
@@ -584,18 +597,26 @@ check_file_names() {
                     sub(/^\.\//, "", t)
                     dir = ""; base = t
                     if (index(t, "/")) { dir = t; sub(/\/[^\/]*$/, "", dir); sub(/.*\//, "", base) }
-                    if (dir == "" && gp && g) { dir = "figs"; t = "figs/" t }
+                    if (dir == "" && gp && g) { dir = "figs/srcs"; t = "figs/srcs/" t }
+                    kind = g ? "g" : "i"
+                    if (dir ~ /^figs\/srcs\//) {
+                        base = substr(dir, 11); sub(/\/.*/, "", base)
+                        dir = "figs/srcs"; t = dir "/" base; kind = "d"
+                    }
                     if (dir != "figs" && dir != "figs/srcs" && dir != "tabs") continue
                     b = base; sub(/\..*/, "", b)
                     if (!match(b, /^[0-9]+_/)) continue
                     k = substr(b, 1, RLENGTH - 1)
-                    if (k != key) print t "\t" k "\t" (g ? "g" : "i")
+                    if (stem != "" && dir == "figs/srcs") {
+                        if (b != stem) print t "\t" k "\t" kind
+                    } else if (k != key) print t "\t" k "\t" kind
                 }
             }' "${includer}" 2>/dev/null || true)"
         # Name the file on disk: \input reads the target's .tex when it exists,
-        # and \includegraphics the one file that adds an extension to it; with
-        # none or several, the target is named as written. One warning per
-        # file, however many includes name it.
+        # and \includegraphics the one graphic that adds an extension to it;
+        # with none or several, the target is named as written, and a
+        # multi-file source by its directory. One warning per file, however
+        # many includes name it.
         seen=$'\n'
         while IFS=$'\t' read -r target tkey kind; do
             [[ -n "${target}" ]] || continue
@@ -603,7 +624,7 @@ check_file_names() {
                 target="${target}.tex"
             elif [[ "${kind}" == g && ! -f "${MANU_DIR}/${target}" ]]; then
                 found=''; matches=0
-                for candidate in "${MANU_DIR}/${target}".*; do
+                for candidate in "${MANU_DIR}/${target}".{pdf,png,jpg,jpeg,eps,mps,svg}; do
                     if [[ -f "${candidate}" ]]; then
                         matches=$(( matches + 1 )); found="${candidate#"${MANU_DIR}"/}"
                     fi
@@ -617,6 +638,11 @@ check_file_names() {
             esac
             seen="${seen}${target}"$'\n'
             asset="${target##*/}"
+            if [[ -n "${stem}" && "${target}" == figs/srcs/* ]]; then
+                asset="${asset#"${asset%%.*}"}"
+                warn "manus/${target} is included from ${includer#"${ROOT_DIR}"/}, whose graphic and sources share its name — expected ${stem}${asset}; rename it with stage-figs-designer (conventions §10.6)."
+                continue
+            fi
             warn "manus/${target} is included from ${includer#"${ROOT_DIR}"/} with key ${tkey}, where its includer's key is ${ikey} — expected ${ikey}_${asset#*_}; re-key it with stage-outl-planner (conventions §10.6)."
         done <<< "${hits}"
     done
@@ -652,14 +678,16 @@ done < <(find "${MANU_DIR}" -type f \( -name '*.tex' -o -name '*.sty' -o -name '
 # ---- 0. file names and keys (warning; §10.6) --------------------------------
 # Reads the file tree and the includes, never the build, so it runs first
 # and still reports when the build fails. Every file under secs/, figs/ (files
-# only; srcs/ is its own directory), figs/srcs/, and tabs/ is <nn>_<slug>.<ext>;
-# each directory then lists in one order in git and ls and in VS Code, Overleaf,
-# and Finder, provided every number inside a slug is padded to one width; every
-# figure, figure source, and table carries the key of a section, or 00 for
-# main.tex; and every keyed include under figs/ or tabs/ carries its includer's
-# key. A warning on purpose: a name cannot move a page or a reference, and
-# renaming is stage-outl-planner's. Never scans cycls/ (the poster reuses
-# manus/figs/ by relative path) or wkdrs/.
+# only; srcs/ is its own directory), figs/srcs/, and tabs/ is <nn>_<slug>.<ext>,
+# one under figs/ a figure file, <nn>_<slug>.tex; each directory then lists in
+# one order in git and ls and in VS Code, Overleaf, and Finder, provided every
+# number inside a slug is padded to one width; every figure file, figure
+# graphic or source, and table carries the key of a section, or 00 for
+# main.tex; every keyed include under figs/ or tabs/ carries its includer's
+# key; and a figure file's graphic under figs/srcs/ shares its name. A warning
+# on purpose: a name cannot move a page or a reference, and renaming is
+# stage-outl-planner's. Never scans cycls/ (the poster reuses
+# manus/figs/srcs/ graphics by relative path) or wkdrs/.
 IN_WORK_TREE=false
 if git -C "${ROOT_DIR}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     IN_WORK_TREE=true

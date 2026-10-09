@@ -92,21 +92,15 @@ it is gone.
 \maketitle
 
 %% Teaser slot — key 00 (conventions §10.6): the one figure this file places
-%% itself, so it is figs/00_teaser.pdf, its source figs/srcs/00_teaser.pptx (or
-%% .tex, .py, .drawio), and its notes/outline.md Figures row, F1, has Section
-%% main.tex (conventions §8.5). /stage-figs-designer teaser renders it, and
-%% /stage-outl-planner uncomments this block once that row is planned and the
-%% PDF exists: commented, it asks nothing of the build or lint. The caption
-%% stays a visible todo until the author writes it — /stage-sect-drafter writes
-%% only in secs/. [htb] keeps the teaser on page 1, under the title panel, in
-%% either column layout: [t] alone moves it to page 2 in onecolumn, and so does
-%% figure* in twocolumn, where a spanning float starts on the next page.
-% \begin{figure}[htb]
-%   \centering
-%   \includegraphics[width=\linewidth]{figs/00_teaser}
-%   \caption{\todo{Teaser caption: the problem, the key idea, and the headline result, each number with its source anchor.}}
-%   \label{fig:teaser}
-% \end{figure}
+%% itself, so its figure file is figs/00_teaser.tex, its graphic
+%% figs/srcs/00_teaser.pdf and its source figs/srcs/00_teaser.pptx (or .tex,
+%% .py, .drawio), and its notes/outline.md Figures row, F1, has Section
+%% main.tex (conventions §8.5). /stage-figs-designer teaser writes the figure
+%% file — the float, \label{fig:teaser}, and a visible todo caption the author
+%% replaces there — and renders its graphic; /stage-outl-planner uncomments
+%% this line once that row is planned and the figure file exists: commented, it
+%% asks nothing of the build or lint.
+% \input{figs/00_teaser}
 
 %% Placeholder body — /stage-outl-planner deletes it once a secs/ input is live.
 \section{Introduction}
@@ -117,7 +111,7 @@ it is gone.
 %% notes/outline.md fixes. The <nn>_ key is load-bearing (conventions §5.5):
 %% outline rows, the ledger's "Stated in" column, and this input order share it,
 %% and every figure and table a section includes takes its key (secs/03_method
-%% places figs/03_<slug>.pdf); 00 is kept for an asset this file includes
+%% inputs figs/03_<slug>.tex); 00 is kept for an asset this file includes
 %% directly, as the teaser slot above does (conventions §10.6).
 %% Example shape:
 % \input{secs/01_intro}

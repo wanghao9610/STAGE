@@ -1,7 +1,7 @@
 ---
 name: stage-clms-auditor
 description: >-
-  Trace every number in manus/tabs/ and manus/secs/ through its % src: comment and the claim ledger to
+  Trace every number in manus/tabs/, figs/, and secs/ through its % src: comment and the claim ledger to
   a fingerprinted mates/ entry, grade it matched, mismatched, or unsourced, and flip its status in
   notes/claims.md. Use when the user invokes stage-clms-auditor, stage-auto starts it, before a
   submission freeze, or when asked whether the paper's numbers are backed by evidence. Never edits the
@@ -13,9 +13,9 @@ description: >-
 Invocation: `stage-clms-auditor [SECTION | CLAIM_ID] [DESCRIPTION]` — a section argument resolves
 per conventions §5 and audits that section's numbers; a claim ID (`C7`) audits one ledger claim
 everywhere its `Stated in` reaches (unknown ID → ask, conventions §7); no argument audits all of
-`manus/tabs/` and `manus/secs/`. Anything left after that is a description (conventions §7.13): in
+`manus/tabs/`, `manus/figs/*.tex`, and `manus/secs/`. Anything left after that is a description (conventions §7.13): in
 your own words, what this run is for. Prose that resolves to neither a section nor a claim is
-description alone, not a missing target — audit all of `manus/tabs/` and `manus/secs/`, and say so
+description alone, not a missing target — audit all of `manus/tabs/`, `manus/figs/*.tex`, and `manus/secs/`, and say so
 in the reply's first line. A lone token that looks like a section or a claim ID and matches none
 is not a description: it stays the ambiguity above. A description can steer which numbers get the
 closest read; it never moves a verdict, which the evidence fixes. An `involve=<level>` token is
@@ -60,7 +60,8 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    operands reproduces it at its stated precision; a recomputation that disagrees is `mismatched`,
    and a missing derivation or an operand that does not trace makes it `unsourced`.
 3. **The trace has a fixed order.** In `manus/tabs/`: the data row's own
-   `% src: mates/<...>#<anchor>` comment. In `manus/secs/`: an inline `% src:` comment when the
+   `% src: mates/<...>#<anchor>` comment. In a figure file `manus/figs/<nn>_<slug>.tex`: the
+   caption sentence's own `% src:` comment. In `manus/secs/`: an inline `% src:` comment when the
    drafter left one, else the Evidence link of the ledger claim that sentence states (a claim
    whose `Stated in` names this file); a sentence that states no ledger claim, or whose claim has
    Evidence `—`, leaves its numbers unsourced. Nothing else counts — a number merely "consistent
@@ -91,7 +92,7 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    `stage-tabs-builder`, per the promise it keeps in `tasks/<cycle>_promises.md` — returns it to
    `drafted`, after which verification is the ordinary path.
 7. **Fan out the trace (§6).** More than one `.tex` file in scope → one delegate per in-scope
-   `manus/secs/` and `manus/tabs/` file, each reading its one `.tex` file plus `notes/claims.md` and
+   `manus/secs/`, `manus/tabs/`, and `manus/figs/*.tex` file, each reading its one `.tex` file plus `notes/claims.md` and
    `mates/MANIFEST.md` (read-only), following Principle 3's order for its own numbers, opening the
    cited `mates/` file at its anchor, and returning one row per number — Where (`file:line`),
    Value, Bin (traced / declared-`\todo` / cited-work, Step 5), Claim (the ledger ID the sentence
@@ -121,9 +122,9 @@ read-only, conventions §10 — numbers are fixed upstream in STAR and re-import
    `notes/outline.md`. Real date from the system clock (conventions §4). No `notes/claims.md` →
    it is `stage-stry-coach`'s to create (conventions §8): this run creates none and ingests no
    backlog row, and its closing command is `stage-stry-coach`.
-2. **Resolve scope (conventions §5).** Section → its `secs/` file plus every table it `\input`s
-   or `\ref`s; claim ID → every file its `Stated in` names; none → all of `manus/tabs/` and
-   `manus/secs/`.
+2. **Resolve scope (conventions §5).** Section → its `secs/` file plus every table and figure
+   file it `\input`s or `\ref`s; claim ID → every file its `Stated in` names; none → all of
+   `manus/tabs/`, `manus/figs/*.tex`, and `manus/secs/`.
 3. **Staleness gate.** Run `execs/scpts/import.sh --diff` (shell) and record the result: clean, or
    the drifted / new-upstream / missing-upstream lists. Drifted paths taint matches (Principle
    5). No STAR source configured → note it and continue; MANIFEST fingerprints remain the
