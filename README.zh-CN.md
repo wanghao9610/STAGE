@@ -36,6 +36,7 @@ STAGE 采用双层模型：本仓库是**模板**；一篇论文 = 一个**实�
 - [更新 STAGE 的 skill 与工作流文档](#更新-stage-的-skill-与工作流文档)
 - [项目约定](#项目约定)
 - [将 STAGE 用于新论文](#将-stage-用于新论文)
+- [更新日志](#更新日志)
 - [引用](#引用)
 - [许可证](#许可证)
 
@@ -518,6 +519,42 @@ bash execs/update.sh --skill stage-flow-status
 - 安装进论文实例后，每个所选宿主都是自包含的。直接检出模板时，具名目录可能把共用文件链接到 `.agents/skills/`，所以删除共享根目录前要先把准备保留的目录实体化；使用 Codex 时必须同时保留 `.agents/`，每个宿主自己的钩子和配置文件也要随它的 skill 一起保留。
 
 骨架本身可独立使用：目录布局、`.env`、`execs/run.sh` 与 `execs/scpts/lint.sh` 在完全不装任何 skill 的情况下也能工作，因此删掉全部工具目录同样是受支持的用法。一篇论文一个仓库——第二篇论文是模板的第二个实例，而不是这里的第二棵目录树。
+
+## 更新日志
+
+按日期列出要点，最新在前。`bash execs/update.sh` 跟随 `main`。
+
+- **2026-10-09** —— 图改为一个 LaTeX 文件 `manus/figs/<nn>_<slug>.tex`，其中包含浮动体、图题（其中每个数值或比较性的句子都带自己的 `% src:` 行）与 `\label{fig:<slug>}`，以及内联的 TikZ 或 `\includegraphics{figs/srcs/<nn>_<slug>}`；章节用 `\input{figs/<nn>_<slug>}` 放置它，与放置表格相同。渲染出的 PDF、PPTX、脚本、来源映射与渲染记录以图文件同名放在 `manus/figs/srcs/` 下，`stage.sty` 设置 `\graphicspath{{figs/srcs/}}`。图题改由 `stage-figs-designer` 撰写（此前由 `stage-sect-drafter` 写），并把其中的论断记入 `notes/claims.md`；起草者只负责放置。`stage-subm-packer` 只打包 `figs/*.tex` 及其引用的图形，绝不打包 PPTX、脚本或来源映射；各审计 skill、`stage-copy-editor` 与 `lint.sh` 像覆盖表格标题一样覆盖图题。`manus/figs/` 下出现其他文件，或图文件引用的图形另有名字时，`lint.sh` 会警告。
+- **2026-10-08** —— LaTeX Workshop 改为通过 `bash execs/run.sh` 构建，编辑器因此遵守 `LATEX_ENGINE`，以及让 `manus/stys/` 中的会议模板类按裸文件名加载同目录文件所需的 `TEXINPUTS`。此前 `% !TeX program` 一行优先于 `% !LW recipe`，会直接运行引擎；原有 recipe 保留作后备。仓库根目录的 `latexmkrc` 为每个引擎加上 `-synctex=1`：不带它的一次引擎运行会删掉已有的 `.synctex.gz`，于是一次命令行构建会让编辑器与 PDF 之间的跳转失效，直到下一次修改源文件。
+- **2026-10-06** —— 模型分档路由移除：`STAGE_PLAN_MODEL`、`STAGE_EXEC_MODEL`、`STAGE_READ_MODEL` 从 `.env.example` 删去，各 skill、扇出与规约都不再指定档位。参数提示与 STAR、STORY 统一为同一种写法：只读与审计类 skill 标 `[involve=<level>]`，`/stage-auto` 写出建议的档位，原先带笼统的 `[TARGET] [DESCRIPTION] [involve=low|medium|high]` 的十二个 Pi 提示模板，现在各自带上该 skill 自己的提示。
+
+<details>
+<summary>更早的更新</summary>
+
+- **2026-09-27** —— 章节文件改为 `secs/<nn>_<slug>.tex`：第一位数字表示部分（0 为正文，1 为附录），第二位表示部分内的顺序（`00_abstract`、`01_intro`……`10_appx-details`）。图、图的源文件与表格采用引入它们的那个文件的键——`secs/03_method.tex` 放置 `figs/03_framework.pdf`，`00` 属于 `main.tex`——slug 一律为小写短横线形式，在目录内唯一。预告图（teaser）在 `\maketitle` 之后有一个注释掉的位置，规划好后由 `stage-outl-planner` 取消注释。`lint.sh` 会对不合此规则的命名与引入者错误发出警告，并改为按 TeX 的方式读取源文件：偶数个反斜杠之后的注释、跨注释连接的行、分在多行的引入目标。非 UTF-8 字节、无法读取的文件或 FIFO 不再让它中止或挂起；`ANON` 必须恰为 `true` 或 `false`，此前行尾注释会让身份泄露扫描被跳过。
+- **2026-09-26** —— 交叉引用打印首字母大写的名称：`cleveref` 以 `capitalise` 选项加载，`stage.sty` 把 `\autoref` 的名称设为一致的写法（Section、Appendix、Figure、Table……），并在每次 babel 切换语言后重新设置。未设置 `STAGE_LANG` 时回复所跟随的对话语言，改为取自用户最近一条用自己的话写的消息——绝不取自单独的命令行、粘贴的文本、工具输出，或运行时加载的英文 skill——因此只有一条斜杠命令的一轮不会再把中文对话切换成英文。
+- **2026-09-25** —— 一次无界面场景测试跑了十五次真实的 skill 运行，据此修复如下。提交守卫（全部七份副本）能识别 `sudo`、`xargs`、`timeout`、`eval` 等包装命令，并拒绝删除或移动远程 tag 的推送，dry run 则放行。Bash 放行钩子在 `involve=low` 下不再为每个 skill 开头读取 `.env` 的那一步提示，加了引号的 `;` 或 `|` 也不再能藏住一次覆盖。`execs/update.sh` 在缺少时安装 `.latexindent.yaml` 与 `.editorconfig`，`import.sh --diff` 把重新导入即可消除的漂移，与上游缺失或被篡改的文件区分开，全部十六个 skill 都把规约读到 §13（harness 钩子与模型溯源）末尾。
+- **2026-09-24** —— `/stage-auto <目标>` 朝一个明确的目标推进：先运行 `stage-flow-status`，再启动每次交接点名的未标记 skill（共十个），遇到任何标 † 的 skill、专为作者做选择而设的模式或重复时停下。它先对 `git status` 做快照，在开头一行写出 `mates/` 下的脏证据，从不写入 `mates/`；要求审计或评审的目标不会启动任何写作 skill。其他运行现在都以报告和确切的下一条命令结束，继续推进交给 `/stage-auto`。路由器的中文版退役。
+- **2026-09-24** —— 人类写作指南、项目记忆规范与模型 ID 规范并入规约，一次读取即可得到所有共享规则；工作流图按 STAR 的运行顺序布局重画。`execs/update.sh` 恢复为只新增和覆盖：不再删除 STAGE 停止提供的文件，改由 README 列出、自行删除。每个 skill 同时获得了一个模型档位，已于 2026-10-06 再次移除。
+- **2026-09-24** —— 一次评审把每条规则追溯到必须执行它的 skill。每个大纲与台账状态现在都有写入者，每条路由都指向能接手的 skill；`lint.sh`、`run.sh` 与模板落实规约承诺的关口——构建失败会留下 `wkdrs/builds/main.failed`，该文件存在时 `lint.sh --no-build` 拒绝运行。`stage-subm-packer` 会标出最近一次审计未核验的论断。
+- **2026-09-24** —— 钩子补上一次对抗性检查发现的缺口。Bash 放行钩子与提交守卫按 shell 实际拼读的方式读取命令，因此 `\rm`、`r''m` 与 `$'rm'` 都是 `rm`，也能看穿环境变量前缀、`env`、`command` 与串联命令。编辑放行钩子在 `involve=low` 下，对隔着双斜杠的 `mates/` 和已解包的会议模板包保留提示。受托者写的文件记录受托者自己的模型；Claude、Qwen 与 DSH 的溯源行对解析器参数做 shell 转义；Pi 与 Cursor 把写文件的受托者派给能写入的代理。
+- **2026-09-23** —— 没有任何运行加载的中文副本全部删除：`SKILL_zh.md` 各版本、四个 harness 树中的 `stage.zh-CN.md` 命令包装，以及工作流文档与 `AGENTS.md` 的 `.zh-CN.md` 副本。调用中的 `involve=` 现在能传到 Claude 的编辑放行钩子；新增的 `stage_bash_gate.sh` 让 `INVOLVE=low` 对 STAGE 红线之外的命令跳过 Claude 的 shell 提示。已给出的明确授权在其范围内不再重复询问；推荐的命令在档位与 `.env` 不同时写出 involve 档位。
+- **2026-09-23** —— 项目记忆按事实的去向分流：只在本机成立的事实，或用户不想进仓库的事实，写入 git 忽略的 `.stage/memory/local/`，其余写入随仓库的 `.stage/memory/`。索引由各文件 frontmatter 的 `summary` 生成，`MEMORY.md` 随之取消，Codex 在每次会话开始时都会加载它。Claude 的受托者在 `SubagentStart` 时解析自己的模型 ID，Codex 的溯源行写出确切 ID。另外修复：`stage-refs-curator` 先查 workshop 档位再查会议行，`stage-flow-status` 能跟随符号链接的目录，每个 skill 的描述都控制在 DSH 目录的 500 字符以内。
+- **2026-08-25** —— `import.sh --diff` 在有漂移时以 2 退出、硬错误仍为 1，skill 不会再把配置错误的 `STAR_HOME` 误当成过期证据；`ANON` 扫描忽略注释。Qwen、DSH 与 Pi 的提交守卫采用 STAGE 的规则集，包括冻结 tag 保护。`unsourced` 与 `weakened` 论断有了回到 `verified` 的合规路径。每次运行收尾都以 harness 自己的调用语法逐字写出下一步的确切命令。
+- **2026-08-24** —— `.agents/skills/` 成为唯一的手写副本，由 `port.sh` 生成六个具名 harness 树。`stage-copy-editor` 在新的人类写作指南下加入以证据为界的自然写作，`lint.sh` 输出提示性的文字警告。
+- **2026-08-23** —— harness 树与 STAR 对齐为七个。Codex 与 Kimi 各获得一个 `/stage` 路由插件，README 介绍 STAR · STAGE · STORY 家族，LaTeX Workshop 以 XeLaTeX recipe 构建 `main-zh.tex`。
+- **2026-08-18** —— 共享的工作流用语与 STAR 同步，产出表与论断记录表采用 STAR 的名称。基于手动登记证据的论断会注明：其数值如何选出，没有上游检查。
+- **2026-08-12** —— 参考文献列表不再像数据库导出：随附 `stage.bst`，`arxiv.cls` 改名为 `stage.cls`。每个 skill 都可在目标之后接一段自由描述（规约 §7.13），并配有十六个参数提示。
+- **2026-08-10** —— `stage-peer-reviewer extern=<path>` 用同一个五视角评审组评审一篇不是本仓库写的论文，不涉及 cycle、构建与论断记录表。
+- **2026-08-08** —— `stage-figs-designer` 新增经 Codex 图像生成到 PPTX 的流程。`INVOLVE=low` 不经询问即提交，由提交守卫钩子兜底。
+- **2026-08-07** —— 论文的语气成为一个文件：`notes/style.md` 保存运行时应用、报告中度量的各项参数。委派改为凡工作可拆分处即扇出，共十六个扇出点，且不再询问许可。`stage-flow-status` 通过一次 `scan.sh` 调用读取登记表，不再逐个文件读取。
+- **2026-08-06** —— `stage-refs-curator` 的阅读扇出为每篇论文一个受托者，同行评审组的各视角自己检索，每个 skill 都写明所在 harness 的派发工具——不写的话扇出从不触发。
+- **2026-08-05** —— 每份工作流产物都记录写它的模型。`reference.bib` 有了成文的 citekey 与溯源格式，`stage-refs-curator discover` 为未与 STAR 配对的仓库按主题检索，停止条件取代请求配额。第十六个 skill `stage-pstr-builder` 把录用的论文做成海报。稿件一句一行，`execs/scpts/fmt.sh` 只调整格式、不改文字。
+- **2026-08-04** —— 点名的下一步会被执行，而不只是打印出来。中文描述保持一行，YAML 折叠不再在词中间插入空格。
+- **2026-08-03** —— Cursor 与 Kimi Code 的 skill 树及中文版本上线，并有覆盖全部四棵树的一致性检查。所有入口中环境变量优先于 `.env`。`stage-subm-packer` 以生成副本的方式产出会议格式，而不是就地替换。项目主页、工作流图、让编辑器构建不落在源码树里的 LaTeX Workshop 设置、`execs/update.sh --force`、按 STAR 结构编写的 `AGENTS.md`，以及每篇论文自己的 `.stage/memory/` 记忆也一并加入。
+- **2026-08-02** —— STAGE 首个发布：写作工作流规约、十五个 `stage-*` skill、`execs/` 下的可执行层，以及带锚定评分标准的 `stage-peer-reviewer` 五视角评审组。
+
+</details>
 
 ## 引用
 
