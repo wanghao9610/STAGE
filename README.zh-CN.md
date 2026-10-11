@@ -2,7 +2,7 @@
   <img src="docs/srcs/stage-project-icon.png" alt="STAGE 项目图标" width="128">
   <h1>STAGE</h1>
   <p><strong>Systematic Toolchain for Authoring, Guiding, and Editing</strong></p>
-  <p><em>STAR 的学术写作伴侣 —— every STAR needs a STAGE。</em></p>
+  <p><em>STAR takes the STAGE to tell a STORY.</em></p>
   <p><a href="https://wanghao9610.github.io/STAGE/"><strong>文档站点</strong></a></p>
 </div>
 

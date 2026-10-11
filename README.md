@@ -2,7 +2,7 @@
   <img src="docs/srcs/stage-project-icon.png" alt="STAGE project icon" width="128">
   <h1>STAGE</h1>
   <p><strong>Systematic Toolchain for Authoring, Guiding, and Editing</strong></p>
-  <p><em>The academic-writing companion to STAR — every STAR needs a STAGE.</em></p>
+  <p><em>STAR takes the STAGE to tell a STORY.</em></p>
   <p><a href="https://wanghao9610.github.io/STAGE/"><strong>Documentation site</strong></a></p>
 </div>
 
